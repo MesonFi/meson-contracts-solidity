@@ -1,0 +1,2 @@
+# meson-contracts-solidity
+ 

@@ -1,0 +1,21 @@
+{
+  "name": "meson-contracts-solidity",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "4.2.0",
+    "@openzeppelin/hardhat-upgrades": "^1.11.0",
+    "chai": "^4.3.4",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.4.7",
+    "hardhat": "2.5.0"
+  },
+  "scripts": {
+    "build": "hardhat compile --config hardhat.config.js",
+    "cleanbuild": "hardhat clean && hardhat compile --config hardhat.config.js",
+    "deploy": "hardhat run scripts/deploy.js"
+  }
+}

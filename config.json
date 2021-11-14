@@ -1,0 +1,17 @@
+{
+  "main": "./contracts/Meson.sol",
+  "deploy": "",
+  "framework": "hardhat",
+  "npmClient": "yarn",
+  "compilers": {
+    "solc": "0.8.6",
+    "truffle": "",
+    "evmVersion": "istanbul"
+  },
+  "linter": "solhint",
+  "editor": {
+    "fontFamily": "Hack",
+    "fontSize": "13px",
+    "ligatures": false
+  }
+}
