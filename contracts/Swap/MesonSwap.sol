@@ -13,6 +13,7 @@ import "./IMesonSwap.sol";
 import "./MesonSwapStore.sol";
 import "../Pricing/MesonPricing.sol";
 
+/// @title MesonSwap
 contract MesonSwap is
   Context,
   MesonConfig,
@@ -23,6 +24,7 @@ contract MesonSwap is
   uint256 public lockingAmount;
   uint256 public swaped;
 
+  /// @inheritdoc IMesonSwap
   function requestSwap(
     uint256 amount,
     address inToken,
@@ -45,12 +47,14 @@ contract MesonSwap is
     return swapId;
   }
 
+  /// @inheritdoc IMesonSwap
   function bondSwap(bytes32 swapId, address provider)
     public
     override
     swapExists(swapId)
     swapUnbonded(swapId)
   {
+    require(_msgSender() == provider, "must be signed by provider");
     requests[swapId].provider = provider;
     requests[swapId].bondUntil = LowGasSafeMath.add(
       block.timestamp,
@@ -58,8 +62,10 @@ contract MesonSwap is
     );
   }
 
+  /// @inheritdoc IMesonSwap
   function unbondSwap(bytes32 swapId) public override {}
 
+  /// @inheritdoc IMesonSwap
   function executeSwap(
     bytes32 swapId,
     bytes memory signature,
@@ -80,6 +86,7 @@ contract MesonSwap is
     IERC20Minimal(inToken).transferFrom(address(this), provider, amount);
   }
 
+  /// @inheritdoc IMesonSwap
   function cancelSwap(bytes32 swapId)
     public
     override
@@ -89,11 +96,13 @@ contract MesonSwap is
     // TODO
   }
 
+  /// @dev Check the swap for the given swapId exsits
   modifier swapExists(bytes32 swapId) {
     require(requests[swapId].metaAmount > 0, "swap not found");
     _;
   }
 
+  /// @dev Check the swap is bonded
   modifier swapBonded(bytes32 swapId) {
     require(
       requests[swapId].provider != address(0) &&
@@ -103,6 +112,7 @@ contract MesonSwap is
     _;
   }
 
+  /// @dev Check the swap is unbonded
   modifier swapUnbonded(bytes32 swapId) {
     require(
       requests[swapId].provider == address(0) ||

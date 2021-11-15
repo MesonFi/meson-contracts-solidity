@@ -10,6 +10,7 @@ import "../interfaces/IERC20Minimal.sol";
 import "./IMesonPools.sol";
 import "../Pricing/MesonPricing.sol";
 
+/// @title MesonPools
 contract MesonPools is Context, MesonPricing, IMesonPools {
   mapping(address => mapping(address => uint256)) public balanceOf;
 
@@ -17,6 +18,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
   mapping(address => uint256) public epochTsOf;
   mapping(address => uint256) public releasedInEpochOf;
 
+  /// @inheritdoc IMesonPools
   function deposit(address token, uint256 amount)
     public
     override
@@ -31,6 +33,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     _transferToken(token, provider, address(this), amount);
   }
 
+  /// @inheritdoc IMesonPools
   function withdraw(address token, uint256 amount)
     public
     override
@@ -69,10 +72,13 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     IERC20Minimal(token).transferFrom(sender, receiver, amount); // test this is a valid token
   }
 
+  /// @inheritdoc IMesonPools
   function pause() public override {}
 
+  /// @inheritdoc IMesonPools
   function unpause() public override {}
 
+  /// @inheritdoc IMesonPools
   function release(
     address provider,
     bytes memory signature,
@@ -92,7 +98,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
 
     require(epoch == epochOf[provider], "invalid epoch");
     require(
-      _signatureValid(
+      _isSignatureValid(
         provider,
         signature,
         metaAmount,
@@ -108,6 +114,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     _withdrawTo(receiver, provider, outToken, amount);
   }
 
+  /// @inheritdoc IMesonPools
   function challenge(
     address provider,
     bytes memory signature,
@@ -118,7 +125,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     uint256 epoch
   ) public override {
     require(
-      _signatureValid(
+      _isSignatureValid(
         provider,
         signature,
         metaAmount,
@@ -132,7 +139,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     // TODO
   }
 
-  function _signatureValid(
+  function _isSignatureValid(
     address provider,
     bytes memory signature,
     uint256 metaAmount,

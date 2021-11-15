@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
+/// @title MesonSwapStore
 contract MesonSwapStore {
   struct SwapRequest {
     uint256 amount;
@@ -13,7 +14,8 @@ contract MesonSwapStore {
     uint256 bondUntil;
   }
 
-  mapping(bytes32 => SwapRequest) public requests; // swap requests by swapIds
+  /// @notice swap requests by swapIds
+  mapping(bytes32 => SwapRequest) public requests;
 
   function _newRequest(
     bytes32 swapId,

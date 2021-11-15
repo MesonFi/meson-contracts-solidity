@@ -11,11 +11,14 @@
     "chai": "^4.3.4",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.7",
-    "hardhat": "2.5.0"
+    "hardhat": "2.5.0",
+    "solc-0.8.6": "npm:solc@0.8.6",
+    "solidity-docgen": "^0.5.16"
   },
   "scripts": {
     "build": "hardhat compile --config hardhat.config.js",
     "cleanbuild": "hardhat clean && hardhat compile --config hardhat.config.js",
-    "deploy": "hardhat run scripts/deploy.js"
+    "deploy": "hardhat run scripts/deploy.js",
+    "docgen": "solidity-docgen --solc-module solc-0.8.6 -t ./templates"
   }
 }

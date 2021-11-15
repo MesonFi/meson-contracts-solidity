@@ -3,6 +3,7 @@ pragma solidity 0.8.6;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+/// @notice Parameters of the Meson contract
 contract MesonConfig is Ownable {
   string constant CURRENT_CHAIN = "ETH";
 

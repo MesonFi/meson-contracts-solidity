@@ -4,8 +4,6 @@ pragma solidity 0.8.6;
 import "./Swap/MesonSwap.sol";
 import "./Pools/MesonPools.sol";
 
-// import "./MesonPricing.sol";
-
 contract Meson is MesonSwap, MesonPools {
   address pricingContract;
 

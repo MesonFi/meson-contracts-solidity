@@ -8,6 +8,9 @@ import "../libraries/List.sol";
 
 import "../MesonConfig.sol";
 
+/// @title MesonPricing
+/// @notice The class that keeps track of token supplies and swap requests,
+/// and calculates the prices of tokens based on them.
 contract MesonPricing is MesonConfig {
   using List for List.Bytes32List;
 
@@ -23,6 +26,7 @@ contract MesonPricing is MesonConfig {
   mapping(address => uint256) internal _tokenSupply;
   mapping(address => uint256) internal _tokenDemand;
 
+  /// @notice convert from real token amount to meta amount
   function _toMetaAmount(address token, uint256 amount)
     internal
     returns (uint256 metaAmount)
@@ -34,6 +38,7 @@ contract MesonPricing is MesonConfig {
     metaAmount = amount;
   }
 
+  /// @notice convert from meta amount to real token amount
   function _fromMetaAmount(address token, uint256 metaAmount)
     internal
     returns (uint256 amount)
@@ -45,23 +50,32 @@ contract MesonPricing is MesonConfig {
     amount = metaAmount;
   }
 
+  /// @notice Get total supply for a given token
   function totalSupplyFor(address token) external view returns (uint256) {
     return _tokenSupply[token];
   }
 
+  /// @notice Get total demand for a given token
   function totalDemandFor(address token) external view returns (uint256) {
     return _tokenSupply[token];
   }
 
+  /// @notice Increase supply for a given token; will be called when
+  /// a liquidity provider add tokens to the pool
   function _increaseSupply(address token, uint256 amount) internal {
     _tokenSupply[token] = LowGasSafeMath.add(_tokenSupply[token], amount);
   }
 
+  /// @notice Decrease supply for a given token; will be called when
+  /// a liquidity provider withdraw tokens to the pool, or a swap
+  /// is released
   function _decreaseSupply(address token, uint256 amount) internal {
     require(_tokenSupply[token] > amount, "overdrawn");
     _tokenSupply[token] = LowGasSafeMath.sub(_tokenSupply[token], amount);
   }
 
+  /// @notice Update demand for a given token; will be called when
+  /// a swap is released
   function _updateDemand(address token, uint256 amount) internal {
     uint256 ts = block.timestamp;
     bytes32 id = keccak256(abi.encodePacked(ts, token, amount)); // TODO something else
@@ -71,6 +85,8 @@ contract MesonPricing is MesonConfig {
     _tokenDemand[token] = LowGasSafeMath.add(_tokenDemand[token], amount);
   }
 
+  /// @notice Remove expired swaps and update demand for a given token;
+  /// swaps will not count to total demands after TOTAL_DEMAND_CALC_PERIOD
   function _removeExpiredSwaps(address token) private {
     uint256 current = block.timestamp;
     List.Bytes32List storage list = _recentSwapLists[token];
@@ -87,6 +103,7 @@ contract MesonPricing is MesonConfig {
     }
   }
 
+  /// @notice Get swap ID as a user
   function _getSwapId(
     uint256 metaAmount,
     address inToken,
@@ -112,6 +129,7 @@ contract MesonPricing is MesonConfig {
       );
   }
 
+  /// @notice Get swap ID as a liquidity provider
   function _getSwapIdAsProvider(
     uint256 metaAmount,
     string memory inToken,
