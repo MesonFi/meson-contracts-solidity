@@ -1,5 +1,6 @@
 require('@nomiclabs/hardhat-waffle')
 require('@nomiclabs/hardhat-ethers')
+require('@typechain/hardhat')
 require('@openzeppelin/hardhat-upgrades')
 const config = require('./config.json')
 
@@ -24,6 +25,11 @@ module.exports = {
       optimizer: config.compilers.optimizer,
       evmVersion: config.compilers.evmVersion,
     },
+  },
+  typechain: {
+    outDir: 'types',
+    target: 'ethers-v5',
+    alwaysGenerateOverloads: false,
   },
   defaultNetwork: 'obsidians',
   networks: {
