@@ -14,6 +14,9 @@ import "./MesonSwapStore.sol";
 import "../Pricing/MesonPricing.sol";
 
 /// @title MesonSwap
+/// @notice The class to receive and process swap requests.
+/// Methods in this class will be executed by users or LPs when
+/// users initiate swaps in the current chain.
 contract MesonSwap is
   Context,
   MesonConfig,

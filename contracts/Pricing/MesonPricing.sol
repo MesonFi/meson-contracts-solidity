@@ -67,7 +67,7 @@ contract MesonPricing is MesonConfig {
   }
 
   /// @notice Decrease supply for a given token; will be called when
-  /// a liquidity provider withdraw tokens to the pool, or a swap
+  /// a liquidity provider withdraw tokens from the pool or a swap
   /// is released
   function _decreaseSupply(address token, uint256 amount) internal {
     require(_tokenSupply[token] > amount, "overdrawn");
@@ -103,7 +103,7 @@ contract MesonPricing is MesonConfig {
     }
   }
 
-  /// @notice Get swap ID as a user
+  /// @notice Get ID for a swap on the chain the swap is initiated
   function _getSwapId(
     uint256 metaAmount,
     address inToken,
@@ -129,7 +129,7 @@ contract MesonPricing is MesonConfig {
       );
   }
 
-  /// @notice Get swap ID as a liquidity provider
+  /// @notice Get ID for a swap on the target chain the swap is requested
   function _getSwapIdAsProvider(
     uint256 metaAmount,
     string memory inToken,

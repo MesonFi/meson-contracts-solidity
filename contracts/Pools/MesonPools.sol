@@ -11,6 +11,9 @@ import "./IMesonPools.sol";
 import "../Pricing/MesonPricing.sol";
 
 /// @title MesonPools
+/// @notice The class to manage liquidity pools for providers.
+/// Methods in this class will be executed by LPs when users want to
+/// swap into the current chain.
 contract MesonPools is Context, MesonPricing, IMesonPools {
   mapping(address => mapping(address => uint256)) public balanceOf;
 
@@ -34,7 +37,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
   }
 
   /// @inheritdoc IMesonPools
-  function withdraw(address token, uint256 amount)
+  function withdraw(address token, uint256 amount, uint256 epoch)
     public
     override
     tokenSupported(token)
@@ -44,6 +47,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     _withdrawTo(provider, provider, token, amount);
   }
 
+  // @notice Perform the withdraw operations and update internal states
   function _withdrawTo(
     address receiver,
     address provider,
@@ -63,20 +67,24 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     _transferToken(token, address(this), receiver, amount);
   }
 
+  // @notice Execute the token transfer transaction
   function _transferToken(
     address token,
     address sender,
     address receiver,
     uint256 amount
   ) private {
-    IERC20Minimal(token).transferFrom(sender, receiver, amount); // test this is a valid token
+    IERC20Minimal(token).transferFrom(sender, receiver, amount);
   }
+
 
   /// @inheritdoc IMesonPools
   function pause() public override {}
 
+
   /// @inheritdoc IMesonPools
   function unpause() public override {}
+
 
   /// @inheritdoc IMesonPools
   function release(
@@ -114,6 +122,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     _withdrawTo(receiver, provider, outToken, amount);
   }
 
+
   /// @inheritdoc IMesonPools
   function challenge(
     address provider,
@@ -139,6 +148,8 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     // TODO
   }
 
+
+  /// @notice Verify the submitted signature
   function _isSignatureValid(
     address provider,
     bytes memory signature,
