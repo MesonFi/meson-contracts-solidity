@@ -47,6 +47,9 @@ contract MesonSwap is
     _newRequest(swapId, amount, metaAmount, inToken, chain, outToken, receiver);
 
     IERC20Minimal(inToken).transferFrom(provider, address(this), amount);
+
+    emit RequestPosted(swapId, metaAmount, inToken, chain, outToken, receiver);
+
     return swapId;
   }
 
@@ -63,6 +66,8 @@ contract MesonSwap is
       block.timestamp,
       BOND_TIME_PERIOD
     );
+
+    emit RequestBonded(swapId, provider);
   }
 
   /// @inheritdoc IMesonSwap
@@ -87,6 +92,8 @@ contract MesonSwap is
     _updateDemand(inToken, amount);
 
     IERC20Minimal(inToken).transferFrom(address(this), provider, amount);
+
+    emit RequestExecuted(swapId);
   }
 
   /// @inheritdoc IMesonSwap

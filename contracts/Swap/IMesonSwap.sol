@@ -64,4 +64,32 @@ interface IMesonSwap {
   /// @dev Designed to be used by users
   /// @param swapId The ID of the swap
   function cancelSwap(bytes32 swapId) external;
+
+  /// @notice Event when a new swap request has been posted.
+  /// Emit at the end of `requestSwap()` calls.
+  /// @param swapId The ID of the swap
+  /// @param amount The contract address of either token0 or token1
+  /// @param inToken The contract address of the given token
+  /// @param chain The target chain name
+  /// @param outToken The type of token
+  /// @param receiver The address of the output token
+  event RequestPosted(
+      bytes32 swapId,
+      uint256 amount,
+      address inToken,
+      string chain,
+      string outToken,
+      string receiver
+  );
+
+  /// @notice Event when a swap request has been bonded.
+  /// Emit at the end of `bondSwap()` calls.
+  /// @param swapId The ID of the swap
+  /// @param bondedProvider The address of the bonded provider
+  event RequestBonded(bytes32 swapId, address bondedProvider);
+
+  /// @notice Event when a swap request has been fully executed.
+  /// Emit at the end of `executeSwap()` calls.
+  /// @param swapId The ID of the swap
+  event RequestExecuted(bytes32 swapId);
 }
