@@ -29,10 +29,13 @@ library List {
 
   /// @notice Get the tail item of the list (but not remove it)
   /// @param list The list
-  /// @return item The tail item
+  /// @return item The tail item. Returns 0 if the list is empty.
   function getTail(Bytes32List storage list) public view returns (bytes32) {
-    require(list._length > 0, "list is empty");
-    return list._items[list._tail];
+    if (list._length > 0) {
+      return list._items[list._tail];
+    } else {
+      return 0;
+    }
   }
 
   /// @notice Get the tail item and remove it
