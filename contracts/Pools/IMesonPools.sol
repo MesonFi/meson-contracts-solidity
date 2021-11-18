@@ -76,4 +76,10 @@ interface IMesonPools {
     address receiver,
     uint256 epoch
   ) external;
+
+  /// @notice Event when a swap request has been released.
+  /// Emit at the end of `release()` calls.
+  /// @param swapId The ID of the swap
+  /// @param epoch The epoch (ref. xxx)
+  event RequestReleased(bytes32 swapId, uint256 epoch);
 }

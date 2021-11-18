@@ -118,8 +118,12 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
       "invalid signature"
     );
 
+    bytes32 swapId =
+      _getSwapIdAsProvider(metaAmount, inToken, outToken, receiver);
     uint256 amount = _fromMetaAmount(outToken, metaAmount);
     _withdrawTo(receiver, provider, outToken, amount);
+
+    emit RequestReleased(swapId, epoch);
   }
 
 
