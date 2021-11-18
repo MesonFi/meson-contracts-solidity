@@ -23,7 +23,7 @@ library List {
     } else {
       list._head = list._head + 1;
     }
-    list._items[list._head] = id;
+    list._items.push(id);
     list._length = list._length + 1;
   }
 
@@ -36,6 +36,7 @@ library List {
       item = list._items[list._tail];
       success = true;
     } else {
+      item = 0;
       success = false;
     }
   }
@@ -46,11 +47,13 @@ library List {
   /// @return item The tail item
   function popItem(Bytes32List storage list) internal returns (bool success, bytes32 item) {
     if (list._length == 0) {
+      item = 0;
       success = false;
     } else {
       item = list._items[list._tail];
       list._tail = list._tail + 1;
-      delete list._items[list._tail];
+      // TODO how to clear the memory?
+      // delete list._items[list._tail];
       list._length = list._length - 1;
       success = true;
     }
