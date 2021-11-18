@@ -12,11 +12,12 @@ describe('List', () => {
 
   beforeEach('deploy ListTest', async () => {
     list = await waffle.loadFixture(fixture)
+    await list.createNewList()
   })
 
-  describe('#createNewList', () => {
-    it('returns true', async () => {
-      await expect(list.createNewList()).to.be.true
+  describe('#getListLength', () => {
+    it('is 0', async () => {
+      expect(await list.getListLength()).to.eq(0)
     })
   })
 })

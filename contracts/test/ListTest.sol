@@ -11,6 +11,10 @@ contract ListTest {
   function createNewList() external returns (bool) {
     bytes32[] memory items;
     list = List.Bytes32List(0, 0, 0, items);
-    return true;
+    return false;
+  }
+
+  function getListLength() external view returns (uint256) {
+    return list._length;
   }
 }
