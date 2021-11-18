@@ -7,7 +7,7 @@ import "./Pools/MesonPools.sol";
 contract Meson is MesonSwap, MesonPools {
   address pricingContract;
 
-  constructor(address pricingContract_) {
-    pricingContract = pricingContract_;
+  constructor(address supportedToken) {
+    _addTokenToSwapList(supportedToken);
   }
 }
