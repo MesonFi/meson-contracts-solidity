@@ -17,7 +17,8 @@
     "mocha-chai-jest-snapshot": "^1.1.3",
     "solc-0.8.6": "npm:solc@0.8.6",
     "solidity-docgen": "^0.5.16",
-    "typechain": "^6.0.3"
+    "typechain": "^6.0.3",
+    "typescript": "^4.5.2"
   },
   "scripts": {
     "build": "hardhat compile --config hardhat.config.js",
