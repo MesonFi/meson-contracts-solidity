@@ -1,6 +1,5 @@
 import { ethers, waffle } from 'hardhat'
 import { expect } from './shared/expect'
-// import snapshotGasCost from './shared/snapshotGasCost'
 import { ListTest } from '../typechain/ListTest'
 
 const addr = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
@@ -14,15 +13,18 @@ describe('List', () => {
 
   beforeEach('deploy ListTest', async () => {
     list = await waffle.loadFixture(fixture)
-    // await list.createNewList(addr)
   })
+
+  const item1 = '0x0000000000000000000000000000000000000000000000000000000000000001'
+  const item2 = '0x0000000000000000000000000000000000000000000000000000000000000002'
+  const item3 = '0x0000000000000000000000000000000000000000000000000000000000000003'
+  const item4 = '0x0000000000000000000000000000000000000000000000000000000000000004'
 
   describe('#addItem', () => {
     it('is empty array', async () => {
       expect(await list.getListItems(addr)).to.be.an('array').that.is.empty;
     })
 
-    const item1 = '0x0000000000000000000000000000000000000000000000000000000000000001'
     it('add one item', async () => {
       await list.addItem(addr, item1)
 
@@ -32,8 +34,6 @@ describe('List', () => {
       // expect(await list.getTail(addr)).to.eq(item1)
     })
 
-    const item2 = '0x0000000000000000000000000000000000000000000000000000000000000002'
-    const item3 = '0x0000000000000000000000000000000000000000000000000000000000000003'
     it('add 3 items', async () => {
       await list.addItem(addr, item1)
       await list.addItem(addr, item2)
@@ -43,7 +43,9 @@ describe('List', () => {
       expect(await list.getListTail(addr)).to.eq(0)
       expect(await list.getListHead(addr)).to.eq(2)
     })
+  })
 
+  describe('#popItem', () => {
     it('add 3 items and remove 2', async () => {
       await list.addItem(addr, item1)
       await list.addItem(addr, item2)
@@ -70,7 +72,6 @@ describe('List', () => {
       expect(await list.getListHead(addr)).to.eq(2)
     })
 
-    const item4 = '0x0000000000000000000000000000000000000000000000000000000000000004'
     it('add 2 items, remove 3, and 2 items', async () => {
       await list.addItem(addr, item1)
       await list.addItem(addr, item2)
