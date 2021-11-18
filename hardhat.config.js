@@ -1,3 +1,4 @@
+require('@typechain/hardhat')
 require('@nomiclabs/hardhat-waffle')
 require('@nomiclabs/hardhat-ethers')
 require('@openzeppelin/hardhat-upgrades')
@@ -23,6 +24,12 @@ module.exports = {
     settings: {
       optimizer: config.compilers.optimizer,
       evmVersion: config.compilers.evmVersion,
+      metadata: {
+        // do not include the metadata hash, since this is machine dependent
+        // and we want all generated code to be deterministic
+        // https://docs.soliditylang.org/en/v0.7.6/metadata.html
+        bytecodeHash: 'none',
+      },
     },
   },
   defaultNetwork: 'obsidians',
@@ -34,4 +41,7 @@ module.exports = {
       timeout: 0,
     },
   },
+  typechain: {
+    outDir: 'typechain',
+  }
 }
