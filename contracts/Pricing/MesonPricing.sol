@@ -99,8 +99,8 @@ contract MesonPricing is MesonConfig {
     uint256 current = block.timestamp;
     List.Bytes32List storage list = _recentSwapLists[token];
 
-    bytes32 id = list.getTail();
-    if (id == 0) return; // list is empty, ignore
+    (bool success, bytes32 id) = list.getTail();
+    if (!success) return; // list is empty, ignore
 
     while (_swaps[token][id].ts + TOTAL_DEMAND_CALC_PERIOD < current) {
       _tokenDemand[token] = LowGasSafeMath.sub(
@@ -109,7 +109,7 @@ contract MesonPricing is MesonConfig {
       );
       list.popItem();
       delete _swaps[token][id];
-      id = list.getTail();
+      (success, id) = list.getTail();
     }
   }
 

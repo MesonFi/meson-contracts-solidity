@@ -29,26 +29,30 @@ library List {
 
   /// @notice Get the tail item of the list (but not remove it)
   /// @param list The list
+  /// @return success false means the list is empty.
   /// @return item The tail item. Returns 0 if the list is empty.
-  function getTail(Bytes32List storage list) internal view returns (bytes32) {
+  function getTail(Bytes32List storage list) internal view returns (bool success, bytes32 item) {
     if (list._length > 0) {
-      return list._items[list._tail];
+      item = list._items[list._tail];
+      success = true;
     } else {
-      return 0;
+      success = false;
     }
   }
 
   /// @notice Get the tail item and remove it
   /// @param list The list
+  /// @return success false means the list is empty.
   /// @return item The tail item
-  function popItem(Bytes32List storage list) internal returns (bytes32) {
-    require(list._length > 0, "list is empty");
-
-    bytes32 id = list._items[list._tail];
-    list._tail = list._tail + 1;
-    delete list._items[list._tail];
-    list._length = list._length - 1;
-
-    return id;
+  function popItem(Bytes32List storage list) internal returns (bool success, bytes32 item) {
+    if (list._length == 0) {
+      success = false;
+    } else {
+      item = list._items[list._tail];
+      list._tail = list._tail + 1;
+      delete list._items[list._tail];
+      list._length = list._length - 1;
+      success = true;
+    }
   }
 }
