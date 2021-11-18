@@ -31,7 +31,7 @@ contract MesonPricing is MesonConfig {
     internal
     returns (uint256 metaAmount)
   {
-    _removeExpiredSwaps(token);
+    // _removeExpiredSwaps(token);
     uint256 supply = _tokenSupply[token];
 
     // TODO
@@ -43,7 +43,7 @@ contract MesonPricing is MesonConfig {
     internal
     returns (uint256 amount)
   {
-    _removeExpiredSwaps(token);
+    // _removeExpiredSwaps(token);
     uint256 supply = _tokenSupply[token];
 
     // TODO
@@ -81,7 +81,7 @@ contract MesonPricing is MesonConfig {
     bytes32 id = keccak256(abi.encodePacked(ts, token, amount)); // TODO something else
     Swap memory swap = Swap(id, amount, ts);
     _swaps[token][id] = swap;
-    _recentSwapLists[token].addItem(id);
+    // _recentSwapLists[token].addItem(id);
     _tokenDemand[token] = LowGasSafeMath.add(_tokenDemand[token], amount);
   }
 
