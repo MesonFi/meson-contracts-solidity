@@ -15,7 +15,7 @@ library List {
   /// @notice Add a new item to the list
   /// @param list The list
   /// @param id The item to add
-  function addItem(Bytes32List storage list, bytes32 id) public {
+  function addItem(Bytes32List storage list, bytes32 id) internal {
     require(list._tail < list._tail + 1, "list overflow");
 
     if (list._length == 0) {
@@ -29,16 +29,19 @@ library List {
 
   /// @notice Get the tail item of the list (but not remove it)
   /// @param list The list
-  /// @return item The tail item
-  function getTail(Bytes32List storage list) public view returns (bytes32) {
-    require(list._length > 0, "list is empty");
-    return list._items[list._tail];
+  /// @return item The tail item. Returns 0 if the list is empty.
+  function getTail(Bytes32List storage list) internal view returns (bytes32) {
+    if (list._length > 0) {
+      return list._items[list._tail];
+    } else {
+      return 0;
+    }
   }
 
   /// @notice Get the tail item and remove it
   /// @param list The list
   /// @return item The tail item
-  function popItem(Bytes32List storage list) public returns (bytes32) {
+  function popItem(Bytes32List storage list) internal returns (bytes32) {
     require(list._length > 0, "list is empty");
 
     bytes32 id = list._items[list._tail];

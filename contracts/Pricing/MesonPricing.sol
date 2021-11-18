@@ -92,6 +92,8 @@ contract MesonPricing is MesonConfig {
     List.Bytes32List storage list = _recentSwapLists[token];
 
     bytes32 id = list.getTail();
+    if (id == 0) return; // list is empty, ignore
+
     while (_swaps[token][id].ts + TOTAL_DEMAND_CALC_PERIOD < current) {
       _tokenDemand[token] = LowGasSafeMath.sub(
         _tokenDemand[token],
