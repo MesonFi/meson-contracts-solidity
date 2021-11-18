@@ -8,8 +8,10 @@ const addr = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
 describe('List', () => {
   let mesonPricing: MesonPricingTest
   const fixture = async () => {
-    const factory = await ethers.getContractFactory('MesonPricingTest')
-    return (await factory.deploy(token)) as MesonPricingTest
+    const factory = await ethers.getContractFactory('MesonPricingTest');
+    const contract = (await factory.deploy(token)) as MesonPricingTest;
+    await contract.addSupportedToken(token);
+    return contract;
   }
 
   beforeEach('deploy MesonPricingTest', async () => {

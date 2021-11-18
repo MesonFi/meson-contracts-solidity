@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
 import "../libraries/LowGasSafeMath.sol";
 import "../libraries/List.sol";
@@ -28,7 +28,7 @@ contract MesonPricing is MesonConfig {
   mapping(address => uint256) internal _tokenSupply;
   mapping(address => uint256) internal _tokenDemand;
 
-  function _addTokenToSwapList (address token) internal {
+  function addSupportedToken(address token) public onlyOwner() {
     _supportedTokens[token] = true;
     bytes32[] memory items;
     _recentSwapLists[token] = List.Bytes32List(0, 0, 0, items);
@@ -134,7 +134,7 @@ contract MesonPricing is MesonConfig {
           ":",
           receiver,
           ":",
-          Strings.toString(metaAmount)
+          StringsUpgradeable.toString(metaAmount)
         )
       );
   }
@@ -159,7 +159,7 @@ contract MesonPricing is MesonConfig {
           ":",
           receiver,
           ":",
-          Strings.toString(metaAmount)
+          StringsUpgradeable.toString(metaAmount)
         )
       );
   }

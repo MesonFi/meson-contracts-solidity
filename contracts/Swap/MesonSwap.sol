@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
 
 import "../libraries/LowGasSafeMath.sol";
 import "../interfaces/IERC20Minimal.sol";
@@ -18,7 +18,7 @@ import "../Pricing/MesonPricing.sol";
 /// Methods in this class will be executed by users or LPs when
 /// users initiate swaps in the current chain.
 contract MesonSwap is
-  Context,
+  ContextUpgradeable,
   MesonConfig,
   IMesonSwap,
   MesonSwapStore,
@@ -81,7 +81,7 @@ contract MesonSwap is
   ) public override swapExists(swapId) swapBonded(swapId) {
     bytes32 swapHash = keccak256(abi.encodePacked(swapId, epoch));
     require(
-      ECDSA.recover(swapHash, signature) == requests[swapId].provider,
+      ECDSAUpgradeable.recover(swapHash, signature) == requests[swapId].provider,
       "invalid signature"
     );
 

@@ -38,7 +38,7 @@ export default {
   networks: {
     hardhat: {},
     obsidians: {
-      url: 'http://localhost:62743',
+      url: 'http://localhost:8545',
       accounts: 'remote',
       timeout: 0,
     },

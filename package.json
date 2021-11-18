@@ -6,7 +6,7 @@
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "@openzeppelin/contracts": "4.2.0",
+    "@openzeppelin/contracts-upgradeable": "^4.3.3",
     "@openzeppelin/hardhat-upgrades": "^1.11.0",
     "@typechain/ethers-v5": "^8.0.3",
     "@typechain/hardhat": "^3.0.0",
@@ -30,6 +30,7 @@
     "cleanbuild": "hardhat clean && hardhat compile --config hardhat.config.ts",
     "test": "hardhat test",
     "deploy": "hardhat run scripts/deploy.js",
+    "deploy_upgrade": "hardhat run scripts/upgrade.js",
     "docgen": "solidity-docgen --solc-module solc-0.8.6 -t ./templates"
   }
 }

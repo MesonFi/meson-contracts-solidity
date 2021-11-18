@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
 
 import "../libraries/LowGasSafeMath.sol";
 import "../interfaces/IERC20Minimal.sol";
@@ -14,7 +14,7 @@ import "../Pricing/MesonPricing.sol";
 /// @notice The class to manage liquidity pools for providers.
 /// Methods in this class will be executed by LPs when users want to
 /// swap into the current chain.
-contract MesonPools is Context, MesonPricing, IMesonPools {
+contract MesonPools is ContextUpgradeable, MesonPricing, IMesonPools {
   mapping(address => mapping(address => uint256)) public balanceOf;
 
   mapping(address => uint256) public epochOf;
@@ -167,7 +167,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
       _getSwapIdAsProvider(metaAmount, inToken, outToken, receiver);
     bytes32 swapHash = keccak256(abi.encodePacked(swapId, epoch));
     require(
-      ECDSA.recover(swapHash, signature) == provider,
+      ECDSAUpgradeable.recover(swapHash, signature) == provider,
       "invalid signature"
     );
     return true;
