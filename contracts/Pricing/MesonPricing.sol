@@ -20,18 +20,26 @@ contract MesonPricing is MesonConfig {
     uint256 ts;
   }
 
+  mapping(address => bool) private _supportedTokens;
+
   mapping(address => mapping(bytes32 => Swap)) private _swaps;
   mapping(address => List.Bytes32List) private _recentSwapLists;
 
   mapping(address => uint256) internal _tokenSupply;
   mapping(address => uint256) internal _tokenDemand;
 
+  function _addTokenToSwapList (address token) internal {
+    _supportedTokens[token] = true;
+    bytes32[] memory items;
+    _recentSwapLists[token] = List.Bytes32List(0, 0, 0, items);
+  }
+
   /// @notice convert from real token amount to meta amount
   function _toMetaAmount(address token, uint256 amount)
     internal
     returns (uint256 metaAmount)
   {
-    // _removeExpiredSwaps(token);
+    _removeExpiredSwaps(token);
     uint256 supply = _tokenSupply[token];
 
     // TODO
@@ -43,7 +51,7 @@ contract MesonPricing is MesonConfig {
     internal
     returns (uint256 amount)
   {
-    // _removeExpiredSwaps(token);
+    _removeExpiredSwaps(token);
     uint256 supply = _tokenSupply[token];
 
     // TODO
@@ -81,7 +89,7 @@ contract MesonPricing is MesonConfig {
     bytes32 id = keccak256(abi.encodePacked(ts, token, amount)); // TODO something else
     Swap memory swap = Swap(id, amount, ts);
     _swaps[token][id] = swap;
-    // _recentSwapLists[token].addItem(id);
+    _recentSwapLists[token].addItem(id);
     _tokenDemand[token] = LowGasSafeMath.add(_tokenDemand[token], amount);
   }
 
@@ -157,7 +165,7 @@ contract MesonPricing is MesonConfig {
   }
 
   modifier tokenSupported(address token) {
-    require(true, "unsupported token");
+    require(_supportedTokens[token], "unsupported token");
     _;
   }
 }
