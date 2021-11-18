@@ -1,8 +1,10 @@
-require('@typechain/hardhat')
-require('@nomiclabs/hardhat-waffle')
-require('@nomiclabs/hardhat-ethers')
-require('@openzeppelin/hardhat-upgrades')
-const config = require('./config.json')
+import '@typechain/hardhat'
+import '@nomiclabs/hardhat-waffle'
+import '@nomiclabs/hardhat-ethers'
+import '@openzeppelin/hardhat-upgrades'
+
+import { task } from "hardhat/config";
+import config from './config.json'
 
 task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners()
@@ -18,11 +20,11 @@ task('balance', `Prints an account's balance`)
     console.log(hre.ethers.utils.formatEther(balance), 'ETH')
   })
 
-module.exports = {
+export default {
   solidity: {
     version: config.compilers.solc,
     settings: {
-      optimizer: config.compilers.optimizer,
+      // optimizer: config.compilers.optimizer,
       evmVersion: config.compilers.evmVersion,
       metadata: {
         // do not include the metadata hash, since this is machine dependent
