@@ -20,7 +20,7 @@ contract MesonPricing is MesonConfig {
     uint256 ts;
   }
 
-  mapping(address => bool) private _supportedTokens;
+  mapping(address => bool) public supportedTokens;
 
   mapping(address => mapping(bytes32 => Swap)) private _swaps;
   mapping(address => List.Bytes32List) private _recentSwapLists;
@@ -29,7 +29,7 @@ contract MesonPricing is MesonConfig {
   mapping(address => uint256) internal _tokenDemand;
 
   function _addTokenToSwapList (address token) internal {
-    _supportedTokens[token] = true;
+    supportedTokens[token] = true;
     bytes32[] memory items;
     _recentSwapLists[token] = List.Bytes32List(0, 0, 0, items);
   }
@@ -165,7 +165,7 @@ contract MesonPricing is MesonConfig {
   }
 
   modifier tokenSupported(address token) {
-    require(_supportedTokens[token], "unsupported token");
+    require(supportedTokens[token], "unsupported token");
     _;
   }
 }

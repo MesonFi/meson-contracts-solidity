@@ -5,9 +5,11 @@ import "./Swap/MesonSwap.sol";
 import "./Pools/MesonPools.sol";
 
 contract Meson is MesonSwap, MesonPools {
-  address pricingContract;
+  bool private initialized;
 
-  constructor(address supportedToken) {
-    _addTokenToSwapList(supportedToken);
+  function initialize(address _supportedToken) public {
+    require(!initialized, "Contract instance has already been initialized");
+    initialized = true;
+    _addTokenToSwapList(_supportedToken);
   }
 }
