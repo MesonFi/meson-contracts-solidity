@@ -28,7 +28,7 @@
   "scripts": {
     "build": "hardhat compile --config hardhat.config.ts",
     "cleanbuild": "hardhat clean && hardhat compile --config hardhat.config.ts",
-    "test": "hardhat test",
+    "test": "hardhat --network hardhat test",
     "deploy": "hardhat run scripts/deploy-upgradable.js",
     "upgrade": "hardhat run scripts/upgrade.js",
     "docgen": "solidity-docgen --solc-module solc-0.8.6 -t ./templates"
