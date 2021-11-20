@@ -8,11 +8,11 @@ contract MesonPricingTest is MesonPricing {
     _addTokenToSwapList(token);
   }
 
-  function increase(address token, uint256 amount) public {
+  function increaseSupply(address token, uint256 amount) public {
     _increaseSupply(token, amount);
   }
 
-  function decrease(address token, uint256 amount) public {
+  function decreaseSupply(address token, uint256 amount) public {
     _decreaseSupply(token, amount);
   }
 }
