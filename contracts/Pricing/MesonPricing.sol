@@ -78,7 +78,7 @@ contract MesonPricing is MesonConfig {
   /// a liquidity provider withdraw tokens from the pool or a swap
   /// is released
   function _decreaseSupply(address token, uint256 amount) internal {
-    require(_tokenSupply[token] > amount, "overdrawn");
+    require(_tokenSupply[token] >= amount, "overdrawn");
     _tokenSupply[token] = LowGasSafeMath.sub(_tokenSupply[token], amount);
   }
 

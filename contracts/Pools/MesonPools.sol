@@ -45,6 +45,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     tokenSupported(token)
   {
     address provider = _msgSender(); // this may not be the correct msg.sender
+    require(epoch == epochOf[provider], "wrong epoch"); // TODO allow to increase epoch by 1?
     _decreaseSupply(token, amount);
     _withdrawTo(provider, provider, token, amount);
   }
@@ -56,10 +57,10 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     address token,
     uint256 amount
   ) private {
-    require(balanceOf[token][provider] > amount, "overdrawn");
+    require(balanceOf[token][provider] >= amount, "overdrawn");
 
     uint256 newReleased = LowGasSafeMath.add(releasedInEpochOf[provider], amount);
-    require(newReleased < MAX_RELEASE_AMOUNT_BY_EPOCH, "overdrawn in epoch");
+    require(newReleased <= MAX_RELEASE_AMOUNT_BY_EPOCH, "overdrawn in epoch");
     releasedInEpochOf[provider] = newReleased;
 
     balanceOf[token][provider] = LowGasSafeMath.sub(
