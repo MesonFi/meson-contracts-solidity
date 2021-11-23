@@ -101,7 +101,7 @@ describe('MesonPools', () => {
       await contract.release(wallet.address, signature, amount, inToken, token.address, receiver, epoch)
 
       expect(await contract.balanceOf(token.address, wallet.address)).to.equal(1000 - amount)
-      expect(await token.balanceOf(addr)).to.equal(amount)
+      expect(await token.balanceOf(receiver)).to.equal(amount)
     })
 
     it('refuses unsupported token', async () => {
