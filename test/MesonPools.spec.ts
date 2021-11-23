@@ -1,6 +1,6 @@
 import { waffle } from 'hardhat'
 import { expect } from './shared/expect'
-import { wallet } from './shared/wallet'
+import { wallet, signSwap, Swap } from './shared/wallet'
 import { fixtures } from './shared/fixtures'
 import { MockToken } from '../typechain/MockToken'
 import { MesonPoolsTest } from '../typechain/MesonPoolsTest'
@@ -60,6 +60,10 @@ describe('MesonPools', () => {
       await expect(contract.withdraw(token.address, 1, 0)).to.be.revertedWith('overdrawn')
     })
 
+    it('refuses unsupported token', async () => {
+      await expect(contract.withdraw(unsupportedToken.address, 1000, 0)).to.be.revertedWith('unsupported token')
+    })
+
     it('refuses too much withdrawal in one epoch', async () => {
       await token.approve(contract.address, 2000000)
       await contract.deposit(token.address, 2000000)
@@ -70,6 +74,44 @@ describe('MesonPools', () => {
       await token.approve(contract.address, 1000)
       await contract.deposit(token.address, 1000)
       await expect(contract.withdraw(token.address, 1000, 1)).to.be.revertedWith('wrong epoch')
+    })
+  })
+
+
+  describe('#release', () => {
+    const inToken = 'IN_TOKEN_ADDR'
+    const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
+    const amount = 100
+    const epoch = 0
+
+    it('accepts 100 release', async () => {
+      await token.approve(contract.address, 1000)
+      await contract.deposit(token.address, 1000)
+
+      const swap: Swap = {
+        inToken,
+        outToken: token.address,
+        chain: 'ETH',
+        receiver,
+        amount,
+      }
+
+      const signature = signSwap(swap, epoch)
+
+      await contract.release(wallet.address, signature, amount, inToken, token.address, receiver, epoch)
+
+      expect(await contract.balanceOf(token.address, wallet.address)).to.equal(1000 - amount)
+      expect(await token.balanceOf(addr)).to.equal(amount)
+    })
+
+    it('refuses unsupported token', async () => {
+      await expect(contract.release(wallet.address, '0x', amount, inToken, unsupportedToken.address, receiver, epoch))
+        .to.be.revertedWith('unsupported token')
+    })
+
+    it('refuses wrong epoch', async () => {
+      await expect(contract.release(wallet.address, '0x', amount, inToken, token.address, receiver, epoch + 2))
+        .to.be.revertedWith('invalid epoch')
     })
   })
 })
