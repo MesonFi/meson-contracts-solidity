@@ -80,7 +80,7 @@ contract MesonSwap is
     bytes memory signature,
     uint256 epoch
   ) public override swapExists(swapId) swapBonded(swapId) {
-    bytes32 swapHash = keccak256(abi.encodePacked(swapId, ":", Strings.toString(epoch)));
+    bytes32 swapHash = _getSwapHash(swapId, epoch);
     require(
       ECDSA.recover(swapHash, signature) == requests[swapId].provider,
       "invalid signature"

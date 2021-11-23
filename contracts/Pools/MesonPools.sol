@@ -159,7 +159,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
   ) private returns (bytes32) {
     bytes32 swapId =
       _getSwapIdAsProvider(metaAmount, inToken, outToken, receiver);
-    bytes32 swapHash = keccak256(abi.encodePacked(swapId, ":", Strings.toString(epoch)));
+    bytes32 swapHash = _getSwapHash(swapId, epoch);
     require(
       ECDSA.recover(swapHash, signature) == provider,
       "invalid signature"
