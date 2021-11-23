@@ -16,6 +16,10 @@ contract MesonPricingTest is MesonPricing {
     _decreaseSupply(token, amount);
   }
 
+  function getSwapHash(bytes32 swapId, uint256 epoch) public pure returns (bytes32) {
+    return _getSwapHash(swapId, epoch);
+  }
+
   function getSwapId(
     uint256 metaAmount,
     address inToken,
