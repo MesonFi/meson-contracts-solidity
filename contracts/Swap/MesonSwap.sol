@@ -94,6 +94,8 @@ contract MesonSwap is
 
     IERC20Minimal(inToken).transferFrom(address(this), provider, amount);
 
+    _deleteRequest(swapId);
+
     emit RequestExecuted(swapId);
   }
 
