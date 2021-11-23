@@ -15,7 +15,7 @@ export type Swap = {
 }
 
 export function getSwapId(swap: Swap) {
-const bytes = concat([
+  const bytes = concat([
     toUtf8Bytes(swap.inToken),
     toUtf8Bytes(`:ETH:`),
     swap.outToken,
@@ -26,9 +26,13 @@ const bytes = concat([
   return keccak256(bytes)
 }
 
-export function signSwap(swap: Swap, epoch: number) {
-  const msg = concat([getSwapId(swap), toUtf8Bytes(`:${epoch}`)])
-  const swapHash = keccak256(msg)
+export function getSwapHash(swapId: string, epoch: number) {
+  const msg = concat([swapId, toUtf8Bytes(`:${epoch}`)]);
+  return keccak256(msg);
+}
 
+export function signSwap(swap: Swap, epoch: number) {
+  const swapId = getSwapId(swap);
+  const swapHash = getSwapHash(swapId, epoch);
   return joinSignature(wallet._signingKey().signDigest(swapHash))
 }
