@@ -2,6 +2,7 @@
 pragma solidity 0.8.6;
 
 import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "../libraries/LowGasSafeMath.sol";
@@ -79,7 +80,7 @@ contract MesonSwap is
     bytes memory signature,
     uint256 epoch
   ) public override swapExists(swapId) swapBonded(swapId) {
-    bytes32 swapHash = keccak256(abi.encodePacked(swapId, epoch));
+    bytes32 swapHash = keccak256(abi.encodePacked(swapId, ":", Strings.toString(epoch)));
     require(
       ECDSA.recover(swapHash, signature) == requests[swapId].provider,
       "invalid signature"

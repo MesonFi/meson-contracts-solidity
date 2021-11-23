@@ -2,6 +2,7 @@
 pragma solidity 0.8.6;
 
 import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "../libraries/LowGasSafeMath.sol";
@@ -107,7 +108,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     address outToken,
     address receiver,
     uint256 epoch
-  ) public override {
+  ) public override tokenSupported(outToken) {
     if (epoch == epochOf[provider] + 1) { // epoch can only increment by 1
       uint256 ts = block.timestamp;
       require(epochTsOf[provider] + EPOCH_TIME_PERIOD < ts, "increment epoch too fast");
@@ -117,21 +118,17 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     }
 
     require(epoch == epochOf[provider], "invalid epoch");
-    require(
-      _isSignatureValid(
-        provider,
-        signature,
-        metaAmount,
-        inToken,
-        outToken,
-        receiver,
-        epoch
-      ),
-      "invalid signature"
+
+    bytes32 swapId = _isSignatureValid(
+      provider,
+      signature,
+      metaAmount,
+      inToken,
+      outToken,
+      receiver,
+      epoch
     );
 
-    bytes32 swapId =
-      _getSwapIdAsProvider(metaAmount, inToken, outToken, receiver);
     uint256 amount = _fromMetaAmount(outToken, metaAmount);
     _withdrawTo(receiver, provider, outToken, amount);
 
@@ -149,19 +146,15 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     address receiver,
     uint256 epoch
   ) public override {
-    require(
-      _isSignatureValid(
-        provider,
-        signature,
-        metaAmount,
-        inToken,
-        outToken,
-        receiver,
-        epoch
-      ),
-      "invalid signature"
+    bytes32 swapId = _isSignatureValid(
+      provider,
+      signature,
+      metaAmount,
+      inToken,
+      outToken,
+      receiver,
+      epoch
     );
-    // TODO
   }
 
 
@@ -174,14 +167,14 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     address outToken,
     address receiver,
     uint256 epoch
-  ) private returns (bool) {
+  ) private returns (bytes32) {
     bytes32 swapId =
       _getSwapIdAsProvider(metaAmount, inToken, outToken, receiver);
-    bytes32 swapHash = keccak256(abi.encodePacked(swapId, epoch));
+    bytes32 swapHash = keccak256(abi.encodePacked(swapId, ":", Strings.toString(epoch)));
     require(
       ECDSA.recover(swapHash, signature) == provider,
       "invalid signature"
     );
-    return true;
+    return swapId;
   }
 }
