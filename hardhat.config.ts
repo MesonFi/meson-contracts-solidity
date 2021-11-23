@@ -24,7 +24,9 @@ export default {
   solidity: {
     version: config.compilers.solc,
     settings: {
-      // optimizer: config.compilers.optimizer,
+      optimizer: {
+        enabled: process.env.DEBUG ? false : true,
+      },
       evmVersion: config.compilers.evmVersion,
       metadata: {
         // do not include the metadata hash, since this is machine dependent
