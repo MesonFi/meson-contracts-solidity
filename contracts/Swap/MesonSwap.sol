@@ -40,7 +40,7 @@ contract MesonSwap is
 
     uint256 metaAmount = _toMetaAmount(inToken, amount);
     bytes32 swapId = _getSwapId(metaAmount, inToken, chain, outToken, receiver);
-    require(requests[swapId].metaAmount == 0, "swap conflict");
+    require(!_swapExists(swapId), "swap conflict");
 
     address provider = _msgSender();
     lockingAmount = LowGasSafeMath.add(lockingAmount, amount);
@@ -59,7 +59,7 @@ contract MesonSwap is
     public
     override
     swapExists(swapId)
-    swapUnbonded(swapId)
+    swapUnbondedOrExpired(swapId)
   {
     require(_msgSender() == provider, "must be signed by provider");
     requests[swapId].provider = provider;
@@ -72,7 +72,7 @@ contract MesonSwap is
   }
 
   /// @inheritdoc IMesonSwap
-  function unbondSwap(bytes32 swapId) public override {}
+  function unbondSwap(bytes32 swapId) public override swapExists(swapId) {}
 
   /// @inheritdoc IMesonSwap
   function executeSwap(
@@ -102,34 +102,44 @@ contract MesonSwap is
     public
     override
     swapExists(swapId)
-    swapUnbonded(swapId)
+    swapUnbondedOrExpired(swapId)
   {
     // TODO
   }
 
   /// @dev Check the swap for the given swapId exsits
   modifier swapExists(bytes32 swapId) {
-    require(requests[swapId].metaAmount > 0, "swap not found");
+    require(_swapExists(swapId), "swap not found");
     _;
   }
 
   /// @dev Check the swap is bonded
   modifier swapBonded(bytes32 swapId) {
-    require(
-      requests[swapId].provider != address(0) &&
-        requests[swapId].bondUntil >= block.timestamp,
-      "swap not bonded"
-    );
+    require(_swapIsBonded(swapId), "swap not bonded");
     _;
   }
 
-  /// @dev Check the swap is unbonded
-  modifier swapUnbonded(bytes32 swapId) {
-    require(
-      requests[swapId].provider == address(0) ||
-        requests[swapId].bondUntil < block.timestamp,
-      "swap not bonded"
-    );
+  /// @dev Check the swap is not expired
+  modifier swapNotExpired(bytes32 swapId) {
+    require(!_swapIsExpired(swapId), "swap is expired");
     _;
+  }
+
+  /// @dev Check the swap is unbonded or expired
+  modifier swapUnbondedOrExpired(bytes32 swapId) {
+    require(!_swapIsBonded(swapId) || _swapIsExpired(swapId), "swap not bonded or expired");
+    _;
+  }
+
+  function _swapExists(bytes32 swapId) private returns (bool) {
+    return requests[swapId].metaAmount > 0;
+  }
+
+  function _swapIsBonded(bytes32 swapId) private returns (bool) {
+    return requests[swapId].provider != address(0);
+  }
+
+  function _swapIsExpired(bytes32 swapId) private returns (bool) {
+    return requests[swapId].bondUntil >= block.timestamp;
   }
 }
