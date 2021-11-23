@@ -16,7 +16,7 @@ export type Swap = {
 
 export function getSwapId(swap: Swap) {
 const bytes = concat([
-    swap.inToken,
+    toUtf8Bytes(swap.inToken),
     toUtf8Bytes(`:ETH:`),
     swap.outToken,
     toUtf8Bytes(':'),
