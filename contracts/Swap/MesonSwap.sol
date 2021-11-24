@@ -91,7 +91,7 @@ contract MesonSwap is
     address provider = requests[swapId].provider;
 
     _updateDemand(inToken, amount);
-
+    _deleteRequest(swapId);
     emit RequestExecuted(swapId);
 
     _safeTransfer(inToken, provider, amount);
