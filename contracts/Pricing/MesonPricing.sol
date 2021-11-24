@@ -28,7 +28,7 @@ contract MesonPricing is MesonConfig {
   mapping(address => uint256) internal _tokenSupply;
   mapping(address => uint256) internal _tokenDemand;
 
-  function _addTokenToSwapList (address token) internal {
+  function _addTokenToSwapList(address token) internal {
     supportedTokens[token] = true;
     bytes32[] memory items;
     _recentSwapLists[token] = List.Bytes32List(0, 0, 0, items);
@@ -115,7 +115,7 @@ contract MesonPricing is MesonConfig {
 
   /// @notice Get Hash for a swap on the chain the swap is initiated
   function _getSwapHash(bytes32 swapId, uint256 epoch) internal pure returns (bytes32) {
-      return keccak256(abi.encodePacked(swapId, ":", epoch));
+    return keccak256(abi.encodePacked(swapId, ":", epoch));
   }
 
   /// @notice Get ID for a swap on the chain the swap is initiated
@@ -126,19 +126,20 @@ contract MesonPricing is MesonConfig {
     bytes memory outToken,
     bytes memory receiver
   ) internal pure returns (bytes32) {
-    return keccak256(
-      abi.encodePacked(
-        inToken,
-        ":",
-        chain,
-        ":",
-        outToken,
-        ":",
-        receiver,
-        ":",
-        metaAmount
-      )
-    );
+    return
+      keccak256(
+        abi.encodePacked(
+          inToken,
+          ":",
+          chain,
+          ":",
+          outToken,
+          ":",
+          receiver,
+          ":",
+          metaAmount
+        )
+      );
   }
 
   /// @notice Get ID for a swap on the target chain the swap is requested
@@ -148,19 +149,20 @@ contract MesonPricing is MesonConfig {
     address outToken,
     address receiver
   ) internal pure returns (bytes32) {
-    return keccak256(
-      abi.encodePacked(
-        inToken,
-        ":",
-        CURRENT_CHAIN,
-        ":",
-        outToken,
-        ":",
-        receiver,
-        ":",
-        metaAmount
-      )
-    );
+    return
+      keccak256(
+        abi.encodePacked(
+          inToken,
+          ":",
+          CURRENT_CHAIN,
+          ":",
+          outToken,
+          ":",
+          receiver,
+          ":",
+          metaAmount
+        )
+      );
   }
 
   modifier tokenSupported(address token) {
