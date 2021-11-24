@@ -176,7 +176,7 @@ contract MesonPricing is MesonConfig {
   /// @param token The contract address of the token which will be transferred
   /// @param receiver The recipient of the transfer
   /// @param amount The value of the transfer
-  function _safeTransfer(address token, address receiver, uint256 amount) private {
+  function _safeTransfer(address token, address receiver, uint256 amount) internal {
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(ERC20_TRANSFER_SELECTOR, receiver, amount));
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
   }
