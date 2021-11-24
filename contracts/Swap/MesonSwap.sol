@@ -32,9 +32,9 @@ contract MesonSwap is
   function requestSwap(
     uint256 amount,
     address inToken,
-    string memory chain,
-    string memory outToken,
-    string memory receiver
+    bytes4 chain,
+    bytes memory outToken,
+    bytes memory receiver
   ) public override tokenSupported(inToken) returns (bytes32) {
     // TODO: how to allow contracts to use and make sure it is safe?
 
@@ -80,7 +80,7 @@ contract MesonSwap is
     bytes memory signature,
     uint256 epoch
   ) public override swapExists(swapId) swapBonded(swapId) {
-    bytes32 swapHash = keccak256(abi.encodePacked(swapId, ":", Strings.toString(epoch)));
+    bytes32 swapHash = _getSwapHash(swapId, epoch);
     require(
       ECDSA.recover(swapHash, signature) == requests[swapId].provider,
       "invalid signature"

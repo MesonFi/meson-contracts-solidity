@@ -93,7 +93,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     address provider,
     bytes memory signature,
     uint256 metaAmount,
-    string memory inToken,
+    bytes memory inToken,
     address outToken,
     address receiver,
     uint256 epoch
@@ -130,7 +130,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     address provider,
     bytes memory signature,
     uint256 metaAmount,
-    string memory inToken,
+    bytes memory inToken,
     address outToken,
     address receiver,
     uint256 epoch
@@ -152,14 +152,14 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     address provider,
     bytes memory signature,
     uint256 metaAmount,
-    string memory inToken,
+    bytes memory inToken,
     address outToken,
     address receiver,
     uint256 epoch
   ) private pure returns (bytes32) {
     bytes32 swapId =
       _getSwapIdAsProvider(metaAmount, inToken, outToken, receiver);
-    bytes32 swapHash = keccak256(abi.encodePacked(swapId, ":", Strings.toString(epoch)));
+    bytes32 swapHash = _getSwapHash(swapId, epoch);
     require(
       ECDSA.recover(swapHash, signature) == provider,
       "invalid signature"

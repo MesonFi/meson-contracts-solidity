@@ -7,9 +7,9 @@ contract MesonSwapStore {
     uint256 amount;
     uint256 metaAmount;
     address inToken;
-    string chain;
-    string outToken;
-    string receiver; // could be an hex42 address (eth) or in other types
+    bytes4 chain;
+    bytes outToken;
+    bytes receiver; // could be an hex42 address (eth) or in other types
     address provider;
     uint256 bondUntil;
   }
@@ -22,9 +22,9 @@ contract MesonSwapStore {
     uint256 amount,
     uint256 metaAmount,
     address inToken,
-    string memory chain,
-    string memory outToken,
-    string memory receiver
+    bytes4 chain,
+    bytes memory outToken,
+    bytes memory receiver
   ) internal {
     requests[swapId] = SwapRequest({
       amount: amount,

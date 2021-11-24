@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
 
-const { concat, toUtf8Bytes, keccak256, joinSignature } = ethers.utils
+const { joinSignature, solidityKeccak256 } = ethers.utils
 
 // default mnemonic for hardhat network
 const mnemonic = 'test test test test test test test test test test test junk'
@@ -15,20 +15,21 @@ export type Swap = {
 }
 
 export function getSwapId(swap: Swap) {
-const bytes = concat([
-    toUtf8Bytes(swap.inToken),
-    toUtf8Bytes(`:ETH:`),
-    swap.outToken,
-    toUtf8Bytes(':'),
-    swap.receiver,
-    toUtf8Bytes(`:${swap.amount}`)
-  ])
-  return keccak256(bytes)
+  return solidityKeccak256(
+    ["bytes", "string", "bytes4", "string", "bytes", "string", "bytes", "string", "uint256"],
+    [swap.inToken, ":", swap.chain, ":", swap.outToken, ":", swap.receiver, ":", swap.amount]
+  )
+}
+
+export function getSwapHash(swapId: string, epoch: number) {
+  return solidityKeccak256(
+    ["bytes32", "string", "uint256"],
+    [swapId, ":", epoch]
+  )
 }
 
 export function signSwap(swap: Swap, epoch: number) {
-  const msg = concat([getSwapId(swap), toUtf8Bytes(`:${epoch}`)])
-  const swapHash = keccak256(msg)
-
+  const swapId = getSwapId(swap)
+  const swapHash = getSwapHash(swapId, epoch)
   return joinSignature(wallet._signingKey().signDigest(swapHash))
 }

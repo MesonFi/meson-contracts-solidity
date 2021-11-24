@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/utils/Strings.sol";
-
 import "../libraries/LowGasSafeMath.sol";
 import "../libraries/List.sol";
 
@@ -30,7 +28,7 @@ contract MesonPricing is MesonConfig {
   mapping(address => uint256) internal _tokenSupply;
   mapping(address => uint256) internal _tokenDemand;
 
-  function _addTokenToSwapList (address token) internal {
+  function _addTokenToSwapList(address token) internal {
     supportedTokens[token] = true;
     bytes32[] memory items;
     _recentSwapLists[token] = List.Bytes32List(0, 0, 0, items);
@@ -115,16 +113,19 @@ contract MesonPricing is MesonConfig {
     }
   }
 
+  /// @notice Get hash for a swap on the chain the swap is initiated
+  function _getSwapHash(bytes32 swapId, uint256 epoch) internal pure returns (bytes32) {
+    return keccak256(abi.encodePacked(swapId, ":", epoch));
+  }
+
   /// @notice Get ID for a swap on the chain the swap is initiated
   function _getSwapId(
     uint256 metaAmount,
     address inToken,
-    string memory chain,
-    string memory outToken,
-    string memory receiver
+    bytes4 chain,
+    bytes memory outToken,
+    bytes memory receiver
   ) internal pure returns (bytes32) {
-    // TODO allow users to submit same swap request multiple times
-    // like add nonce?
     return
       keccak256(
         abi.encodePacked(
@@ -136,7 +137,7 @@ contract MesonPricing is MesonConfig {
           ":",
           receiver,
           ":",
-          Strings.toString(metaAmount)
+          metaAmount
         )
       );
   }
@@ -144,12 +145,10 @@ contract MesonPricing is MesonConfig {
   /// @notice Get ID for a swap on the target chain the swap is requested
   function _getSwapIdAsProvider(
     uint256 metaAmount,
-    string memory inToken,
+    bytes memory inToken,
     address outToken,
     address receiver
   ) internal pure returns (bytes32) {
-    // TODO allow users to submit same swap request multiple times
-    // like add nonce?
     return
       keccak256(
         abi.encodePacked(
@@ -161,7 +160,7 @@ contract MesonPricing is MesonConfig {
           ":",
           receiver,
           ":",
-          Strings.toString(metaAmount)
+          metaAmount
         )
       );
   }

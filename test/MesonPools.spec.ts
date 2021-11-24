@@ -1,4 +1,4 @@
-import { waffle } from 'hardhat'
+import { ethers, waffle } from 'hardhat'
 import { expect } from './shared/expect'
 import { wallet, signSwap, Swap } from './shared/wallet'
 import { fixtures } from './shared/fixtures'
@@ -79,7 +79,8 @@ describe('MesonPools', () => {
 
 
   describe('#release', () => {
-    const inToken = 'IN_TOKEN_ADDR'
+    const chain = '0x8000003c' // for ETH by SLIP-44
+    const inToken = ethers.utils.toUtf8Bytes('IN_TOKEN_ADDR')
     const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
     const amount = 100
     const epoch = 0
@@ -91,7 +92,7 @@ describe('MesonPools', () => {
       const swap: Swap = {
         inToken,
         outToken: token.address,
-        chain: 'ETH',
+        chain,
         receiver,
         amount,
       }
