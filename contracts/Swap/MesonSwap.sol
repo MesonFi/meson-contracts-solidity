@@ -127,6 +127,7 @@ contract MesonSwap is
 
   /// @dev Check the swap is unbonded or expired
   modifier swapUnbondedOrExpired(bytes32 swapId) {
+    // TODO: get requests[swapId] first and pass down may save gas?
     require(!_swapIsBonded(swapId) || _swapIsExpired(swapId), "swap not bonded or expired");
     _;
   }
