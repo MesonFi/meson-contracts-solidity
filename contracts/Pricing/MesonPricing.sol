@@ -20,6 +20,8 @@ contract MesonPricing is MesonConfig {
     uint256 ts;
   }
 
+  bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
+
   mapping(address => bool) public supportedTokens;
 
   mapping(address => mapping(bytes32 => Swap)) private _swaps;

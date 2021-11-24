@@ -16,8 +16,6 @@ import "../Pricing/MesonPricing.sol";
 /// Methods in this class will be executed by LPs when users want to
 /// swap into the current chain.
 contract MesonPools is Context, MesonPricing, IMesonPools {
-  bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
-
   mapping(address => mapping(address => uint256)) public balanceOf;
 
   mapping(address => uint256) public epochOf;
