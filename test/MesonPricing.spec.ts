@@ -63,13 +63,13 @@ describe('MesonPricing', () => {
         chain,
         outToken,
         receiver
-      );
+      )
       const swapIdAsProvider = await contract.getSwapIdAsProvider(
         amount,
         inToken,
         outToken,
         receiver
-      );
+      )
       expect(swapId).to.equal(swapIdAsUser)
       expect(swapId).to.equal(swapIdAsProvider)
     })

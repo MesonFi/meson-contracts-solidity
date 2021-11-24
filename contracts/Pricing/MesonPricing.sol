@@ -113,7 +113,7 @@ contract MesonPricing is MesonConfig {
     }
   }
 
-  /// @notice Get Hash for a swap on the chain the swap is initiated
+  /// @notice Get hash for a swap on the chain the swap is initiated
   function _getSwapHash(bytes32 swapId, uint256 epoch) internal pure returns (bytes32) {
     return keccak256(abi.encodePacked(swapId, ":", epoch));
   }

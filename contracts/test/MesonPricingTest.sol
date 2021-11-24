@@ -36,7 +36,6 @@ contract MesonPricingTest is MesonPricing {
     );
   }
 
-  /// @notice Get ID for a swap on the target chain the swap is requested
   function getSwapIdAsProvider(
     uint256 metaAmount,
     bytes memory inToken,
