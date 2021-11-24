@@ -37,4 +37,8 @@ contract MesonSwapStore {
       bondUntil: 0
     });
   }
+
+  function _deleteRequest(bytes32 swapId) internal {
+    delete requests[swapId];
+  }
 }

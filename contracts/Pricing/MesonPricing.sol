@@ -18,6 +18,8 @@ contract MesonPricing is MesonConfig {
     uint256 ts;
   }
 
+  bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
+
   mapping(address => bool) public supportedTokens;
 
   mapping(address => mapping(bytes32 => Swap)) private _swaps;
@@ -191,5 +193,15 @@ contract MesonPricing is MesonConfig {
   modifier tokenSupported(address token) {
     require(supportedTokens[token], "unsupported token");
     _;
+  }
+
+  /// @notice Safe transfers tokens from msg.sender to a recipient
+  /// for interacting with ERC20 tokens that do not consistently return true/false
+  /// @param token The contract address of the token which will be transferred
+  /// @param receiver The recipient of the transfer
+  /// @param amount The value of the transfer
+  function _safeTransfer(address token, address receiver, uint256 amount) internal {
+    (bool success, bytes memory data) = token.call(abi.encodeWithSelector(ERC20_TRANSFER_SELECTOR, receiver, amount));
+    require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
   }
 }
