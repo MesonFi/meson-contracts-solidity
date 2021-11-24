@@ -132,15 +132,15 @@ contract MesonSwap is
     _;
   }
 
-  function _swapExists(bytes32 swapId) private returns (bool) {
+  function _swapExists(bytes32 swapId) private view returns (bool) {
     return requests[swapId].metaAmount > 0;
   }
 
-  function _swapIsBonded(bytes32 swapId) private returns (bool) {
+  function _swapIsBonded(bytes32 swapId) private view returns (bool) {
     return requests[swapId].provider != address(0);
   }
 
-  function _swapIsExpired(bytes32 swapId) private returns (bool) {
+  function _swapIsExpired(bytes32 swapId) private view returns (bool) {
     return requests[swapId].bondUntil >= block.timestamp;
   }
 }

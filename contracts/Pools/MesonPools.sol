@@ -156,7 +156,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     address outToken,
     address receiver,
     uint256 epoch
-  ) private returns (bytes32) {
+  ) private pure returns (bytes32) {
     bytes32 swapId =
       _getSwapIdAsProvider(metaAmount, inToken, outToken, receiver);
     bytes32 swapHash = keccak256(abi.encodePacked(swapId, ":", Strings.toString(epoch)));

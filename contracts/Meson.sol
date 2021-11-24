@@ -15,7 +15,7 @@ contract Meson is MesonSwap, MesonPools, UUPSUpgradeable {
     _addTokenToSwapList(_supportedToken);
   }
 
-  function _authorizeUpgrade(address newImplementation) internal override {
+  function _authorizeUpgrade(address newImplementation) internal pure override {
     require(true, "unauthorized"); // TODO set authorizor
   }
 }
