@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/utils/Strings.sol";
-
 import "../libraries/LowGasSafeMath.sol";
 import "../libraries/List.sol";
 
@@ -117,7 +115,7 @@ contract MesonPricing is MesonConfig {
 
   /// @notice Get Hash for a swap on the chain the swap is initiated
   function _getSwapHash(bytes32 swapId, uint256 epoch) internal pure returns (bytes32) {
-      return keccak256(abi.encodePacked(swapId, ":", Strings.toString(epoch)));
+      return keccak256(abi.encodePacked(swapId, ":", epoch));
   }
 
   /// @notice Get ID for a swap on the chain the swap is initiated
@@ -128,6 +126,39 @@ contract MesonPricing is MesonConfig {
     string memory outToken,
     string memory receiver
   ) internal pure returns (bytes32) {
+    return _getSwapIdInternal(
+      _addressToString(inToken),
+      chain,
+      outToken,
+      receiver,
+      metaAmount
+    );
+  }
+
+  /// @notice Get ID for a swap on the target chain the swap is requested
+  function _getSwapIdAsProvider(
+    uint256 metaAmount,
+    string memory inToken,
+    address outToken,
+    address receiver
+  ) internal pure returns (bytes32) {
+    return _getSwapIdInternal(
+      inToken,
+      CURRENT_CHAIN,
+      _addressToString(outToken),
+      _addressToString(receiver),
+      metaAmount
+    );
+  }
+
+  /// @notice Get ID for a swap on the chain the swap is initiated
+  function _getSwapIdInternal(
+    string memory inToken,
+    string memory chain,
+    string memory outToken,
+    string memory receiver,
+    uint256 metaAmount
+  ) private pure returns (bytes32) {
     // TODO allow users to submit same swap request multiple times
     // like add nonce?
     return
@@ -141,34 +172,22 @@ contract MesonPricing is MesonConfig {
           ":",
           receiver,
           ":",
-          Strings.toString(metaAmount)
+          metaAmount
         )
       );
   }
 
-  /// @notice Get ID for a swap on the target chain the swap is requested
-  function _getSwapIdAsProvider(
-    uint256 metaAmount,
-    string memory inToken,
-    address outToken,
-    address receiver
-  ) internal pure returns (bytes32) {
-    // TODO allow users to submit same swap request multiple times
-    // like add nonce?
-    return
-      keccak256(
-        abi.encodePacked(
-          inToken,
-          ":",
-          CURRENT_CHAIN,
-          ":",
-          outToken,
-          ":",
-          receiver,
-          ":",
-          Strings.toString(metaAmount)
-        )
-      );
+  function _addressToString(address addr) private pure returns (string memory) {
+      bytes memory data = abi.encodePacked(addr);
+      bytes memory alphabet = "0123456789abcdef";
+      bytes memory str = new bytes(2 + data.length * 2);
+      str[0] = "0";
+      str[1] = "x";
+      for (uint i = 0; i < data.length; i++) {
+          str[2+i*2] = alphabet[uint(uint8(data[i] >> 4))];
+          str[3+i*2] = alphabet[uint(uint8(data[i] & 0x0f))];
+      }
+      return string(str);
   }
 
   modifier tokenSupported(address token) {
