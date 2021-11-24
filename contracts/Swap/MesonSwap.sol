@@ -115,32 +115,26 @@ contract MesonSwap is
 
   /// @dev Check the swap is bonded
   modifier swapBonded(bytes32 swapId) {
-    require(_swapIsBonded(swapId), "swap not bonded");
-    _;
-  }
-
-  /// @dev Check the swap is not expired
-  modifier swapNotExpired(bytes32 swapId) {
-    require(!_swapIsExpired(swapId), "swap is expired");
+    require(_isSwapBonded(swapId), "swap not bonded");
     _;
   }
 
   /// @dev Check the swap is unbonded or expired
   modifier swapUnbondedOrExpired(bytes32 swapId) {
     // TODO: get requests[swapId] first and pass down may save gas?
-    require(!_swapIsBonded(swapId) || _swapIsExpired(swapId), "swap not bonded or expired");
+    require(!_isSwapBonded(swapId) || _isSwapExpired(swapId), "swap bonded");
     _;
   }
 
-  function _swapExists(bytes32 swapId) private view returns (bool) {
+  function _swapExists(bytes32 swapId) internal view returns (bool) {
     return requests[swapId].metaAmount > 0;
   }
 
-  function _swapIsBonded(bytes32 swapId) private view returns (bool) {
+  function _isSwapBonded(bytes32 swapId) internal view returns (bool) {
     return requests[swapId].provider != address(0);
   }
 
-  function _swapIsExpired(bytes32 swapId) private view returns (bool) {
-    return requests[swapId].bondUntil >= block.timestamp;
+  function _isSwapExpired(bytes32 swapId) internal view returns (bool) {
+    return requests[swapId].bondUntil < block.timestamp;
   }
 }

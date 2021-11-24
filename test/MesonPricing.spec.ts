@@ -53,10 +53,10 @@ describe('MesonPricing', () => {
   const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
   const amount = 1
   const swap: Swap = { inToken, outToken, chain, receiver, amount }
+  const swapId = getSwapId(swap)
 
   describe('#getSwapId', () => {
     it('returns same result as getSwapIdAsProvider and the js function', async () => {
-      const swapId = getSwapId(swap)
       const swapIdAsUser = await contract.getSwapId(
         amount,
         inToken,
@@ -77,7 +77,6 @@ describe('MesonPricing', () => {
 
   describe('#getSwapHash', () => {
     it('returns same result as the js function', async () => {
-      const swapId = getSwapId(swap)
       const epoch = 10
       const swapHash = getSwapHash(swapId, epoch)
 

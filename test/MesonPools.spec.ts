@@ -12,7 +12,7 @@ describe('MesonPools', () => {
 
   beforeEach('deploy MesonPoolsTest', async () => {
     const result = await waffle.loadFixture(fixtures)
-    contract = result.contract
+    contract = result.pools
     token = result.token1
     unsupportedToken = result.token2
   })
