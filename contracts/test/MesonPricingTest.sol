@@ -23,9 +23,9 @@ contract MesonPricingTest is MesonPricing {
   function getSwapId(
     uint256 metaAmount,
     address inToken,
-    string memory chain,
-    string memory outToken,
-    string memory receiver
+    bytes memory chain,
+    bytes memory outToken,
+    bytes memory receiver
   ) public pure returns (bytes32) {
     return _getSwapId(
       metaAmount,
@@ -39,7 +39,7 @@ contract MesonPricingTest is MesonPricing {
   /// @notice Get ID for a swap on the target chain the swap is requested
   function getSwapIdAsProvider(
     uint256 metaAmount,
-    string memory inToken,
+    bytes memory inToken,
     address outToken,
     address receiver
   ) public pure returns (bytes32) {

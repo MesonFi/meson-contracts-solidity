@@ -93,7 +93,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     address provider,
     bytes memory signature,
     uint256 metaAmount,
-    string memory inToken,
+    bytes memory inToken,
     address outToken,
     address receiver,
     uint256 epoch
@@ -130,7 +130,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     address provider,
     bytes memory signature,
     uint256 metaAmount,
-    string memory inToken,
+    bytes memory inToken,
     address outToken,
     address receiver,
     uint256 epoch
@@ -152,7 +152,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     address provider,
     bytes memory signature,
     uint256 metaAmount,
-    string memory inToken,
+    bytes memory inToken,
     address outToken,
     address receiver,
     uint256 epoch

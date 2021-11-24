@@ -32,9 +32,9 @@ contract MesonSwap is
   function requestSwap(
     uint256 amount,
     address inToken,
-    string memory chain,
-    string memory outToken,
-    string memory receiver
+    bytes memory chain,
+    bytes memory outToken,
+    bytes memory receiver
   ) public override tokenSupported(inToken) returns (bytes32) {
     // TODO: how to allow contracts to use and make sure it is safe?
 
