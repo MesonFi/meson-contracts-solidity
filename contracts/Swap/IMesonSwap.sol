@@ -16,7 +16,7 @@ interface IMesonSwap {
   function requestSwap(
     uint256 amount,
     address inToken,
-    bytes memory chain,
+    bytes4 chain,
     bytes memory outToken,
     bytes memory receiver
   ) external returns (bytes32);
@@ -77,7 +77,7 @@ interface IMesonSwap {
       bytes32 swapId,
       uint256 amount,
       address inToken,
-      bytes chain,
+      bytes4 chain,
       bytes outToken,
       bytes receiver
   );

@@ -5,7 +5,8 @@ pragma solidity 0.8.6;
 
 /// @notice Parameters of the Meson contract
 contract MesonConfig {
-  string constant CURRENT_CHAIN = "ETH";
+  // Ref https://github.com/satoshilabs/slips/blob/master/slip-0044.md
+  bytes4 constant CURRENT_CHAIN = 0x8000003c;
 
   uint256 constant BOND_TIME_PERIOD = 1 hours;
 

@@ -122,7 +122,7 @@ contract MesonPricing is MesonConfig {
   function _getSwapId(
     uint256 metaAmount,
     address inToken,
-    bytes memory chain,
+    bytes4 chain,
     bytes memory outToken,
     bytes memory receiver
   ) internal pure returns (bytes32) {

@@ -7,7 +7,7 @@ contract MesonSwapStore {
     uint256 amount;
     uint256 metaAmount;
     address inToken;
-    bytes chain;
+    bytes4 chain;
     bytes outToken;
     bytes receiver; // could be an hex42 address (eth) or in other types
     address provider;
@@ -22,7 +22,7 @@ contract MesonSwapStore {
     uint256 amount,
     uint256 metaAmount,
     address inToken,
-    bytes memory chain,
+    bytes4 chain,
     bytes memory outToken,
     bytes memory receiver
   ) internal {

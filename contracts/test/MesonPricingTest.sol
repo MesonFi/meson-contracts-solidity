@@ -23,7 +23,7 @@ contract MesonPricingTest is MesonPricing {
   function getSwapId(
     uint256 metaAmount,
     address inToken,
-    bytes memory chain,
+    bytes4 chain,
     bytes memory outToken,
     bytes memory receiver
   ) public pure returns (bytes32) {

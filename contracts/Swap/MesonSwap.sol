@@ -32,7 +32,7 @@ contract MesonSwap is
   function requestSwap(
     uint256 amount,
     address inToken,
-    bytes memory chain,
+    bytes4 chain,
     bytes memory outToken,
     bytes memory receiver
   ) public override tokenSupported(inToken) returns (bytes32) {
