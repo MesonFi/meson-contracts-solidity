@@ -16,20 +16,20 @@ export type Swap = {
 
 export function getSwapId(swap: Swap) {
   return solidityKeccak256(
-    ["string", "string", "string", "string", "string", "string", "string", "string", "uint256"],
+    ["bytes", "string", "bytes4", "string", "bytes", "string", "bytes", "string", "uint256"],
     [swap.inToken, ":", swap.chain, ":", swap.outToken, ":", swap.receiver, ":", swap.amount]
-  );
+  )
 }
 
 export function getSwapHash(swapId: string, epoch: number) {
   return solidityKeccak256(
     ["bytes32", "string", "uint256"],
     [swapId, ":", epoch]
-  );
+  )
 }
 
 export function signSwap(swap: Swap, epoch: number) {
-  const swapId = getSwapId(swap);
-  const swapHash = getSwapHash(swapId, epoch);
+  const swapId = getSwapId(swap)
+  const swapHash = getSwapHash(swapId, epoch)
   return joinSignature(wallet._signingKey().signDigest(swapHash))
 }

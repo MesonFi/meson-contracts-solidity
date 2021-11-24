@@ -1,11 +1,9 @@
 import { ethers, waffle } from 'hardhat'
 import { expect } from './shared/expect'
-import { wallet, signSwap, Swap, getSwapId, getSwapHash } from './shared/wallet'
+import { Swap, getSwapId, getSwapHash } from './shared/wallet'
 import { MesonPricingTest } from '../typechain/MesonPricingTest'
-import { BigNumber } from '@ethersproject/bignumber'
 
 const token = '0x243f22fbd4c375581aaacfcfff5a43793eb8a74d'
-const addr = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
 
 describe('MesonPricing', () => {
   let contract: MesonPricingTest
@@ -49,55 +47,42 @@ describe('MesonPricing', () => {
     })
   })
 
+  const chain = '0x8000003c' // for ETH by SLIP-44
+  const inToken = '0x943f0cabc0675f3642927e25abfa9a7ae15e8672'
+  const outToken = '0x2151166224670b37ec76c8ee2011bbbf4bbf2a52'
+  const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
+  const amount = 1
+  const swap: Swap = { inToken, outToken, chain, receiver, amount }
+
   describe('#getSwapId', () => {
-    it('getSwapId returns same result as getSwapIdAsProvider', async () => {
-      const swapId = await contract.getSwapId(
-        1,
-        token,
-        'ETH',
-        token,
-        addr
+    it('returns same result as getSwapIdAsProvider and the js function', async () => {
+      const swapId = getSwapId(swap)
+      const swapIdAsUser = await contract.getSwapId(
+        amount,
+        inToken,
+        chain,
+        outToken,
+        receiver
       );
       const swapIdAsProvider = await contract.getSwapIdAsProvider(
-        BigNumber.from(1),
-        token,
-        token,
-        addr
+        amount,
+        inToken,
+        outToken,
+        receiver
       );
-      expect(swapIdAsProvider).to.equal(swapId);
-    })
-
-    it('getSwapIdAsProvider returns same result as the js function', async () => {
-      const swap: Swap = {
-        inToken: '0x943f0cabc0675f3642927e25abfa9a7ae15e8672',
-        outToken: '0x2151166224670b37ec76c8ee2011bbbf4bbf2a52',
-        chain: 'ETH',
-        receiver: '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211',
-        amount: 1,
-      }
-
-      const swapIdAsProvider = await contract.getSwapIdAsProvider(
-        swap.amount, swap.inToken, swap.outToken, swap.receiver);
-      const swapId = getSwapId(swap);
-      expect(swapId).to.equal(swapIdAsProvider);
+      expect(swapId).to.equal(swapIdAsUser)
+      expect(swapId).to.equal(swapIdAsProvider)
     })
   })
 
   describe('#getSwapHash', () => {
-    it('getSwapHash returns same result as the js function', async () => {
-      const swap: Swap = {
-        inToken: '0x943f0cabc0675f3642927e25abfa9a7ae15e8672',
-        outToken: '0x2151166224670b37ec76c8ee2011bbbf4bbf2a52',
-        chain: 'ETH',
-        receiver: '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211',
-        amount: 1,
-      }
-      const swapId = getSwapId(swap);
-      const epoch = 10;
+    it('returns same result as the js function', async () => {
+      const swapId = getSwapId(swap)
+      const epoch = 10
+      const swapHash = getSwapHash(swapId, epoch)
 
-      const swapHashAsProvider = await contract.getSwapHash(swapId, epoch);
-      const swapHash = getSwapHash(swapId, epoch);
-      expect(swapHash).to.equal(swapHashAsProvider);
+      const swapHashAsProvider = await contract.getSwapHash(swapId, epoch)
+      expect(swapHash).to.equal(swapHashAsProvider)
     })
   })
 })
