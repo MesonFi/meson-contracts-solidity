@@ -91,12 +91,10 @@ contract MesonSwap is
     address provider = requests[swapId].provider;
 
     _updateDemand(inToken, amount);
+    _deleteRequest(swapId);
+    emit RequestExecuted(swapId);
 
     IERC20Minimal(inToken).transferFrom(address(this), provider, amount);
-
-    _deleteRequest(swapId);
-
-    emit RequestExecuted(swapId);
   }
 
   /// @inheritdoc IMesonSwap
