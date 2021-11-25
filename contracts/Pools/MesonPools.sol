@@ -14,7 +14,7 @@ import "../utils/MesonPricing.sol";
 /// @notice The class to manage liquidity pools for providers.
 /// Methods in this class will be executed by LPs when users want to
 /// swap into the current chain.
-contract MesonPools is Context, MesonPricing, IMesonPools {
+contract MesonPools is Context, IMesonPools, MesonPricing {
   mapping(address => mapping(address => uint256)) public balanceOf;
 
   mapping(address => uint256) public epochOf;

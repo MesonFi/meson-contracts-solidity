@@ -14,7 +14,7 @@ import "../utils/MesonPricing.sol";
 /// @notice The class to receive and process swap requests.
 /// Methods in this class will be executed by users or LPs when
 /// users initiate swaps in the current chain.
-contract MesonSwap is Context, MesonPricing, IMesonSwap {
+contract MesonSwap is Context, IMesonSwap, MesonPricing {
   /// @notice swap requests by swapIds
   mapping(bytes32 => SwapRequest) public requests;
 
