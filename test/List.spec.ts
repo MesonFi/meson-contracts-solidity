@@ -31,7 +31,6 @@ describe('List', () => {
       expect(await contract.getListLength(addr)).to.eq(1)
       expect(await contract.getListTail(addr)).to.eq(0)
       expect(await contract.getListHead(addr)).to.eq(0)
-      // expect(await list.getTail(addr)).to.eq(item1)
     })
 
     it('add 3 items', async () => {
