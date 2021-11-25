@@ -1,17 +1,20 @@
+import { Wallet } from 'ethers'
 import { ethers, waffle } from 'hardhat'
 import { expect } from './shared/expect'
-import { wallet, signSwap, Swap } from './shared/wallet'
+import { signSwap, Swap, getSwapId } from '../libs/meson_helpers'
 import { fixtures } from './shared/fixtures'
 import { MockToken } from '../typechain/MockToken'
 import { MesonPoolsTest } from '../typechain/MesonPoolsTest'
 
 describe('MesonPools', () => {
+  let wallet: Wallet
   let contract: MesonPoolsTest
   let token: MockToken
   let unsupportedToken: MockToken
 
   beforeEach('deploy MesonPoolsTest', async () => {
     const result = await waffle.loadFixture(fixtures)
+    wallet = result.wallet
     contract = result.pools
     token = result.token1
     unsupportedToken = result.token2
@@ -79,7 +82,7 @@ describe('MesonPools', () => {
 
 
   describe('#release', () => {
-    const chain = '0x8000003c' // for ETH by SLIP-44
+    const outChain = '0x8000003c' // for ETH by SLIP-44
     const inToken = ethers.utils.toUtf8Bytes('IN_TOKEN_ADDR')
     const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
     const amount = 100
@@ -93,13 +96,14 @@ describe('MesonPools', () => {
       const swap: Swap = {
         inToken,
         outToken: token.address,
-        chain,
+        outChain,
         receiver,
         amount,
         ts,
       }
 
-      const signature = signSwap(swap, epoch)
+      const swapId = getSwapId(swap);
+      const signature = signSwap(wallet, swapId, epoch)
 
       await contract.release(wallet.address, signature, amount, inToken, token.address, receiver, ts, epoch)
 

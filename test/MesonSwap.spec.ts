@@ -1,24 +1,27 @@
+import { Wallet } from 'ethers'
 import { waffle, ethers } from 'hardhat'
 import { expect } from './shared/expect'
-import { wallet, getSwapId, signSwap, Swap } from './shared/wallet'
+import { getSwapId, signSwap, Swap } from '../libs/meson_helpers'
 import { fixtures } from './shared/fixtures'
 import { MockToken } from '../typechain/MockToken'
 import { MesonSwapTest } from '../typechain/MesonSwapTest'
 
 describe('MesonSwap', () => {
+  let wallet: Wallet
   let contract: MesonSwapTest
   let token: MockToken
   let unsupportedToken: MockToken
 
   beforeEach('deploy MesonSwapTest', async () => {
     const result = await waffle.loadFixture(fixtures)
+    wallet = result.wallet
     contract = result.swap
     token = result.token1
     unsupportedToken = result.token2
   })
 
 
-  const chain = '0x8000003c' // for ETH by SLIP-44
+  const outChain = '0x8000003c' // for ETH by SLIP-44
   const outToken = ethers.utils.toUtf8Bytes('OUT_TOKEN_ADDR')
   const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
   const amount = 100
@@ -26,11 +29,11 @@ describe('MesonSwap', () => {
   describe('#requestSwap', () => {
     it('accepts a swap', async () => {
       await token.approve(contract.address, amount)
-      const res = await contract.requestSwap(amount, token.address, chain, outToken, receiver)
+      const res = await contract.requestSwap(amount, token.address, outChain, outToken, receiver)
       const block = await ethers.provider.getBlock(res.blockNumber)
       const ts = block.timestamp
 
-      const swap: Swap = { inToken: token.address, outToken, chain, receiver, amount, ts }
+      const swap: Swap = { inToken: token.address, outToken, outChain, receiver, amount, ts }
       const swapId = getSwapId(swap)
       expect(await contract.doesSwapExist(swapId)).to.equal(true)
     })
@@ -38,7 +41,7 @@ describe('MesonSwap', () => {
     it('refuses unsupported token', async () => {
       await unsupportedToken.approve(contract.address, amount)
       await expect(
-        contract.requestSwap(amount, contract.address, chain, outToken, receiver)
+        contract.requestSwap(amount, contract.address, outChain, outToken, receiver)
       ).to.be.revertedWith('unsupported token')
     })
   })
@@ -46,11 +49,11 @@ describe('MesonSwap', () => {
   describe('#bondSwap', () => {
     it('can bond a swap', async () => {
       await token.approve(contract.address, amount)
-      const res = await contract.requestSwap(amount, token.address, chain, outToken, receiver)
+      const res = await contract.requestSwap(amount, token.address, outChain, outToken, receiver)
       const block = await ethers.provider.getBlock(res.blockNumber)
       const ts = block.timestamp
 
-      const swap: Swap = { inToken: token.address, outToken, chain, receiver, amount, ts }
+      const swap: Swap = { inToken: token.address, outToken, outChain, receiver, amount, ts }
       const swapId = getSwapId(swap)
 
       await contract.bondSwap(swapId, wallet.address)
@@ -63,14 +66,14 @@ describe('MesonSwap', () => {
   describe('#executeSwap', () => {
     it('can execute a swap', async () => {
       await token.approve(contract.address, amount)
-      const res = await contract.requestSwap(amount, token.address, chain, outToken, receiver)
+      const res = await contract.requestSwap(amount, token.address, outChain, outToken, receiver)
       const block = await ethers.provider.getBlock(res.blockNumber)
       const ts = block.timestamp
 
-      const swap: Swap = { inToken: token.address, outToken, chain, receiver, amount, ts }
+      const swap: Swap = { inToken: token.address, outToken, outChain, receiver, amount, ts }
       const epoch = 0
       const swapId = getSwapId(swap)
-      const signautre = signSwap(swap, epoch)
+      const signautre = signSwap(wallet, swapId, epoch)
 
       await contract.bondSwap(swapId, wallet.address)
       await contract.executeSwap(swapId, signautre, epoch)
