@@ -119,8 +119,10 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
       epoch
     );
 
-    _updateDemand(outToken, metaAmount); // TODO: LPs can call release to increase demand
     uint256 amount = _fromMetaAmount(outToken, metaAmount);
+    _updateDemand(outToken, metaAmount); // TODO: LPs can call release to increase demand
+    _decreaseSupply(outToken, amount);
+
     _withdrawTo(receiver, provider, outToken, amount);
 
     emit RequestReleased(swapId, epoch);
