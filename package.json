@@ -33,6 +33,10 @@
     "build": "hardhat compile --config hardhat.config.ts",
     "cleanbuild": "hardhat clean && hardhat compile --config hardhat.config.ts",
     "test": "hardhat --network hardhat test",
+    "chain:eth": "BLOCKCHAIN_NAME=eth node scripts/set-chain-config.js",
+    "chain:bsc": "BLOCKCHAIN_NAME=bsc node scripts/set-chain-config.js",
+    "chain:cfx": "BLOCKCHAIN_NAME=cfx node scripts/set-chain-config.js",
+    "chain:one": "BLOCKCHAIN_NAME=one node scripts/set-chain-config.js",
     "deploy": "hardhat run scripts/deploy-upgradable.js",
     "upgrade": "hardhat run scripts/upgrade.js",
     "docgen": "solidity-docgen --solc-module solc-0.8.6 -t ./templates"
