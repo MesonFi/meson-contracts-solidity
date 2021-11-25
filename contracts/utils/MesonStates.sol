@@ -37,7 +37,7 @@ contract MesonStates is MesonHelpers {
 
   /// @notice Get total demand for a given token
   function totalDemandFor(address token) external view returns (uint256) {
-    return _tokenSupply[token];
+    return _tokenDemand[token];
   }
 
   /// @notice Increase supply for a given token; will be called when
@@ -56,13 +56,13 @@ contract MesonStates is MesonHelpers {
 
   /// @notice Update demand for a given token; will be called when
   /// a swap is released
-  function _updateDemand(address token, uint256 amount) internal {
+  function _updateDemand(address token, uint256 metaAmount) internal {
     uint256 ts = block.timestamp;
-    bytes32 id = keccak256(abi.encodePacked(ts, token, amount)); // TODO something else
-    Swap memory swap = Swap(id, amount, ts);
+    bytes32 id = keccak256(abi.encodePacked(ts, token, metaAmount)); // TODO something else
+    Swap memory swap = Swap(id, metaAmount, ts);
     _swaps[token][id] = swap;
     _recentSwapLists[token].addItem(id);
-    _tokenDemand[token] = LowGasSafeMath.add(_tokenDemand[token], amount);
+    _tokenDemand[token] = LowGasSafeMath.add(_tokenDemand[token], metaAmount);
   }
 
   /// @notice Remove expired swaps and update demand for a given token;
@@ -77,7 +77,7 @@ contract MesonStates is MesonHelpers {
     while (_swaps[token][id].ts + TOTAL_DEMAND_CALC_PERIOD < current) {
       _tokenDemand[token] = LowGasSafeMath.sub(
         _tokenDemand[token],
-        _swaps[token][id].amount
+        _swaps[token][id].metaAmount
       );
       list.popItem();
       delete _swaps[token][id];

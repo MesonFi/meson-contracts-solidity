@@ -11,7 +11,7 @@ contract MesonHelpers is MesonConfig {
 
   struct Swap {
     bytes32 id;
-    uint256 amount;
+    uint256 metaAmount;
     uint256 ts;
   }
 
