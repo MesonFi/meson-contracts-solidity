@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "../MesonConfig.sol";
 
-/// @title MesonSwapHelpers
-contract MesonSwapHelpers is MesonConfig {
+/// @title MesonHelpers
+contract MesonHelpers is MesonConfig {
   bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
 
   struct Swap {

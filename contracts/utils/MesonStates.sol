@@ -4,11 +4,11 @@ pragma solidity 0.8.6;
 import "../libraries/LowGasSafeMath.sol";
 import "../libraries/List.sol";
 
-import "./MesonSwapHelpers.sol";
+import "./MesonHelpers.sol";
 
 /// @title MesonStates
 /// @notice The class that keeps track of token supplies and swap requests,
-contract MesonStates is MesonSwapHelpers {
+contract MesonStates is MesonHelpers {
   using List for List.Bytes32List;
 
   mapping(address => bool) public supportedTokens;
