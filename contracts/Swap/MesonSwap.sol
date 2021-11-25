@@ -38,7 +38,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
 
     IERC20Minimal(inToken).transferFrom(provider, address(this), amount);
 
-    emit RequestPosted(swapId, metaAmount, inToken, chain, outToken, receiver);
+    emit RequestPosted(swapId, metaAmount, inToken, chain, outToken, receiver, ts);
 
     return swapId;
   }
