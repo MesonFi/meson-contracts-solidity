@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "../libraries/LowGasSafeMath.sol";
 import "../interfaces/IERC20Minimal.sol";
-import "../libraries/BytesLib.sol";
 
 import "../MesonConfig.sol";
 import "./IMesonSwap.sol";
