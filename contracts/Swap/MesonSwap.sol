@@ -75,7 +75,6 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     address inToken = requests[swapId].inToken;
     address provider = requests[swapId].provider;
 
-    _updateDemand(inToken, metaAmount);
     _deleteRequest(swapId);
     emit RequestExecuted(swapId);
 
