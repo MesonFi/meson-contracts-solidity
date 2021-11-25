@@ -3,8 +3,6 @@ import { expect } from './shared/expect'
 import { Swap, getSwapId, getSwapHash } from './shared/wallet'
 import { MesonHelpersTest } from '../typechain/MesonHelpersTest'
 
-const token = '0x243f22fbd4c375581aaacfcfff5a43793eb8a74d'
-
 describe('MesonHelpers', () => {
   let contract: MesonHelpersTest
   const fixture = async () => {
