@@ -3,19 +3,18 @@ pragma solidity 0.8.6;
 
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "../libraries/LowGasSafeMath.sol";
 import "../interfaces/IERC20Minimal.sol";
 
 import "./IMesonPools.sol";
-import "../Pricing/MesonPricing.sol";
+import "../utils/MesonPricing.sol";
 
 /// @title MesonPools
 /// @notice The class to manage liquidity pools for providers.
 /// Methods in this class will be executed by LPs when users want to
 /// swap into the current chain.
-contract MesonPools is Context, MesonPricing, IMesonPools {
+contract MesonPools is Context, IMesonPools, MesonPricing {
   mapping(address => mapping(address => uint256)) public balanceOf;
 
   mapping(address => uint256) public epochOf;
@@ -160,10 +159,7 @@ contract MesonPools is Context, MesonPricing, IMesonPools {
     bytes32 swapId =
       _getSwapIdAsProvider(metaAmount, inToken, outToken, receiver);
     bytes32 swapHash = _getSwapHash(swapId, epoch);
-    require(
-      ECDSA.recover(swapHash, signature) == provider,
-      "invalid signature"
-    );
+    _checkSignature(signature, swapHash, provider);
     return swapId;
   }
 }

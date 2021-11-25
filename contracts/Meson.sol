@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "./Swap/MesonSwap.sol";
 import "./Pools/MesonPools.sol";
 
-contract Meson is MesonSwap, MesonPools, UUPSUpgradeable {
+contract Meson is UUPSUpgradeable, MesonSwap, MesonPools {
   bool private initialized;
 
   function initialize(address _supportedToken) public {

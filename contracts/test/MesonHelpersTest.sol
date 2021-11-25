@@ -1,21 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.6;
 
-import "../Pricing/MesonPricing.sol";
+import "../utils/MesonHelpers.sol";
 
-contract MesonPricingTest is MesonPricing {
-  constructor(address token) public {
-    _addTokenToSwapList(token);
-  }
-
-  function increaseSupply(address token, uint256 amount) public {
-    _increaseSupply(token, amount);
-  }
-
-  function decreaseSupply(address token, uint256 amount) public {
-    _decreaseSupply(token, amount);
-  }
-
+contract MesonHelpersTest is MesonHelpers {
   function getSwapHash(bytes32 swapId, uint256 epoch) public pure returns (bytes32) {
     return _getSwapHash(swapId, epoch);
   }
