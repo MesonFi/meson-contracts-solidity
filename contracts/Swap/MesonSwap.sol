@@ -26,19 +26,17 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     bytes memory outToken,
     bytes memory receiver
   ) public override tokenSupported(inToken) returns (bytes32) {
-    // TODO: how to allow contracts to use and make sure it is safe?
-
     uint256 metaAmount = _toMetaAmount(inToken, amount);
-    bytes32 swapId = _getSwapId(metaAmount, inToken, chain, outToken, receiver);
+    uint256 ts = block.timestamp;
+    bytes32 swapId = _getSwapId(metaAmount, inToken, chain, outToken, receiver, ts);
     require(!_swapExists(swapId), "swap conflict");
 
     address provider = _msgSender();
-
-    _newRequest(swapId, amount, metaAmount, inToken, chain, outToken, receiver);
+    _newRequest(swapId, amount, metaAmount, inToken, chain, outToken, receiver, ts);
 
     IERC20Minimal(inToken).transferFrom(provider, address(this), amount);
 
-    emit RequestPosted(swapId, metaAmount, inToken, chain, outToken, receiver);
+    emit RequestPosted(swapId, metaAmount, inToken, chain, outToken, receiver, ts);
 
     return swapId;
   }
@@ -105,7 +103,8 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     address inToken,
     bytes4 chain,
     bytes memory outToken,
-    bytes memory receiver
+    bytes memory receiver,
+    uint256 ts
   ) internal {
     requests[swapId] = SwapRequest({
       amount: amount,
@@ -115,6 +114,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
       outToken: outToken,
       receiver: receiver,
       provider: address(0),
+      ts: ts,
       bondUntil: 0
     });
   }

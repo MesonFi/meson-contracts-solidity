@@ -45,6 +45,7 @@ interface IMesonPools {
   /// @param inToken The input token deposited by the user
   /// @param outToken The output token the user wish to withdraw
   /// @param receiver The address that will receive the output token
+  /// @param ts The block time the swap is initially requested
   /// @param epoch The epoch (ref. xxx)
   function release(
     address provider,
@@ -53,6 +54,7 @@ interface IMesonPools {
     bytes memory inToken,
     address outToken,
     address receiver,
+    uint256 ts,
     uint256 epoch
   ) external;
 
@@ -66,6 +68,7 @@ interface IMesonPools {
   /// @param inToken The input token deposited by the user
   /// @param outToken The output token the user wish to withdraw
   /// @param receiver The address that will receive the output token
+  /// @param ts The block time the swap is initially requested
   /// @param epoch The epoch (ref. xxx)
   function challenge(
     address provider,
@@ -74,6 +77,7 @@ interface IMesonPools {
     bytes memory inToken,
     address outToken,
     address receiver,
+    uint256 ts,
     uint256 epoch
   ) external;
 

@@ -73,13 +73,15 @@ interface IMesonSwap {
   /// @param chain The target chain name
   /// @param outToken The type of token
   /// @param receiver The address of the output token
+  /// @param ts The block time the swap is initially requested
   event RequestPosted(
       bytes32 swapId,
       uint256 amount,
       address inToken,
       bytes4 chain,
       bytes outToken,
-      bytes receiver
+      bytes receiver,
+      uint256 ts
   );
 
   /// @notice Event when a swap request has been bonded.

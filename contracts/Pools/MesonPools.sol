@@ -95,6 +95,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     bytes memory inToken,
     address outToken,
     address receiver,
+    uint256 ts,
     uint256 epoch
   ) public override tokenSupported(outToken) {
     if (epoch == epochOf[provider] + 1) { // epoch can only increment by 1
@@ -114,6 +115,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
       inToken,
       outToken,
       receiver,
+      ts,
       epoch
     );
 
@@ -132,6 +134,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     bytes memory inToken,
     address outToken,
     address receiver,
+    uint256 ts,
     uint256 epoch
   ) public override {
     bytes32 swapId = _isSignatureValid(
@@ -141,6 +144,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
       inToken,
       outToken,
       receiver,
+      ts,
       epoch
     );
   }
@@ -154,10 +158,11 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     bytes memory inToken,
     address outToken,
     address receiver,
+    uint256 ts,
     uint256 epoch
   ) private pure returns (bytes32) {
     bytes32 swapId =
-      _getSwapIdAsProvider(metaAmount, inToken, outToken, receiver);
+      _getSwapIdAsProvider(metaAmount, inToken, outToken, receiver, ts);
     bytes32 swapHash = _getSwapHash(swapId, epoch);
     _checkSignature(signature, swapHash, provider);
     return swapId;

@@ -13,14 +13,16 @@ contract MesonHelpersTest is MesonHelpers {
     address inToken,
     bytes4 chain,
     bytes memory outToken,
-    bytes memory receiver
+    bytes memory receiver,
+    uint256 ts
   ) public pure returns (bytes32) {
     return _getSwapId(
       metaAmount,
       inToken,
       chain,
       outToken,
-      receiver
+      receiver,
+      ts
     );
   }
 
@@ -28,13 +30,15 @@ contract MesonHelpersTest is MesonHelpers {
     uint256 metaAmount,
     bytes memory inToken,
     address outToken,
-    address receiver
+    address receiver,
+    uint256 ts
   ) public pure returns (bytes32) {
     return _getSwapIdAsProvider(
       metaAmount,
       inToken,
       outToken,
-      receiver
+      receiver,
+      ts
     );
   }
 }

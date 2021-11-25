@@ -12,19 +12,20 @@ export type Swap = {
   chain: string,
   receiver: string,
   amount: number,
+  ts: number,
 }
 
 export function getSwapId(swap: Swap) {
   return solidityKeccak256(
-    ["bytes", "string", "bytes4", "string", "bytes", "string", "bytes", "string", "uint256"],
-    [swap.inToken, ":", swap.chain, ":", swap.outToken, ":", swap.receiver, ":", swap.amount]
+    ['bytes', 'string', 'bytes4', 'string', 'bytes', 'string', 'bytes', 'string', 'uint256', 'string', 'uint256'],
+    [swap.inToken, ':', swap.chain, ':', swap.outToken, ':', swap.receiver, ':', swap.amount, ':', swap.ts]
   )
 }
 
 export function getSwapHash(swapId: string, epoch: number) {
   return solidityKeccak256(
-    ["bytes32", "string", "uint256"],
-    [swapId, ":", epoch]
+    ['bytes32', 'string', 'uint256'],
+    [swapId, ':', epoch]
   )
 }
 
