@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.6;
 
-import "../Pricing/MesonPricing.sol";
+import "../utils/MesonPricing.sol";
 
 contract MesonPricingTest is MesonPricing {
   constructor(address token) public {

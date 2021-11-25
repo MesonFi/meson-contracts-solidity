@@ -3,29 +3,20 @@ pragma solidity 0.8.6;
 
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "../libraries/LowGasSafeMath.sol";
 import "../interfaces/IERC20Minimal.sol";
 
-import "../MesonConfig.sol";
 import "./IMesonSwap.sol";
-import "./MesonSwapStore.sol";
-import "../Pricing/MesonPricing.sol";
+import "../utils/MesonPricing.sol";
 
 /// @title MesonSwap
 /// @notice The class to receive and process swap requests.
 /// Methods in this class will be executed by users or LPs when
 /// users initiate swaps in the current chain.
-contract MesonSwap is
-  Context,
-  MesonConfig,
-  IMesonSwap,
-  MesonSwapStore,
-  MesonPricing
-{
-  uint256 public lockingAmount;
-  uint256 public swaped;
+contract MesonSwap is Context, MesonPricing, IMesonSwap {
+  /// @notice swap requests by swapIds
+  mapping(bytes32 => SwapRequest) public requests;
 
   /// @inheritdoc IMesonSwap
   function requestSwap(
@@ -42,7 +33,6 @@ contract MesonSwap is
     require(!_swapExists(swapId), "swap conflict");
 
     address provider = _msgSender();
-    lockingAmount = LowGasSafeMath.add(lockingAmount, amount);
 
     _newRequest(swapId, amount, metaAmount, inToken, chain, outToken, receiver);
 
@@ -80,10 +70,7 @@ contract MesonSwap is
     uint256 epoch
   ) public override swapExists(swapId) swapBonded(swapId) {
     bytes32 swapHash = _getSwapHash(swapId, epoch);
-    require(
-      ECDSA.recover(swapHash, signature) == requests[swapId].provider,
-      "invalid signature"
-    );
+    _checkSignature(signature, swapHash, requests[swapId].provider);
 
     uint256 amount = requests[swapId].amount;
     address inToken = requests[swapId].inToken;
@@ -96,6 +83,10 @@ contract MesonSwap is
     _safeTransfer(inToken, provider, amount);
   }
 
+  function _deleteRequest(bytes32 swapId) internal {
+    delete requests[swapId];
+  }
+
   /// @inheritdoc IMesonSwap
   function cancelSwap(bytes32 swapId)
     public
@@ -104,6 +95,27 @@ contract MesonSwap is
     swapUnbondedOrExpired(swapId)
   {
     // TODO
+  }
+
+  function _newRequest(
+    bytes32 swapId,
+    uint256 amount,
+    uint256 metaAmount,
+    address inToken,
+    bytes4 chain,
+    bytes memory outToken,
+    bytes memory receiver
+  ) internal {
+    requests[swapId] = SwapRequest({
+      amount: amount,
+      metaAmount: metaAmount,
+      inToken: inToken,
+      chain: chain,
+      outToken: outToken,
+      receiver: receiver,
+      provider: address(0),
+      bondUntil: 0
+    });
   }
 
   /// @dev Check the swap for the given swapId exsits
