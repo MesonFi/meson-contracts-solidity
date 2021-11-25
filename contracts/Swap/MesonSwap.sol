@@ -26,8 +26,6 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     bytes memory outToken,
     bytes memory receiver
   ) public override tokenSupported(inToken) returns (bytes32) {
-    // TODO: how to allow contracts to use and make sure it is safe?
-
     uint256 metaAmount = _toMetaAmount(inToken, amount);
     uint256 ts = block.timestamp;
     bytes32 swapId = _getSwapId(metaAmount, inToken, chain, outToken, receiver, ts);
