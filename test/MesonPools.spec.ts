@@ -84,6 +84,7 @@ describe('MesonPools', () => {
     const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
     const amount = 100
     const epoch = 0
+    const ts = Date.now()
 
     it('accepts 100 release', async () => {
       await token.approve(contract.address, 1000)
@@ -95,23 +96,24 @@ describe('MesonPools', () => {
         chain,
         receiver,
         amount,
+        ts,
       }
 
       const signature = signSwap(swap, epoch)
 
-      await contract.release(wallet.address, signature, amount, inToken, token.address, receiver, epoch)
+      await contract.release(wallet.address, signature, amount, inToken, token.address, receiver, ts, epoch)
 
       expect(await contract.balanceOf(token.address, wallet.address)).to.equal(1000 - amount)
       expect(await token.balanceOf(receiver)).to.equal(amount)
     })
 
     it('refuses unsupported token', async () => {
-      await expect(contract.release(wallet.address, '0x', amount, inToken, unsupportedToken.address, receiver, epoch))
+      await expect(contract.release(wallet.address, '0x', amount, inToken, unsupportedToken.address, receiver, ts, epoch))
         .to.be.revertedWith('unsupported token')
     })
 
     it('refuses wrong epoch', async () => {
-      await expect(contract.release(wallet.address, '0x', amount, inToken, token.address, receiver, epoch + 2))
+      await expect(contract.release(wallet.address, '0x', amount, inToken, token.address, receiver, ts, epoch + 2))
         .to.be.revertedWith('invalid epoch')
     })
   })

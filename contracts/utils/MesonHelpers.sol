@@ -23,6 +23,7 @@ contract MesonHelpers is MesonConfig {
     bytes outToken;
     bytes receiver; // could be an hex42 address (eth) or in other types
     address provider;
+    uint256 ts;
     uint256 bondUntil;
   }
 
@@ -55,7 +56,8 @@ contract MesonHelpers is MesonConfig {
     address inToken,
     bytes4 chain,
     bytes memory outToken,
-    bytes memory receiver
+    bytes memory receiver,
+    uint256 ts
   ) internal pure returns (bytes32) {
     return
       keccak256(
@@ -68,7 +70,9 @@ contract MesonHelpers is MesonConfig {
           ":",
           receiver,
           ":",
-          metaAmount
+          metaAmount,
+          ":",
+          ts
         )
       );
   }
@@ -78,7 +82,8 @@ contract MesonHelpers is MesonConfig {
     uint256 metaAmount,
     bytes memory inToken,
     address outToken,
-    address receiver
+    address receiver,
+    uint256 ts
   ) internal pure returns (bytes32) {
     return
       keccak256(
@@ -91,7 +96,9 @@ contract MesonHelpers is MesonConfig {
           ":",
           receiver,
           ":",
-          metaAmount
+          metaAmount,
+          ":",
+          ts
         )
       );
   }

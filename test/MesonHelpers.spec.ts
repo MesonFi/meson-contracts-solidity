@@ -19,7 +19,8 @@ describe('MesonHelpers', () => {
   const outToken = '0x2151166224670b37ec76c8ee2011bbbf4bbf2a52'
   const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
   const amount = 1
-  const swap: Swap = { inToken, outToken, chain, receiver, amount }
+  const ts = Date.now()
+  const swap: Swap = { inToken, outToken, chain, receiver, amount, ts }
   const swapId = getSwapId(swap)
 
   describe('#getSwapId', () => {
@@ -29,13 +30,15 @@ describe('MesonHelpers', () => {
         inToken,
         chain,
         outToken,
-        receiver
+        receiver,
+        ts
       )
       const swapIdAsProvider = await contract.getSwapIdAsProvider(
         amount,
         inToken,
         outToken,
-        receiver
+        receiver,
+        ts
       )
       expect(swapId).to.equal(swapIdAsUser)
       expect(swapId).to.equal(swapIdAsProvider)

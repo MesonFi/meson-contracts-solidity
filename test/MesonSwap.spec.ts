@@ -25,11 +25,13 @@ describe('MesonSwap', () => {
 
   describe('#requestSwap', () => {
     it('accepts a swap', async () => {
-      const swap: Swap = { inToken: token.address, outToken, chain, receiver, amount }
-      const swapId = getSwapId(swap)
-
       await token.approve(contract.address, amount)
-      await contract.requestSwap(amount, token.address, chain, outToken, receiver)
+      const res = await contract.requestSwap(amount, token.address, chain, outToken, receiver)
+      const block = await ethers.provider.getBlock(res.blockNumber)
+      const ts = block.timestamp
+
+      const swap: Swap = { inToken: token.address, outToken, chain, receiver, amount, ts }
+      const swapId = getSwapId(swap)
       expect(await contract.doesSwapExist(swapId)).to.equal(true)
     })
 
@@ -43,13 +45,15 @@ describe('MesonSwap', () => {
 
   describe('#bondSwap', () => {
     it('can bond a swap', async () => {
-      const swap: Swap = { inToken: token.address, outToken, chain, receiver, amount }
+      await token.approve(contract.address, amount)
+      const res = await contract.requestSwap(amount, token.address, chain, outToken, receiver)
+      const block = await ethers.provider.getBlock(res.blockNumber)
+      const ts = block.timestamp
+
+      const swap: Swap = { inToken: token.address, outToken, chain, receiver, amount, ts }
       const swapId = getSwapId(swap)
 
-      await token.approve(contract.address, amount)
-      await contract.requestSwap(amount, token.address, chain, outToken, receiver)
       await contract.bondSwap(swapId, wallet.address)
-
       expect(await contract.isSwapBonded(swapId)).to.equal(true)
       await expect(contract.bondSwap(swapId, wallet.address))
         .to.be.revertedWith('swap bonded')
@@ -58,13 +62,16 @@ describe('MesonSwap', () => {
 
   describe('#executeSwap', () => {
     it('can execute a swap', async () => {
-      const swap: Swap = { inToken: token.address, outToken, chain, receiver, amount }
+      await token.approve(contract.address, amount)
+      const res = await contract.requestSwap(amount, token.address, chain, outToken, receiver)
+      const block = await ethers.provider.getBlock(res.blockNumber)
+      const ts = block.timestamp
+
+      const swap: Swap = { inToken: token.address, outToken, chain, receiver, amount, ts }
       const epoch = 0
       const swapId = getSwapId(swap)
       const signautre = signSwap(swap, epoch)
 
-      await token.approve(contract.address, amount)
-      await contract.requestSwap(amount, token.address, chain, outToken, receiver)
       await contract.bondSwap(swapId, wallet.address)
       await contract.executeSwap(swapId, signautre, epoch)
 
