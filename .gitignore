@@ -8,3 +8,5 @@ artifacts
 typechain
 deploys
 docs
+
+contracts/MesonConfig.sol
