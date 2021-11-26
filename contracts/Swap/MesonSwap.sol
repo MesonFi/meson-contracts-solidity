@@ -71,7 +71,6 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     _checkSignature(signature, swapHash, requests[swapId].provider);
 
     uint256 amount = requests[swapId].amount;
-    uint256 metaAmount = requests[swapId].metaAmount;
     address inToken = requests[swapId].inToken;
     address provider = requests[swapId].provider;
 

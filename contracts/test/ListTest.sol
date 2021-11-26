@@ -33,7 +33,7 @@ contract ListTest {
     lists[addr].addItem(item);
   }
 
-  function getTail(address addr) external returns (bytes32) {
+  function getTail(address addr) external view returns (bytes32) {
     (bool success, bytes32 item) = lists[addr].getTail();
     if (!success) {
       return 0;

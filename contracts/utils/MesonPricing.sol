@@ -15,7 +15,8 @@ contract MesonPricing is MesonStates {
     returns (uint256 metaAmount)
   {
     _removeExpiredSwaps(token);
-    uint256 supply = _tokenSupply[token];
+    // uint256 supply = _tokenSupply[token];
+    // uint256 demand = _tokenDemand[token];
 
     // TODO
     metaAmount = amount;
@@ -27,7 +28,8 @@ contract MesonPricing is MesonStates {
     returns (uint256 amount)
   {
     _removeExpiredSwaps(token);
-    uint256 supply = _tokenSupply[token];
+    // uint256 supply = _tokenSupply[token];
+    // uint256 demand = _tokenDemand[token];
 
     // TODO
     amount = metaAmount;

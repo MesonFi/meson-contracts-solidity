@@ -4,7 +4,7 @@ pragma solidity =0.8.6;
 import "../utils/MesonStates.sol";
 
 contract MesonStatesTest is MesonStates {
-  constructor(address token) public {
+  constructor(address token) {
     _addTokenToSwapList(token);
   }
 

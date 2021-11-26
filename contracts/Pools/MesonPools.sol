@@ -99,10 +99,10 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     uint256 epoch
   ) public override tokenSupported(outToken) {
     if (epoch == epochOf[provider] + 1) { // epoch can only increment by 1
-      uint256 ts = block.timestamp;
-      require(epochTsOf[provider] + EPOCH_TIME_PERIOD < ts, "increment epoch too fast");
+      uint256 currentTs = block.timestamp;
+      require(epochTsOf[provider] + EPOCH_TIME_PERIOD < currentTs, "increment epoch too fast");
       epochOf[provider] = epoch;
-      epochTsOf[provider] = ts;
+      epochTsOf[provider] = currentTs;
       releasedInEpochOf[provider] = 0;
     }
 
