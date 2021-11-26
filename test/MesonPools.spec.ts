@@ -1,20 +1,18 @@
-import { Wallet } from 'ethers'
 import { ethers, waffle } from 'hardhat'
 import { expect } from './shared/expect'
-import { signSwap, Swap, getSwapId } from '../libs/meson_helpers'
+import { wallet } from './shared/wallet'
 import { fixtures } from './shared/fixtures'
+import { signSwap, Swap, getSwapId } from '../libs/meson_helpers'
 import { MockToken } from '../typechain/MockToken'
 import { MesonPoolsTest } from '../typechain/MesonPoolsTest'
 
 describe('MesonPools', () => {
-  let wallet: Wallet
   let contract: MesonPoolsTest
   let token: MockToken
   let unsupportedToken: MockToken
 
   beforeEach('deploy MesonPoolsTest', async () => {
     const result = await waffle.loadFixture(fixtures)
-    wallet = result.wallet
     contract = result.pools
     token = result.token1
     unsupportedToken = result.token2

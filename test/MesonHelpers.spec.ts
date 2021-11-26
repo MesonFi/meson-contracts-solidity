@@ -1,22 +1,19 @@
-import { Wallet } from 'ethers'
 import { ethers, waffle } from 'hardhat'
 import { expect } from './shared/expect'
-import { fixtures } from './shared/fixtures'
+import { wallet } from './shared/wallet'
 import { Swap, getSwapId, getSwapHash, signSwap } from '../libs/meson_helpers'
 import { MesonHelpersTest } from '../typechain/MesonHelpersTest'
 
 describe('MesonHelpers', () => {
   let contract: MesonHelpersTest
-  let wallet: Wallet
+
+  const fixture = async () => {
+    const factory = await ethers.getContractFactory('MesonHelpersTest')
+    return (await factory.deploy()) as MesonHelpersTest
+  }
 
   beforeEach('deploy MesonHelpersTest', async () => {
-    const result = await waffle.loadFixture(fixtures)
-    wallet = result.wallet
-
-    contract = await waffle.loadFixture(async () => {
-      const factory = await ethers.getContractFactory('MesonHelpersTest')
-      return (await factory.deploy()) as MesonHelpersTest
-    })
+    contract = await waffle.loadFixture(fixture)
   })
 
   const outChain = '0x8000003c' // for ETH by SLIP-44

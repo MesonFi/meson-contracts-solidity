@@ -4,7 +4,6 @@ pragma solidity =0.8.6;
 import "../utils/MesonHelpers.sol";
 
 contract MesonHelpersTest is MesonHelpers {
-
   function getSwapHash(bytes32 swapId, uint256 epoch) public pure returns (bytes32) {
     return _getSwapHash(swapId, epoch);
   }

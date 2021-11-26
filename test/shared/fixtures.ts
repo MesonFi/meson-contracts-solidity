@@ -1,14 +1,9 @@
 import { ethers } from 'hardhat'
-
 import { MockToken } from '../../typechain/MockToken'
 import { MesonPoolsTest } from '../../typechain/MesonPoolsTest'
 import { MesonSwapTest } from '../../typechain/MesonSwapTest'
 
-export async function fixtures() {
-  // default mnemonic for hardhat network
-  const mnemonic = 'test test test test test test test test test test test junk'
-  const wallet = ethers.Wallet.fromMnemonic(mnemonic)
-
+export async function fixtures () {
   const tokenFactory = await ethers.getContractFactory('MockToken')
   const token1: MockToken = await tokenFactory.deploy(1000000000)
   const token2: MockToken = await tokenFactory.deploy(1000000000)
@@ -21,5 +16,5 @@ export async function fixtures() {
   const swap: MesonSwapTest = await swapFactory.deploy()
   await swap.addTokenToSwapList(token1.address)
 
-  return { wallet, pools, swap, token1, token2 }
+  return { pools, swap, token1, token2 }
 }
