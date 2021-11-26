@@ -5,6 +5,18 @@ import "../interfaces/IERC20Minimal.sol";
 
 /// @title MesonSwap Interface
 interface IMesonSwap {
+  struct SwapRequest {
+    uint256 amount;
+    uint256 metaAmount;
+    address inToken;
+    bytes4 chain;
+    bytes outToken;
+    bytes receiver; // could be an hex42 address (eth) or in other types
+    address provider;
+    uint256 ts;
+    uint256 bondUntil;
+  }
+
   /// @notice Create a new swap request. This is step 1️⃣  in a swap.
   /// @dev Designed to be used by users
   /// @param amount The contract address of either token0 or token1

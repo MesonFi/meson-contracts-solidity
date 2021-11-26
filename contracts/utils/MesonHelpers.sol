@@ -15,18 +15,6 @@ contract MesonHelpers is MesonConfig {
     uint256 ts;
   }
 
-  struct SwapRequest {
-    uint256 amount;
-    uint256 metaAmount;
-    address inToken;
-    bytes4 chain;
-    bytes outToken;
-    bytes receiver; // could be an hex42 address (eth) or in other types
-    address provider;
-    uint256 ts;
-    uint256 bondUntil;
-  }
-
   /// @notice Safe transfers tokens from msg.sender to a recipient
   /// for interacting with ERC20 tokens that do not consistently return true/false
   /// @param token The contract address of the token which will be transferred
