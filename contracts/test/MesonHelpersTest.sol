@@ -41,4 +41,12 @@ contract MesonHelpersTest is MesonHelpers {
       ts
     );
   }
+
+  function checkSignature(
+    bytes memory signature,
+    bytes32 message,
+    address signer
+  ) public pure {
+    _checkSignature(signature, message, signer);
+  }
 }
