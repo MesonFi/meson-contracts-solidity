@@ -1,13 +1,13 @@
 const { ethers, upgrades } = require('hardhat')
 
-const token = '0x243f22fbd4c375581aaacfcfff5a43793eb8a74d'
+const token = '0xbff1e190dbe45d3d74d4f3d9624e740366063c28'
 
 async function main() {
-  const Meson = await ethers.getContractFactory('Meson')
-  console.log('Deploying Meson...')
+  const Meson = await ethers.getContractFactory('UpgradableMeson')
+  console.log('Deploying UpgradableMeson...')
   const meson = await upgrades.deployProxy(Meson, [token], { kind: 'uups' })
   await meson.deployed()
-  console.log('Meson deployed to:', meson.address)
+  console.log('UpgradableMeson deployed to:', meson.address)
 }
 
 main()
