@@ -12,22 +12,22 @@ describe('MesonPools', () => {
   let unsupportedToken: MockToken
 
   beforeEach('deploy MesonPoolsTest', async () => {
-    const result = await waffle.loadFixture(fixtures)
+    const result = await waffle.loadFixture(() => fixtures(wallet))
     contract = result.pools
     token = result.token1
     unsupportedToken = result.token2
   })
 
-  describe('#totalSupplyFor', () => {
-    it('is zero', async () => {
-      expect(await contract.totalSupplyFor(token.address)).to.equal(0)
-    })
-  })
-
-  describe('#totalSupply', () => {
+  describe('#token totalSupply & balance for signer', () => {
     it('is 1000000', async () => {
       expect(await token.totalSupply()).to.equal(1000000000)
       expect(await token.balanceOf(wallet.address)).to.equal(1000000000)
+    })
+  })
+
+  describe('#totalSupplyFor', () => {
+    it('is zero', async () => {
+      expect(await contract.totalSupplyFor(token.address)).to.equal(0)
     })
   })
 
@@ -100,13 +100,15 @@ describe('MesonPools', () => {
         ts,
       }
 
-      const swapId = getSwapId(swap);
+      const swapId = getSwapId(swap)
       const signature = signSwap(wallet, swapId, epoch)
 
+      const receiverInitialBalance = BigInt(await token.balanceOf(receiver))
       await contract.release(wallet.address, signature, amount, inToken, token.address, receiver, ts, epoch)
+      const receiverFinalBalance = (receiverInitialBalance + BigInt(amount)).toString()
 
       expect(await contract.balanceOf(token.address, wallet.address)).to.equal(1000 - amount)
-      expect(await token.balanceOf(receiver)).to.equal(amount)
+      expect(await token.balanceOf(receiver)).to.equal(receiverFinalBalance)
     })
 
     it('refuses unsupported token', async () => {

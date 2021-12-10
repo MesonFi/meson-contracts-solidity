@@ -12,7 +12,7 @@ describe('MesonSwap', () => {
   let unsupportedToken: MockToken
 
   beforeEach('deploy MesonSwapTest', async () => {
-    const result = await waffle.loadFixture(fixtures)
+    const result = await waffle.loadFixture(() => fixtures(wallet))
     contract = result.swap
     token = result.token1
     unsupportedToken = result.token2
