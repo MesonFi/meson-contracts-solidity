@@ -11,6 +11,10 @@ async function setChainConfig(chain) {
 
   let blockchainName, coinType
   switch (chain) {
+    case 'local':
+      blockchainName = 'LocalTest'
+      coinType = '0x80000001'
+      break
     case 'eth':
       blockchainName = 'Ethereum'
       coinType = '0x8000003c'
