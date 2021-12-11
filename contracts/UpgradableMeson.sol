@@ -9,10 +9,12 @@ import "./Pools/MesonPools.sol";
 contract UpgradableMeson is UUPSUpgradeable, MesonSwap, MesonPools {
   bool private initialized;
 
-  function initialize(address _supportedToken) public {
+  function initialize(address[] memory _supportedTokens) public {
     require(!initialized, "Contract instance has already been initialized");
     initialized = true;
-    _addTokenToSwapList(_supportedToken);
+    for (uint i = 0; i < _supportedTokens.length; i++) {
+      _addTokenToSwapList(_supportedTokens[i]);
+    }
   }
 
   function _authorizeUpgrade(address newImplementation) internal pure override {
