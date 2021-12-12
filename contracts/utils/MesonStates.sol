@@ -13,8 +13,8 @@ contract MesonStates is MesonHelpers {
 
   mapping(address => bool) public supportedTokens;
 
-  mapping(address => mapping(bytes32 => Swap)) private _swaps;
-  mapping(address => List.Bytes32List) private _recentSwapLists;
+  mapping(address => mapping(bytes32 => Swap)) internal _recentSwaps;
+  mapping(address => List.Bytes32List) internal _recentSwapLists;
 
   mapping(address => uint256) internal _tokenSupply;
   mapping(address => uint256) internal _tokenDemand;
@@ -60,7 +60,7 @@ contract MesonStates is MesonHelpers {
     uint256 ts = block.timestamp;
     bytes32 id = keccak256(abi.encodePacked(ts, token, metaAmount)); // TODO something else
     Swap memory swap = Swap(id, metaAmount, ts);
-    _swaps[token][id] = swap;
+    _recentSwaps[token][id] = swap;
     _recentSwapLists[token].addItem(id);
     _tokenDemand[token] = LowGasSafeMath.add(_tokenDemand[token], metaAmount);
   }
@@ -72,15 +72,13 @@ contract MesonStates is MesonHelpers {
     List.Bytes32List storage list = _recentSwapLists[token];
 
     (bool success, bytes32 id) = list.getTail();
-    if (!success) return; // list is empty, ignore
-
-    while (_swaps[token][id].ts + TOTAL_DEMAND_CALC_PERIOD < current) {
+    while (success && (_recentSwaps[token][id].ts + TOTAL_DEMAND_CALC_PERIOD < current)) {
       _tokenDemand[token] = LowGasSafeMath.sub(
         _tokenDemand[token],
-        _swaps[token][id].metaAmount
+        _recentSwaps[token][id].metaAmount
       );
       list.popItem();
-      delete _swaps[token][id];
+      delete _recentSwaps[token][id];
       (success, id) = list.getTail();
     }
   }
