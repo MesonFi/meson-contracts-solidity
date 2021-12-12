@@ -66,9 +66,9 @@ describe('MesonPools', () => {
     })
 
     it('refuses too much withdrawal in one epoch', async () => {
-      await token.approve(contract.address, 2000000)
-      await contract.deposit(token.address, 2000000)
-      await expect(contract.withdraw(token.address, 1000001, 0)).to.be.revertedWith('overdrawn in epoch')
+      await token.approve(contract.address, 200000000)
+      await contract.deposit(token.address, 200000000)
+      await expect(contract.withdraw(token.address, 100000001, 0)).to.be.revertedWith('overdrawn in epoch')
     })
 
     it('refuses wrong epoch', async () => {
