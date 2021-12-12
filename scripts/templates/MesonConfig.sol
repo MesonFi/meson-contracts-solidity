@@ -13,7 +13,7 @@ contract MesonConfig {
 
   uint256 constant EPOCH_TIME_PERIOD = 1 hours;
 
-  uint256 constant MAX_RELEASE_AMOUNT_BY_EPOCH = 1000000;
+  uint256 constant MAX_RELEASE_AMOUNT_BY_EPOCH = 100000000;
 
   uint256 constant TOTAL_DEMAND_CALC_PERIOD = 1 days;
 }
