@@ -79,8 +79,7 @@ describe('MesonPools', () => {
   })
 
 
-  describe('#release', () => {
-    const outChain = '0x8000003c' // for ETH by SLIP-44
+  describe('#release', async () => {
     const inToken = ethers.utils.toUtf8Bytes('IN_TOKEN_ADDR')
     const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
     const amount = 100
@@ -88,6 +87,8 @@ describe('MesonPools', () => {
     const ts = Date.now()
 
     it('accepts 100 release', async () => {
+      const outChain = await contract.getCurrentChain()
+      
       await token.approve(contract.address, 1000)
       await contract.deposit(token.address, 1000)
 

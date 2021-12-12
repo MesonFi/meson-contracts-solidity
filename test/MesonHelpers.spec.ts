@@ -6,6 +6,15 @@ import { MesonHelpersTest } from '../typechain/MesonHelpersTest'
 
 describe('MesonHelpers', () => {
   let contract: MesonHelpersTest
+  let outChain: string
+  let swap: Swap
+  let swapId: string
+
+  const inToken = '0x943f0cabc0675f3642927e25abfa9a7ae15e8672'
+  const outToken = '0x2151166224670b37ec76c8ee2011bbbf4bbf2a52'
+  const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
+  const amount = 1
+  const ts = Date.now()
 
   const fixture = async () => {
     const factory = await ethers.getContractFactory('MesonHelpersTest')
@@ -14,16 +23,10 @@ describe('MesonHelpers', () => {
 
   beforeEach('deploy MesonHelpersTest', async () => {
     contract = await waffle.loadFixture(fixture)
+    outChain = await contract.getCurrentChain()
+    swap = { inToken, outToken, outChain, receiver, amount, ts }
+    swapId = getSwapId(swap)
   })
-
-  const outChain = '0x8000003c' // for ETH by SLIP-44
-  const inToken = '0x943f0cabc0675f3642927e25abfa9a7ae15e8672'
-  const outToken = '0x2151166224670b37ec76c8ee2011bbbf4bbf2a52'
-  const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
-  const amount = 1
-  const ts = Date.now()
-  const swap: Swap = { inToken, outToken, outChain, receiver, amount, ts }
-  const swapId = getSwapId(swap)
 
   describe('#getSwapId', () => {
     it('returns same result as getSwapIdAsProvider and the js function', async () => {

@@ -98,4 +98,8 @@ contract MesonHelpers is MesonConfig {
   ) internal pure {
     require(ECDSA.recover(message, signature) == signer, "invalid signature");
   }
+
+  function getCurrentChain() external pure returns (bytes4) {
+    return CURRENT_CHAIN;
+  }
 }
