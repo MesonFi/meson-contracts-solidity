@@ -42,6 +42,7 @@ interface IMesonPools {
   /// @param provider The address of the liquidity provider
   /// @param signature A signature that will unlock the swaps atomically on both chains
   /// @param metaAmount The meta-amount of token to swap (not the exact releasing amount)
+  /// @param inChain The input chain name
   /// @param inToken The input token deposited by the user
   /// @param outToken The output token the user wish to withdraw
   /// @param receiver The address that will receive the output token
@@ -51,6 +52,7 @@ interface IMesonPools {
     address provider,
     bytes memory signature,
     uint256 metaAmount,
+    bytes4 inChain,
     bytes memory inToken,
     address outToken,
     address receiver,
@@ -65,6 +67,7 @@ interface IMesonPools {
   /// @param provider The address of the liquidity provider
   /// @param signature A signature that will unlock the swaps atomically on both chains
   /// @param metaAmount The meta-amount of token to swap (not the exact releasing amount)
+  /// @param inChain The input chain name
   /// @param inToken The input token deposited by the user
   /// @param outToken The output token the user wish to withdraw
   /// @param receiver The address that will receive the output token
@@ -74,6 +77,7 @@ interface IMesonPools {
     address provider,
     bytes memory signature,
     uint256 metaAmount,
+    bytes4 inChain,
     bytes memory inToken,
     address outToken,
     address receiver,
@@ -84,6 +88,7 @@ interface IMesonPools {
   /// @notice Event when a swap request has been released.
   /// Emit at the end of `release()` calls.
   /// @param swapId The ID of the swap
+  /// @param inChain The input chain name
   /// @param epoch The epoch (ref. xxx)
-  event RequestReleased(bytes32 swapId, uint256 epoch);
+  event RequestReleased(bytes32 swapId, bytes4 inChain, uint256 epoch);
 }

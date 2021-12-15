@@ -22,21 +22,21 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
   function requestSwap(
     uint256 amount,
     address inToken,
-    bytes4 chain,
+    bytes4 outChain,
     bytes memory outToken,
     bytes memory receiver
   ) public override tokenSupported(inToken) returns (bytes32) {
     uint256 metaAmount = _toMetaAmount(inToken, amount);
     uint256 ts = block.timestamp;
-    bytes32 swapId = _getSwapId(metaAmount, inToken, chain, outToken, receiver, ts);
+    bytes32 swapId = _getSwapId(metaAmount, inToken, outChain, outToken, receiver, ts);
     require(!_swapExists(swapId), "swap conflict");
 
     address provider = _msgSender();
-    _newRequest(swapId, amount, metaAmount, inToken, chain, outToken, receiver, ts);
+    _newRequest(swapId, amount, metaAmount, inToken, outChain, outToken, receiver, ts);
 
     IERC20Minimal(inToken).transferFrom(provider, address(this), amount);
 
-    emit RequestPosted(swapId, metaAmount, inToken, chain, outToken, receiver, ts);
+    emit RequestPosted(swapId, metaAmount, inToken, outChain, outToken, receiver, ts);
 
     return swapId;
   }

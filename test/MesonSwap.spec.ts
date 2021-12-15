@@ -19,6 +19,7 @@ describe('MesonSwap', () => {
   })
 
 
+  const inChain = '0x80000001' // for TestNet by SLIP-44
   const outChain = '0x8000003c' // for ETH by SLIP-44
   const outToken = ethers.utils.toUtf8Bytes('OUT_TOKEN_ADDR')
   const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
@@ -28,10 +29,11 @@ describe('MesonSwap', () => {
     it('accepts a swap', async () => {
       await token.approve(contract.address, amount)
       const res = await contract.requestSwap(amount, token.address, outChain, outToken, receiver)
-      const block = await ethers.provider.getBlock(res.blockNumber)
+      await res.wait() // Wait for it to be mined
+      const block = await ethers.provider.getBlock(res.blockNumber!)
       const ts = block.timestamp
 
-      const swap: Swap = { inToken: token.address, outToken, outChain, receiver, amount, ts }
+      const swap: Swap = { inChain, inToken: token.address, outToken, outChain, receiver, amount, ts }
       const swapId = getSwapId(swap)
       expect(await contract.doesSwapExist(swapId)).to.equal(true)
     })
@@ -48,10 +50,11 @@ describe('MesonSwap', () => {
     it('can bond a swap', async () => {
       await token.approve(contract.address, amount)
       const res = await contract.requestSwap(amount, token.address, outChain, outToken, receiver)
-      const block = await ethers.provider.getBlock(res.blockNumber)
+      await res.wait() // Wait for it to be mined
+      const block = await ethers.provider.getBlock(res.blockNumber!)
       const ts = block.timestamp
 
-      const swap: Swap = { inToken: token.address, outToken, outChain, receiver, amount, ts }
+      const swap: Swap = { inChain, inToken: token.address, outToken, outChain, receiver, amount, ts }
       const swapId = getSwapId(swap)
 
       await contract.bondSwap(swapId, wallet.address)
@@ -65,10 +68,11 @@ describe('MesonSwap', () => {
     it('can execute a swap', async () => {
       await token.approve(contract.address, amount)
       const res = await contract.requestSwap(amount, token.address, outChain, outToken, receiver)
-      const block = await ethers.provider.getBlock(res.blockNumber)
+      await res.wait() // Wait for it to be mined
+      const block = await ethers.provider.getBlock(res.blockNumber!)
       const ts = block.timestamp
 
-      const swap: Swap = { inToken: token.address, outToken, outChain, receiver, amount, ts }
+      const swap: Swap = { inChain, inToken: token.address, outToken, outChain, receiver, amount, ts }
       const epoch = 0
       const swapId = getSwapId(swap)
       const signautre = signSwap(wallet, swapId, epoch)

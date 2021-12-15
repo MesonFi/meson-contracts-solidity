@@ -80,6 +80,7 @@ describe('MesonPools', () => {
 
 
   describe('#release', async () => {
+    const inChain = '0x80000099';
     const inToken = ethers.utils.toUtf8Bytes('IN_TOKEN_ADDR')
     const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
     const amount = 100
@@ -88,11 +89,12 @@ describe('MesonPools', () => {
 
     it('accepts 100 release', async () => {
       const outChain = await contract.getCurrentChain()
-      
+
       await token.approve(contract.address, 1000)
       await contract.deposit(token.address, 1000)
 
       const swap: Swap = {
+        inChain,
         inToken,
         outToken: token.address,
         outChain,
@@ -104,8 +106,8 @@ describe('MesonPools', () => {
       const swapId = getSwapId(swap)
       const signature = signSwap(wallet, swapId, epoch)
 
-      const receiverInitialBalance = BigInt(await token.balanceOf(receiver))
-      await contract.release(wallet.address, signature, amount, inToken, token.address, receiver, ts, epoch)
+      const receiverInitialBalance = (await token.balanceOf(receiver)).toBigInt()
+      await contract.release(wallet.address, signature, amount, inChain, inToken, token.address, receiver, ts, epoch)
       const receiverFinalBalance = (receiverInitialBalance + BigInt(amount)).toString()
 
       expect(await contract.balanceOf(token.address, wallet.address)).to.equal(1000 - amount)
@@ -113,12 +115,12 @@ describe('MesonPools', () => {
     })
 
     it('refuses unsupported token', async () => {
-      await expect(contract.release(wallet.address, '0x', amount, inToken, unsupportedToken.address, receiver, ts, epoch))
+      await expect(contract.release(wallet.address, '0x', amount, inChain, inToken, unsupportedToken.address, receiver, ts, epoch))
         .to.be.revertedWith('unsupported token')
     })
 
     it('refuses wrong epoch', async () => {
-      await expect(contract.release(wallet.address, '0x', amount, inToken, token.address, receiver, ts, epoch + 2))
+      await expect(contract.release(wallet.address, '0x', amount, inChain, inToken, token.address, receiver, ts, epoch + 2))
         .to.be.revertedWith('invalid epoch')
     })
   })

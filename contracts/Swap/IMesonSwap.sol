@@ -21,14 +21,14 @@ interface IMesonSwap {
   /// @dev Designed to be used by users
   /// @param amount The contract address of either token0 or token1
   /// @param inToken The contract address of the given token
-  /// @param chain The target chain name
+  /// @param outChain The target chain name
   /// @param outToken The type of token
   /// @param receiver The address of the output token
   /// @return swapId The ID of the swap
   function requestSwap(
     uint256 amount,
     address inToken,
-    bytes4 chain,
+    bytes4 outChain,
     bytes memory outToken,
     bytes memory receiver
   ) external returns (bytes32);
@@ -82,7 +82,7 @@ interface IMesonSwap {
   /// @param swapId The ID of the swap
   /// @param amount The contract address of either token0 or token1
   /// @param inToken The contract address of the given token
-  /// @param chain The target chain name
+  /// @param outChain The target chain name
   /// @param outToken The type of token
   /// @param receiver The address of the output token
   /// @param ts The block time the swap is initially requested
@@ -90,7 +90,7 @@ interface IMesonSwap {
       bytes32 swapId,
       uint256 amount,
       address inToken,
-      bytes4 chain,
+      bytes4 outChain,
       bytes outToken,
       bytes receiver,
       uint256 ts

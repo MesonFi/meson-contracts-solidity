@@ -6,6 +6,7 @@ import { MesonHelpersTest } from '../typechain/MesonHelpersTest'
 
 describe('MesonHelpers', () => {
   let contract: MesonHelpersTest
+  let inChain: string
   let outChain: string
   let swap: Swap
   let swapId: string
@@ -23,8 +24,10 @@ describe('MesonHelpers', () => {
 
   beforeEach('deploy MesonHelpersTest', async () => {
     contract = await waffle.loadFixture(fixture)
-    outChain = await contract.getCurrentChain()
-    swap = { inToken, outToken, outChain, receiver, amount, ts }
+    inChain = await contract.getCurrentChain()
+    // TODO: Find a way to simulate two chains in tests
+    outChain = inChain
+    swap = { inChain, inToken, outToken, outChain, receiver, amount, ts }
     swapId = getSwapId(swap)
   })
 
@@ -40,6 +43,7 @@ describe('MesonHelpers', () => {
       )
       const swapIdAsProvider = await contract.getSwapIdAsProvider(
         amount,
+        inChain,
         inToken,
         outToken,
         receiver,

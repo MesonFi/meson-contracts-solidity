@@ -42,7 +42,7 @@ contract MesonHelpers is MesonConfig {
   function _getSwapId(
     uint256 metaAmount,
     address inToken,
-    bytes4 chain,
+    bytes4 outChain,
     bytes memory outToken,
     bytes memory receiver,
     uint256 ts
@@ -50,9 +50,11 @@ contract MesonHelpers is MesonConfig {
     return
       keccak256(
         abi.encodePacked(
+          CURRENT_CHAIN,
+          ":",
           inToken,
           ":",
-          chain,
+          outChain,
           ":",
           outToken,
           ":",
@@ -68,6 +70,7 @@ contract MesonHelpers is MesonConfig {
   /// @notice Get ID for a swap on the target chain the swap is requested
   function _getSwapIdAsProvider(
     uint256 metaAmount,
+    bytes4 inChain,
     bytes memory inToken,
     address outToken,
     address receiver,
@@ -76,6 +79,8 @@ contract MesonHelpers is MesonConfig {
     return
       keccak256(
         abi.encodePacked(
+          inChain,
+          ":",
           inToken,
           ":",
           CURRENT_CHAIN,

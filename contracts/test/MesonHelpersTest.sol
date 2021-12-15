@@ -11,7 +11,7 @@ contract MesonHelpersTest is MesonHelpers {
   function getSwapId(
     uint256 metaAmount,
     address inToken,
-    bytes4 chain,
+    bytes4 outChain,
     bytes memory outToken,
     bytes memory receiver,
     uint256 ts
@@ -19,7 +19,7 @@ contract MesonHelpersTest is MesonHelpers {
     return _getSwapId(
       metaAmount,
       inToken,
-      chain,
+      outChain,
       outToken,
       receiver,
       ts
@@ -28,6 +28,7 @@ contract MesonHelpersTest is MesonHelpers {
 
   function getSwapIdAsProvider(
     uint256 metaAmount,
+    bytes4 inChain,
     bytes memory inToken,
     address outToken,
     address receiver,
@@ -35,6 +36,7 @@ contract MesonHelpersTest is MesonHelpers {
   ) public pure returns (bytes32) {
     return _getSwapIdAsProvider(
       metaAmount,
+      inChain,
       inToken,
       outToken,
       receiver,

@@ -3,6 +3,7 @@ import { ethers, BytesLike, Wallet } from 'ethers'
 const { joinSignature, solidityKeccak256 } = ethers.utils
 
 export type Swap = {
+  inChain: BytesLike,
   inToken: BytesLike,
   outChain: BytesLike,
   outToken: BytesLike,
@@ -13,8 +14,8 @@ export type Swap = {
 
 export function getSwapId(swap: Swap) {
   return solidityKeccak256(
-    ['bytes', 'string', 'bytes4', 'string', 'bytes', 'string', 'bytes', 'string', 'uint256', 'string', 'uint256'],
-    [swap.inToken, ':', swap.outChain, ':', swap.outToken, ':', swap.receiver, ':', swap.amount, ':', swap.ts]
+    ['bytes4', 'string', 'bytes', 'string', 'bytes4', 'string', 'bytes', 'string', 'bytes', 'string', 'uint256', 'string', 'uint256'],
+    [swap.inChain, ':', swap.inToken, ':', swap.outChain, ':', swap.outToken, ':', swap.receiver, ':', swap.amount, ':', swap.ts]
   )
 }
 

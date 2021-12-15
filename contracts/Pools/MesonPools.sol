@@ -92,6 +92,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     address provider,
     bytes memory signature,
     uint256 metaAmount,
+    bytes4 inChain,
     bytes memory inToken,
     address outToken,
     address receiver,
@@ -112,6 +113,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
       provider,
       signature,
       metaAmount,
+      inChain,
       inToken,
       outToken,
       receiver,
@@ -125,7 +127,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
 
     _withdrawTo(receiver, provider, outToken, amount);
 
-    emit RequestReleased(swapId, epoch);
+    emit RequestReleased(swapId, inChain, epoch);
   }
 
 
@@ -134,6 +136,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     address provider,
     bytes memory signature,
     uint256 metaAmount,
+    bytes4 inChain,
     bytes memory inToken,
     address outToken,
     address receiver,
@@ -144,12 +147,15 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
       provider,
       signature,
       metaAmount,
+      inChain,
       inToken,
       outToken,
       receiver,
       ts,
       epoch
     );
+
+    // TODO: implement this method
   }
 
 
@@ -158,6 +164,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     address provider,
     bytes memory signature,
     uint256 metaAmount,
+    bytes4 inChain,
     bytes memory inToken,
     address outToken,
     address receiver,
@@ -165,7 +172,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     uint256 epoch
   ) private pure returns (bytes32) {
     bytes32 swapId =
-      _getSwapIdAsProvider(metaAmount, inToken, outToken, receiver, ts);
+      _getSwapIdAsProvider(metaAmount, inChain, inToken, outToken, receiver, ts);
     bytes32 swapHash = _getSwapHash(swapId, epoch);
     _checkSignature(signature, swapHash, provider);
     return swapId;
