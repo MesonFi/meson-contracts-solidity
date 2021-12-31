@@ -5,7 +5,7 @@ import { SwapRequestData } from './SwapRequest'
 export class SwapSigner {
   _domain: any
 
-  constructor(verifyingContract: BytesLike, chainId: number) {
+  constructor(verifyingContract: BytesLike, chainId: BytesLike) {
     this._domain = { name: 'Meson Fi', version: '1', chainId, verifyingContract }
   }
 

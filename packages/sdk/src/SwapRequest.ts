@@ -1,6 +1,6 @@
-import { ethers, BytesLike } from 'ethers'
+import { utils, BytesLike } from 'ethers'
 
-const { id, keccak256, defaultAbiCoder } = ethers.utils
+const { id, keccak256, defaultAbiCoder } = utils
 
 const SWAP_REQUEST_TYPEHASH = id('SwapRequest(uint256 expireTs,bytes inToken,uint256 amount,bytes4 outChain,bytes outToken,bytes recipient)')
 
@@ -13,7 +13,7 @@ export interface SwapRequestData {
   recipient: BytesLike,
 }
 
-interface PartialSwapRequest {
+export interface PartialSwapRequest {
   inToken: BytesLike,
   amount: number,
   outToken: BytesLike,
@@ -28,6 +28,9 @@ export class SwapRequest implements SwapRequestData {
   readonly outToken: BytesLike
   readonly recipient: BytesLike
 
+  private _encoded: BytesLike
+  private _swapId: BytesLike
+
   constructor(req: SwapRequestData) {
     this.expireTs = req.expireTs
     this.inToken = req.inToken
@@ -37,30 +40,28 @@ export class SwapRequest implements SwapRequestData {
     this.recipient = req.recipient
   }
 
-  static To(outChain: BytesLike, swap: PartialSwapRequest, lockPeriod: number = 3600) {
-    return new SwapRequest({
-      ...swap,
-      outChain,
-      expireTs: Date.now() + lockPeriod,
-    })
-  }
-
   encode(): BytesLike {
-    return defaultAbiCoder.encode(
-      ['bytes32', 'uint256', 'bytes32', 'uint256', 'bytes4', 'bytes32', 'bytes32'],
-      [
-        SWAP_REQUEST_TYPEHASH,
-        this.expireTs,
-        keccak256(this.inToken),
-        this.amount,
-        this.outChain,
-        keccak256(this.outToken),
-        keccak256(this.recipient)
-      ]
-    )
+    if (!this._encoded) {
+      this._encoded = defaultAbiCoder.encode(
+        ['bytes32', 'uint256', 'bytes32', 'uint256', 'bytes4', 'bytes32', 'bytes32'],
+        [
+          SWAP_REQUEST_TYPEHASH,
+          this.expireTs,
+          keccak256(this.inToken),
+          this.amount,
+          this.outChain,
+          keccak256(this.outToken),
+          keccak256(this.recipient)
+        ]
+      )
+    }
+    return this._encoded
   }
 
-  getSwapId (): BytesLike {
-    return keccak256(this.encode())
+  id (): BytesLike {
+    if (!this._swapId) {
+      this._swapId = keccak256(this.encode())
+    }
+    return this._swapId
   }
 }
