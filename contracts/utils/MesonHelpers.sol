@@ -55,48 +55,6 @@ contract MesonHelpers is MesonConfig {
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
   }
 
-  /// @notice Get ID for a swap on the chain the swap is initiated
-  function _getSwapId(
-    uint256 expireTs,
-    address inToken,
-    uint256 amount,
-    bytes4 outChain,
-    bytes memory outToken,
-    bytes memory recipient
-  ) internal pure returns (bytes32) {
-    return
-      keccak256(
-        _encodeSwap(
-          expireTs,
-          abi.encodePacked(inToken),
-          amount,
-          outChain,
-          outToken,
-          recipient
-        )
-      );
-  }
-
-  function _encodeSwap(
-    uint256 expireTs,
-    bytes memory inToken,
-    uint256 amount,
-    bytes4 outChain,
-    bytes memory outToken,
-    bytes memory recipient
-  ) internal pure returns (bytes memory) {
-    return
-      abi.encode(
-        SWAP_REQUEST_TYPEHASH,
-        expireTs,
-        keccak256(inToken),
-        amount,
-        outChain,
-        keccak256(outToken),
-        keccak256(recipient)
-      );
-  }
-
   function _decodeSwap(bytes memory encodedSwap) internal pure returns (uint256, bytes32, uint256) {
     (bytes32 typehash, uint256 expireTs, bytes32 inTokenHash, uint256 amount, , ,) =
       abi.decode(encodedSwap, (bytes32, uint256, bytes32, uint256, bytes4, bytes32, bytes32));

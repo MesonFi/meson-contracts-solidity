@@ -12,7 +12,17 @@ contract MesonHelpersTest is MesonHelpers {
     bytes memory outToken,
     bytes memory recipient
   ) external pure returns (bytes32) {
-    return _getSwapId(expireTs, inToken, amount, outChain, outToken, recipient);
+    return
+      keccak256(
+        encodeSwap(
+          expireTs,
+          abi.encodePacked(inToken),
+          amount,
+          outChain,
+          outToken,
+          recipient
+        )
+      );
   }
 
   function encodeSwap(
@@ -22,8 +32,17 @@ contract MesonHelpersTest is MesonHelpers {
     bytes4 outChain,
     bytes memory outToken,
     bytes memory recipient
-  ) external pure returns (bytes memory) {
-    return _encodeSwap(expireTs, inToken, amount, outChain, outToken, recipient);
+  ) public pure returns (bytes memory) {
+    return
+      abi.encode(
+        SWAP_REQUEST_TYPEHASH,
+        expireTs,
+        keccak256(inToken),
+        amount,
+        outChain,
+        keccak256(outToken),
+        keccak256(recipient)
+      );
   }
 
   function decodeSwap(bytes memory encodedSwap)
