@@ -22,7 +22,7 @@
     "mocha": "^9.1.3",
     "mocha-chai-jest-snapshot": "^1.1.3",
     "regenerator-runtime": "^0.13.9",
-    "solc-0.8.6": "npm:solc@0.8.6",
+    "solc": "0.8.6",
     "solidity-docgen": "^0.5.16",
     "ts-generator": "^0.1.1",
     "ts-node": "^10.4.0",
@@ -40,6 +40,6 @@
     "chain:one": "BLOCKCHAIN_NAME=one node scripts/set-chain-config.js",
     "deploy": "hardhat run scripts/deploy-upgradable.js",
     "upgrade": "hardhat run scripts/upgrade.js",
-    "docgen": "solidity-docgen --solc-module solc-0.8.6 -t ./templates"
+    "docgen": "solidity-docgen --solc-module solc -t ./templates"
   }
 }

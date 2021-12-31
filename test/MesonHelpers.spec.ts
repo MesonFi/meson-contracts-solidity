@@ -1,20 +1,22 @@
 import { ethers, waffle } from 'hardhat'
 import { expect } from './shared/expect'
 import { wallet } from './shared/wallet'
-import { Swap, getSwapId, getSwapHash, signSwap } from '../libs/meson_helpers'
+import { Swap, encodeSwap, getSwapId, TypedSigner } from '../libs/meson_helpers'
 import { MesonHelpersTest } from '../typechain/MesonHelpersTest'
 
 describe('MesonHelpers', () => {
   let contract: MesonHelpersTest
+  let typedSigner: TypedSigner
   let outChain: string
   let swap: Swap
+  let encodedSwap: string
   let swapId: string
 
+  const expireTs = Date.now()
   const inToken = '0x943f0cabc0675f3642927e25abfa9a7ae15e8672'
-  const outToken = '0x2151166224670b37ec76c8ee2011bbbf4bbf2a52'
-  const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
   const amount = 1
-  const ts = Date.now()
+  const outToken = '0x2151166224670b37ec76c8ee2011bbbf4bbf2a52'
+  const recipient = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
 
   const fixture = async () => {
     const factory = await ethers.getContractFactory('MesonHelpersTest')
@@ -24,50 +26,62 @@ describe('MesonHelpers', () => {
   beforeEach('deploy MesonHelpersTest', async () => {
     contract = await waffle.loadFixture(fixture)
     outChain = await contract.getCurrentChain()
-    swap = { inToken, outToken, outChain, receiver, amount, ts }
+    typedSigner = new TypedSigner(contract.address, 3 /* chainId */)
+    swap = { expireTs, inToken, amount, outChain, outToken, recipient }
+    encodedSwap = encodeSwap(swap)
     swapId = getSwapId(swap)
   })
 
-  describe('#getSwapId', () => {
-    it('returns same result as getSwapIdAsProvider and the js function', async () => {
-      const swapIdAsUser = await contract.getSwapId(
-        amount,
+  describe('#encodeSwap', () => {
+    it('returns same result as js function', async () => {
+      const encodedSwapFromContract = await contract.encodeSwap(
+        expireTs,
         inToken,
+        amount,
         outChain,
         outToken,
-        receiver,
-        ts
+        recipient
       )
-      const swapIdAsProvider = await contract.getSwapIdAsProvider(
-        amount,
+
+      expect(encodedSwapFromContract).to.equal(encodedSwap)
+    })
+  })
+
+  describe('#getSwapId', () => {
+    it('returns same result as js function', async () => {
+      const swapIdFromContract = await contract.getSwapId(
+        expireTs,
         inToken,
+        amount,
+        outChain,
         outToken,
-        receiver,
-        ts
+        recipient
       )
-      expect(swapId).to.equal(swapIdAsUser)
-      expect(swapId).to.equal(swapIdAsProvider)
+
+      expect(swapIdFromContract).to.equal(swapId)
     })
   })
 
-  describe('#getSwapHash', () => {
-    it('returns same result as the js function', async () => {
-      const epoch = 10
-      const swapHash = getSwapHash(swapId, epoch)
-
-      const swapHashAsProvider = await contract.getSwapHash(swapId, epoch)
-      expect(swapHash).to.equal(swapHashAsProvider)
+  describe('#decodeSwap', () => {
+    it('returns decoded swap data', async () => {
+      const decoded = await contract.decodeSwap(encodedSwap)
+      expect(decoded[0]).to.equal(expireTs)
+      expect(decoded[1].toLowerCase()).to.equal(ethers.utils.keccak256(inToken))
+      expect(decoded[2]).to.equal(amount)
     })
   })
 
-  describe('#checkSignature', () => {
-    it('checkSignature could check signer from message and signature', async () => {
-      const swapId = getSwapId(swap);
-      const epoch = 10;
-      const swapHash = getSwapHash(swapId, epoch);
-      const signature = signSwap(wallet, swapId, epoch);
+  describe('#checkRequestSignature', () => {
+    it('validates a request signature', async () => {
+      const { r, s, v } = await typedSigner.signSwapRequest(swap, wallet)
+      await contract.checkRequestSignature(swapId, wallet.address, r, s, v)
+    })
+  })
 
-      await contract.checkSignature(signature, swapHash, wallet.address);
+  describe('#checkReleaseSignature', () => {
+    it('validates a release signature', async () => {
+      const { r, s, v } = await typedSigner.signSwapRelease(swapId, wallet)
+      await contract.checkReleaseSignature(swapId, wallet.address, r, s, v)
     })
   })
 })
