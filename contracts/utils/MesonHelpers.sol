@@ -4,6 +4,7 @@ pragma solidity 0.8.6;
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "../MesonConfig.sol";
+import "../interfaces/IERC20Minimal.sol";
 
 /// @title MesonHelpers
 contract MesonHelpers is MesonConfig {
@@ -53,6 +54,15 @@ contract MesonHelpers is MesonConfig {
   ) internal {
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(ERC20_TRANSFER_SELECTOR, recipient, amount));
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
+  }
+
+  /// @notice Execute the token transfer transaction
+  function _unsafeDepositToken(
+    address token,
+    address sender,
+    uint256 amount
+  ) internal {
+    IERC20Minimal(token).transferFrom(sender, address(this), amount);
   }
 
   function _decodeSwap(bytes memory encodedSwap) internal pure returns (uint256, bytes32, uint256) {

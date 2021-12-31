@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "../libraries/LowGasSafeMath.sol";
-import "../interfaces/IERC20Minimal.sol";
 
 import "./IMesonPools.sol";
 import "../utils/MesonPricing.sol";
@@ -31,7 +30,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
       amount
     );
     _increaseSupply(token, amount);
-    _transferToken(token, provider, address(this), amount);
+    _unsafeDepositToken(token, provider, amount);
   }
 
   /// @inheritdoc IMesonPools
@@ -58,16 +57,6 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
       amount
     );
     _safeTransfer(token, receiver, amount);
-  }
-
-  /// @notice Execute the token transfer transaction
-  function _transferToken(
-    address token,
-    address sender,
-    address receiver,
-    uint256 amount
-  ) private {
-    IERC20Minimal(token).transferFrom(sender, receiver, amount);
   }
 
   /// @inheritdoc IMesonPools

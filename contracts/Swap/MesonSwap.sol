@@ -53,7 +53,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
       amount
     );
 
-    IERC20Minimal(inToken).transferFrom(initiator, address(this), amount);
+    _unsafeDepositToken(inToken, initiator, amount);
 
     emit SwapPosted(swapId, ts, amount, inToken);
   }
