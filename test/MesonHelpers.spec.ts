@@ -1,9 +1,9 @@
 import { ethers, waffle } from 'hardhat'
 import { MesonInterface, SwapRequest, SwapSigner } from '@meson/sdk'
+import { MesonHelpersTest } from '@meson/contract-types/MesonHelpersTest'
 
 import { expect } from './shared/expect'
 import { wallet } from './shared/wallet'
-import { MesonHelpersTest } from '../typechain/MesonHelpersTest'
 
 describe('MesonHelpers', () => {
   let contract: MesonHelpersTest

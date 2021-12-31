@@ -1,6 +1,7 @@
 import { ethers, waffle } from 'hardhat'
+import { MesonStatesTest } from '@meson/contract-types/MesonStatesTest'
+
 import { expect } from './shared/expect'
-import { MesonStatesTest } from '../typechain/MesonStatesTest'
 
 const token = '0x243f22fbd4c375581aaacfcfff5a43793eb8a74d'
 

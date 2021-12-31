@@ -46,6 +46,6 @@ export default {
     },
   },
   typechain: {
-    outDir: 'typechain',
+    outDir: 'packages/contract-types/types',
   }
 }
