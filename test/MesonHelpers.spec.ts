@@ -1,14 +1,14 @@
 import { ethers, waffle } from 'hardhat'
 import { expect } from './shared/expect'
 import { wallet } from './shared/wallet'
-import { Swap, encodeSwap, getSwapId, TypedSigner } from '../libs/meson_helpers'
+import { SwapRequest, SwapSigner } from '../libs'
 import { MesonHelpersTest } from '../typechain/MesonHelpersTest'
 
 describe('MesonHelpers', () => {
   let contract: MesonHelpersTest
-  let typedSigner: TypedSigner
   let outChain: string
-  let swap: Swap
+  let swap: SwapRequest
+  let swapSigner: SwapSigner
   let encodedSwap: string
   let swapId: string
 
@@ -26,10 +26,10 @@ describe('MesonHelpers', () => {
   beforeEach('deploy MesonHelpersTest', async () => {
     contract = await waffle.loadFixture(fixture)
     outChain = await contract.getCurrentChain()
-    typedSigner = new TypedSigner(contract.address, 3 /* chainId */)
-    swap = { expireTs, inToken, amount, outChain, outToken, recipient }
-    encodedSwap = encodeSwap(swap)
-    swapId = getSwapId(swap)
+    swap = new SwapRequest({ expireTs, inToken, amount, outChain, outToken, recipient })
+    swapSigner = new SwapSigner(contract.address, 3 /* chainId */)
+    encodedSwap = swap.encode()
+    swapId = swap.getSwapId()
   })
 
   describe('#encodeSwap', () => {
@@ -73,14 +73,14 @@ describe('MesonHelpers', () => {
 
   describe('#checkRequestSignature', () => {
     it('validates a request signature', async () => {
-      const { r, s, v } = await typedSigner.signSwapRequest(swap, wallet)
+      const { r, s, v } = await swapSigner.signSwapRequest(swap, wallet)
       await contract.checkRequestSignature(swapId, wallet.address, r, s, v)
     })
   })
 
   describe('#checkReleaseSignature', () => {
     it('validates a release signature', async () => {
-      const { r, s, v } = await typedSigner.signSwapRelease(swapId, wallet)
+      const { r, s, v } = await swapSigner.signSwapRelease(swapId, wallet)
       await contract.checkReleaseSignature(swapId, wallet.address, r, s, v)
     })
   })
