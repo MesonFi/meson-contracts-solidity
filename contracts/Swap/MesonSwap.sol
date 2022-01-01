@@ -64,9 +64,10 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     swapExists(swapId)
     swapExpired(swapId)
   {
-    address inToken = requests[swapId].inToken;
-    address initiator = requests[swapId].initiator;
-    uint256 amount = requests[swapId].amount;
+    SwapRequest memory req = requests[swapId];
+    address inToken = req.inToken;
+    address initiator = req.initiator;
+    uint256 amount = req.amount;
     delete requests[swapId];
 
     _safeTransfer(inToken, initiator, amount);
