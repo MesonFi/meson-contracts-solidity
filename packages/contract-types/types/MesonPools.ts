@@ -24,7 +24,7 @@ export interface MesonPoolsInterface extends utils.Interface {
     "deposit(address,uint256)": FunctionFragment;
     "getChainId()": FunctionFragment;
     "getCurrentChain()": FunctionFragment;
-    "lock(bytes,address,address)": FunctionFragment;
+    "lock(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
     "lockingSwaps(bytes32)": FunctionFragment;
     "release(bytes32,uint256,bytes32,bytes32,uint8)": FunctionFragment;
     "supportedTokens(address)": FunctionFragment;
@@ -64,7 +64,7 @@ export interface MesonPoolsInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "lock",
-    values: [BytesLike, string, string]
+    values: [BytesLike, string, string, BytesLike, BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "lockingSwaps",
@@ -199,6 +199,9 @@ export interface MesonPools extends BaseContract {
       encodedSwap: BytesLike,
       token: string,
       recipient: string,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -283,6 +286,9 @@ export interface MesonPools extends BaseContract {
     encodedSwap: BytesLike,
     token: string,
     recipient: string,
+    r: BytesLike,
+    s: BytesLike,
+    v: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -358,6 +364,9 @@ export interface MesonPools extends BaseContract {
       encodedSwap: BytesLike,
       token: string,
       recipient: string,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -448,6 +457,9 @@ export interface MesonPools extends BaseContract {
       encodedSwap: BytesLike,
       token: string,
       recipient: string,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -524,6 +536,9 @@ export interface MesonPools extends BaseContract {
       encodedSwap: BytesLike,
       token: string,
       recipient: string,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

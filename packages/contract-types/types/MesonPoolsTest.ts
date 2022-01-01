@@ -25,8 +25,8 @@ export interface MesonPoolsTestInterface extends utils.Interface {
     "deposit(address,uint256)": FunctionFragment;
     "getChainId()": FunctionFragment;
     "getCurrentChain()": FunctionFragment;
-    "isSwapLocked(bytes32)": FunctionFragment;
-    "lock(bytes,address,address)": FunctionFragment;
+    "hasLockingSwap(bytes32)": FunctionFragment;
+    "lock(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
     "lockingSwaps(bytes32)": FunctionFragment;
     "release(bytes32,uint256,bytes32,bytes32,uint8)": FunctionFragment;
     "supportedTokens(address)": FunctionFragment;
@@ -69,12 +69,12 @@ export interface MesonPoolsTestInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "isSwapLocked",
+    functionFragment: "hasLockingSwap",
     values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "lock",
-    values: [BytesLike, string, string]
+    values: [BytesLike, string, string, BytesLike, BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "lockingSwaps",
@@ -115,7 +115,7 @@ export interface MesonPoolsTestInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "isSwapLocked",
+    functionFragment: "hasLockingSwap",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "lock", data: BytesLike): Result;
@@ -218,7 +218,7 @@ export interface MesonPoolsTest extends BaseContract {
 
     getCurrentChain(overrides?: CallOverrides): Promise<[string]>;
 
-    isSwapLocked(
+    hasLockingSwap(
       swapId: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
@@ -227,6 +227,9 @@ export interface MesonPoolsTest extends BaseContract {
       encodedSwap: BytesLike,
       token: string,
       recipient: string,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -312,12 +315,18 @@ export interface MesonPoolsTest extends BaseContract {
 
   getCurrentChain(overrides?: CallOverrides): Promise<string>;
 
-  isSwapLocked(swapId: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+  hasLockingSwap(
+    swapId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   lock(
     encodedSwap: BytesLike,
     token: string,
     recipient: string,
+    r: BytesLike,
+    s: BytesLike,
+    v: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -391,7 +400,7 @@ export interface MesonPoolsTest extends BaseContract {
 
     getCurrentChain(overrides?: CallOverrides): Promise<string>;
 
-    isSwapLocked(
+    hasLockingSwap(
       swapId: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
@@ -400,6 +409,9 @@ export interface MesonPoolsTest extends BaseContract {
       encodedSwap: BytesLike,
       token: string,
       recipient: string,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -491,7 +503,7 @@ export interface MesonPoolsTest extends BaseContract {
 
     getCurrentChain(overrides?: CallOverrides): Promise<BigNumber>;
 
-    isSwapLocked(
+    hasLockingSwap(
       swapId: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -500,6 +512,9 @@ export interface MesonPoolsTest extends BaseContract {
       encodedSwap: BytesLike,
       token: string,
       recipient: string,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -577,7 +592,7 @@ export interface MesonPoolsTest extends BaseContract {
 
     getCurrentChain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    isSwapLocked(
+    hasLockingSwap(
       swapId: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -586,6 +601,9 @@ export interface MesonPoolsTest extends BaseContract {
       encodedSwap: BytesLike,
       token: string,
       recipient: string,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
