@@ -1,20 +1,15 @@
 import { ethers, waffle } from 'hardhat'
-import { MesonInterface, SwapRequest, SwapSigner } from '@meson/sdk'
-import { MesonHelpersTest } from '@meson/contract-types/MesonHelpersTest'
+import { MesonInterface, SwapRequest } from '@meson/sdk'
+import { MesonHelpersTest } from '@meson/contract-types'
 
 import { expect } from './shared/expect'
 import { wallet } from './shared/wallet'
+import { getDefaultSwap } from './shared/meson'
 
 describe('MesonHelpers', () => {
   let contract: MesonHelpersTest
-  let outChain: string
   let meson: MesonInterface
   let swap: SwapRequest
-
-  const inToken = '0x943f0cabc0675f3642927e25abfa9a7ae15e8672'
-  const amount = 1
-  const outToken = '0x2151166224670b37ec76c8ee2011bbbf4bbf2a52'
-  const recipient = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
 
   const fixture = async () => {
     const factory = await ethers.getContractFactory('MesonHelpersTest')
@@ -23,20 +18,20 @@ describe('MesonHelpers', () => {
 
   beforeEach('deploy MesonHelpersTest', async () => {
     contract = await waffle.loadFixture(fixture)
-    outChain = await contract.getCurrentChain()
+    const outChain = await contract.getCurrentChain()
     meson = new MesonInterface({ mesonAddress: contract.address, chainId: '0x3' })
-    swap = meson.requestSwap(outChain, { inToken, amount, outToken, recipient })
+    swap = meson.requestSwap(outChain, getDefaultSwap())
   })
 
   describe('#encodeSwap', () => {
     it('returns same result as js function', async () => {
       const encodedSwapFromContract = await contract.encodeSwap(
         swap.expireTs,
-        inToken,
-        amount,
-        outChain,
-        outToken,
-        recipient
+        swap.inToken,
+        swap.amount,
+        swap.outChain,
+        swap.outToken,
+        swap.recipient
       )
 
       expect(encodedSwapFromContract).to.equal(swap.encode())
@@ -47,23 +42,23 @@ describe('MesonHelpers', () => {
     it('returns same result as js function', async () => {
       const swapIdFromContract = await contract.getSwapId(
         swap.expireTs,
-        inToken,
-        amount,
-        outChain,
-        outToken,
-        recipient
+        swap.inToken,
+        swap.amount,
+        swap.outChain,
+        swap.outToken,
+        swap.recipient
       )
 
       expect(swapIdFromContract).to.equal(swap.id())
     })
   })
 
-  describe('#decodeSwap', () => {
+  describe('#decodeSwapInput', () => {
     it('returns decoded swap data', async () => {
-      const decoded = await contract.decodeSwap(swap.encode())
+      const decoded = await contract.decodeSwapInput(swap.encode())
       expect(decoded[0]).to.equal(swap.expireTs)
-      expect(decoded[1].toLowerCase()).to.equal(ethers.utils.keccak256(inToken))
-      expect(decoded[2]).to.equal(amount)
+      expect(decoded[1].toLowerCase()).to.equal(ethers.utils.keccak256(swap.inToken))
+      expect(decoded[2]).to.equal(swap.amount)
     })
   })
 
