@@ -23,6 +23,7 @@ export interface MesonSwapTestInterface extends utils.Interface {
     "cancelSwap(bytes32)": FunctionFragment;
     "doesSwapExist(bytes32)": FunctionFragment;
     "executeSwap(bytes32,bytes32,bytes32,uint8)": FunctionFragment;
+    "getChainId()": FunctionFragment;
     "getCurrentChain()": FunctionFragment;
     "postSwap(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
     "requests(bytes32)": FunctionFragment;
@@ -46,6 +47,10 @@ export interface MesonSwapTestInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "executeSwap",
     values: [BytesLike, BytesLike, BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getChainId",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getCurrentChain",
@@ -82,6 +87,7 @@ export interface MesonSwapTestInterface extends utils.Interface {
     functionFragment: "executeSwap",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getChainId", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getCurrentChain",
     data: BytesLike
@@ -177,6 +183,8 @@ export interface MesonSwapTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    getChainId(overrides?: CallOverrides): Promise<[number]>;
+
     getCurrentChain(overrides?: CallOverrides): Promise<[string]>;
 
     postSwap(
@@ -238,6 +246,8 @@ export interface MesonSwapTest extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  getChainId(overrides?: CallOverrides): Promise<number>;
+
   getCurrentChain(overrides?: CallOverrides): Promise<string>;
 
   postSwap(
@@ -286,6 +296,8 @@ export interface MesonSwapTest extends BaseContract {
       v: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    getChainId(overrides?: CallOverrides): Promise<number>;
 
     getCurrentChain(overrides?: CallOverrides): Promise<string>;
 
@@ -370,6 +382,8 @@ export interface MesonSwapTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+
     getCurrentChain(overrides?: CallOverrides): Promise<BigNumber>;
 
     postSwap(
@@ -423,6 +437,8 @@ export interface MesonSwapTest extends BaseContract {
       v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    getChainId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getCurrentChain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

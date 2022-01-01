@@ -25,6 +25,7 @@ export interface UpgradableMesonInterface extends utils.Interface {
     "challenge(address,bytes,uint256,bytes,address,address,uint256)": FunctionFragment;
     "deposit(address,uint256)": FunctionFragment;
     "executeSwap(bytes32,bytes32,bytes32,uint8)": FunctionFragment;
+    "getChainId()": FunctionFragment;
     "getCurrentChain()": FunctionFragment;
     "initialize(address[])": FunctionFragment;
     "lock(bytes,address,address)": FunctionFragment;
@@ -68,6 +69,10 @@ export interface UpgradableMesonInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "executeSwap",
     values: [BytesLike, BytesLike, BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getChainId",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getCurrentChain",
@@ -125,6 +130,7 @@ export interface UpgradableMesonInterface extends utils.Interface {
     functionFragment: "executeSwap",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getChainId", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getCurrentChain",
     data: BytesLike
@@ -283,6 +289,8 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    getChainId(overrides?: CallOverrides): Promise<[number]>;
+
     getCurrentChain(overrides?: CallOverrides): Promise<[string]>;
 
     initialize(
@@ -417,6 +425,8 @@ export interface UpgradableMeson extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  getChainId(overrides?: CallOverrides): Promise<number>;
+
   getCurrentChain(overrides?: CallOverrides): Promise<string>;
 
   initialize(
@@ -538,6 +548,8 @@ export interface UpgradableMeson extends BaseContract {
       v: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    getChainId(overrides?: CallOverrides): Promise<number>;
 
     getCurrentChain(overrides?: CallOverrides): Promise<string>;
 
@@ -715,6 +727,8 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+
     getCurrentChain(overrides?: CallOverrides): Promise<BigNumber>;
 
     initialize(
@@ -829,6 +843,8 @@ export interface UpgradableMeson extends BaseContract {
       v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    getChainId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getCurrentChain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
