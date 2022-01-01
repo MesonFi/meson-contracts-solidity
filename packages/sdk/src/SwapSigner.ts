@@ -20,8 +20,13 @@ const releaseTypes = {
 export class SwapSigner {
   _domain: any
 
-  constructor(verifyingContract: BytesLike, chainId: BytesLike) {
-    this._domain = { name: 'Meson Fi', version: '1', chainId, verifyingContract }
+  constructor(mesonAddress: BytesLike, chainId: BytesLike) {
+    this._domain = {
+      name: 'Meson Fi',
+      version: '1',
+      chainId,
+      verifyingContract: mesonAddress
+    }
   }
 
   async signSwapRequest(swap: SwapRequestData, wallet: Wallet) {
