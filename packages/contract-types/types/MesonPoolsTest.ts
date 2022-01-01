@@ -23,7 +23,6 @@ export interface MesonPoolsTestInterface extends utils.Interface {
     "balanceOf(address,address)": FunctionFragment;
     "challenge(address,bytes,uint256,bytes,address,address,uint256)": FunctionFragment;
     "deposit(address,uint256)": FunctionFragment;
-    "getChainId()": FunctionFragment;
     "getCurrentChain()": FunctionFragment;
     "hasLockingSwap(bytes32)": FunctionFragment;
     "lock(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
@@ -59,10 +58,6 @@ export interface MesonPoolsTestInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "deposit",
     values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getChainId",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getCurrentChain",
@@ -109,7 +104,6 @@ export interface MesonPoolsTestInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "challenge", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getChainId", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getCurrentChain",
     data: BytesLike
@@ -214,8 +208,6 @@ export interface MesonPoolsTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getChainId(overrides?: CallOverrides): Promise<[number]>;
-
     getCurrentChain(overrides?: CallOverrides): Promise<[string]>;
 
     hasLockingSwap(
@@ -311,8 +303,6 @@ export interface MesonPoolsTest extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getChainId(overrides?: CallOverrides): Promise<number>;
-
   getCurrentChain(overrides?: CallOverrides): Promise<string>;
 
   hasLockingSwap(
@@ -395,8 +385,6 @@ export interface MesonPoolsTest extends BaseContract {
       amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    getChainId(overrides?: CallOverrides): Promise<number>;
 
     getCurrentChain(overrides?: CallOverrides): Promise<string>;
 
@@ -499,8 +487,6 @@ export interface MesonPoolsTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
-
     getCurrentChain(overrides?: CallOverrides): Promise<BigNumber>;
 
     hasLockingSwap(
@@ -587,8 +573,6 @@ export interface MesonPoolsTest extends BaseContract {
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    getChainId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getCurrentChain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

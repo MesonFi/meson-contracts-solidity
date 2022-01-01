@@ -16,20 +16,14 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface MesonHelpersInterface extends utils.Interface {
   functions: {
-    "getChainId()": FunctionFragment;
     "getCurrentChain()": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "getChainId",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "getCurrentChain",
     values?: undefined
   ): string;
 
-  decodeFunctionResult(functionFragment: "getChainId", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getCurrentChain",
     data: BytesLike
@@ -65,32 +59,22 @@ export interface MesonHelpers extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    getChainId(overrides?: CallOverrides): Promise<[number]>;
-
     getCurrentChain(overrides?: CallOverrides): Promise<[string]>;
   };
-
-  getChainId(overrides?: CallOverrides): Promise<number>;
 
   getCurrentChain(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
-    getChainId(overrides?: CallOverrides): Promise<number>;
-
     getCurrentChain(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
 
   estimateGas: {
-    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
-
     getCurrentChain(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    getChainId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     getCurrentChain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }
