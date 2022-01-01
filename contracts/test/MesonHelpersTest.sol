@@ -45,12 +45,12 @@ contract MesonHelpersTest is MesonHelpers {
       );
   }
 
-  function decodeSwap(bytes memory encodedSwap)
+  function decodeSwapInput(bytes memory encodedSwap)
     external
     pure
     returns (uint256, bytes32, uint256)
   {
-    return _decodeSwap(encodedSwap);
+    return _decodeSwapInput(encodedSwap);
   }
 
   function checkRequestSignature(
@@ -71,9 +71,5 @@ contract MesonHelpersTest is MesonHelpers {
     uint8 v
   ) public view {
     _checkReleaseSignature(swapId, signer, r, s, v);
-  }
-
-  function getCurrentChain() external pure returns (bytes4) {
-    return CURRENT_CHAIN;
   }
 }

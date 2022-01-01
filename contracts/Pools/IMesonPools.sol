@@ -33,9 +33,8 @@ interface IMesonPools {
 
   /// @notice Lock tokens
   function lock(
-    bytes32 swapId,
-    address token,
-    uint256 amount,
+    bytes memory encodedSwap,
+    address outToken,
     address recipient
   ) external;
 

@@ -103,19 +103,14 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "bytes32",
-        name: "swapId",
-        type: "bytes32",
+        internalType: "bytes",
+        name: "encodedSwap",
+        type: "bytes",
       },
       {
         internalType: "address",
-        name: "token",
+        name: "outToken",
         type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
       },
       {
         internalType: "address",

@@ -20,6 +20,7 @@ export type { MesonStatesTest } from "./MesonStatesTest";
 export type { MesonSwapTest } from "./MesonSwapTest";
 export type { MockToken } from "./MockToken";
 export type { UpgradableMeson } from "./UpgradableMeson";
+export type { MesonHelpers } from "./MesonHelpers";
 export type { MesonPricing } from "./MesonPricing";
 export type { MesonStates } from "./MesonStates";
 
@@ -42,5 +43,6 @@ export { MesonStatesTest__factory } from "./factories/MesonStatesTest__factory";
 export { MesonSwapTest__factory } from "./factories/MesonSwapTest__factory";
 export { MockToken__factory } from "./factories/MockToken__factory";
 export { UpgradableMeson__factory } from "./factories/UpgradableMeson__factory";
+export { MesonHelpers__factory } from "./factories/MesonHelpers__factory";
 export { MesonPricing__factory } from "./factories/MesonPricing__factory";
 export { MesonStates__factory } from "./factories/MesonStates__factory";

@@ -27,7 +27,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     bytes32 s,
     uint8 v
   ) public override tokenSupported(inToken) returns (bytes32 swapId) {
-    (uint256 expireTs, bytes32 inTokenHash, uint256 amount) = _decodeSwap(encodedSwap);
+    (uint256 expireTs, bytes32 inTokenHash, uint256 amount) = _decodeSwapInput(encodedSwap);
 
     require(keccak256(abi.encodePacked(inToken)) == inTokenHash, "inToken does not match");
     require(amount > 0, "swap amount must be greater than zero");

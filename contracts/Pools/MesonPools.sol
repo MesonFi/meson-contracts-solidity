@@ -34,10 +34,11 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
   }
 
   /// @inheritdoc IMesonPools
-  function withdraw(
-    address token,
-    uint256 amount
-  ) public override tokenSupported(token) {
+  function withdraw(address token, uint256 amount)
+    public
+    override
+    tokenSupported(token)
+  {
     address provider = _msgSender(); // this may not be the correct msg.sender
     _decreaseSupply(token, amount);
     _withdrawTo(provider, provider, token, amount);
@@ -61,14 +62,22 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
 
   /// @inheritdoc IMesonPools
   function lock(
-    bytes32 swapId,
+    bytes memory encodedSwap,
     address token,
-    uint256 amount,
     address recipient
   ) public override tokenSupported(token) {
-    address provider = _msgSender();
+    (uint256 amount, bytes32 outTokenHash, bytes32 recipientHash) =
+      _decodeSwapOutput(encodedSwap);
+
     require(amount > 0, "amount must be greater than zero");
-    require(balanceOf[token][provider] > amount, "insufficient balance");
+    require(keccak256(abi.encodePacked(token)) == outTokenHash, "token does not match");
+    require(keccak256(abi.encodePacked(recipient)) == recipientHash, "recipient does not match");
+
+    address provider = _msgSender();
+    require(balanceOf[token][provider] >= amount, "insufficient balance");
+
+    bytes32 swapId = keccak256(encodedSwap);
+    require(!_isSwapLocked(swapId), "swap already locked");
 
     balanceOf[token][provider] = balanceOf[token][provider] - amount;
     uint256 ts = block.timestamp;
@@ -100,7 +109,6 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     delete lockingSwaps[swapId];
   }
 
-
   /// @inheritdoc IMesonPools
   function release(
     bytes32 swapId,
@@ -110,8 +118,11 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     uint8 v
   ) public override {
     LockingSwap memory lockingSwap = lockingSwaps[swapId];
-    require(lockingSwap.amount > 0, "no locking swap found for the swapId");
-    require(metaAmount < lockingSwap.amount, "release amount cannot be greater than locking amount");
+    require(_isSwapLocked(swapId), "no locking swap found for the swapId");
+    require(
+      metaAmount <= lockingSwap.amount,
+      "release amount cannot be greater than locking amount"
+    );
 
     _checkReleaseSignature(swapId, lockingSwap.initiator, r, s, v);
 
@@ -119,18 +130,20 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     address provider = lockingSwap.provider;
     address recipient = lockingSwap.recipient;
 
-    uint256 amount = _fromMetaAmount(token, metaAmount);
-    _updateDemand(token, metaAmount);
-    _decreaseSupply(token, amount);
+    // uint256 amount = _fromMetaAmount(token, metaAmount);
+    // _updateDemand(token, metaAmount);
+    // _decreaseSupply(token, amount);
 
-    balanceOf[token][provider] = LowGasSafeMath.add(
-      balanceOf[token][provider],
-      LowGasSafeMath.sub(lockingSwap.amount, amount)
-    );
+    if (metaAmount < lockingSwap.amount) {
+      balanceOf[token][provider] = LowGasSafeMath.add(
+        balanceOf[token][provider],
+        LowGasSafeMath.sub(lockingSwap.amount, metaAmount)
+      );
+    }
 
     delete lockingSwaps[swapId];
 
-    _safeTransfer(token, recipient, amount);
+    _safeTransfer(token, recipient, metaAmount);
 
     emit SwapReleased(swapId);
   }
@@ -156,5 +169,9 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     //     ts,
     //     epoch
     //   );
+  }
+
+  function _isSwapLocked(bytes32 swapId) internal view returns (bool) {
+    return lockingSwaps[swapId].amount > 0;
   }
 }

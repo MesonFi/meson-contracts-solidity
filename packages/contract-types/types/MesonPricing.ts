@@ -16,11 +16,16 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface MesonPricingInterface extends utils.Interface {
   functions: {
+    "getCurrentChain()": FunctionFragment;
     "supportedTokens(address)": FunctionFragment;
     "totalDemandFor(address)": FunctionFragment;
     "totalSupplyFor(address)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "getCurrentChain",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "supportedTokens",
     values: [string]
@@ -34,6 +39,10 @@ export interface MesonPricingInterface extends utils.Interface {
     values: [string]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "getCurrentChain",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "supportedTokens",
     data: BytesLike
@@ -77,6 +86,8 @@ export interface MesonPricing extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    getCurrentChain(overrides?: CallOverrides): Promise<[string]>;
+
     supportedTokens(
       arg0: string,
       overrides?: CallOverrides
@@ -93,6 +104,8 @@ export interface MesonPricing extends BaseContract {
     ): Promise<[BigNumber]>;
   };
 
+  getCurrentChain(overrides?: CallOverrides): Promise<string>;
+
   supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
   totalDemandFor(token: string, overrides?: CallOverrides): Promise<BigNumber>;
@@ -100,6 +113,8 @@ export interface MesonPricing extends BaseContract {
   totalSupplyFor(token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
+    getCurrentChain(overrides?: CallOverrides): Promise<string>;
+
     supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
     totalDemandFor(
@@ -116,6 +131,8 @@ export interface MesonPricing extends BaseContract {
   filters: {};
 
   estimateGas: {
+    getCurrentChain(overrides?: CallOverrides): Promise<BigNumber>;
+
     supportedTokens(
       arg0: string,
       overrides?: CallOverrides
@@ -133,6 +150,8 @@ export interface MesonPricing extends BaseContract {
   };
 
   populateTransaction: {
+    getCurrentChain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     supportedTokens(
       arg0: string,
       overrides?: CallOverrides

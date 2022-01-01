@@ -65,16 +65,18 @@ contract MesonHelpers is MesonConfig {
     IERC20Minimal(token).transferFrom(sender, address(this), amount);
   }
 
-  function _decodeSwap(bytes memory encodedSwap) internal pure returns (uint256, bytes32, uint256) {
+  function _decodeSwapInput(bytes memory encodedSwap) internal pure returns (uint256, bytes32, uint256) {
     (bytes32 typehash, uint256 expireTs, bytes32 inTokenHash, uint256 amount, , ,) =
       abi.decode(encodedSwap, (bytes32, uint256, bytes32, uint256, bytes4, bytes32, bytes32));
     require(typehash == SWAP_REQUEST_TYPEHASH, "Invalid swap request typehash");
-
-    // address inTokenAddr;
-    // assembly {
-    //   inTokenAddr := mload(add(inToken, 20))
-    // }
     return (expireTs, inTokenHash, amount);
+  }
+
+  function _decodeSwapOutput(bytes memory encodedSwap) internal pure returns (uint256, bytes32, bytes32) {
+    (bytes32 typehash, , , uint256 amount, , bytes32 outTokenHash, bytes32 recipientHash) =
+      abi.decode(encodedSwap, (bytes32, uint256, bytes32, uint256, bytes4, bytes32, bytes32));
+    require(typehash == SWAP_REQUEST_TYPEHASH, "Invalid swap request typehash");
+    return (amount, outTokenHash, recipientHash);
   }
 
   function _checkRequestSignature(
@@ -108,5 +110,9 @@ contract MesonHelpers is MesonConfig {
     bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, hash));
     require(signer != address(0), "signer cannot be empty address");
     require(signer == ecrecover(digest, v, r, s), "invalid signatures");
+  }
+
+  function getCurrentChain() external pure returns (bytes4) {
+    return CURRENT_CHAIN;
   }
 }

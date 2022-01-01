@@ -22,7 +22,8 @@ export interface MesonPoolsInterface extends utils.Interface {
     "balanceOf(address,address)": FunctionFragment;
     "challenge(address,bytes,uint256,bytes,address,address,uint256)": FunctionFragment;
     "deposit(address,uint256)": FunctionFragment;
-    "lock(bytes32,address,uint256,address)": FunctionFragment;
+    "getCurrentChain()": FunctionFragment;
+    "lock(bytes,address,address)": FunctionFragment;
     "lockingSwaps(bytes32)": FunctionFragment;
     "release(bytes32,uint256,bytes32,bytes32,uint8)": FunctionFragment;
     "supportedTokens(address)": FunctionFragment;
@@ -53,8 +54,12 @@ export interface MesonPoolsInterface extends utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getCurrentChain",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "lock",
-    values: [BytesLike, string, BigNumberish, string]
+    values: [BytesLike, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "lockingSwaps",
@@ -85,6 +90,10 @@ export interface MesonPoolsInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "challenge", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getCurrentChain",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "lock", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "lockingSwaps",
@@ -176,10 +185,11 @@ export interface MesonPools extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    getCurrentChain(overrides?: CallOverrides): Promise<[string]>;
+
     lock(
-      swapId: BytesLike,
+      encodedSwap: BytesLike,
       token: string,
-      amount: BigNumberish,
       recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -257,10 +267,11 @@ export interface MesonPools extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  getCurrentChain(overrides?: CallOverrides): Promise<string>;
+
   lock(
-    swapId: BytesLike,
+    encodedSwap: BytesLike,
     token: string,
-    amount: BigNumberish,
     recipient: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -329,10 +340,11 @@ export interface MesonPools extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    getCurrentChain(overrides?: CallOverrides): Promise<string>;
+
     lock(
-      swapId: BytesLike,
+      encodedSwap: BytesLike,
       token: string,
-      amount: BigNumberish,
       recipient: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -416,10 +428,11 @@ export interface MesonPools extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    getCurrentChain(overrides?: CallOverrides): Promise<BigNumber>;
+
     lock(
-      swapId: BytesLike,
+      encodedSwap: BytesLike,
       token: string,
-      amount: BigNumberish,
       recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -489,10 +502,11 @@ export interface MesonPools extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    getCurrentChain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     lock(
-      swapId: BytesLike,
+      encodedSwap: BytesLike,
       token: string,
-      amount: BigNumberish,
       recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
