@@ -95,16 +95,18 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
 
   /// @inheritdoc IMesonPools
   function unlock(bytes32 swapId) public override {
-    uint256 ts = block.timestamp;
-    uint256 until = lockingSwaps[swapId].until;
-    address token = lockingSwaps[swapId].token;
-    address provider = lockingSwaps[swapId].provider;
-    require(until > 0, "swap not found");
-    require(ts > until, "The swap is lockied");
+    require(_hasLockingSwap(swapId), "swap does not exist");
+
+    LockingSwap memory lockingSwap = lockingSwaps[swapId];
+    require(block.timestamp > lockingSwap.until, "The swap is still in lock");
+
+    address token = lockingSwap.token;
+    uint256 amount = lockingSwap.amount;
+    address provider = lockingSwap.provider;
 
     balanceOf[token][provider] = LowGasSafeMath.add(
       balanceOf[token][provider],
-      lockingSwaps[swapId].amount
+      amount
     );
     delete lockingSwaps[swapId];
   }
