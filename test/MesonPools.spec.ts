@@ -81,7 +81,7 @@ describe('MesonPools', () => {
 
       await contract.lock(swap.encode(), token.address, swap.recipient)
       expect(await contract.balanceOf(token.address, wallet.address)).to.equal(0)
-      expect(await contract.isSwapLocked(swap.id())).to.equal(true)
+      expect(await contract.hasLockingSwap(swap.id())).to.equal(true)
     })
 
     it('refuses mismatch outToken or recipient', async () => {

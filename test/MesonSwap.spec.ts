@@ -33,7 +33,7 @@ describe('MesonSwap', () => {
 
       const { r, s, v } = await meson.signer.signSwapRequest(swap, wallet)
       await contract.postSwap(swap.encode(), token.address, wallet.address, r, s, v)
-      expect(await contract.doesSwapExist(swap.id())).to.equal(true)
+      expect(await contract.hasSwap(swap.id())).to.equal(true)
     })
 
     it('refuses unsupported token', async () => {
@@ -58,7 +58,7 @@ describe('MesonSwap', () => {
       const { r: r2, s: s2, v: v2 } = await meson.signer.signSwapRelease(swap.id(), wallet)
       await contract.executeSwap(swap.id(), r2, s2, v2)
 
-      expect(await contract.doesSwapExist(swap.id())).to.equal(false)
+      expect(await contract.hasSwap(swap.id())).to.equal(false)
       expect(await token.balanceOf(wallet.address)).to.equal(1000000000)
     })
   })

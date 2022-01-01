@@ -8,7 +8,7 @@ contract MesonPoolsTest is MesonPools {
     _addTokenToSwapList(token);
   }
 
-  function isSwapLocked(bytes32 swapId) external view returns (bool) {
-    return _isSwapLocked(swapId);
+  function hasLockingSwap(bytes32 swapId) external view returns (bool) {
+    return _hasLockingSwap(swapId);
   }
 }

@@ -8,7 +8,7 @@ contract MesonSwapTest is MesonSwap {
     _addTokenToSwapList(token);
   }
 
-  function doesSwapExist(bytes32 swapId) external view returns (bool) {
-    return _doesSwapExist(swapId);
+  function hasSwap(bytes32 swapId) external view returns (bool) {
+    return _hasSwap(swapId);
   }
 }

@@ -77,7 +77,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     require(balanceOf[token][provider] >= amount, "insufficient balance");
 
     bytes32 swapId = keccak256(encodedSwap);
-    require(!_isSwapLocked(swapId), "swap already locked");
+    require(!_hasLockingSwap(swapId), "locking swap already exists");
 
     balanceOf[token][provider] = balanceOf[token][provider] - amount;
     uint256 ts = block.timestamp;
@@ -118,7 +118,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     uint8 v
   ) public override {
     LockingSwap memory lockingSwap = lockingSwaps[swapId];
-    require(_isSwapLocked(swapId), "no locking swap found for the swapId");
+    require(_hasLockingSwap(swapId), "swap does not exist");
     require(
       metaAmount <= lockingSwap.amount,
       "release amount cannot be greater than locking amount"
@@ -171,7 +171,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     //   );
   }
 
-  function _isSwapLocked(bytes32 swapId) internal view returns (bool) {
+  function _hasLockingSwap(bytes32 swapId) internal view returns (bool) {
     return lockingSwaps[swapId].amount > 0;
   }
 }
