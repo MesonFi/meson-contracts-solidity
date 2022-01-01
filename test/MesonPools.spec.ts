@@ -79,7 +79,8 @@ describe('MesonPools', () => {
       await token.approve(contract.address, swap.amount)
       await contract.deposit(token.address, swap.amount)
 
-      await contract.lock(swap.encode(), token.address, swap.recipient)
+      const { r, s, v } = await meson.signer.signSwapRequest(swap, wallet)
+      await contract.lock(swap.encode(), token.address, swap.recipient, r, s, v)
       expect(await contract.balanceOf(token.address, wallet.address)).to.equal(0)
       expect(await contract.hasLockingSwap(swap.id())).to.equal(true)
     })
@@ -89,12 +90,14 @@ describe('MesonPools', () => {
       await token.approve(contract.address, swap.amount)
       await contract.deposit(token.address, swap.amount)
 
+      const { r, s, v } = await meson.signer.signSwapRequest(swap, wallet)
+
       // await expect(
       //   contract.lock(swap.encode(), unsupportedToken.address, swap.recipient)
       // ).to.be.revertedWith('outToken does not match')
 
       await expect(
-        contract.lock(swap.encode(), token.address, wallet.address)
+        contract.lock(swap.encode(), token.address, wallet.address, r, s, v)
       ).to.be.revertedWith('recipient does not match')
     })
   })
@@ -105,9 +108,11 @@ describe('MesonPools', () => {
       await token.approve(contract.address, swap.amount)
       await contract.deposit(token.address, swap.amount)
 
-      await contract.lock(swap.encode(), token.address, swap.recipient)
-      const { r, s, v } = await meson.signer.signSwapRelease(swap.id(), wallet)
-      await contract.release(swap.id(), swap.amount, r, s, v)
+      const { r, s, v } = await meson.signer.signSwapRequest(swap, wallet)
+      await contract.lock(swap.encode(), token.address, swap.recipient, r, s, v)
+
+      const { r: r2, s: s2, v: v2 } = await meson.signer.signSwapRelease(swap.id(), wallet)
+      await contract.release(swap.id(), swap.amount, r2, s2, v2)
 
       expect(await contract.balanceOf(token.address, wallet.address)).to.equal(0)
       expect(await token.balanceOf(swap.recipient)).to.equal(swap.amount)
