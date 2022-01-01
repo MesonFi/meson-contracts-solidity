@@ -2,6 +2,21 @@ import { BytesLike, Wallet } from 'ethers'
 
 import { SwapRequestData } from './SwapRequest'
 
+const requestTypes = {
+  SwapRequest: [
+    { name: 'expireTs', type: 'uint256' },
+    { name: 'inToken', type: 'bytes' },
+    { name: 'amount', type: 'uint256' },
+    { name: 'outChain', type: 'bytes4' },
+    { name: 'outToken', type: 'bytes' },
+    { name: 'recipient', type: 'bytes' }
+  ]
+}
+
+const releaseTypes = {
+  SwapRelease: [{ name: 'swapId', type: 'bytes32' }]
+}
+
 export class SwapSigner {
   _domain: any
 
@@ -10,27 +25,12 @@ export class SwapSigner {
   }
 
   async signSwapRequest(swap: SwapRequestData, wallet: Wallet) {
-    const types = {
-      SwapRequest: [
-        { name: 'expireTs', type: 'uint256' },
-        { name: 'inToken', type: 'bytes' },
-        { name: 'amount', type: 'uint256' },
-        { name: 'outChain', type: 'bytes4' },
-        { name: 'outToken', type: 'bytes' },
-        { name: 'recipient', type: 'bytes' }
-      ]
-    }
-
-    const signature = await wallet._signTypedData(this._domain, types, swap)
+    const signature = await wallet._signTypedData(this._domain, requestTypes, swap)
     return this._separateSignature(signature)
   }
 
   async signSwapRelease(swapId: BytesLike, wallet: Wallet) {
-    const types = {
-      SwapRelease: [{ name: 'swapId', type: 'bytes32' }]
-    }
-
-    const signature = await wallet._signTypedData(this._domain, types, { swapId })
+    const signature = await wallet._signTypedData(this._domain, releaseTypes, { swapId })
     return this._separateSignature(signature)
   }
 
