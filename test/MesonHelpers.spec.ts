@@ -1,5 +1,5 @@
 import { ethers, waffle } from 'hardhat'
-import { MesonInterface, SwapRequest } from '@meson/sdk'
+import { MesonClient, SwapRequest } from '@meson/sdk'
 import { MesonHelpersTest } from '@meson/contract-types'
 
 import { expect } from './shared/expect'
@@ -8,7 +8,7 @@ import { getDefaultSwap } from './shared/meson'
 
 describe('MesonHelpers', () => {
   let contract: MesonHelpersTest
-  let meson: MesonInterface
+  let meson: MesonClient
   let swap: SwapRequest
 
   const fixture = async () => {
@@ -19,7 +19,7 @@ describe('MesonHelpers', () => {
   beforeEach('deploy MesonHelpersTest', async () => {
     contract = await waffle.loadFixture(fixture)
     const outChain = await contract.getCurrentChain()
-    meson = new MesonInterface({ mesonAddress: contract.address, chainId: '0x3' })
+    meson = new MesonClient({ mesonAddress: contract.address, chainId: '0x3' })
     swap = meson.requestSwap(outChain, getDefaultSwap())
   })
 

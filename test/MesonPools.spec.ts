@@ -1,5 +1,5 @@
-import { ethers, waffle } from 'hardhat'
-import { MesonInterface } from '@meson/sdk'
+import { waffle } from 'hardhat'
+import { MesonClient } from '@meson/sdk'
 import { MockToken, MesonPoolsTest } from '@meson/contract-typs'
 
 import { expect } from './shared/expect'
@@ -12,7 +12,7 @@ describe('MesonPools', () => {
   let token: MockToken
   let unsupportedToken: MockToken
   let outChain: string
-  let meson: MesonInterface
+  let meson: MesonClient
 
   beforeEach('deploy MesonPoolsTest', async () => {
     const result = await waffle.loadFixture(() => fixtures(wallet))
@@ -21,7 +21,7 @@ describe('MesonPools', () => {
     unsupportedToken = result.token2
 
     outChain = await contract.getCurrentChain()
-    meson = new MesonInterface({ mesonAddress: contract.address, chainId: '0x3' })
+    meson = new MesonClient({ mesonAddress: contract.address, chainId: '0x3' })
   })
 
   describe('#token totalSupply & balance for signer', () => {
