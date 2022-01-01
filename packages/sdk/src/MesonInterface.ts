@@ -15,11 +15,11 @@ export class MesonInterface {
     this._signer = new SwapSigner(config.mesonAddress, config.chainId)
   }
 
-  requestSwap(outChain: BytesLike, swap: PartialSwapRequest, lockPeriod: number = 3600) {
+  requestSwap(outChain: BytesLike, swap: PartialSwapRequest, lockPeriod: number = 5400) {
     return new SwapRequest({
       ...swap,
       outChain,
-      expireTs: Date.now() + lockPeriod,
+      expireTs: Math.floor(Date.now() / 1000) + lockPeriod,
     })
   }
 
