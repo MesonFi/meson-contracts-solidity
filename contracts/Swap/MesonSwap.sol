@@ -39,7 +39,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     address provider = _msgSender();
 
     swapId = keccak256(encodedSwap);
-    require(!_isSwapExist(swapId), "swap conflict"); // TODO: prevent duplication attack
+    require(!_doesSwapExist(swapId), "swap conflict"); // TODO: prevent duplication attack
 
     _checkRequestSignature(swapId, initiator, r, s, v);
 
@@ -102,7 +102,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
 
   /// @dev Check the swap for the given swapId exsits
   modifier swapExists(bytes32 swapId) {
-    require(_isSwapExist(swapId), "swap not found");
+    require(_doesSwapExist(swapId), "swap not found");
     _;
   }
 
@@ -112,7 +112,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     _;
   }
 
-  function _isSwapExist(bytes32 swapId) internal view returns (bool) {
+  function _doesSwapExist(bytes32 swapId) internal view returns (bool) {
     return requests[swapId].amount > 0;
   }
 }
