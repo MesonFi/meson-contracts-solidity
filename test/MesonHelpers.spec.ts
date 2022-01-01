@@ -18,9 +18,8 @@ describe('MesonHelpers', () => {
 
   beforeEach('deploy MesonHelpersTest', async () => {
     mesonInstance = await waffle.loadFixture(fixture)
-    const chainId = await mesonInstance.getChainId()
     const outChain = await mesonInstance.getCurrentChain()
-    mesonClient = new MesonClient({ mesonInstance, chainId })
+    mesonClient = await MesonClient.Create(mesonInstance)
     swap = mesonClient.requestSwap(outChain, getDefaultSwap())
   })
 

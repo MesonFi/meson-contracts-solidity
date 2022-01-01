@@ -7,7 +7,6 @@ pragma solidity 0.8.6;
 /// for CONFIG_BLOCKCHAIN_NAME
 contract MesonConfig {
   // Ref https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-  uint8 constant CHAIN_ID = CONFIG_CHAIN_ID;
   bytes4 constant CURRENT_CHAIN = CONFIG_COIN_TYPE;
 
   uint256 constant MIN_BOND_TIME_PERIOD = 1 hours;

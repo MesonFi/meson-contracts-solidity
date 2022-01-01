@@ -17,7 +17,7 @@ contract MesonHelpers is MesonConfig {
         EIP712_DOMAIN_TYPEHASH,
         keccak256(bytes("Meson Fi")),
         keccak256(bytes("1")),
-        CHAIN_ID,
+        block.chainid,
         address(this)
       )
     );
@@ -99,10 +99,6 @@ contract MesonHelpers is MesonConfig {
   ) internal view returns (address) {
     bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, hash));
     return ecrecover(digest, v, r, s);
-  }
-
-  function getChainId() external pure returns (uint8) {
-    return CHAIN_ID;
   }
 
   function getCurrentChain() external pure returns (bytes4) {

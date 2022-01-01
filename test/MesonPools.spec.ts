@@ -20,9 +20,8 @@ describe('MesonPools', () => {
     token = result.token1
     unsupportedToken = result.token2
 
-    const chainId = await mesonInstance.getChainId()
     outChain = await mesonInstance.getCurrentChain()
-    mesonClient = new MesonClient({ mesonInstance, chainId })
+    mesonClient = await MesonClient.Create(mesonInstance)
   })
 
   describe('#token totalSupply & balance for signer', () => {
