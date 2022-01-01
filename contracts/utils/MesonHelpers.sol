@@ -79,16 +79,6 @@ contract MesonHelpers is MesonConfig {
     return (amount, outTokenHash, recipientHash);
   }
 
-  function _checkRequestSignature(
-    bytes32 swapId,
-    address signer,
-    bytes32 r,
-    bytes32 s,
-    uint8 v
-  ) internal view {
-    _checkSignature(swapId, signer, r, s, v);
-  }
-
   function _checkReleaseSignature(
     bytes32 swapId,
     address signer,
@@ -96,20 +86,19 @@ contract MesonHelpers is MesonConfig {
     bytes32 s,
     uint8 v
   ) internal view {
+    require(signer != address(0), "signer cannot be empty address");
     bytes32 hash = keccak256(abi.encode(SWAP_RELEASE_TYPEHASH, swapId));
-    _checkSignature(hash, signer, r, s, v);
+    require(signer == _recoverSigner(hash, r, s, v), "invalid signature");
   }
 
-  function _checkSignature(
+  function _recoverSigner(
     bytes32 hash,
-    address signer,
     bytes32 r,
     bytes32 s,
     uint8 v
-  ) internal view {
+  ) internal view returns (address) {
     bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, hash));
-    require(signer != address(0), "signer cannot be empty address");
-    require(signer == ecrecover(digest, v, r, s), "invalid signatures");
+    return ecrecover(digest, v, r, s);
   }
 
   function getChainId() external pure returns (uint8) {
