@@ -33,8 +33,8 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     require(amount > 0, "swap amount must be greater than zero");
 
     uint256 ts = block.timestamp;
-    require(expireTs > ts + 3600, "expires ts too early");
-    require(expireTs < ts + 7200, "expires ts too late");
+    require(expireTs > ts + MIN_BOND_TIME_PERIOD, "expires ts too early");
+    require(expireTs < ts + MAX_BOND_TIME_PERIOD, "expires ts too late");
 
     address provider = _msgSender();
 

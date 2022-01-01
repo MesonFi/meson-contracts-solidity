@@ -87,7 +87,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
       token,
       amount,
       recipient,
-      ts + 1200
+      ts + LOCK_TIME_PERIOD
     );
 
     emit SwapLocked(swapId, provider);
