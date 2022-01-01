@@ -21,9 +21,9 @@ export interface MesonSwapTestInterface extends utils.Interface {
   functions: {
     "addTokenToSwapList(address)": FunctionFragment;
     "cancelSwap(bytes32)": FunctionFragment;
+    "doesSwapExist(bytes32)": FunctionFragment;
     "executeSwap(bytes32,bytes32,bytes32,uint8)": FunctionFragment;
     "getCurrentChain()": FunctionFragment;
-    "isSwapExist(bytes32)": FunctionFragment;
     "postSwap(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
     "requests(bytes32)": FunctionFragment;
     "supportedTokens(address)": FunctionFragment;
@@ -40,16 +40,16 @@ export interface MesonSwapTestInterface extends utils.Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "doesSwapExist",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "executeSwap",
     values: [BytesLike, BytesLike, BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getCurrentChain",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "isSwapExist",
-    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "postSwap",
@@ -75,15 +75,15 @@ export interface MesonSwapTestInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "cancelSwap", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "doesSwapExist",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "executeSwap",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "getCurrentChain",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "isSwapExist",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "postSwap", data: BytesLike): Result;
@@ -164,6 +164,11 @@ export interface MesonSwapTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    doesSwapExist(
+      swapId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     executeSwap(
       swapId: BytesLike,
       r: BytesLike,
@@ -173,11 +178,6 @@ export interface MesonSwapTest extends BaseContract {
     ): Promise<ContractTransaction>;
 
     getCurrentChain(overrides?: CallOverrides): Promise<[string]>;
-
-    isSwapExist(
-      swapId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
 
     postSwap(
       encodedSwap: BytesLike,
@@ -228,6 +228,8 @@ export interface MesonSwapTest extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  doesSwapExist(swapId: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+
   executeSwap(
     swapId: BytesLike,
     r: BytesLike,
@@ -237,8 +239,6 @@ export interface MesonSwapTest extends BaseContract {
   ): Promise<ContractTransaction>;
 
   getCurrentChain(overrides?: CallOverrides): Promise<string>;
-
-  isSwapExist(swapId: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
   postSwap(
     encodedSwap: BytesLike,
@@ -274,6 +274,11 @@ export interface MesonSwapTest extends BaseContract {
 
     cancelSwap(swapId: BytesLike, overrides?: CallOverrides): Promise<void>;
 
+    doesSwapExist(
+      swapId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     executeSwap(
       swapId: BytesLike,
       r: BytesLike,
@@ -283,8 +288,6 @@ export interface MesonSwapTest extends BaseContract {
     ): Promise<void>;
 
     getCurrentChain(overrides?: CallOverrides): Promise<string>;
-
-    isSwapExist(swapId: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
     postSwap(
       encodedSwap: BytesLike,
@@ -354,6 +357,11 @@ export interface MesonSwapTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    doesSwapExist(
+      swapId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     executeSwap(
       swapId: BytesLike,
       r: BytesLike,
@@ -363,11 +371,6 @@ export interface MesonSwapTest extends BaseContract {
     ): Promise<BigNumber>;
 
     getCurrentChain(overrides?: CallOverrides): Promise<BigNumber>;
-
-    isSwapExist(
-      swapId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     postSwap(
       encodedSwap: BytesLike,
@@ -408,6 +411,11 @@ export interface MesonSwapTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    doesSwapExist(
+      swapId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     executeSwap(
       swapId: BytesLike,
       r: BytesLike,
@@ -417,11 +425,6 @@ export interface MesonSwapTest extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     getCurrentChain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    isSwapExist(
-      swapId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     postSwap(
       encodedSwap: BytesLike,
