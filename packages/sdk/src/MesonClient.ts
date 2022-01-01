@@ -1,18 +1,20 @@
-import { BytesLike } from 'ethers'
+import { Contract, BytesLike } from 'ethers'
 
 import { SwapRequest, PartialSwapRequest } from './SwapRequest'
 import { SwapSigner } from './SwapSigner'
 
 type MesonClientConfig = {
-  mesonAddress: BytesLike,
+  mesonInstance: Contract,
   chainId: BytesLike, // hex number
 }
 
 export class MesonClient {
+  private _mesonInstance: Contract
   private _signer: SwapSigner
 
   constructor (config: MesonClientConfig) {
-    this._signer = new SwapSigner(config.mesonAddress, config.chainId)
+    this._mesonInstance = config.mesonInstance
+    this._signer = new SwapSigner(this._mesonInstance.address, config.chainId)
   }
 
   requestSwap(outChain: BytesLike, swap: PartialSwapRequest, lockPeriod: number = 5400) {

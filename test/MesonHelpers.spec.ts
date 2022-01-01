@@ -7,8 +7,8 @@ import { wallet } from './shared/wallet'
 import { getDefaultSwap } from './shared/meson'
 
 describe('MesonHelpers', () => {
-  let contract: MesonHelpersTest
-  let meson: MesonClient
+  let mesonInstance: MesonHelpersTest
+  let mesonClient: MesonClient
   let swap: SwapRequest
 
   const fixture = async () => {
@@ -17,16 +17,16 @@ describe('MesonHelpers', () => {
   }
 
   beforeEach('deploy MesonHelpersTest', async () => {
-    contract = await waffle.loadFixture(fixture)
-    const chainId = await contract.getChainId()
-    const outChain = await contract.getCurrentChain()
-    meson = new MesonClient({ mesonAddress: contract.address, chainId })
-    swap = meson.requestSwap(outChain, getDefaultSwap())
+    mesonInstance = await waffle.loadFixture(fixture)
+    const chainId = await mesonInstance.getChainId()
+    const outChain = await mesonInstance.getCurrentChain()
+    mesonClient = new MesonClient({ mesonInstance, chainId })
+    swap = mesonClient.requestSwap(outChain, getDefaultSwap())
   })
 
   describe('#encodeSwap', () => {
     it('returns same result as js function', async () => {
-      const encodedSwapFromContract = await contract.encodeSwap(
+      const encodedSwapFromContract = await mesonInstance.encodeSwap(
         swap.expireTs,
         swap.inToken,
         swap.amount,
@@ -41,7 +41,7 @@ describe('MesonHelpers', () => {
 
   describe('#getSwapId', () => {
     it('returns same result as js function', async () => {
-      const swapIdFromContract = await contract.getSwapId(
+      const swapIdFromContract = await mesonInstance.getSwapId(
         swap.expireTs,
         swap.inToken,
         swap.amount,
@@ -56,7 +56,7 @@ describe('MesonHelpers', () => {
 
   describe('#decodeSwapInput', () => {
     it('returns decoded swap data', async () => {
-      const decoded = await contract.decodeSwapInput(swap.encode())
+      const decoded = await mesonInstance.decodeSwapInput(swap.encode())
       expect(decoded[0]).to.equal(swap.expireTs)
       expect(decoded[1].toLowerCase()).to.equal(ethers.utils.keccak256(swap.inToken))
       expect(decoded[2]).to.equal(swap.amount)
@@ -65,15 +65,15 @@ describe('MesonHelpers', () => {
 
   describe('#checkRequestSignature', () => {
     it('validates a request signature', async () => {
-      const { r, s, v } = await meson.signer.signSwapRequest(swap, wallet)
-      await contract.checkRequestSignature(swap.id(), wallet.address, r, s, v)
+      const { r, s, v } = await mesonClient.signer.signSwapRequest(swap, wallet)
+      await mesonInstance.checkRequestSignature(swap.id(), wallet.address, r, s, v)
     })
   })
 
   describe('#checkReleaseSignature', () => {
     it('validates a release signature', async () => {
-      const { r, s, v } = await meson.signer.signSwapRelease(swap.id(), wallet)
-      await contract.checkReleaseSignature(swap.id(), wallet.address, r, s, v)
+      const { r, s, v } = await mesonClient.signer.signSwapRelease(swap.id(), wallet)
+      await mesonInstance.checkReleaseSignature(swap.id(), wallet.address, r, s, v)
     })
   })
 })
