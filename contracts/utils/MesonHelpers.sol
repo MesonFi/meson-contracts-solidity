@@ -17,7 +17,7 @@ contract MesonHelpers is MesonConfig {
         EIP712_DOMAIN_TYPEHASH,
         keccak256(bytes("Meson Fi")),
         keccak256(bytes("1")),
-        3, // Ropstan chain ID
+        CHAIN_ID,
         address(this)
       )
     );
@@ -110,6 +110,10 @@ contract MesonHelpers is MesonConfig {
     bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, hash));
     require(signer != address(0), "signer cannot be empty address");
     require(signer == ecrecover(digest, v, r, s), "invalid signatures");
+  }
+
+  function getChainId() external pure returns (uint8) {
+    return CHAIN_ID;
   }
 
   function getCurrentChain() external pure returns (bytes4) {
