@@ -40,7 +40,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
 
     swapId = _getSwapId(encodedSwap);
     require(!_hasSwap(swapId), "swap conflict"); // TODO: prevent duplication attack
-    require(initiator == _recoverSigner(swapId, r, s, v), "invalid signature");
+    require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
 
     // uint256 metaAmount = _toMetaAmount(inToken, amount);
 

@@ -77,15 +77,6 @@ contract MesonHelpers is MesonConfig {
     return keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, swapHash));
   }
 
-  function _recoverSigner(
-    bytes32 digest,
-    bytes32 r,
-    bytes32 s,
-    uint8 v
-  ) internal view returns (address) {
-    return ecrecover(digest, v, r, s);
-  }
-
   function _checkReleaseSignature(
     bytes32 swapId,
     address signer,
@@ -94,18 +85,9 @@ contract MesonHelpers is MesonConfig {
     uint8 v
   ) internal view {
     require(signer != address(0), "signer cannot be empty address");
-    bytes32 hash = keccak256(abi.encode(SWAP_RELEASE_TYPEHASH, swapId));
-    require(signer == _recoverEip712Signer(hash, r, s, v), "invalid signature");
-  }
-
-  function _recoverEip712Signer(
-    bytes32 hash,
-    bytes32 r,
-    bytes32 s,
-    uint8 v
-  ) internal view returns (address) {
-    bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, hash));
-    return ecrecover(digest, v, r, s);
+    bytes32 releaseHash = keccak256(abi.encode(SWAP_RELEASE_TYPEHASH, swapId));
+    bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, releaseHash));
+    require(signer == ecrecover(digest, v, r, s), "invalid signature");
   }
 
   function getCoinType() external pure returns (bytes4) {

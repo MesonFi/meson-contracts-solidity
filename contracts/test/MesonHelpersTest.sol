@@ -59,7 +59,7 @@ contract MesonHelpersTest is MesonHelpers {
     bytes32 s,
     uint8 v
   ) public view {
-    require(signer == _recoverSigner(swapId, r, s, v), "invalid signature");
+    require(signer == ecrecover(swapId, v, r, s), "invalid signature");
   }
 
   function checkReleaseSignature(

@@ -85,7 +85,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     balanceOf[token][provider] = balanceOf[token][provider] - amount;
     uint256 ts = block.timestamp;
     lockingSwaps[swapId] = LockingSwap(
-      _recoverSigner(swapId, r, s, v),
+      ecrecover(swapId, v, r, s),
       provider,
       token,
       amount,
