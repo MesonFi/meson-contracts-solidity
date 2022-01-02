@@ -1,4 +1,4 @@
-import { Contract, Wallet, BytesLike } from 'ethers'
+import { Contract, BytesLike } from 'ethers'
 
 import { SwapSigner } from './SwapSigner'
 import { PartialSwapRequest } from './SwapRequest'
@@ -8,10 +8,11 @@ import { SwapRequestWithProvider } from './SwapRequestWithProvider'
 export class MesonClient {
   readonly mesonInstance: Contract
   readonly signer: SwapSigner
+  private _coinType: BytesLike
 
   static async Create(mesonInstance: Contract) {
     const client = new MesonClient(mesonInstance)
-    await client.getChainId()
+    await client.getNetworkConfig()
     return client
   }
 
@@ -20,11 +21,16 @@ export class MesonClient {
     this.signer = new SwapSigner(mesonInstance.address)
   }
 
+  get coinType () {
+    return this._coinType
+  }
+
   get mesonAddress () {
     return this.mesonInstance.address
   }
 
-  async getChainId () {
+  async getNetworkConfig () {
+    this._coinType = await this.mesonInstance.getCoinType()
     const network = await this.mesonInstance.provider.getNetwork()
     this.signer.chainId = network.chainId
   }
@@ -32,6 +38,7 @@ export class MesonClient {
   requestSwap(outChain: BytesLike, swap: PartialSwapRequest, lockPeriod: number = 5400) {
     return new SwapRequestWithSigner({
       ...swap,
+      inChain: this.coinType,
       outChain,
       expireTs: Math.floor(Date.now() / 1000) + lockPeriod,
     }, this.signer)

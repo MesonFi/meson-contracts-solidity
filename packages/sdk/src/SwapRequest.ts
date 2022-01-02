@@ -6,24 +6,27 @@ const SWAP_REQUEST_TYPEHASH = id('SwapRequest(uint256 expireTs,bytes inToken,uin
 
 export interface SwapRequestData {
   expireTs: number,
+  inChain: BytesLike,
   inToken: BytesLike,
-  amount: number,
+  amount: string,
   outChain: BytesLike,
   outToken: BytesLike,
   recipient: BytesLike,
 }
 
 export interface PartialSwapRequest {
+  inChain: BytesLike,
   inToken: BytesLike,
-  amount: number,
+  amount: string,
   outToken: BytesLike,
   recipient: BytesLike,
 }
 
 export class SwapRequest implements SwapRequestData {
   readonly expireTs: number
+  readonly inChain: BytesLike
   readonly inToken: BytesLike
-  readonly amount: number
+  readonly amount: string
   readonly outChain: BytesLike
   readonly outToken: BytesLike
   readonly recipient: BytesLike
@@ -33,6 +36,7 @@ export class SwapRequest implements SwapRequestData {
 
   constructor(req: SwapRequestData) {
     this.expireTs = req.expireTs
+    this.inChain = req.inChain
     this.inToken = req.inToken
     this.amount = req.amount
     this.outChain = req.outChain
@@ -68,6 +72,7 @@ export class SwapRequest implements SwapRequestData {
   toObject () {
     return {
       expireTs: this.expireTs,
+      inChain: this.inChain,
       inToken: this.inToken,
       amount: this.amount,
       outChain: this.outChain,

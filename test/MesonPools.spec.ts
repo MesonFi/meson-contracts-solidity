@@ -22,7 +22,7 @@ describe('MesonPools', () => {
     token = result.token1.connect(provider)
     unsupportedToken = result.token2.connect(provider)
 
-    outChain = await mesonInstance.getCurrentChain()
+    outChain = await mesonInstance.getCoinType()
     mesonClient = await MesonClient.Create(mesonInstance)
   })
 

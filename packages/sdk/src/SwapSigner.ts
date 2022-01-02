@@ -1,4 +1,4 @@
-import { Wallet, BytesLike, Bytes } from 'ethers'
+import { Wallet, BytesLike } from 'ethers'
 
 import { SwapRequestData } from './SwapRequest'
 

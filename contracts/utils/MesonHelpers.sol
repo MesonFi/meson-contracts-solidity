@@ -101,7 +101,7 @@ contract MesonHelpers is MesonConfig {
     return ecrecover(digest, v, r, s);
   }
 
-  function getCurrentChain() external pure returns (bytes4) {
-    return CURRENT_CHAIN;
+  function getCoinType() external pure returns (bytes4) {
+    return COIN_TYPE;
   }
 }
