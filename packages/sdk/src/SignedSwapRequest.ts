@@ -19,41 +19,44 @@ export class SignedSwapRequest extends SwapRequest {
   readonly initiator: BytesLike
   readonly signature: [string, string, number]
 
-  constructor (serialized: string) {
+  static FromSerialized (json: string) {
     let parsed: SignedSwapRequestData
     try {
-      parsed = JSON.parse(serialized)
+      parsed = JSON.parse(json)
     } catch {
       throw new Error('Invalid json string')
     }
+    return new SignedSwapRequest(parsed)
+  }
 
-    if (!parsed.chainId) {
+  constructor (signedSwap: SignedSwapRequestData) {
+    if (!signedSwap.chainId) {
       throw new Error('Missing chain id')
-    } else if (!parsed.mesonAddress) {
+    } else if (!signedSwap.mesonAddress) {
       throw new Error('Missing meson contract address')
-    } else if (!parsed.initiator) {
+    } else if (!signedSwap.initiator) {
       throw new Error('Missing initiator')
-    } else if (!parsed.signature) {
+    } else if (!signedSwap.signature) {
       throw new Error('Missing signature')
     }
 
-    const signer = new SwapSigner(parsed.mesonAddress, Number(parsed.chainId))
-    const recovered = signer.recoverFromRequestSignature(parsed.encoded, parsed.signature)
-    if (recovered !== parsed.initiator) {
+    const signer = new SwapSigner(signedSwap.mesonAddress, Number(signedSwap.chainId))
+    const recovered = signer.recoverFromRequestSignature(signedSwap.encoded, signedSwap.signature)
+    if (recovered !== signedSwap.initiator) {
       throw new Error('Invalid signature')
     }
 
-    super(parsed)
+    super(signedSwap)
 
-    if (this.encode() !== parsed.encoded) {
+    if (this.encode() !== signedSwap.encoded) {
       throw new Error('Encoded value mismatch')
     }
 
     this.signer = signer
-    this.chainId = parsed.chainId
-    this.mesonAddress = parsed.mesonAddress
-    this.initiator = parsed.initiator
-    this.signature = parsed.signature
+    this.chainId = signedSwap.chainId
+    this.mesonAddress = signedSwap.mesonAddress
+    this.initiator = signedSwap.initiator
+    this.signature = signedSwap.signature
   }
 
   checkReleaseSignature (signature: [string, string, number]) {

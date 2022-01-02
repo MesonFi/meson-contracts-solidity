@@ -2,6 +2,7 @@ import { Wallet } from '@ethersproject/wallet'
 
 import { SwapSigner } from './SwapSigner'
 import { SwapRequest, SwapRequestData } from './SwapRequest'
+import { SignedSwapRequestData } from './SignedSwapRequest'
 
 export class SwapRequestWithSigner extends SwapRequest {
   readonly signer: SwapSigner
@@ -19,25 +20,33 @@ export class SwapRequestWithSigner extends SwapRequest {
     return await this.signer.signSwapRelease(this, wallet)
   }
 
-  async serializeRequest(wallet: Wallet) {
+  async exportRequest(wallet: Wallet) {
     const signature = await this.signRequest(wallet)
-    return JSON.stringify({
+    return {
       ...this.toObject(),
       initiator: wallet.address.toLowerCase(),
       chainId: this.signer.chainId,
       mesonAddress: this.signer.mesonAddress,
       signature,
-    })
+    } as SignedSwapRequestData
   }
 
-  async serializeRelease(wallet: Wallet) {
+  async exportRelease(wallet: Wallet) {
     const signature = await this.signRelease(wallet)
-    return JSON.stringify({
+    return {
       swapId: this.swapId,
       initiator: wallet.address.toLowerCase(),
       chainId: this.signer.chainId,
       mesonAddress: this.signer.mesonAddress,
       signature,
-    })
+    }
+  }
+
+  async serializeRequest(wallet: Wallet) {
+    return JSON.stringify(await this.exportRequest(wallet))
+  }
+
+  async serializeRelease(wallet: Wallet) {
+    return JSON.stringify(await this.exportRelease(wallet))
   }
 }
