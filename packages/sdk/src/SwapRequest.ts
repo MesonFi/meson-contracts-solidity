@@ -72,7 +72,6 @@ export class SwapRequest implements SwapRequestData {
       outChain: this.outChain,
       outToken: this.outToken,
       recipient: this.recipient,
-      encoded: this.encode(),
     }
   }
 

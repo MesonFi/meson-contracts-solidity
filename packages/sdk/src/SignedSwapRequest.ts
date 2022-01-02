@@ -11,9 +11,7 @@ export interface SignedSwapCommonData {
   signature: [string, string, number],
 }
 
-export interface SignedSwapRequestData extends SwapRequestData, SignedSwapCommonData {
-  encoded: BytesLike,
-}
+export interface SignedSwapRequestData extends SwapRequestData, SignedSwapCommonData {}
 
 export interface SignedSwapReleaseData extends SignedSwapCommonData {
   swapId: string,
@@ -48,17 +46,12 @@ export class SignedSwapRequest extends SwapRequest {
     }
 
     const signer = new SwapSigner(signedReq.mesonAddress, Number(signedReq.chainId))
-    const recovered = signer.recoverFromRequestSignature(signedReq.encoded, signedReq.signature)
+    const recovered = signer.recoverFromRequestSignature(signedReq, signedReq.signature)
     if (recovered !== signedReq.initiator) {
       throw new Error('Invalid signature')
     }
 
     super(signedReq)
-
-    if (this.encode() !== signedReq.encoded) {
-      throw new Error('Encoded value mismatch')
-    }
-
     this.signer = signer
     this.chainId = signedReq.chainId
     this.mesonAddress = signedReq.mesonAddress

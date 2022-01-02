@@ -5,7 +5,7 @@ import { recoverAddress } from '@ethersproject/transactions'
 import { hexConcat, BytesLike } from '@ethersproject/bytes'
 import { TypedDataDomain } from '@ethersproject/abstract-signer'
 
-import { SwapRequest, SWAP_REQUEST_TYPE, SWAP_RELEASE_TYPE } from './SwapRequest'
+import { SwapRequest, SwapRequestData, SWAP_REQUEST_TYPE, SWAP_RELEASE_TYPE } from './SwapRequest'
 
 export class SwapSigner {
   readonly domain: TypedDataDomain
@@ -44,11 +44,11 @@ export class SwapSigner {
     return [r, s, v] as [string, string, number]
   }
 
-  recoverFromRequestSignature(encodedSwap: BytesLike, [r, s, v]: [string, string, number]) {
+  recoverFromRequestSignature(swap: SwapRequestData, [r, s, v]: [string, string, number]) {
     const digest = keccak256(hexConcat([
       '0x1901',
       _TypedDataEncoder.hashDomain(this.domain),
-      keccak256(encodedSwap)
+      _TypedDataEncoder.from(SWAP_REQUEST_TYPE).hash(swap)
     ]))
     return recoverAddress(digest, { r, s, v }).toLowerCase()
   }
