@@ -65,8 +65,8 @@ describe('MesonStates', () => {
 
   describe('#removeExpiredSwaps', () => {
     const id0 = '0x0000000000000000000000000000000000000000000000000000000000000000';
-    const id1 = "0x464f9a206dee56c06e8f668bc1933f6286aa952f7cea9d677e18b5f089555fa1";
-    const id2 = "0x464f9a206dee56c06e8f668bc1933f6286aa952f7cea9d677e18b5f089555fa2";
+    const id1 = '0x464f9a206dee56c06e8f668bc1933f6286aa952f7cea9d677e18b5f089555fa1';
+    const id2 = '0x464f9a206dee56c06e8f668bc1933f6286aa952f7cea9d677e18b5f089555fa2';
     const amount = 100;
     const expiredTs = 1;
     const validTs = Math.floor(Date.now() / 1000);
