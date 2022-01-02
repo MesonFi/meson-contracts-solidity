@@ -15,7 +15,6 @@ export interface SwapRequestData {
 }
 
 export interface PartialSwapRequest {
-  inChain: BytesLike,
   inToken: BytesLike,
   amount: string,
   outToken: BytesLike,
