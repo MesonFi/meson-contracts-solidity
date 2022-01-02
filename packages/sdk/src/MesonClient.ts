@@ -48,7 +48,7 @@ export class MesonClient {
     }
   }
 
-  async post(signedRequest: SignedSwapRequest) {
+  async postSwap(signedRequest: SignedSwapRequest) {
     this._check(signedRequest)
     return this.mesonInstance.postSwap(
       signedRequest.encode(),
@@ -58,7 +58,7 @@ export class MesonClient {
     )
   }
 
-  async execute(signedRelease: SignedSwapReleaseData) {
+  async executeSwap(signedRelease: SignedSwapReleaseData) {
     this._check(signedRelease)
     return this.mesonInstance.executeSwap(signedRelease.swapId, ...signedRelease.signature)
   }

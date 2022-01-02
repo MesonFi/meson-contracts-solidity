@@ -36,7 +36,7 @@ describe('MesonSwap', () => {
 
       const signedRequest = new SignedSwapRequest(exported)
       await token.approve(mesonInstance.address, swap.amount)
-      await lpClient.post(signedRequest)
+      await lpClient.postSwap(signedRequest)
 
       expect(await mesonInstance.hasSwap(swap.swapId)).to.equal(true)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
@@ -48,7 +48,7 @@ describe('MesonSwap', () => {
 
       const signedRequest = new SignedSwapRequest(exported)
       await unsupportedToken.approve(mesonInstance.address, swap.amount)
-      await expect(lpClient.post(signedRequest)).to.be.revertedWith('unsupported token')
+      await expect(lpClient.postSwap(signedRequest)).to.be.revertedWith('unsupported token')
     })
   })
 
@@ -61,11 +61,11 @@ describe('MesonSwap', () => {
 
       const signedRequest = new SignedSwapRequest(exported)
       await token.approve(mesonInstance.address, swap.amount)
-      await lpClient.post(signedRequest)
+      await lpClient.postSwap(signedRequest)
 
       const signedRelease = await swap.exportRelease(initiator)
       SignedSwapRequest.CheckReleaseSignature(signedRelease)
-      await lpClient.execute(signedRelease)
+      await lpClient.executeSwap(signedRelease)
 
       expect(await mesonInstance.hasSwap(swap.swapId)).to.equal(false)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
