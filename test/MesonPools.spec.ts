@@ -3,8 +3,8 @@ import { MesonClient } from '@meson/sdk'
 import { MockToken, MesonPoolsTest } from '@meson/contract-typs'
 
 import { expect } from './shared/expect'
-import { wallet } from './shared/wallet'
-import { fixtures } from './shared/fixtures'
+import { wallet, initiator, provider } from './shared/wallet'
+import { fixtures, TOKEN_BALANCE, TOKEN_TOTAL_SUPPLY } from './shared/fixtures'
 import { getDefaultSwap } from './shared/meson'
 
 describe('MesonPools', () => {
@@ -15,19 +15,27 @@ describe('MesonPools', () => {
   let mesonClient: MesonClient
 
   beforeEach('deploy MesonPoolsTest', async () => {
-    const result = await waffle.loadFixture(() => fixtures(wallet))
-    mesonInstance = result.pools
-    token = result.token1
-    unsupportedToken = result.token2
+    const result = await waffle.loadFixture(() => fixtures([
+      initiator.address, provider.address
+    ]))
+    mesonInstance = result.pools.connect(provider)
+    token = result.token1.connect(provider)
+    unsupportedToken = result.token2.connect(provider)
 
     outChain = await mesonInstance.getCurrentChain()
     mesonClient = await MesonClient.Create(mesonInstance)
   })
 
-  describe('#token totalSupply & balance for signer', () => {
-    it('is 1000000', async () => {
-      expect(await token.totalSupply()).to.equal(1000000000)
-      expect(await token.balanceOf(wallet.address)).to.equal(1000000000)
+  describe('#token total supply', () => {
+    it(`is ${TOKEN_TOTAL_SUPPLY}`, async () => {
+      expect(await token.totalSupply()).to.equal(TOKEN_TOTAL_SUPPLY)
+    })
+  })
+
+  describe('#token balance for an account', () => {
+    it(`is ${TOKEN_BALANCE}`, async () => {
+      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE)
+      expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE)
     })
   })
 
@@ -41,9 +49,9 @@ describe('MesonPools', () => {
     it('accepts 1000 deposit', async () => {
       await token.approve(mesonInstance.address, 1000)
       await mesonInstance.deposit(token.address, 1000)
-      expect(await mesonInstance.balanceOf(token.address, wallet.address)).to.equal(1000)
+      expect(await mesonInstance.balanceOf(token.address, provider.address)).to.equal(1000)
       expect(await mesonInstance.totalSupplyFor(token.address)).to.equal(1000)
-      expect(await token.balanceOf(wallet.address)).to.equal(999999000)
+      expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.sub(1000))
 
       await expect(mesonInstance.deposit(token.address, 1)).to.be.reverted
     })
@@ -62,7 +70,7 @@ describe('MesonPools', () => {
       await mesonInstance.deposit(token.address, 1000)
       await mesonInstance.withdraw(token.address, 1000)
       expect(await mesonInstance.totalSupplyFor(token.address)).to.equal(0)
-      expect(await token.balanceOf(wallet.address)).to.equal(1000000000)
+      expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE)
 
       await expect(mesonInstance.withdraw(token.address, 1)).to.be.revertedWith('overdrawn')
     })

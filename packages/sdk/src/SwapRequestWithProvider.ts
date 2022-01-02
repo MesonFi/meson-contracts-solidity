@@ -4,9 +4,13 @@ import { SwapRequest, SwapRequestData } from './SwapRequest'
 
 export class SwapRequestWithProvider extends SwapRequest {
   readonly mesonInstance: Contract
-  readonly signatures: [BytesLike]
+  readonly signatures: [BytesLike, BytesLike, number]
   
-  constructor (req: SwapRequestData, signatures: [BytesLike], mesonInstance: Contract) {
+  constructor (
+    req: SwapRequestData,
+    signatures: [BytesLike, BytesLike, number],
+    mesonInstance: Contract
+  ) {
     super(req)
     this.signatures = signatures
     this.mesonInstance = mesonInstance
@@ -29,16 +33,17 @@ export class SwapRequestWithProvider extends SwapRequest {
     return swap
   }
 
-  async post (wallet: Wallet) {
+  async post (initiatorAddress: BytesLike) {
+    // TODO check signatures
     return this.mesonInstance.postSwap(
       this.encode(),
       this.inToken,
-      wallet.address,
+      initiatorAddress,
       ...this.signatures
     )
   }
 
-  async execute (releaseSignatures: (string | number)[]) {
+  async execute (releaseSignatures: [BytesLike, BytesLike, number]) {
     return this.mesonInstance.executeSwap(this.id(), ...releaseSignatures)
   }
 }
