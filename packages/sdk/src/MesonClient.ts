@@ -60,10 +60,7 @@ export class MesonClient {
 
   async execute(swap: SignedSwapRequest, signature: [string, string, number]) {
     this._check(swap)
-    const recovered = this.signer.recoverFromReleaseSignature(swap.swapId, signature)
-    if (recovered !== swap.initiator) {
-      throw new Error('Invalid signature')
-    }
+    swap.checkReleaseSignature(signature)
     return this.mesonInstance.executeSwap(swap.swapId, ...signature)
   }
 }
