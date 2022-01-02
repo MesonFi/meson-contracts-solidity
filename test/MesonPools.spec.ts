@@ -1,5 +1,5 @@
 import { waffle } from 'hardhat'
-import { MesonClient } from '@meson/sdk'
+import { MesonClient, SignedSwapRequest } from '@meson/sdk'
 import { MockToken, MesonPoolsTest } from '@meson/contract-typs'
 
 import { expect } from './shared/expect'
@@ -8,11 +8,11 @@ import { fixtures, TOKEN_BALANCE, TOKEN_TOTAL_SUPPLY } from './shared/fixtures'
 import { getDefaultSwap } from './shared/meson'
 
 describe('MesonPools', () => {
-  let mesonInstance: MesonPoolsTest
   let token: MockToken
   let unsupportedToken: MockToken
+  let mesonInstance: MesonPoolsTest
   let outChain: string
-  let mesonClient: MesonClient
+  let userClient: MesonClient
 
   beforeEach('deploy MesonPoolsTest', async () => {
     const result = await waffle.loadFixture(() => fixtures([
@@ -23,7 +23,7 @@ describe('MesonPools', () => {
     unsupportedToken = result.token2.connect(provider)
 
     outChain = await mesonInstance.getCoinType()
-    mesonClient = await MesonClient.Create(mesonInstance)
+    userClient = await MesonClient.Create(result.pools)
   })
 
   describe('#token total supply', () => {
@@ -82,45 +82,49 @@ describe('MesonPools', () => {
 
   describe('#lock', async () => {
     it('lockes a swap', async () => {
-      const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ outToken: token.address }))
-      await token.approve(mesonInstance.address, swap.amount)
-      await mesonInstance.deposit(token.address, swap.amount)
+      const swap = userClient.requestSwap(outChain, getDefaultSwap({ outToken: token.address }))
+      const exported = await swap.exportRequest(initiator)
 
-      const sigs = await swap.signRequest(initiator)
-      await mesonInstance.lock(swap.encode(), token.address, swap.recipient, ...sigs)
+      const signedRequest = new SignedSwapRequest(exported)
+      await token.approve(mesonInstance.address, signedRequest.amount)
+      await mesonInstance.deposit(signedRequest.outToken, signedRequest.amount)
+      await mesonInstance.lock(signedRequest.encode(), signedRequest.outToken, signedRequest.recipient, ...signedRequest.signature)
 
       expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
       expect(await mesonInstance.hasLockingSwap(swap.swapId)).to.equal(true)
     })
 
     it('refuses mismatch outToken or recipient', async () => {
-      const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ outToken: token.address }))
-      await token.approve(mesonInstance.address, swap.amount)
-      await mesonInstance.deposit(token.address, swap.amount)
+      const swap = userClient.requestSwap(outChain, getDefaultSwap({ outToken: token.address }))
+      const exported = await swap.exportRequest(initiator)
 
-      const sigs = await swap.signRequest(initiator)
+      const signedRequest = new SignedSwapRequest(exported)
+      await token.approve(mesonInstance.address, signedRequest.amount)
+      await mesonInstance.deposit(signedRequest.outToken, signedRequest.amount)
 
       // await expect(
       //   contract.lock(swap.encode(), unsupportedToken.address, swap.recipient)
       // ).to.be.revertedWith('outToken does not match')
 
       await expect(
-        mesonInstance.lock(swap.encode(), token.address, provider.address, ...sigs)
+        mesonInstance.lock(signedRequest.encode(), signedRequest.outToken, provider.address, ...signedRequest.signature)
       ).to.be.revertedWith('recipient does not match')
     })
   })
 
   describe('#release', async () => {
     it('accepts a release', async () => {
-      const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ outToken: token.address }))
-      await token.approve(mesonInstance.address, swap.amount)
-      await mesonInstance.deposit(token.address, swap.amount)
+      const swap = userClient.requestSwap(outChain, getDefaultSwap({ outToken: token.address }))
+      const exported = await swap.exportRequest(initiator)
+      
+      const signedRequest = new SignedSwapRequest(exported)
+      await token.approve(mesonInstance.address, signedRequest.amount)
+      await mesonInstance.deposit(signedRequest.outToken, signedRequest.amount)
+      await mesonInstance.lock(signedRequest.encode(), signedRequest.outToken, signedRequest.recipient, ...signedRequest.signature)
 
-      const sigs = await swap.signRequest(initiator)
-      await mesonInstance.lock(swap.encode(), token.address, swap.recipient, ...sigs)
-
-      const releaseSig = await swap.signRelease(initiator)
-      await mesonInstance.release(swap.swapId, swap.amount, ...releaseSig)
+      const signedRelease = await swap.exportRelease(initiator)
+      SignedSwapRequest.CheckReleaseSignature(signedRelease)
+      await mesonInstance.release(signedRelease.swapId, swap.amount, ...signedRelease.signature)
 
       expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
       expect(await token.balanceOf(swap.recipient)).to.equal(swap.amount)
