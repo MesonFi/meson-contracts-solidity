@@ -3,7 +3,7 @@ import { BytesLike } from '@ethersproject/bytes'
 
 import { SwapSigner } from './SwapSigner'
 import { SwapRequestWithSigner } from './SwapRequestWithSigner'
-import { SignedSwapRequest } from './SignedSwapRequest'
+import { SignedSwapCommonData, SignedSwapRequest, SignedSwapReleaseData } from './SignedSwapRequest'
 
 export interface PartialSwapRequest {
   inToken: BytesLike,
@@ -40,7 +40,7 @@ export class MesonClient {
     }, this.signer)
   }
 
-  private _check (swap: SignedSwapRequest) {
+  private _check (swap: SignedSwapCommonData) {
     if (this.chainId !== swap.chainId) {
       throw new Error('Mismatch chain id')
     } else if (this.mesonInstance.address !== swap.mesonAddress) {
@@ -48,18 +48,18 @@ export class MesonClient {
     }
   }
 
-  async post(swap: SignedSwapRequest) {
-    this._check(swap)
+  async post(signedRequest: SignedSwapRequest) {
+    this._check(signedRequest)
     return this.mesonInstance.postSwap(
-      swap.encode(),
-      swap.inToken,
-      swap.initiator,
-      ...swap.signature
+      signedRequest.encode(),
+      signedRequest.inToken,
+      signedRequest.initiator,
+      ...signedRequest.signature
     )
   }
 
-  async execute(swap: SignedSwapRequest, signature: [string, string, number]) {
-    this._check(swap)
-    return this.mesonInstance.executeSwap(swap.swapId, ...signature)
+  async execute(signedRelease: SignedSwapReleaseData) {
+    this._check(signedRelease)
+    return this.mesonInstance.executeSwap(signedRelease.swapId, ...signedRelease.signature)
   }
 }

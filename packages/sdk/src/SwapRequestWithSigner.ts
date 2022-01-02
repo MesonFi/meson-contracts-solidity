@@ -2,7 +2,7 @@ import { Wallet } from '@ethersproject/wallet'
 
 import { SwapSigner } from './SwapSigner'
 import { SwapRequest, SwapRequestData } from './SwapRequest'
-import { SignedSwapRequestData } from './SignedSwapRequest'
+import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwapRequest'
 
 export class SwapRequestWithSigner extends SwapRequest {
   readonly signer: SwapSigner
@@ -39,7 +39,7 @@ export class SwapRequestWithSigner extends SwapRequest {
       chainId: this.signer.chainId,
       mesonAddress: this.signer.mesonAddress,
       signature,
-    }
+    } as SignedSwapReleaseData
   }
 
   async serializeRequest(wallet: Wallet) {

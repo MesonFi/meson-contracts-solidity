@@ -59,9 +59,9 @@ describe('MesonSwap', () => {
       await token.approve(mesonInstance.address, swap.amount)
       await mesonClient.post(signedRequest)
 
-      const exportedRelease = await swap.exportRelease(initiator)
-      SignedSwapRequest.CheckReleaseSignature(exportedRelease)
-      await mesonClient.execute(signedRequest, exportedRelease.signature)
+      const signedRelease = await swap.exportRelease(initiator)
+      SignedSwapRequest.CheckReleaseSignature(signedRelease)
+      await mesonClient.execute(signedRelease)
 
       expect(await mesonInstance.hasSwap(swap.swapId)).to.equal(false)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
