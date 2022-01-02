@@ -30,8 +30,11 @@ describe('MesonSwap', () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: token.address }))
       await token.approve(mesonInstance.address, swap.amount)
 
-      const { r, s, v } = await mesonClient.signer.signSwapRequest(swap, wallet)
-      await mesonInstance.postSwap(swap.encode(), token.address, wallet.address, r, s, v)
+      const serializedRequest = await swap.serializeRequest(wallet)
+
+      const req = mesonClient.parseRequest(serializedRequest)
+      await req.post(wallet)
+
       expect(await mesonInstance.hasSwap(swap.id())).to.equal(true)
     })
 
@@ -39,10 +42,10 @@ describe('MesonSwap', () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: unsupportedToken.address }))
       await unsupportedToken.approve(mesonInstance.address, swap.amount)
 
-      const { r, s, v } = await mesonClient.signer.signSwapRequest(swap, wallet)
-      await expect(
-        mesonInstance.postSwap(swap.encode(), unsupportedToken.address, wallet.address, r, s, v)
-      ).to.be.revertedWith('unsupported token')
+      const serializedRequest = await swap.serializeRequest(wallet)
+
+      const req = mesonClient.parseRequest(serializedRequest)
+      await expect(req.post(wallet)).to.be.revertedWith('unsupported token')
     })
   })
 
@@ -51,11 +54,13 @@ describe('MesonSwap', () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: token.address }))
       await token.approve(mesonInstance.address, swap.amount)
 
-      const { r, s, v } = await mesonClient.signer.signSwapRequest(swap, wallet)
-      await mesonInstance.postSwap(swap.encode(), token.address, wallet.address, r, s, v)
+      const serializedRequest = await swap.serializeRequest(wallet)
 
-      const { r: r2, s: s2, v: v2 } = await mesonClient.signer.signSwapRelease(swap.id(), wallet)
-      await mesonInstance.executeSwap(swap.id(), r2, s2, v2)
+      const req = mesonClient.parseRequest(serializedRequest)
+      await req.post(wallet)
+
+      const releaseSignatures = await swap.signRelease(wallet)
+      await req.execute(releaseSignatures)
 
       expect(await mesonInstance.hasSwap(swap.id())).to.equal(false)
       expect(await token.balanceOf(wallet.address)).to.equal(1000000000)

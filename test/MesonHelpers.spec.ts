@@ -1,5 +1,5 @@
 import { ethers, waffle } from 'hardhat'
-import { MesonClient, SwapRequest } from '@meson/sdk'
+import { MesonClient, SwapRequestWithSigner } from '@meson/sdk'
 import { MesonHelpersTest } from '@meson/contract-types'
 
 import { expect } from './shared/expect'
@@ -9,7 +9,7 @@ import { getDefaultSwap } from './shared/meson'
 describe('MesonHelpers', () => {
   let mesonInstance: MesonHelpersTest
   let mesonClient: MesonClient
-  let swap: SwapRequest
+  let swap: SwapRequestWithSigner
 
   const fixture = async () => {
     const factory = await ethers.getContractFactory('MesonHelpersTest')
@@ -64,15 +64,15 @@ describe('MesonHelpers', () => {
 
   describe('#checkRequestSignature', () => {
     it('validates a request signature', async () => {
-      const { r, s, v } = await mesonClient.signer.signSwapRequest(swap, wallet)
-      await mesonInstance.checkRequestSignature(swap.id(), wallet.address, r, s, v)
+      const sigs = await swap.signRequest(wallet)
+      await mesonInstance.checkRequestSignature(swap.id(), wallet.address, ...sigs)
     })
   })
 
   describe('#checkReleaseSignature', () => {
     it('validates a release signature', async () => {
-      const { r, s, v } = await mesonClient.signer.signSwapRelease(swap.id(), wallet)
-      await mesonInstance.checkReleaseSignature(swap.id(), wallet.address, r, s, v)
+      const sigs = await swap.signRelease(wallet)
+      await mesonInstance.checkReleaseSignature(swap.id(), wallet.address, ...sigs)
     })
   })
 })

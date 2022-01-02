@@ -1,12 +1,12 @@
 import { BytesLike } from 'ethers'
-import { SwapRequestData } from '@meson/sdk'
+import { PartialSwapRequest } from '@meson/sdk'
 
 type OptionalSwapRequestData = {
   inToken?: BytesLike,
   outToken?: BytesLike,
 }
 
-export function getDefaultSwap({ inToken, outToken }: OptionalSwapRequestData = {}): SwapRequestData {
+export function getDefaultSwap({ inToken, outToken }: OptionalSwapRequestData = {}): PartialSwapRequest {
   return {
     inToken: inToken || '0x943f0cabc0675f3642927e25abfa9a7ae15e8672',
     amount: 100,

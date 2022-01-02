@@ -1,4 +1,4 @@
-import { utils, BytesLike } from 'ethers'
+import { utils, Wallet, BytesLike } from 'ethers'
 
 const { id, keccak256, defaultAbiCoder } = utils
 
@@ -28,8 +28,8 @@ export class SwapRequest implements SwapRequestData {
   readonly outToken: BytesLike
   readonly recipient: BytesLike
 
-  private _encoded: BytesLike
-  private _swapId: BytesLike
+  private _encoded: BytesLike = ''
+  private _swapId: BytesLike = ''
 
   constructor(req: SwapRequestData) {
     this.expireTs = req.expireTs
@@ -63,5 +63,21 @@ export class SwapRequest implements SwapRequestData {
       this._swapId = keccak256(this.encode())
     }
     return this._swapId
+  }
+
+  toObject () {
+    return {
+      expireTs: this.expireTs,
+      inToken: this.inToken,
+      amount: this.amount,
+      outChain: this.outChain,
+      outToken: this.outToken,
+      recipient: this.recipient,
+      encoded: this.encode(),
+    }
+  }
+
+  serialize () {
+    return JSON.stringify(this.toObject())
   }
 }

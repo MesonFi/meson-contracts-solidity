@@ -1,4 +1,4 @@
-import { BytesLike, Wallet } from 'ethers'
+import { Wallet, BytesLike } from 'ethers'
 
 import { SwapRequestData } from './SwapRequest'
 
@@ -44,10 +44,10 @@ export class SwapSigner {
     return this._separateSignature(signature)
   }
 
-  _separateSignature(signature: BytesLike) {
+  _separateSignature(signature: string) {
     const r = '0x' + signature.substring(2, 66)
     const s = '0x' + signature.substring(66, 130)
     const v = parseInt(signature.substring(130, 132), 16)
-    return { r, s, v }
+    return [r, s, v]
   }
 }
