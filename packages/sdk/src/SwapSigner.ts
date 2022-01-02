@@ -1,4 +1,8 @@
-import { Wallet, BytesLike } from 'ethers'
+import { Wallet } from '@ethersproject/wallet'
+import { id } from '@ethersproject/hash'
+import { defaultAbiCoder } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
+import { TypedDataDomain } from '@ethersproject/abstract-signer'
 
 import { SwapRequestData } from './SwapRequest'
 

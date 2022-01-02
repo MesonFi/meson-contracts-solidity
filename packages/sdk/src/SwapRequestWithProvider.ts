@@ -1,4 +1,6 @@
-import { Contract, Wallet, BytesLike } from 'ethers'
+import { Contract } from '@ethersproject/contracts'
+import { recoverAddress } from '@ethersproject/transactions'
+import { BytesLike } from '@ethersproject/bytes'
 
 import { SwapRequest, SwapRequestData } from './SwapRequest'
 

@@ -1,6 +1,7 @@
-import { utils, Wallet, BytesLike } from 'ethers'
-
-const { id, keccak256, defaultAbiCoder } = utils
+import { id } from '@ethersproject/hash'
+import { keccak256 } from '@ethersproject/keccak256'
+import { defaultAbiCoder } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
 
 const SWAP_REQUEST_TYPEHASH = id('SwapRequest(uint256 expireTs,bytes inToken,uint256 amount,bytes4 outChain,bytes outToken,bytes recipient)')
 

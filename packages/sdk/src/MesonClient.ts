@@ -1,4 +1,5 @@
-import { Contract, BytesLike } from 'ethers'
+import { Contract } from '@ethersproject/contracts'
+import { BytesLike } from '@ethersproject/bytes'
 
 import { SwapSigner } from './SwapSigner'
 import { PartialSwapRequest } from './SwapRequest'
@@ -8,7 +9,7 @@ import { SwapRequestWithProvider } from './SwapRequestWithProvider'
 export class MesonClient {
   readonly mesonInstance: Contract
   readonly signer: SwapSigner
-  private _coinType: BytesLike
+  private _coinType: BytesLike = ''
 
   static async Create(mesonInstance: Contract) {
     const client = new MesonClient(mesonInstance)
