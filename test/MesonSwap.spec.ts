@@ -32,9 +32,9 @@ describe('MesonSwap', () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: token.address }))
       const exported = await swap.exportRequest(initiator)
 
-      const signedSwap = new SignedSwapRequest(exported)
+      const signedRequest = new SignedSwapRequest(exported)
       await token.approve(mesonInstance.address, swap.amount)
-      await mesonClient.post(signedSwap)
+      await mesonClient.post(signedRequest)
 
       expect(await mesonInstance.hasSwap(swap.swapId)).to.equal(true)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
@@ -44,9 +44,9 @@ describe('MesonSwap', () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: unsupportedToken.address }))
       const exported = await swap.exportRequest(initiator)
 
-      const signedSwap = new SignedSwapRequest(exported)
+      const signedRequest = new SignedSwapRequest(exported)
       await unsupportedToken.approve(mesonInstance.address, swap.amount)
-      await expect(mesonClient.post(signedSwap)).to.be.revertedWith('unsupported token')
+      await expect(mesonClient.post(signedRequest)).to.be.revertedWith('unsupported token')
     })
   })
 
@@ -55,12 +55,13 @@ describe('MesonSwap', () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: token.address }))
       const exported = await swap.exportRequest(initiator)
 
-      const signedSwap = new SignedSwapRequest(exported)
+      const signedRequest = new SignedSwapRequest(exported)
       await token.approve(mesonInstance.address, swap.amount)
-      await mesonClient.post(signedSwap)
+      await mesonClient.post(signedRequest)
 
-      const releaseSignature = await swap.signRelease(initiator)
-      await mesonClient.execute(signedSwap, releaseSignature)
+      const exportedRelease = await swap.exportRelease(initiator)
+      SignedSwapRequest.CheckReleaseSignature(exportedRelease)
+      await mesonClient.execute(signedRequest, exportedRelease.signature)
 
       expect(await mesonInstance.hasSwap(swap.swapId)).to.equal(false)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))

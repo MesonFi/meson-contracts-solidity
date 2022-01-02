@@ -29,39 +29,40 @@ export class SignedSwapRequest extends SwapRequest {
     return new SignedSwapRequest(parsed)
   }
 
-  constructor (signedSwap: SignedSwapRequestData) {
-    if (!signedSwap.chainId) {
+  constructor (signedReq: SignedSwapRequestData) {
+    if (!signedReq.chainId) {
       throw new Error('Missing chain id')
-    } else if (!signedSwap.mesonAddress) {
+    } else if (!signedReq.mesonAddress) {
       throw new Error('Missing meson contract address')
-    } else if (!signedSwap.initiator) {
+    } else if (!signedReq.initiator) {
       throw new Error('Missing initiator')
-    } else if (!signedSwap.signature) {
+    } else if (!signedReq.signature) {
       throw new Error('Missing signature')
     }
 
-    const signer = new SwapSigner(signedSwap.mesonAddress, Number(signedSwap.chainId))
-    const recovered = signer.recoverFromRequestSignature(signedSwap.encoded, signedSwap.signature)
-    if (recovered !== signedSwap.initiator) {
+    const signer = new SwapSigner(signedReq.mesonAddress, Number(signedReq.chainId))
+    const recovered = signer.recoverFromRequestSignature(signedReq.encoded, signedReq.signature)
+    if (recovered !== signedReq.initiator) {
       throw new Error('Invalid signature')
     }
 
-    super(signedSwap)
+    super(signedReq)
 
-    if (this.encode() !== signedSwap.encoded) {
+    if (this.encode() !== signedReq.encoded) {
       throw new Error('Encoded value mismatch')
     }
 
     this.signer = signer
-    this.chainId = signedSwap.chainId
-    this.mesonAddress = signedSwap.mesonAddress
-    this.initiator = signedSwap.initiator
-    this.signature = signedSwap.signature
+    this.chainId = signedReq.chainId
+    this.mesonAddress = signedReq.mesonAddress
+    this.initiator = signedReq.initiator
+    this.signature = signedReq.signature
   }
 
-  checkReleaseSignature (signature: [string, string, number]) {
-    const recovered = this.signer.recoverFromReleaseSignature(this.swapId, signature)
-    if (recovered !== this.initiator) {
+  static CheckReleaseSignature (signedRelease: any) {
+    const signer = new SwapSigner(signedRelease.mesonAddress, Number(signedRelease.chainId))
+    const recovered = signer.recoverFromReleaseSignature(signedRelease.swapId, signedRelease.signature)
+    if (recovered !== signedRelease.initiator) {
       throw new Error('Invalid signature')
     }
   }

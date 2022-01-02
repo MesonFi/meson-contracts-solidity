@@ -60,7 +60,6 @@ export class MesonClient {
 
   async execute(swap: SignedSwapRequest, signature: [string, string, number]) {
     this._check(swap)
-    swap.checkReleaseSignature(signature)
     return this.mesonInstance.executeSwap(swap.swapId, ...signature)
   }
 }
