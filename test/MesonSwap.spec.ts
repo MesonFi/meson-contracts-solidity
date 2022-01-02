@@ -1,5 +1,5 @@
 import { waffle } from 'hardhat'
-import { MesonClient, parseSerializedSwap } from '@meson/sdk'
+import { MesonClient, SignedSwapRequest } from '@meson/sdk'
 import { MockToken, MesonSwapTest } from '@meson/contract-typs'
 
 import { expect } from './shared/expect'
@@ -32,7 +32,7 @@ describe('MesonSwap', () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: token.address }))
       const serialized = await swap.serializeRequest(initiator)
 
-      const signedSwap = parseSerializedSwap(serialized)
+      const signedSwap = new SignedSwapRequest(serialized)
       await token.approve(mesonInstance.address, swap.amount)
       await mesonClient.post(signedSwap)
 
@@ -44,7 +44,7 @@ describe('MesonSwap', () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: unsupportedToken.address }))
       const serialized = await swap.serializeRequest(initiator)
 
-      const signedSwap = parseSerializedSwap(serialized)
+      const signedSwap = new SignedSwapRequest(serialized)
       await unsupportedToken.approve(mesonInstance.address, swap.amount)
       await expect(mesonClient.post(signedSwap)).to.be.revertedWith('unsupported token')
     })
@@ -55,7 +55,7 @@ describe('MesonSwap', () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: token.address }))
       const serialized = await swap.serializeRequest(initiator)
 
-      const signedSwap = parseSerializedSwap(serialized)
+      const signedSwap = new SignedSwapRequest(serialized)
       await token.approve(mesonInstance.address, swap.amount)
       await mesonClient.post(signedSwap)
 

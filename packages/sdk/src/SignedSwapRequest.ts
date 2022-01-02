@@ -19,34 +19,41 @@ export class SignedSwapRequest extends SwapRequest {
   readonly initiator: BytesLike
   readonly signature: [string, string, number]
 
-  constructor (req: SignedSwapRequestData) {
-    if (!req.chainId) {
+  constructor (serialized: string) {
+    let parsed: SignedSwapRequestData
+    try {
+      parsed = JSON.parse(serialized)
+    } catch {
+      throw new Error('Invalid json string')
+    }
+
+    if (!parsed.chainId) {
       throw new Error('Missing chain id')
-    } else if (!req.mesonAddress) {
+    } else if (!parsed.mesonAddress) {
       throw new Error('Missing meson contract address')
-    } else if (!req.initiator) {
+    } else if (!parsed.initiator) {
       throw new Error('Missing initiator')
-    } else if (!req.signature) {
+    } else if (!parsed.signature) {
       throw new Error('Missing signature')
     }
 
-    const signer = new SwapSigner(req.mesonAddress, Number(req.chainId))
-    const recovered = signer.recoverFromRequestSignature(req.encoded, req.signature)
-    if (recovered !== req.initiator) {
+    const signer = new SwapSigner(parsed.mesonAddress, Number(parsed.chainId))
+    const recovered = signer.recoverFromRequestSignature(parsed.encoded, parsed.signature)
+    if (recovered !== parsed.initiator) {
       throw new Error('Invalid signature')
     }
 
-    super(req)
+    super(parsed)
 
-    if (this.encode() !== req.encoded) {
+    if (this.encode() !== parsed.encoded) {
       throw new Error('Encoded value mismatch')
     }
 
     this.signer = signer
-    this.chainId = req.chainId
-    this.mesonAddress = req.mesonAddress
-    this.initiator = req.initiator
-    this.signature = req.signature
+    this.chainId = parsed.chainId
+    this.mesonAddress = parsed.mesonAddress
+    this.initiator = parsed.initiator
+    this.signature = parsed.signature
   }
 
   checkReleaseSignature (signature: [string, string, number]) {
