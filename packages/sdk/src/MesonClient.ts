@@ -26,6 +26,10 @@ export class MesonClient {
     return this._coinType
   }
 
+  get eip712Domain () {
+    return this.signer.domain
+  }
+
   get mesonAddress () {
     return this.mesonInstance.address
   }
@@ -46,6 +50,6 @@ export class MesonClient {
   }
 
   parseRequest (serialized: string) {
-    return SwapRequestWithProvider.FromSerialized(serialized, this.mesonInstance)
+    return SwapRequestWithProvider.FromSerialized(serialized, this)
   }
 }

@@ -22,12 +22,12 @@ export class SwapRequestWithSigner extends SwapRequest {
   async serializeRequest (wallet: Wallet) {
     const swapObject = this.toObject()
     const signatures = await this.signRequest(wallet)
-    return JSON.stringify({ ...swapObject, signatures })
+    return JSON.stringify({ ...swapObject, initiator: wallet.address.toLowerCase(), signatures })
   }
 
   async serializeRelease (wallet: Wallet) {
     const swapId = this.id()
     const signatures = await this.signRelease(wallet)
-    return JSON.stringify({ swapId, signatures })
+    return JSON.stringify({ swapId, initiator: wallet.address.toLowerCase(), signatures })
   }
 }

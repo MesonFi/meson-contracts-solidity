@@ -1,33 +1,18 @@
 import { Wallet } from '@ethersproject/wallet'
-import { id } from '@ethersproject/hash'
-import { defaultAbiCoder } from '@ethersproject/abi'
 import { BytesLike } from '@ethersproject/bytes'
 import { TypedDataDomain } from '@ethersproject/abstract-signer'
 
-import { SwapRequestData } from './SwapRequest'
-
-const requestTypes = {
-  SwapRequest: [
-    { name: 'expireTs', type: 'uint256' },
-    { name: 'inToken', type: 'bytes' },
-    { name: 'amount', type: 'uint256' },
-    { name: 'outChain', type: 'bytes4' },
-    { name: 'outToken', type: 'bytes' },
-    { name: 'recipient', type: 'bytes' }
-  ]
-}
+import { SwapRequestData, SWAP_REQUEST_TYPE } from './SwapRequest'
 
 const releaseTypes = {
   SwapRelease: [{ name: 'swapId', type: 'bytes32' }]
 }
 
 export class SwapSigner {
-  _mesonAddress: BytesLike
-  _domain: any
+  readonly domain: TypedDataDomain
 
-  constructor(mesonAddress: BytesLike) {
-    this._mesonAddress = mesonAddress
-    this._domain = {
+  constructor(mesonAddress: string) {
+    this.domain = {
       name: 'Meson Fi',
       version: '1',
       verifyingContract: mesonAddress
@@ -35,16 +20,16 @@ export class SwapSigner {
   }
 
   set chainId (id: number) {
-    this._domain.chainId = id
+    this.domain.chainId = id
   }
 
   async signSwapRequest(swap: SwapRequestData, wallet: Wallet) {
-    const signature = await wallet._signTypedData(this._domain, requestTypes, swap)
+    const signature = await wallet._signTypedData(this.domain, SWAP_REQUEST_TYPE, swap)
     return this._separateSignature(signature)
   }
 
   async signSwapRelease(swapId: BytesLike, wallet: Wallet) {
-    const signature = await wallet._signTypedData(this._domain, releaseTypes, { swapId })
+    const signature = await wallet._signTypedData(this.domain, releaseTypes, { swapId })
     return this._separateSignature(signature)
   }
 

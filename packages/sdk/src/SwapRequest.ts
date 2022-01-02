@@ -1,9 +1,17 @@
-import { id } from '@ethersproject/hash'
+import { _TypedDataEncoder } from '@ethersproject/hash'
 import { keccak256 } from '@ethersproject/keccak256'
-import { defaultAbiCoder } from '@ethersproject/abi'
 import { BytesLike } from '@ethersproject/bytes'
 
-const SWAP_REQUEST_TYPEHASH = id('SwapRequest(uint256 expireTs,bytes inToken,uint256 amount,bytes4 outChain,bytes outToken,bytes recipient)')
+export const SWAP_REQUEST_TYPE = {
+  SwapRequest: [
+    { name: 'expireTs', type: 'uint256' },
+    { name: 'inToken', type: 'bytes' },
+    { name: 'amount', type: 'uint256' },
+    { name: 'outChain', type: 'bytes4' },
+    { name: 'outToken', type: 'bytes' },
+    { name: 'recipient', type: 'bytes' },
+  ]
+}
 
 export interface SwapRequestData {
   expireTs: number,
@@ -44,20 +52,9 @@ export class SwapRequest implements SwapRequestData {
     this.recipient = req.recipient
   }
 
-  encode(): BytesLike {
+  encode (): BytesLike {
     if (!this._encoded) {
-      this._encoded = defaultAbiCoder.encode(
-        ['bytes32', 'uint256', 'bytes32', 'uint256', 'bytes4', 'bytes32', 'bytes32'],
-        [
-          SWAP_REQUEST_TYPEHASH,
-          this.expireTs,
-          keccak256(this.inToken),
-          this.amount,
-          this.outChain,
-          keccak256(this.outToken),
-          keccak256(this.recipient)
-        ]
-      )
+      this._encoded = _TypedDataEncoder.from(SWAP_REQUEST_TYPE).encodeData('SwapRequest', this)
     }
     return this._encoded
   }

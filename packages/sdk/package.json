@@ -8,7 +8,6 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@ethersproject/abi": "^5.5.0",
     "@ethersproject/abstract-signer": "^5.5.0",
     "@ethersproject/bytes": "^5.5.0",
     "@ethersproject/contracts": "^5.5.0",
