@@ -2,11 +2,7 @@ import { Wallet } from '@ethersproject/wallet'
 import { BytesLike } from '@ethersproject/bytes'
 import { TypedDataDomain } from '@ethersproject/abstract-signer'
 
-import { SwapRequestData, SWAP_REQUEST_TYPE } from './SwapRequest'
-
-const releaseTypes = {
-  SwapRelease: [{ name: 'swapId', type: 'bytes32' }]
-}
+import { SwapRequestData, SWAP_REQUEST_TYPE, SWAP_RELEASE_TYPE } from './SwapRequest'
 
 export class SwapSigner {
   readonly domain: TypedDataDomain
@@ -29,7 +25,7 @@ export class SwapSigner {
   }
 
   async signSwapRelease(swapId: BytesLike, wallet: Wallet) {
-    const signature = await wallet._signTypedData(this.domain, releaseTypes, { swapId })
+    const signature = await wallet._signTypedData(this.domain, SWAP_RELEASE_TYPE, { swapId })
     return this._separateSignature(signature)
   }
 

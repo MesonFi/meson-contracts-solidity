@@ -51,7 +51,7 @@ export class SwapRequestWithProvider extends SwapRequest {
     if (recovered !== parsed.initiator) {
       throw new Error('Invalid signature')
     }
-    
+
     const swap = new SwapRequestWithProvider(parsed, mesonClient)
     if (swap.encode() !== parsed.encoded) {
       throw new Error('Encoded value mismatch')
@@ -69,6 +69,19 @@ export class SwapRequestWithProvider extends SwapRequest {
   }
 
   async execute (releaseSignatures: [BytesLike, BytesLike, number]) {
+    const digest = keccak256(hexConcat([
+      '0x1901',
+      _TypedDataEncoder.hashDomain(this.mesonClient.eip712Domain),
+      this.hashSwapId()
+    ]))
+    const recovered = recoverAddress(digest, {
+      r: releaseSignatures[0] as string,
+      s: releaseSignatures[1] as string,
+      v: releaseSignatures[2],
+    }).toLowerCase()
+    if (recovered !== this.initiator) {
+      throw new Error('Invalid signature')
+    }
     return this.mesonClient.mesonInstance.executeSwap(this.id(), ...releaseSignatures)
   }
 }

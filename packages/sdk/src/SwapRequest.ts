@@ -13,6 +13,10 @@ export const SWAP_REQUEST_TYPE = {
   ]
 }
 
+export const SWAP_RELEASE_TYPE = {
+  SwapRelease: [{ name: 'swapId', type: 'bytes32' }]
+}
+
 export interface SwapRequestData {
   expireTs: number,
   inChain: BytesLike,
@@ -54,9 +58,13 @@ export class SwapRequest implements SwapRequestData {
 
   encode (): BytesLike {
     if (!this._encoded) {
-      this._encoded = _TypedDataEncoder.from(SWAP_REQUEST_TYPE).encodeData('SwapRequest', this)
+      this._encoded = _TypedDataEncoder.from(SWAP_REQUEST_TYPE).encode(this)
     }
     return this._encoded
+  }
+
+  hashSwapId (): BytesLike {
+    return _TypedDataEncoder.from(SWAP_RELEASE_TYPE).hash({ swapId: this.id() })
   }
 
   id (): BytesLike {
