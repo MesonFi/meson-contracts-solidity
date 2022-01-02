@@ -79,7 +79,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     address provider = _msgSender();
     require(balanceOf[token][provider] >= amount, "insufficient balance");
 
-    bytes32 swapId = keccak256(encodedSwap);
+    bytes32 swapId = _getSwapId(encodedSwap);
     require(!_hasLockingSwap(swapId), "locking swap already exists");
 
     balanceOf[token][provider] = balanceOf[token][provider] - amount;

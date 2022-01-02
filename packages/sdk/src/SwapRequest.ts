@@ -37,7 +37,6 @@ export class SwapRequest implements SwapRequestData {
   readonly recipient: BytesLike
 
   private _encoded: BytesLike = ''
-  private _swapId: BytesLike = ''
 
   constructor(req: SwapRequestData) {
     this.expireTs = req.expireTs
@@ -54,13 +53,6 @@ export class SwapRequest implements SwapRequestData {
       this._encoded = _TypedDataEncoder.from(SWAP_REQUEST_TYPE).encode(this)
     }
     return this._encoded
-  }
-
-  get swapId(): BytesLike {
-    if (!this._swapId) {
-      this._swapId = keccak256(this.encode())
-    }
-    return this._swapId
   }
 
   toObject() {

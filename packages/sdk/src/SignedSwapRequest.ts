@@ -19,6 +19,7 @@ export interface SignedSwapReleaseData extends SignedSwapCommonData {
 
 export class SignedSwapRequest extends SwapRequest {
   readonly signer: SwapSigner
+  readonly swapId: string
   readonly chainId: number
   readonly mesonAddress: string
   readonly initiator: BytesLike
@@ -53,6 +54,7 @@ export class SignedSwapRequest extends SwapRequest {
 
     super(signedReq)
     this.signer = signer
+    this.swapId = signer.getSwapId(this)
     this.chainId = signedReq.chainId
     this.mesonAddress = signedReq.mesonAddress
     this.initiator = signedReq.initiator

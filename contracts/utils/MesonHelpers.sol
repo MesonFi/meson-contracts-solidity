@@ -29,13 +29,6 @@ contract MesonHelpers is MesonConfig {
 
   bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
 
-  struct EIP712Domain {
-    string name;
-    string version;
-    uint256 chainId;
-    address verifyingContract;
-  }
-
   struct Swap {
     bytes32 id;
     uint256 metaAmount;
@@ -79,6 +72,20 @@ contract MesonHelpers is MesonConfig {
     return (amount, outTokenHash, recipientHash);
   }
 
+  function _getSwapId(bytes memory encodedSwap) internal view returns (bytes32) {
+    bytes32 swapHash = keccak256(encodedSwap);
+    return keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, swapHash));
+  }
+
+  function _recoverSigner(
+    bytes32 digest,
+    bytes32 r,
+    bytes32 s,
+    uint8 v
+  ) internal view returns (address) {
+    return ecrecover(digest, v, r, s);
+  }
+
   function _checkReleaseSignature(
     bytes32 swapId,
     address signer,
@@ -88,10 +95,10 @@ contract MesonHelpers is MesonConfig {
   ) internal view {
     require(signer != address(0), "signer cannot be empty address");
     bytes32 hash = keccak256(abi.encode(SWAP_RELEASE_TYPEHASH, swapId));
-    require(signer == _recoverSigner(hash, r, s, v), "invalid signature");
+    require(signer == _recoverEip712Signer(hash, r, s, v), "invalid signature");
   }
 
-  function _recoverSigner(
+  function _recoverEip712Signer(
     bytes32 hash,
     bytes32 r,
     bytes32 s,

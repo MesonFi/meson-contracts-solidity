@@ -38,7 +38,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
 
     address provider = _msgSender();
 
-    swapId = keccak256(encodedSwap);
+    swapId = _getSwapId(encodedSwap);
     require(!_hasSwap(swapId), "swap conflict"); // TODO: prevent duplication attack
     require(initiator == _recoverSigner(swapId, r, s, v), "invalid signature");
 
