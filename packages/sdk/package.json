@@ -12,7 +12,6 @@
     "@ethersproject/bytes": "^5.5.0",
     "@ethersproject/contracts": "^5.5.0",
     "@ethersproject/hash": "^5.5.0",
-    "@ethersproject/keccak256": "^5.5.0",
     "@ethersproject/transactions": "^5.5.0",
     "@ethersproject/wallet": "^5.5.0"
   }

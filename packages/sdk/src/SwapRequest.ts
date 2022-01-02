@@ -1,5 +1,4 @@
 import { _TypedDataEncoder } from '@ethersproject/hash'
-import { keccak256 } from '@ethersproject/keccak256'
 import { BytesLike } from '@ethersproject/bytes'
 
 export const SWAP_REQUEST_TYPE = {

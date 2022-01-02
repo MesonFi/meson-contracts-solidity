@@ -1,4 +1,3 @@
-import { _TypedDataEncoder } from '@ethersproject/hash'
 import { BytesLike } from '@ethersproject/bytes'
 
 import { SwapSigner } from './SwapSigner'
