@@ -30,10 +30,9 @@ describe('MesonSwap', () => {
   describe('#postSwap', () => {
     it('posts a swap', async () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: token.address }))
-
       const serializedRequest = await swap.serializeRequest(initiator)
-      const req = mesonClient.parseRequest(serializedRequest)
 
+      const req = mesonClient.parseRequest(serializedRequest)
       await token.approve(mesonInstance.address, swap.amount)
       await req.post(initiator.address)
 
@@ -43,10 +42,9 @@ describe('MesonSwap', () => {
 
     it('refuses unsupported token', async () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: unsupportedToken.address }))
-
       const serializedRequest = await swap.serializeRequest(initiator)
-      const req = mesonClient.parseRequest(serializedRequest)
 
+      const req = mesonClient.parseRequest(serializedRequest)
       await unsupportedToken.approve(mesonInstance.address, swap.amount)
       await expect(req.post(initiator.address)).to.be.revertedWith('unsupported token')
     })
@@ -55,10 +53,9 @@ describe('MesonSwap', () => {
   describe('#executeSwap', () => {
     it('can execute a swap', async () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: token.address }))
-
       const serializedRequest = await swap.serializeRequest(initiator)
-      const req = mesonClient.parseRequest(serializedRequest)
 
+      const req = mesonClient.parseRequest(serializedRequest)
       await token.approve(mesonInstance.address, swap.amount)
       await req.post(initiator.address)
 
