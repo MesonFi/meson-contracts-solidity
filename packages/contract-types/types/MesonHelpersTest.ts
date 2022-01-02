@@ -21,7 +21,7 @@ export interface MesonHelpersTestInterface extends utils.Interface {
     "checkRequestSignature(bytes32,address,bytes32,bytes32,uint8)": FunctionFragment;
     "decodeSwapInput(bytes)": FunctionFragment;
     "encodeSwap(uint256,bytes,uint256,bytes4,bytes,bytes)": FunctionFragment;
-    "getCurrentChain()": FunctionFragment;
+    "getCoinType()": FunctionFragment;
     "getSwapId(uint256,address,uint256,bytes4,bytes,bytes)": FunctionFragment;
   };
 
@@ -49,7 +49,7 @@ export interface MesonHelpersTestInterface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "getCurrentChain",
+    functionFragment: "getCoinType",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -78,7 +78,7 @@ export interface MesonHelpersTestInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "encodeSwap", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getCurrentChain",
+    functionFragment: "getCoinType",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getSwapId", data: BytesLike): Result;
@@ -146,7 +146,7 @@ export interface MesonHelpersTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    getCurrentChain(overrides?: CallOverrides): Promise<[string]>;
+    getCoinType(overrides?: CallOverrides): Promise<[string]>;
 
     getSwapId(
       expireTs: BigNumberish,
@@ -192,7 +192,7 @@ export interface MesonHelpersTest extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  getCurrentChain(overrides?: CallOverrides): Promise<string>;
+  getCoinType(overrides?: CallOverrides): Promise<string>;
 
   getSwapId(
     expireTs: BigNumberish,
@@ -238,7 +238,7 @@ export interface MesonHelpersTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    getCurrentChain(overrides?: CallOverrides): Promise<string>;
+    getCoinType(overrides?: CallOverrides): Promise<string>;
 
     getSwapId(
       expireTs: BigNumberish,
@@ -287,7 +287,7 @@ export interface MesonHelpersTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getCurrentChain(overrides?: CallOverrides): Promise<BigNumber>;
+    getCoinType(overrides?: CallOverrides): Promise<BigNumber>;
 
     getSwapId(
       expireTs: BigNumberish,
@@ -334,7 +334,7 @@ export interface MesonHelpersTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getCurrentChain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    getCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getSwapId(
       expireTs: BigNumberish,

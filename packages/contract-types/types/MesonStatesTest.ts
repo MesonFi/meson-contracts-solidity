@@ -52,7 +52,7 @@ export interface MesonStatesTestInterface extends utils.Interface {
   functions: {
     "addRecentSwap(address,bytes32,uint256,uint256)": FunctionFragment;
     "decreaseSupply(address,uint256)": FunctionFragment;
-    "getCurrentChain()": FunctionFragment;
+    "getCoinType()": FunctionFragment;
     "getRecentSwap(address,bytes32)": FunctionFragment;
     "getRecentSwapList(address)": FunctionFragment;
     "increaseSupply(address,uint256)": FunctionFragment;
@@ -72,7 +72,7 @@ export interface MesonStatesTestInterface extends utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getCurrentChain",
+    functionFragment: "getCoinType",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -117,7 +117,7 @@ export interface MesonStatesTestInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getCurrentChain",
+    functionFragment: "getCoinType",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -197,7 +197,7 @@ export interface MesonStatesTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getCurrentChain(overrides?: CallOverrides): Promise<[string]>;
+    getCoinType(overrides?: CallOverrides): Promise<[string]>;
 
     getRecentSwap(
       token: string,
@@ -257,7 +257,7 @@ export interface MesonStatesTest extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getCurrentChain(overrides?: CallOverrides): Promise<string>;
+  getCoinType(overrides?: CallOverrides): Promise<string>;
 
   getRecentSwap(
     token: string,
@@ -308,7 +308,7 @@ export interface MesonStatesTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    getCurrentChain(overrides?: CallOverrides): Promise<string>;
+    getCoinType(overrides?: CallOverrides): Promise<string>;
 
     getRecentSwap(
       token: string,
@@ -365,7 +365,7 @@ export interface MesonStatesTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getCurrentChain(overrides?: CallOverrides): Promise<BigNumber>;
+    getCoinType(overrides?: CallOverrides): Promise<BigNumber>;
 
     getRecentSwap(
       token: string,
@@ -426,7 +426,7 @@ export interface MesonStatesTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    getCurrentChain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    getCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getRecentSwap(
       token: string,

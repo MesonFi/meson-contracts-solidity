@@ -16,16 +16,16 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface MesonHelpersInterface extends utils.Interface {
   functions: {
-    "getCurrentChain()": FunctionFragment;
+    "getCoinType()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "getCurrentChain",
+    functionFragment: "getCoinType",
     values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "getCurrentChain",
+    functionFragment: "getCoinType",
     data: BytesLike
   ): Result;
 
@@ -59,22 +59,22 @@ export interface MesonHelpers extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    getCurrentChain(overrides?: CallOverrides): Promise<[string]>;
+    getCoinType(overrides?: CallOverrides): Promise<[string]>;
   };
 
-  getCurrentChain(overrides?: CallOverrides): Promise<string>;
+  getCoinType(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
-    getCurrentChain(overrides?: CallOverrides): Promise<string>;
+    getCoinType(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
 
   estimateGas: {
-    getCurrentChain(overrides?: CallOverrides): Promise<BigNumber>;
+    getCoinType(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    getCurrentChain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    getCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }
