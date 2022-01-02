@@ -11,23 +11,33 @@ export class SwapRequestWithSigner extends SwapRequest {
     this.signer = signer
   }
 
-  async signRequest (wallet: Wallet) {
+  async signRequest(wallet: Wallet) {
     return await this.signer.signSwapRequest(this, wallet)
   }
 
-  async signRelease (wallet: Wallet) {
-    return await this.signer.signSwapRelease(this.id(), wallet)
+  async signRelease(wallet: Wallet) {
+    return await this.signer.signSwapRelease(this, wallet)
   }
 
-  async serializeRequest (wallet: Wallet) {
-    const swapObject = this.toObject()
-    const signatures = await this.signRequest(wallet)
-    return JSON.stringify({ ...swapObject, initiator: wallet.address.toLowerCase(), signatures })
+  async serializeRequest(wallet: Wallet) {
+    const signature = await this.signRequest(wallet)
+    return JSON.stringify({
+      ...this.toObject(),
+      initiator: wallet.address.toLowerCase(),
+      chainId: this.signer.chainId,
+      mesonAddress: this.signer.mesonAddress,
+      signature,
+    })
   }
 
-  async serializeRelease (wallet: Wallet) {
-    const swapId = this.id()
-    const signatures = await this.signRelease(wallet)
-    return JSON.stringify({ swapId, initiator: wallet.address.toLowerCase(), signatures })
+  async serializeRelease(wallet: Wallet) {
+    const signature = await this.signRelease(wallet)
+    return JSON.stringify({
+      swapId: this.swapId,
+      initiator: wallet.address.toLowerCase(),
+      chainId: this.signer.chainId,
+      mesonAddress: this.signer.mesonAddress,
+      signature,
+    })
   }
 }

@@ -27,13 +27,6 @@ export interface SwapRequestData {
   recipient: BytesLike,
 }
 
-export interface PartialSwapRequest {
-  inToken: BytesLike,
-  amount: string,
-  outToken: BytesLike,
-  recipient: BytesLike,
-}
-
 export class SwapRequest implements SwapRequestData {
   readonly expireTs: number
   readonly inChain: BytesLike
@@ -56,25 +49,21 @@ export class SwapRequest implements SwapRequestData {
     this.recipient = req.recipient
   }
 
-  encode (): BytesLike {
+  encode(): BytesLike {
     if (!this._encoded) {
       this._encoded = _TypedDataEncoder.from(SWAP_REQUEST_TYPE).encode(this)
     }
     return this._encoded
   }
 
-  hashSwapId (): BytesLike {
-    return _TypedDataEncoder.from(SWAP_RELEASE_TYPE).hash({ swapId: this.id() })
-  }
-
-  id (): BytesLike {
+  get swapId(): BytesLike {
     if (!this._swapId) {
       this._swapId = keccak256(this.encode())
     }
     return this._swapId
   }
 
-  toObject () {
+  toObject() {
     return {
       expireTs: this.expireTs,
       inChain: this.inChain,
@@ -87,7 +76,7 @@ export class SwapRequest implements SwapRequestData {
     }
   }
 
-  serialize () {
+  serialize() {
     return JSON.stringify(this.toObject())
   }
 }

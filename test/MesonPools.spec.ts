@@ -90,7 +90,7 @@ describe('MesonPools', () => {
       await mesonInstance.lock(swap.encode(), token.address, swap.recipient, ...sigs)
 
       expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
-      expect(await mesonInstance.hasLockingSwap(swap.id())).to.equal(true)
+      expect(await mesonInstance.hasLockingSwap(swap.swapId)).to.equal(true)
     })
 
     it('refuses mismatch outToken or recipient', async () => {
@@ -120,7 +120,7 @@ describe('MesonPools', () => {
       await mesonInstance.lock(swap.encode(), token.address, swap.recipient, ...sigs)
 
       const releaseSig = await swap.signRelease(initiator)
-      await mesonInstance.release(swap.id(), swap.amount, ...releaseSig)
+      await mesonInstance.release(swap.swapId, swap.amount, ...releaseSig)
 
       expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
       expect(await token.balanceOf(swap.recipient)).to.equal(swap.amount)

@@ -2,42 +2,33 @@ import { Contract } from '@ethersproject/contracts'
 import { BytesLike } from '@ethersproject/bytes'
 
 import { SwapSigner } from './SwapSigner'
-import { PartialSwapRequest } from './SwapRequest'
 import { SwapRequestWithSigner } from './SwapRequestWithSigner'
-import { SwapRequestWithProvider } from './SwapRequestWithProvider'
+import { SignedSwapRequest } from './SignedSwapRequest'
+
+export interface PartialSwapRequest {
+  inToken: BytesLike,
+  amount: string,
+  outToken: BytesLike,
+  recipient: BytesLike,
+}
 
 export class MesonClient {
   readonly mesonInstance: Contract
+  readonly chainId: number
+  readonly coinType: BytesLike
   readonly signer: SwapSigner
-  private _coinType: BytesLike = ''
 
   static async Create(mesonInstance: Contract) {
-    const client = new MesonClient(mesonInstance)
-    await client.getNetworkConfig()
-    return client
+    const network = await mesonInstance.provider.getNetwork()
+    const coinType = await mesonInstance.getCoinType()
+    return new MesonClient(mesonInstance, Number(network.chainId), coinType)
   }
 
-  constructor (mesonInstance: Contract) {
+  constructor(mesonInstance: Contract, chainId: number, coinType: BytesLike) {
     this.mesonInstance = mesonInstance
-    this.signer = new SwapSigner(mesonInstance.address)
-  }
-
-  get coinType () {
-    return this._coinType
-  }
-
-  get eip712Domain () {
-    return this.signer.domain
-  }
-
-  get mesonAddress () {
-    return this.mesonInstance.address
-  }
-
-  async getNetworkConfig () {
-    this._coinType = await this.mesonInstance.getCoinType()
-    const network = await this.mesonInstance.provider.getNetwork()
-    this.signer.chainId = network.chainId
+    this.chainId = chainId
+    this.coinType = coinType
+    this.signer = new SwapSigner(mesonInstance.address, chainId)
   }
 
   requestSwap(outChain: BytesLike, swap: PartialSwapRequest, lockPeriod: number = 5400) {
@@ -49,7 +40,30 @@ export class MesonClient {
     }, this.signer)
   }
 
-  parseRequest (serialized: string) {
-    return SwapRequestWithProvider.FromSerialized(serialized, this)
+  private _check (swap: SignedSwapRequest) {
+    if (this.chainId !== swap.chainId) {
+      throw new Error('Mismatch chain id')
+    } else if (this.mesonInstance.address !== swap.mesonAddress) {
+      throw new Error('Mismatch messon address')
+    }
+  }
+
+  async post(swap: SignedSwapRequest) {
+    this._check(swap)
+    return this.mesonInstance.postSwap(
+      swap.encode(),
+      swap.inToken,
+      swap.initiator,
+      ...swap.signature
+    )
+  }
+
+  async execute(swap: SignedSwapRequest, signature: [string, string, number]) {
+    this._check(swap)
+    const recovered = this.signer.recoverFromReleaseSignature(swap.swapId, signature)
+    if (recovered !== swap.initiator) {
+      throw new Error('Invalid signature')
+    }
+    return this.mesonInstance.executeSwap(swap.swapId, ...signature)
   }
 }

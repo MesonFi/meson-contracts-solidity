@@ -1,5 +1,7 @@
-export { MesonClient } from './MesonClient'
+export { MesonClient, PartialSwapRequest } from './MesonClient'
 export { SwapSigner } from './SwapSigner'
-export { SwapRequest, SwapRequestData, PartialSwapRequest } from './SwapRequest'
+export { SwapRequest, SwapRequestData } from './SwapRequest'
 export { SwapRequestWithSigner } from './SwapRequestWithSigner'
-export { SwapRequestWithProvider } from './SwapRequestWithProvider'
+export { SignedSwapRequest } from './SignedSwapRequest'
+
+export { parseSerializedSwap } from './parseSerializedSwap'

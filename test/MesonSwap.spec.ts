@@ -1,5 +1,5 @@
 import { waffle } from 'hardhat'
-import { MesonClient } from '@meson/sdk'
+import { MesonClient, parseSerializedSwap } from '@meson/sdk'
 import { MockToken, MesonSwapTest } from '@meson/contract-typs'
 
 import { expect } from './shared/expect'
@@ -30,39 +30,39 @@ describe('MesonSwap', () => {
   describe('#postSwap', () => {
     it('posts a swap', async () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: token.address }))
-      const serializedRequest = await swap.serializeRequest(initiator)
+      const serialized = await swap.serializeRequest(initiator)
 
-      const req = mesonClient.parseRequest(serializedRequest)
+      const signedSwap = parseSerializedSwap(serialized)
       await token.approve(mesonInstance.address, swap.amount)
-      await req.post(initiator.address)
+      await mesonClient.post(signedSwap)
 
-      expect(await mesonInstance.hasSwap(swap.id())).to.equal(true)
+      expect(await mesonInstance.hasSwap(swap.swapId)).to.equal(true)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
     })
 
     it('refuses unsupported token', async () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: unsupportedToken.address }))
-      const serializedRequest = await swap.serializeRequest(initiator)
+      const serialized = await swap.serializeRequest(initiator)
 
-      const req = mesonClient.parseRequest(serializedRequest)
+      const signedSwap = parseSerializedSwap(serialized)
       await unsupportedToken.approve(mesonInstance.address, swap.amount)
-      await expect(req.post(initiator.address)).to.be.revertedWith('unsupported token')
+      await expect(mesonClient.post(signedSwap)).to.be.revertedWith('unsupported token')
     })
   })
 
   describe('#executeSwap', () => {
     it('can execute a swap', async () => {
       const swap = mesonClient.requestSwap(outChain, getDefaultSwap({ inToken: token.address }))
-      const serializedRequest = await swap.serializeRequest(initiator)
+      const serialized = await swap.serializeRequest(initiator)
 
-      const req = mesonClient.parseRequest(serializedRequest)
+      const signedSwap = parseSerializedSwap(serialized)
       await token.approve(mesonInstance.address, swap.amount)
-      await req.post(initiator.address)
+      await mesonClient.post(signedSwap)
 
-      const releaseSignatures = await swap.signRelease(initiator)
-      await req.execute(releaseSignatures)
+      const releaseSignature = await swap.signRelease(initiator)
+      await mesonClient.execute(signedSwap, releaseSignature)
 
-      expect(await mesonInstance.hasSwap(swap.id())).to.equal(false)
+      expect(await mesonInstance.hasSwap(swap.swapId)).to.equal(false)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.add(swap.amount))
     })
