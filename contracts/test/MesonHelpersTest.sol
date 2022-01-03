@@ -58,7 +58,7 @@ contract MesonHelpersTest is MesonHelpers {
     bytes32 r,
     bytes32 s,
     uint8 v
-  ) public view {
+  ) public pure {
     require(signer == ecrecover(swapId, v, r, s), "invalid signature");
   }
 

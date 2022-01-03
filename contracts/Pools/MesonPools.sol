@@ -19,26 +19,15 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
   mapping(bytes32 => LockingSwap) public lockingSwaps;
 
   /// @inheritdoc IMesonPools
-  function deposit(address token, uint256 amount)
-    public
-    override
-    tokenSupported(token)
-  {
+  function deposit(address token, uint256 amount) public override tokenSupported(token) {
     address provider = _msgSender();
-    balanceOf[token][provider] = LowGasSafeMath.add(
-      balanceOf[token][provider],
-      amount
-    );
+    balanceOf[token][provider] = LowGasSafeMath.add(balanceOf[token][provider], amount);
     _increaseSupply(token, amount);
     _unsafeDepositToken(token, provider, amount);
   }
 
   /// @inheritdoc IMesonPools
-  function withdraw(address token, uint256 amount)
-    public
-    override
-    tokenSupported(token)
-  {
+  function withdraw(address token, uint256 amount) public override tokenSupported(token) {
     address provider = _msgSender(); // this may not be the correct msg.sender
     _decreaseSupply(token, amount);
     _withdrawTo(provider, provider, token, amount);
@@ -53,10 +42,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
   ) private {
     require(balanceOf[token][provider] >= amount, "overdrawn");
 
-    balanceOf[token][provider] = LowGasSafeMath.sub(
-      balanceOf[token][provider],
-      amount
-    );
+    balanceOf[token][provider] = LowGasSafeMath.sub(balanceOf[token][provider], amount);
     _safeTransfer(token, receiver, amount);
   }
 
@@ -69,8 +55,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     bytes32 s,
     uint8 v
   ) public override tokenSupported(token) {
-    (uint256 amount, bytes32 outTokenHash, bytes32 recipientHash) =
-      _decodeSwapOutput(encodedSwap);
+    (uint256 amount, bytes32 outTokenHash, bytes32 recipientHash) = _decodeSwapOutput(encodedSwap);
 
     require(amount > 0, "amount must be greater than zero");
     require(keccak256(abi.encodePacked(token)) == outTokenHash, "token does not match");
@@ -107,10 +92,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     uint256 amount = lockingSwap.amount;
     address provider = lockingSwap.provider;
 
-    balanceOf[token][provider] = LowGasSafeMath.add(
-      balanceOf[token][provider],
-      amount
-    );
+    balanceOf[token][provider] = LowGasSafeMath.add(balanceOf[token][provider], amount);
     delete lockingSwaps[swapId];
   }
 
