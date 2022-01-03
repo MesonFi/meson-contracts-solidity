@@ -2,9 +2,14 @@
   "name": "@meson/contract-types",
   "version": "0.1.0",
   "description": "",
-  "main": "types/index.ts",
+  "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
+    "postinstall": "npx tsc",
+    "build": "npx tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "typescript": "^4.5.2"
   }
 }
