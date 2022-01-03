@@ -13,6 +13,10 @@ interface IMesonSwap {
     uint256 amount;
   }
 
+  function requestSwap(bytes memory encodedSwap, address inToken) external returns (bytes32 swapId);
+
+  function bondSwap(bytes32 swapId) external;
+
   /// @notice A liquidity provider can call this method to post the swap and bond it
   /// to himself.
   /// This is step 1️⃣  in a swap.
@@ -56,17 +60,27 @@ interface IMesonSwap {
     uint8 v
   ) external;
 
-  /// @notice Event when a new swap request has been posted.
+  /// @notice Event when a new swap is requested.
   /// Emit at the end of `requestSwap()` calls.
   /// @param swapId The ID of the swap
-  /// @param ts The block time the swap is initially requested
+  /// @param expireTs The timestamp the request will expire
   /// @param amount The contract address of either token0 or token1
   /// @param inToken The contract address of the given token
-  event SwapPosted(bytes32 swapId, uint256 ts, uint256 amount, address inToken);
+  event SwapRequested(bytes32 swapId, uint256 expireTs, uint256 amount, address inToken);
+
+  event SwapBonded(bytes32 swapId);
+
+  /// @notice Event when a new swap request is posted.
+  /// Emit at the end of `postSwap()` calls.
+  /// @param swapId The ID of the swap
+  /// @param expireTs The timestamp the request will expire
+  /// @param amount The contract address of either token0 or token1
+  /// @param inToken The contract address of the given token
+  event SwapPosted(bytes32 swapId, uint256 expireTs, uint256 amount, address inToken);
 
   event SwapCancelled(bytes32 swapId);
 
-  /// @notice Event when a swap request has been fully executed.
+  /// @notice Event when a swap request is fully executed.
   /// Emit at the end of `executeSwap()` calls.
   /// @param swapId The ID of the swap
   event SwapExecuted(bytes32 swapId);
