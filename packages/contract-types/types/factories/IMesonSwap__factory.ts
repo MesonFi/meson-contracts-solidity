@@ -17,6 +17,19 @@ const _abi = [
         type: "bytes32",
       },
     ],
+    name: "SwapBonded",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "bytes32",
+        name: "swapId",
+        type: "bytes32",
+      },
+    ],
     name: "SwapCancelled",
     type: "event",
   },
@@ -45,7 +58,7 @@ const _abi = [
       {
         indexed: false,
         internalType: "uint256",
-        name: "ts",
+        name: "expireTs",
         type: "uint256",
       },
       {
@@ -63,6 +76,50 @@ const _abi = [
     ],
     name: "SwapPosted",
     type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "bytes32",
+        name: "swapId",
+        type: "bytes32",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "expireTs",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "inToken",
+        type: "address",
+      },
+    ],
+    name: "SwapRequested",
+    type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "swapId",
+        type: "bytes32",
+      },
+    ],
+    name: "bondSwap",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [
@@ -139,6 +196,30 @@ const _abi = [
       },
     ],
     name: "postSwap",
+    outputs: [
+      {
+        internalType: "bytes32",
+        name: "swapId",
+        type: "bytes32",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes",
+        name: "encodedSwap",
+        type: "bytes",
+      },
+      {
+        internalType: "address",
+        name: "inToken",
+        type: "address",
+      },
+    ],
+    name: "requestSwap",
     outputs: [
       {
         internalType: "bytes32",

@@ -72,7 +72,7 @@ const _abi = [
     ],
     name: "checkRequestSignature",
     outputs: [],
-    stateMutability: "view",
+    stateMutability: "pure",
     type: "function",
   },
   {
