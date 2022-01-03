@@ -26,7 +26,7 @@ export class SwapRequestWithSigner extends SwapRequest {
     const signature = await this.signRequest(wallet)
     return {
       ...this.toObject(),
-      initiator: wallet.address.toLowerCase(),
+      initiator: (await wallet.getAddress()).toLowerCase(),
       chainId: this.signer.chainId,
       mesonAddress: this.signer.mesonAddress,
       signature,
@@ -37,7 +37,7 @@ export class SwapRequestWithSigner extends SwapRequest {
     const signature = await this.signRelease(wallet)
     return {
       swapId: this.swapId,
-      initiator: wallet.address.toLowerCase(),
+      initiator: (await wallet.getAddress()).toLowerCase(),
       chainId: this.signer.chainId,
       mesonAddress: this.signer.mesonAddress,
       signature,
