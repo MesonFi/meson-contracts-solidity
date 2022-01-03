@@ -4,6 +4,7 @@
     "name": "Ropsten",
     "chainId": "0x3",
     "slip44": "0x8000003c",
+    "addressFormat": "hex",
     "mesonAddress": "0x9481bf780b1f9731a0c2baecbc8fc6406584b10d",
     "tokens": [
       {
@@ -20,10 +21,18 @@
   },
   {
     "id": "bsc-testnet",
-    "name": "BSC Testnet",
+    "name": "Binance Smart Chain Testnet",
     "chainId": "0x61",
     "slip44": "0x80000207",
+    "addressFormat": "hex",
+    "url": "https://data-seed-prebsc-1-s1.binance.org:8545",
+    "explorer": "https://testnet.bscscan.com",
     "mesonAddress": "0xd2bb96c0f2b36f2af8d02184bae77bab76392a2e",
+    "nativeCurrency": {
+      "name": "BNB",
+      "symbol": "tBNB",
+      "decimals": 18
+    },
     "tokens": [
       {
         "addr": "0x6ee95fc14fbC9Cca8068C0Ef2066Af666cCB10FD",
@@ -42,6 +51,7 @@
     "name": "Conflux Testnet",
     "chainId": "0x1",
     "slip44": "0x800001f7",
+    "addressFormat": "cip37",
     "mesonAddress": "cfxtest:acf4e758reembkssv95w1nr15316uec702grzxh10x",
     "tokens": [
       {
