@@ -1,0 +1,24 @@
+{
+  "name": "@meson/presets",
+  "version": "0.1.0",
+  "description": "",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "tsconfig.json"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "yarn build"
+  },
+  "dependencies": {
+    "@meson/contract-abis": "0.1.0",
+    "@meson/sdk": "0.1.0",
+    "@ethersproject/contracts": "5.5.0"
+  },
+  "devDependencies": {
+    "typescript": "^3.9.10"
+  }
+}
