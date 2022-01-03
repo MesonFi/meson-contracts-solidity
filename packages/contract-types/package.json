@@ -2,9 +2,6 @@
   "name": "@meson/contract-types",
   "version": "0.1.0",
   "description": "",
-  "types": "types/index.ts",
-  "license": "MIT",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  }
+  "types": "types/index.js",
+  "license": "MIT"
 }
