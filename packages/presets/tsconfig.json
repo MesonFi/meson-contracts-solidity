@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2018",
     "module": "commonjs",
-    "lib": ["es2019", "dom"],
-    "outDir": "lib",
-    "declaration": true,
+    "strict": false,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "outDir": "dist",
+    "declaration": true,
     "resolveJsonModule": true,
-    "types": ["node"]
+    "typeRoots": ["./node_modules/@types"]
   },
-  "include": ["src"]
+  "include": ["./src"],
+  "ts-node": {
+    "transpileOnly": true,
+    "transpiler": "ts-node/transpilers/swc-experimental"
+  }
 }

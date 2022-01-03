@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "description": "",
   "license": "MIT",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
-    "lib",
+    "src",
     "tsconfig.json"
   ],
   "scripts": {
     "build": "tsc",
-    "prepare": "yarn build"
+    "postinstall": "yarn build"
   },
   "dependencies": {
     "@meson/contract-abis": "0.1.0",
