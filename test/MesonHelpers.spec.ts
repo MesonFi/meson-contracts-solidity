@@ -1,20 +1,15 @@
 import { ethers, waffle } from 'hardhat'
+import { MesonClient, SwapRequestWithSigner } from '@meson/sdk'
+import { MesonHelpersTest } from '@meson/contract-types'
+
 import { expect } from './shared/expect'
 import { wallet } from './shared/wallet'
-import { Swap, getSwapId, getSwapHash, signSwap } from '../libs/meson_helpers'
-import { MesonHelpersTest } from '../typechain/MesonHelpersTest'
+import { getDefaultSwap } from './shared/meson'
 
 describe('MesonHelpers', () => {
-  let contract: MesonHelpersTest
-  let outChain: string
-  let swap: Swap
-  let swapId: string
-
-  const inToken = '0x943f0cabc0675f3642927e25abfa9a7ae15e8672'
-  const outToken = '0x2151166224670b37ec76c8ee2011bbbf4bbf2a52'
-  const receiver = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
-  const amount = 1
-  const ts = Date.now()
+  let mesonInstance: MesonHelpersTest
+  let mesonClient: MesonClient
+  let swap: SwapRequestWithSigner
 
   const fixture = async () => {
     const factory = await ethers.getContractFactory('MesonHelpersTest')
@@ -22,52 +17,62 @@ describe('MesonHelpers', () => {
   }
 
   beforeEach('deploy MesonHelpersTest', async () => {
-    contract = await waffle.loadFixture(fixture)
-    outChain = await contract.getCurrentChain()
-    swap = { inToken, outToken, outChain, receiver, amount, ts }
-    swapId = getSwapId(swap)
+    mesonInstance = await waffle.loadFixture(fixture)
+    const outChain = await mesonInstance.getCoinType()
+    mesonClient = await MesonClient.Create(mesonInstance)
+    swap = mesonClient.requestSwap(outChain, getDefaultSwap())
+  })
+
+  describe('#encodeSwap', () => {
+    it('returns same result as js function', async () => {
+      const encodedSwapFromContract = await mesonInstance.encodeSwap(
+        swap.expireTs,
+        swap.inToken,
+        swap.amount,
+        swap.outChain,
+        swap.outToken,
+        swap.recipient
+      )
+
+      expect(encodedSwapFromContract).to.equal(swap.encode())
+    })
   })
 
   describe('#getSwapId', () => {
-    it('returns same result as getSwapIdAsProvider and the js function', async () => {
-      const swapIdAsUser = await contract.getSwapId(
-        amount,
-        inToken,
-        outChain,
-        outToken,
-        receiver,
-        ts
+    it('returns same result as js function', async () => {
+      const swapIdFromContract = await mesonInstance.getSwapId(
+        swap.expireTs,
+        swap.inToken,
+        swap.amount,
+        swap.outChain,
+        swap.outToken,
+        swap.recipient
       )
-      const swapIdAsProvider = await contract.getSwapIdAsProvider(
-        amount,
-        inToken,
-        outToken,
-        receiver,
-        ts
-      )
-      expect(swapId).to.equal(swapIdAsUser)
-      expect(swapId).to.equal(swapIdAsProvider)
+
+      expect(swapIdFromContract).to.equal(swap.swapId)
     })
   })
 
-  describe('#getSwapHash', () => {
-    it('returns same result as the js function', async () => {
-      const epoch = 10
-      const swapHash = getSwapHash(swapId, epoch)
-
-      const swapHashAsProvider = await contract.getSwapHash(swapId, epoch)
-      expect(swapHash).to.equal(swapHashAsProvider)
+  describe('#decodeSwapInput', () => {
+    it('returns decoded swap data', async () => {
+      const decoded = await mesonInstance.decodeSwapInput(swap.encode())
+      expect(decoded[0]).to.equal(swap.expireTs)
+      expect(decoded[1].toLowerCase()).to.equal(ethers.utils.keccak256(swap.inToken))
+      expect(decoded[2]).to.equal(swap.amount)
     })
   })
 
-  describe('#checkSignature', () => {
-    it('checkSignature could check signer from message and signature', async () => {
-      const swapId = getSwapId(swap);
-      const epoch = 10;
-      const swapHash = getSwapHash(swapId, epoch);
-      const signature = signSwap(wallet, swapId, epoch);
+  describe('#checkRequestSignature', () => {
+    it('validates a request signature', async () => {
+      const sigs = await swap.signRequest(wallet)
+      await mesonInstance.checkRequestSignature(swap.swapId, wallet.address, ...sigs)
+    })
+  })
 
-      await contract.checkSignature(signature, swapHash, wallet.address);
+  describe('#checkReleaseSignature', () => {
+    it('validates a release signature', async () => {
+      const sigs = await swap.signRelease(wallet)
+      await mesonInstance.checkReleaseSignature(swap.swapId, wallet.address, ...sigs)
     })
   })
 })

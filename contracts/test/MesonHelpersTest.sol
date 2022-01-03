@@ -4,49 +4,71 @@ pragma solidity =0.8.6;
 import "../utils/MesonHelpers.sol";
 
 contract MesonHelpersTest is MesonHelpers {
-  function getSwapHash(bytes32 swapId, uint256 epoch) public pure returns (bytes32) {
-    return _getSwapHash(swapId, epoch);
-  }
-
   function getSwapId(
-    uint256 metaAmount,
+    uint256 expireTs,
     address inToken,
-    bytes4 chain,
+    uint256 amount,
+    bytes4 outChain,
     bytes memory outToken,
-    bytes memory receiver,
-    uint256 ts
-  ) public pure returns (bytes32) {
+    bytes memory recipient
+  ) external view returns (bytes32) {
     return _getSwapId(
-      metaAmount,
-      inToken,
-      chain,
-      outToken,
-      receiver,
-      ts
+      encodeSwap(
+        expireTs,
+        abi.encodePacked(inToken),
+        amount,
+        outChain,
+        outToken,
+        recipient
+      )
     );
   }
 
-  function getSwapIdAsProvider(
-    uint256 metaAmount,
+  function encodeSwap(
+    uint256 expireTs,
     bytes memory inToken,
-    address outToken,
-    address receiver,
-    uint256 ts
-  ) public pure returns (bytes32) {
-    return _getSwapIdAsProvider(
-      metaAmount,
-      inToken,
-      outToken,
-      receiver,
-      ts
-    );
+    uint256 amount,
+    bytes4 outChain,
+    bytes memory outToken,
+    bytes memory recipient
+  ) public pure returns (bytes memory) {
+    return
+      abi.encode(
+        SWAP_REQUEST_TYPEHASH,
+        expireTs,
+        keccak256(inToken),
+        amount,
+        outChain,
+        keccak256(outToken),
+        keccak256(recipient)
+      );
   }
 
-  function checkSignature(
-    bytes memory signature,
-    bytes32 message,
-    address signer
-  ) public pure {
-    _checkSignature(signature, message, signer);
+  function decodeSwapInput(bytes memory encodedSwap)
+    external
+    pure
+    returns (uint256, bytes32, uint256)
+  {
+    return _decodeSwapInput(encodedSwap);
+  }
+
+  function checkRequestSignature(
+    bytes32 swapId,
+    address signer,
+    bytes32 r,
+    bytes32 s,
+    uint8 v
+  ) public view {
+    require(signer == ecrecover(swapId, v, r, s), "invalid signature");
+  }
+
+  function checkReleaseSignature(
+    bytes32 swapId,
+    address signer,
+    bytes32 r,
+    bytes32 s,
+    uint8 v
+  ) public view {
+    _checkReleaseSignature(swapId, signer, r, s, v);
   }
 }

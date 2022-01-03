@@ -1,11 +1,10 @@
 .DS_Store
 
-/node_modules
+node_modules
 /.openzeppelin
 
 /cache
 /artifacts
-/typechain
 /deploys
 /docs
 

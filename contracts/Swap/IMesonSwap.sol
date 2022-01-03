@@ -6,52 +6,38 @@ import "../interfaces/IERC20Minimal.sol";
 /// @title MesonSwap Interface
 interface IMesonSwap {
   struct SwapRequest {
-    uint256 amount;
-    uint256 metaAmount;
-    address inToken;
-    bytes4 chain;
-    bytes outToken;
-    bytes receiver; // could be an hex42 address (eth) or in other types
+    address initiator;
     address provider;
-    uint256 ts;
-    uint256 bondUntil;
+    uint256 expireTs;
+    address inToken;
+    uint256 amount;
   }
 
-  /// @notice Create a new swap request. This is step 1️⃣  in a swap.
-  /// @dev Designed to be used by users
-  /// @param amount The contract address of either token0 or token1
-  /// @param inToken The contract address of the given token
-  /// @param chain The target chain name
-  /// @param outToken The type of token
-  /// @param receiver The address of the output token
-  /// @return swapId The ID of the swap
-  function requestSwap(
-    uint256 amount,
-    address inToken,
-    bytes4 chain,
-    bytes memory outToken,
-    bytes memory receiver
-  ) external returns (bytes32);
-
-
-  /// @notice A liquidity provider can call this method to bond the swap to himself.
-  /// This is step 2️⃣  in a swap.
+  /// @notice A liquidity provider can call this method to post the swap and bond it
+  /// to himself.
+  /// This is step 1️⃣  in a swap.
   /// The bonding state will last BOND_TIME_PERIOD and at most one LP can be bonded.
   /// The bonding LP should call `release` and `executeSwap` in sequence
   /// to finish the swap within the bonding period.
   /// Otherwise, once the bonding period expired other LPs will
   /// be able to bond again, or the user can cancel the swap.
   /// @dev Designed to be used by liquidity providers
-  /// @param swapId The ID of the swap
-  /// @param provider The address of the LP; will receives user's tokens on execution
-  function bondSwap(bytes32 swapId, address provider) external;
+  /// @param encodedSwap The abi encoded swap
+  /// @param initiator The address for the initiator of the swap
+  /// @return swapId The ID of the swap
+  function postSwap(
+    bytes memory encodedSwap,
+    address inToken,
+    address initiator,
+    bytes32 r,
+    bytes32 s,
+    uint8 v
+  ) external returns (bytes32 swapId);
 
-
-  /// @notice Unbond a swap
+  /// @notice Cancel a swap
   /// @dev Designed to be used by users
   /// @param swapId The ID of the swap
-  function unbondSwap(bytes32 swapId) external;
-
+  function cancelSwap(bytes32 swapId) external;
 
   /// @notice Execute the swap by providing a signature.
   /// This is step 4️⃣  in a swap.
@@ -63,47 +49,25 @@ interface IMesonSwap {
   /// Otherwise, other people can use the signature to `challenge` the LP.
   /// @dev Designed to be used by the current bonding LP
   /// @param swapId The ID of the swap
-  /// @param signature A signature that will unlock the swaps atomically on both chains
-  /// @param epoch The epoch (ref. xxx)
   function executeSwap(
     bytes32 swapId,
-    bytes memory signature,
-    uint256 epoch
+    bytes32 r,
+    bytes32 s,
+    uint8 v
   ) external;
-
-
-  /// @notice Cancel a swap
-  /// @dev Designed to be used by users
-  /// @param swapId The ID of the swap
-  function cancelSwap(bytes32 swapId) external;
 
   /// @notice Event when a new swap request has been posted.
   /// Emit at the end of `requestSwap()` calls.
   /// @param swapId The ID of the swap
+  /// @param ts The block time the swap is initially requested
   /// @param amount The contract address of either token0 or token1
   /// @param inToken The contract address of the given token
-  /// @param chain The target chain name
-  /// @param outToken The type of token
-  /// @param receiver The address of the output token
-  /// @param ts The block time the swap is initially requested
-  event RequestPosted(
-      bytes32 swapId,
-      uint256 amount,
-      address inToken,
-      bytes4 chain,
-      bytes outToken,
-      bytes receiver,
-      uint256 ts
-  );
+  event SwapPosted(bytes32 swapId, uint256 ts, uint256 amount, address inToken);
 
-  /// @notice Event when a swap request has been bonded.
-  /// Emit at the end of `bondSwap()` calls.
-  /// @param swapId The ID of the swap
-  /// @param bondedProvider The address of the bonded provider
-  event RequestBonded(bytes32 swapId, address bondedProvider);
+  event SwapCancelled(bytes32 swapId);
 
   /// @notice Event when a swap request has been fully executed.
   /// Emit at the end of `executeSwap()` calls.
   /// @param swapId The ID of the swap
-  event RequestExecuted(bytes32 swapId);
+  event SwapExecuted(bytes32 swapId);
 }

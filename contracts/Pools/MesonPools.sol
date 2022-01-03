@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "../libraries/LowGasSafeMath.sol";
-import "../interfaces/IERC20Minimal.sol";
 
 import "./IMesonPools.sol";
 import "../utils/MesonPricing.sol";
@@ -17,9 +16,7 @@ import "../utils/MesonPricing.sol";
 contract MesonPools is Context, IMesonPools, MesonPricing {
   mapping(address => mapping(address => uint256)) public balanceOf;
 
-  mapping(address => uint256) public epochOf;
-  mapping(address => uint256) public epochTsOf;
-  mapping(address => uint256) public releasedInEpochOf;
+  mapping(bytes32 => LockingSwap) public lockingSwaps;
 
   /// @inheritdoc IMesonPools
   function deposit(address token, uint256 amount)
@@ -27,23 +24,22 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     override
     tokenSupported(token)
   {
-    address provider = _msgSender(); // this may not be the correct msg.sender
+    address provider = _msgSender();
     balanceOf[token][provider] = LowGasSafeMath.add(
       balanceOf[token][provider],
       amount
     );
     _increaseSupply(token, amount);
-    _transferToken(token, provider, address(this), amount);
+    _unsafeDepositToken(token, provider, amount);
   }
 
   /// @inheritdoc IMesonPools
-  function withdraw(address token, uint256 amount, uint256 epoch)
+  function withdraw(address token, uint256 amount)
     public
     override
     tokenSupported(token)
   {
     address provider = _msgSender(); // this may not be the correct msg.sender
-    require(epoch == epochOf[provider], "wrong epoch"); // TODO allow to increase epoch by 1?
     _decreaseSupply(token, amount);
     _withdrawTo(provider, provider, token, amount);
   }
@@ -57,10 +53,6 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
   ) private {
     require(balanceOf[token][provider] >= amount, "overdrawn");
 
-    uint256 newReleased = LowGasSafeMath.add(releasedInEpochOf[provider], amount);
-    require(newReleased <= MAX_RELEASE_AMOUNT_BY_EPOCH, "overdrawn in epoch");
-    releasedInEpochOf[provider] = newReleased;
-
     balanceOf[token][provider] = LowGasSafeMath.sub(
       balanceOf[token][provider],
       amount
@@ -68,66 +60,98 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     _safeTransfer(token, receiver, amount);
   }
 
-  /// @notice Execute the token transfer transaction
-  function _transferToken(
+  /// @inheritdoc IMesonPools
+  function lock(
+    bytes memory encodedSwap,
     address token,
-    address sender,
-    address receiver,
-    uint256 amount
-  ) private {
-    IERC20Minimal(token).transferFrom(sender, receiver, amount);
+    address recipient,
+    bytes32 r,
+    bytes32 s,
+    uint8 v
+  ) public override tokenSupported(token) {
+    (uint256 amount, bytes32 outTokenHash, bytes32 recipientHash) =
+      _decodeSwapOutput(encodedSwap);
+
+    require(amount > 0, "amount must be greater than zero");
+    require(keccak256(abi.encodePacked(token)) == outTokenHash, "token does not match");
+    require(keccak256(abi.encodePacked(recipient)) == recipientHash, "recipient does not match");
+
+    address provider = _msgSender();
+    require(balanceOf[token][provider] >= amount, "insufficient balance");
+
+    bytes32 swapId = _getSwapId(encodedSwap);
+    require(!_hasLockingSwap(swapId), "locking swap already exists");
+
+    balanceOf[token][provider] = balanceOf[token][provider] - amount;
+    uint256 ts = block.timestamp;
+    lockingSwaps[swapId] = LockingSwap(
+      ecrecover(swapId, v, r, s),
+      provider,
+      token,
+      amount,
+      recipient,
+      ts + LOCK_TIME_PERIOD
+    );
+
+    emit SwapLocked(swapId, provider);
   }
 
-
   /// @inheritdoc IMesonPools
-  function pause() public override {}
+  function unlock(bytes32 swapId) public override {
+    require(_hasLockingSwap(swapId), "swap does not exist");
 
+    LockingSwap memory lockingSwap = lockingSwaps[swapId];
+    require(block.timestamp > lockingSwap.until, "The swap is still in lock");
 
-  /// @inheritdoc IMesonPools
-  function unpause() public override {}
+    address token = lockingSwap.token;
+    uint256 amount = lockingSwap.amount;
+    address provider = lockingSwap.provider;
 
+    balanceOf[token][provider] = LowGasSafeMath.add(
+      balanceOf[token][provider],
+      amount
+    );
+    delete lockingSwaps[swapId];
+  }
 
   /// @inheritdoc IMesonPools
   function release(
-    address provider,
-    bytes memory signature,
+    bytes32 swapId,
     uint256 metaAmount,
-    bytes memory inToken,
-    address outToken,
-    address receiver,
-    uint256 ts,
-    uint256 epoch
-  ) public override tokenSupported(outToken) {
-    if (epoch == epochOf[provider] + 1) { // epoch can only increment by 1
-      uint256 currentTs = block.timestamp;
-      require(epochTsOf[provider] + EPOCH_TIME_PERIOD < currentTs, "increment epoch too fast");
-      epochOf[provider] = epoch;
-      epochTsOf[provider] = currentTs;
-      releasedInEpochOf[provider] = 0;
-    }
-
-    require(epoch == epochOf[provider], "invalid epoch");
-
-    bytes32 swapId = _isSignatureValid(
-      provider,
-      signature,
-      metaAmount,
-      inToken,
-      outToken,
-      receiver,
-      ts,
-      epoch
+    bytes32 r,
+    bytes32 s,
+    uint8 v
+  ) public override {
+    LockingSwap memory lockingSwap = lockingSwaps[swapId];
+    require(_hasLockingSwap(swapId), "swap does not exist");
+    require(
+      metaAmount <= lockingSwap.amount,
+      "release amount cannot be greater than locking amount"
     );
 
-    uint256 amount = _fromMetaAmount(outToken, metaAmount);
-    _updateDemand(outToken, metaAmount); // TODO: LPs can call release to increase demand
-    _decreaseSupply(outToken, amount);
+    _checkReleaseSignature(swapId, lockingSwap.initiator, r, s, v);
 
-    _withdrawTo(receiver, provider, outToken, amount);
+    address token = lockingSwap.token;
+    address provider = lockingSwap.provider;
+    address recipient = lockingSwap.recipient;
 
-    emit RequestReleased(swapId, epoch);
+    // uint256 amount = _fromMetaAmount(token, metaAmount);
+    // _updateDemand(token, metaAmount);
+    // _decreaseSupply(token, amount);
+
+    if (metaAmount < lockingSwap.amount) {
+      balanceOf[token][provider] = LowGasSafeMath.add(
+        balanceOf[token][provider],
+        LowGasSafeMath.sub(lockingSwap.amount, metaAmount)
+      );
+    }
+
+    delete lockingSwaps[swapId];
+
+    _safeTransfer(token, recipient, metaAmount);
+
+    emit SwapReleased(swapId);
   }
-
 
   /// @inheritdoc IMesonPools
   function challenge(
@@ -137,37 +161,22 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     bytes memory inToken,
     address outToken,
     address receiver,
-    uint256 ts,
-    uint256 epoch
+    uint256 ts
   ) public override {
-    bytes32 swapId = _isSignatureValid(
-      provider,
-      signature,
-      metaAmount,
-      inToken,
-      outToken,
-      receiver,
-      ts,
-      epoch
-    );
+    // bytes32 swapId =
+    //   _isSignatureValid(
+    //     provider,
+    //     signature,
+    //     metaAmount,
+    //     inToken,
+    //     outToken,
+    //     receiver,
+    //     ts,
+    //     epoch
+    //   );
   }
 
-
-  /// @notice Verify the submitted signature
-  function _isSignatureValid(
-    address provider,
-    bytes memory signature,
-    uint256 metaAmount,
-    bytes memory inToken,
-    address outToken,
-    address receiver,
-    uint256 ts,
-    uint256 epoch
-  ) private pure returns (bytes32) {
-    bytes32 swapId =
-      _getSwapIdAsProvider(metaAmount, inToken, outToken, receiver, ts);
-    bytes32 swapHash = _getSwapHash(swapId, epoch);
-    _checkSignature(signature, swapHash, provider);
-    return swapId;
+  function _hasLockingSwap(bytes32 swapId) internal view returns (bool) {
+    return lockingSwaps[swapId].amount > 0;
   }
 }

@@ -9,7 +9,7 @@ async function setChainConfig(chain) {
     'utf8'
   )
 
-  let blockchainName, coinType
+  let blockchainName, chainId, coinType
   switch (chain) {
     case 'local':
       blockchainName = 'LocalTest'

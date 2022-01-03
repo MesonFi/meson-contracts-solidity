@@ -3,6 +3,15 @@ pragma solidity 0.8.6;
 
 /// @title MesonPools Interface
 interface IMesonPools {
+  struct LockingSwap {
+    address initiator;
+    address provider;
+    address token;
+    uint256 amount;
+    address recipient;
+    uint256 until;
+  }
+
   /// @notice Deposit tokens into the liquidity pool. This is the
   /// prerequisite for LPs if they want to participate in swap
   /// trades.
@@ -10,7 +19,6 @@ interface IMesonPools {
   /// @param token The contract address of the depositing token
   /// @param amount The amount to be added to the pool
   function deposit(address token, uint256 amount) external;
-
 
   /// @notice Withdraw tokens from the liquidity pool. In order to make sure
   /// pending swaps can be satisfied, withdraw have a rate limit that
@@ -21,16 +29,20 @@ interface IMesonPools {
   /// @dev Designed to be used by liquidity providers
   /// @param token The contract address of the withdrawing token
   /// @param amount The amount to be removed from the pool
-  function withdraw(address token, uint256 amount, uint256 epoch) external;
+  function withdraw(address token, uint256 amount) external;
 
+  /// @notice Lock tokens
+  function lock(
+    bytes memory encodedSwap,
+    address outToken,
+    address recipient,
+    bytes32 r,
+    bytes32 s,
+    uint8 v
+  ) external;
 
-  /// @notice TBD
-  function pause() external;
-
-
-  /// @notice TBD
-  function unpause() external;
-
+  /// @notice Unlock tokens
+  function unlock(bytes32 swapId) external;
 
   /// @notice Release tokens to satisfy a user's swap request.
   /// This is step 3️⃣  in a swap.
@@ -39,25 +51,15 @@ interface IMesonPools {
   /// For a single swap, signature given here is identical to the one used
   /// in `executeSwap`.
   /// @dev Designed to be used by liquidity providers
-  /// @param provider The address of the liquidity provider
-  /// @param signature A signature that will unlock the swaps atomically on both chains
+  /// @param swapId The ID of the swap
   /// @param metaAmount The meta-amount of token to swap (not the exact releasing amount)
-  /// @param inToken The input token deposited by the user
-  /// @param outToken The output token the user wish to withdraw
-  /// @param receiver The address that will receive the output token
-  /// @param ts The block time the swap is initially requested
-  /// @param epoch The epoch (ref. xxx)
   function release(
-    address provider,
-    bytes memory signature,
+    bytes32 swapId,
     uint256 metaAmount,
-    bytes memory inToken,
-    address outToken,
-    address receiver,
-    uint256 ts,
-    uint256 epoch
+    bytes32 r,
+    bytes32 s,
+    uint8 v
   ) external;
-
 
   /// @notice If a LP calls `executeSwap` before `release`, anyone can
   /// call this to punish the LP.
@@ -69,7 +71,6 @@ interface IMesonPools {
   /// @param outToken The output token the user wish to withdraw
   /// @param receiver The address that will receive the output token
   /// @param ts The block time the swap is initially requested
-  /// @param epoch The epoch (ref. xxx)
   function challenge(
     address provider,
     bytes memory signature,
@@ -77,13 +78,17 @@ interface IMesonPools {
     bytes memory inToken,
     address outToken,
     address receiver,
-    uint256 ts,
-    uint256 epoch
+    uint256 ts
   ) external;
+
+  /// @notice Event when a swap request has been locked.
+  /// Emit at the end of `lock()` calls.
+  /// @param swapId The ID of the swap
+  /// @param provider The address of the bonded provider
+  event SwapLocked(bytes32 swapId, address provider);
 
   /// @notice Event when a swap request has been released.
   /// Emit at the end of `release()` calls.
   /// @param swapId The ID of the swap
-  /// @param epoch The epoch (ref. xxx)
-  event RequestReleased(bytes32 swapId, uint256 epoch);
+  event SwapReleased(bytes32 swapId);
 }
