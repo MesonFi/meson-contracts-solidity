@@ -2,10 +2,16 @@
   "name": "@meson/sdk",
   "version": "0.1.0",
   "description": "",
-  "main": "src/index.ts",
   "license": "MIT",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "tsconfig.json"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "prepare": "yarn build"
   },
   "dependencies": {
     "@ethersproject/abstract-signer": "5.5.0",
@@ -14,5 +20,8 @@
     "@ethersproject/hash": "5.5.0",
     "@ethersproject/transactions": "5.5.0",
     "@ethersproject/wallet": "5.5.0"
+  },
+  "devDependencies": {
+    "typescript": "^3.9.10"
   }
 }
