@@ -1,6 +1,6 @@
 import { ethers, waffle } from 'hardhat'
-import { MesonClient, SwapRequestWithSigner } from '@meson/sdk'
-import { MesonHelpersTest } from '@meson/contract-types'
+import { MesonClient, SwapRequestWithSigner } from '@mesonfi/sdk'
+import { MesonHelpersTest } from '@mesonfi/contract-types'
 
 import { expect } from './shared/expect'
 import { wallet } from './shared/wallet'

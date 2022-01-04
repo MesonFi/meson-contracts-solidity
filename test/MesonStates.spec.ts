@@ -1,5 +1,5 @@
 import { ethers, waffle } from 'hardhat'
-import { MesonStatesTest } from '@meson/contract-types'
+import { MesonStatesTest } from '@mesonfi/contract-types'
 
 import { expect } from './shared/expect'
 

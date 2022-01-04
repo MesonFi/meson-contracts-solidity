@@ -1,6 +1,6 @@
 {
   "name": "meson-contracts-solidity",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "index.js",
   "private": true,
   "scripts": {
@@ -14,7 +14,8 @@
     "chain:one": "BLOCKCHAIN_NAME=one node scripts/set-chain-config.js",
     "deploy": "hardhat run scripts/deploy-upgradable.js",
     "upgrade": "hardhat run scripts/upgrade.js",
-    "docgen": "solidity-docgen --solc-module solc -t ./templates"
+    "docgen": "solidity-docgen --solc-module solc -t ./templates",
+    "publish": "npm publish --workspaces"
   },
   "devDependencies": {
     "@mesonfi/contract-abis": "0.1.0",

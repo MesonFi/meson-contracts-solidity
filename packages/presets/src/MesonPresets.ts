@@ -1,6 +1,6 @@
 import { Contract as EthersContract } from '@ethersproject/contracts'
-import { MesonClient } from '@meson/sdk'
-import { Meson } from '@meson/contract-abis'
+import { MesonClient } from '@mesonfi/sdk'
+import { Meson } from '@mesonfi/contract-abis'
 
 import mainnets from './mainnets.json'
 import testnets from './testnets.json'
