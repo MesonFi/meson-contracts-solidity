@@ -10,7 +10,7 @@
     "tsconfig.json"
   ],
   "scripts": {
-    "build": "yarn run tsc",
+    "build": "npx tsc",
     "postinstall": "yarn build"
   },
   "dependencies": {
