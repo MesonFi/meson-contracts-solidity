@@ -1,5 +1,5 @@
 {
-  "name": "@meson/presets",
+  "name": "@mesonfi/presets",
   "version": "0.1.0",
   "description": "",
   "license": "MIT",
@@ -10,16 +10,15 @@
     "tsconfig.json"
   ],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "postinstall": "yarn build"
   },
   "dependencies": {
-    "@ethersproject/contracts": "5.5.0"
+    "@ethersproject/contracts": "5.5.0",
+    "@mesonfi/contract-abis": "^0.1.0",
+    "@mesonfi/sdk": "^0.1.0"
   },
   "devDependencies": {
     "typescript": "^3.9.10"
-  },
-  "peerDependencies": {
-    "@meson/contract-abis": "*",
-    "@meson/sdk": "*"
   }
 }

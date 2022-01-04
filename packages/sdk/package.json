@@ -1,5 +1,5 @@
 {
-  "name": "@meson/sdk",
+  "name": "@mesonfi/sdk",
   "version": "0.1.0",
   "description": "",
   "license": "MIT",
@@ -10,7 +10,8 @@
     "tsconfig.json"
   ],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "postinstall": "yarn build"
   },
   "dependencies": {
     "@ethersproject/abstract-signer": "5.5.0",

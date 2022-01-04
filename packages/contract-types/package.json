@@ -1,5 +1,5 @@
 {
-  "name": "@meson/contract-types",
+  "name": "@mesonfi/contract-types",
   "version": "0.1.0",
   "description": "",
   "types": "types/index.js",

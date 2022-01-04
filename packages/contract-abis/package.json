@@ -1,5 +1,5 @@
 {
-  "name": "@meson/contract-abis",
+  "name": "@mesonfi/contract-abis",
   "version": "0.1.0",
   "description": "",
   "main": "abis/index.js",
