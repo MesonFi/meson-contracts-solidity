@@ -10,8 +10,7 @@
     "tsconfig.json"
   ],
   "scripts": {
-    "build": "npx tsc",
-    "postinstall": "yarn build"
+    "build": "tsc"
   },
   "dependencies": {
     "@ethersproject/contracts": "5.5.0"
