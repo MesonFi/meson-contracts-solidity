@@ -4,6 +4,7 @@
     "name": "Ethereum",
     "chainId": "0x1",
     "slip44": "0x8000003c",
+    "extensions": ["metamask"],
     "addressFormat": "hex",
     "mesonAddress": "0x9481bf780b1f9731a0c2baecbc8fc6406584b10d",
     "tokens": [
@@ -24,6 +25,7 @@
     "name": "BSC Mainnet",
     "chainId": "0x38",
     "slip44": "0x80000207",
+    "extensions": ["metamask"],
     "addressFormat": "hex",
     "url": "https://bsc-dataseed.binance.org",
     "explorer": "https://api.bscscan.com",
@@ -46,6 +48,7 @@
     "name": "Conflux",
     "chainId": "0x405",
     "slip44": "0x800001f7",
+    "extensions": ["conflux-portal"],
     "addressFormat": "cip37",
     "url": "https://main.confluxrpc.com",
     "mesonAddress": "0x9481bf780b1f9731a0c2baecbc8fc6406584b10d",
@@ -66,6 +69,7 @@
     "id": "one",
     "name": "Harmony",
     "slip44": "0x800003ff",
+    "extensions": [],
     "addressFormat": "hex",
     "mesonAddress": "0x9481bf780b1f9731a0c2baecbc8fc6406584b10d",
     "tokens": []
