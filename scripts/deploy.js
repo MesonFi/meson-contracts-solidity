@@ -1,6 +1,6 @@
 const { ethers } = require('hardhat')
 
-const token = [
+const tokens = [
   '0xcf1511622929f4ba960dfa9b24be84a8fc620bd5'
 ]
 
