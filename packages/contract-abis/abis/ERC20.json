@@ -1,7 +1,5 @@
 {
-  "_format": "hh-sol-artifact-1",
-  "contractName": "IERC20Minimal",
-  "sourceName": "contracts/interfaces/IERC20Minimal.sol",
+  "contractName": "ERC20",
   "abi": [
     {
       "anonymous": false,
@@ -173,9 +171,5 @@
       "stateMutability": "nonpayable",
       "type": "function"
     }
-  ],
-  "bytecode": "0x",
-  "deployedBytecode": "0x",
-  "linkReferences": {},
-  "deployedLinkReferences": {}
+  ]
 }
