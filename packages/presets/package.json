@@ -14,11 +14,13 @@
     "postinstall": "yarn build"
   },
   "dependencies": {
-    "@meson/contract-abis": "0.1.0",
-    "@meson/sdk": "0.1.0",
     "@ethersproject/contracts": "5.5.0"
   },
   "devDependencies": {
     "typescript": "^3.9.10"
+  },
+  "peerDependencies": {
+    "@meson/contract-abis": "*",
+    "@meson/sdk": "*"
   }
 }
