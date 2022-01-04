@@ -11,12 +11,14 @@
       {
         "addr": "0x751de3875aef8c18d7fe983c6deefe366bed438f",
         "name": "Mock USDT",
-        "symbol": "mUSDT"
+        "symbol": "mUSDT",
+        "decimals": 6
       },
       {
         "addr": "0x21d828269a0a7ef69dc25d257299901f318fbba8",
         "name": "Mock USDC",
-        "symbol": "mUSDC"
+        "symbol": "mUSDC",
+        "decimals": 6
       }
     ]
   },
@@ -39,12 +41,14 @@
       {
         "addr": "0x6ee95fc14fbC9Cca8068C0Ef2066Af666cCB10FD",
         "name": "BSC USDT",
-        "symbol": "bUSDT"
+        "symbol": "bUSDT",
+        "decimals": 6
       },
       {
         "addr": "0x08fcc0970095412fdbf24c25c121704f5d7654c3",
         "name": "BSC USDC",
-        "symbol": "bUSDC"
+        "symbol": "bUSDC",
+        "decimals": 6
       }
     ]
   },
@@ -60,12 +64,14 @@
       {
         "addr": "cfxtest:acbwtbb88jeg6gu6c0j1he9c3cahyvbegjfvzx0svb",
         "name": "Mock cUSDT",
-        "symbol": "cUSDT"
+        "symbol": "cUSDT",
+        "decimals": 6
       },
       {
         "addr": "cfxtest:acbh1myrek1dmd5kr1442e8c2zs239kxvjs2dk7x36",
         "name": "Mock cUSDC",
-        "symbol": "cUSDC"
+        "symbol": "cUSDC",
+        "decimals": 6
       }
     ]
   }
