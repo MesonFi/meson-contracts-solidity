@@ -71,13 +71,13 @@
       {
         "addr": "0x01aA3AF577e150F58a6aEa440179c3Cdaad3B8D7",
         "name": "heco USDT",
-        "symbol": "bUSDT",
+        "symbol": "hUSDT",
         "decimals": 6
       },
       {
         "addr": "0x08fcc0970095412fdbf24c25c121704f5d7654c3",
         "name": "heco USDC",
-        "symbol": "bUSDC",
+        "symbol": "hUSDC",
         "decimals": 6
       }
     ]
