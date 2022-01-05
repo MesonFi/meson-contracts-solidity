@@ -74,6 +74,7 @@
   {
     "id": "one",
     "name": "Harmony",
+    "chainId": "unknown",
     "slip44": "0x800003ff",
     "extensions": [],
     "addressFormat": "hex",
