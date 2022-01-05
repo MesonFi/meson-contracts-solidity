@@ -54,16 +54,17 @@
   },
   {
     "id": "heco-testnet",
-    "name": "heco Smart Chain Testnet",
-    "chainId": "0x256",
+    "name": "Huobi ECO Chain Testnet",
+    "chainId": "0x100",
     "slip44": "0x800003f2",
+    "extensions": ["metamask"],
     "addressFormat": "hex",
     "url": "https://http-testnet.hecochain.com",
-    "explorer": "https://scan-testnet.hecochain.com",
+    "explorer": "https://testnet.hecoinfo.com",
     "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
     "nativeCurrency": {
-      "name": "HT",
-      "symbol": "tHt",
+      "name": "Huobi Token",
+      "symbol": "htt",
       "decimals": 18
     },
     "tokens": [
@@ -81,12 +82,13 @@
   },
   {
     "id": "okex-testnet",
-    "name": "okex Smart Chain Testnet",
-    "chainId": "0x256",
+    "name": "OKExChain Testnet",
+    "chainId": "0x41",
     "slip44": "0x800003e4",
+    "extensions": ["metamask"],
     "addressFormat": "hex",
     "url": "https://exchaintestrpc.okex.org",
-    "explorer": "https://www.oklink.com/oec-test/",
+    "explorer": "https://www.oklink.com/okexchain-test",
     "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
     "nativeCurrency": {
       "name": "OKT",
@@ -104,9 +106,9 @@
         "name": "Okex USD Coin",
         "symbol": "USDC"
       }
-      ]
-    }
-      ,{
+    ]
+  },
+  {
     "id": "cfx-testnet",
     "name": "Conflux Testnet",
     "chainId": "0x1",
@@ -129,5 +131,4 @@
       }
     ]
   }
-   
 ]
