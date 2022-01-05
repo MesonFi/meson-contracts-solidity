@@ -1,17 +1,21 @@
 {
-  "name": "@meson/sdk",
+  "name": "@mesonfi/sdk",
   "version": "0.1.0",
   "description": "",
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "repository":"https://github.com/MesonFi/meson-contracts-solidity",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "files": [
-    "src",
+    "lib",
     "tsconfig.json"
   ],
   "scripts": {
-    "build": "yarn run tsc",
-    "postinstall": "yarn build"
+    "build": "tsc",
+    "prepare": "yarn build"
   },
   "dependencies": {
     "@ethersproject/abstract-signer": "5.5.0",
@@ -22,6 +26,6 @@
     "@ethersproject/wallet": "5.5.0"
   },
   "devDependencies": {
-    "typescript": "^4.5.2"
+    "typescript": "^4.5.4"
   }
 }

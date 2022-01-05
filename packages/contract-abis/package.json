@@ -1,10 +1,11 @@
 {
-  "name": "@meson/contract-abis",
-  "version": "0.1.0",
+  "name": "@mesonfi/contract-abis",
+  "version": "0.1.2",
   "description": "",
-  "main": "abis/index.js",
   "license": "MIT",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "repository":"https://github.com/MesonFi/meson-contracts-solidity",
+  "main": "abis/index.js",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   }
 }

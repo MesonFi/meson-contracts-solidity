@@ -1,24 +1,28 @@
 {
-  "name": "@meson/presets",
-  "version": "0.1.0",
+  "name": "@mesonfi/presets",
+  "version": "0.1.3",
   "description": "",
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "repository":"https://github.com/MesonFi/meson-contracts-solidity",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "files": [
-    "src",
+    "lib",
     "tsconfig.json"
   ],
   "scripts": {
-    "build": "yarn run tsc",
-    "postinstall": "yarn build"
+    "build": "tsc",
+    "prepare": "yarn build"
   },
   "dependencies": {
-    "@meson/contract-abis": "0.1.0",
-    "@meson/sdk": "0.1.0",
-    "@ethersproject/contracts": "5.5.0"
+    "@ethersproject/contracts": "5.5.0",
+    "@mesonfi/contract-abis": "^0.1.0",
+    "@mesonfi/sdk": "^0.1.0"
   },
   "devDependencies": {
-    "typescript": "^3.9.10"
+    "typescript": "^4.5.4"
   }
 }

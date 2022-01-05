@@ -3,7 +3,7 @@ import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-ethers'
 import '@openzeppelin/hardhat-upgrades'
 
-import { task } from "hardhat/config";
+import { task } from 'hardhat/config';
 import config from './config.json'
 
 task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {

@@ -1,5 +1,5 @@
 import { BytesLike } from 'ethers'
-import { PartialSwapRequest } from '@meson/sdk'
+import { PartialSwapRequest } from '@mesonfi/sdk'
 
 type OptionalSwapRequestData = {
   inToken?: BytesLike,
