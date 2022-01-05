@@ -21,7 +21,7 @@ export interface IMesonPoolsInterface extends utils.Interface {
   functions: {
     "challenge(address,bytes,uint256,bytes,address,address,uint256)": FunctionFragment;
     "deposit(address,uint256)": FunctionFragment;
-    "lock(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
+    "lock(bytes,address,address,address)": FunctionFragment;
     "release(bytes32,uint256,bytes32,bytes32,uint8)": FunctionFragment;
     "unlock(bytes32)": FunctionFragment;
     "withdraw(address,uint256)": FunctionFragment;
@@ -45,7 +45,7 @@ export interface IMesonPoolsInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "lock",
-    values: [BytesLike, string, string, BytesLike, BytesLike, BigNumberish]
+    values: [BytesLike, string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "release",
@@ -130,11 +130,9 @@ export interface IMesonPools extends BaseContract {
 
     lock(
       encodedSwap: BytesLike,
+      initiator: string,
       outToken: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -178,11 +176,9 @@ export interface IMesonPools extends BaseContract {
 
   lock(
     encodedSwap: BytesLike,
+    initiator: string,
     outToken: string,
     recipient: string,
-    r: BytesLike,
-    s: BytesLike,
-    v: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -226,11 +222,9 @@ export interface IMesonPools extends BaseContract {
 
     lock(
       encodedSwap: BytesLike,
+      initiator: string,
       outToken: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -283,11 +277,9 @@ export interface IMesonPools extends BaseContract {
 
     lock(
       encodedSwap: BytesLike,
+      initiator: string,
       outToken: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -332,11 +324,9 @@ export interface IMesonPools extends BaseContract {
 
     lock(
       encodedSwap: BytesLike,
+      initiator: string,
       outToken: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

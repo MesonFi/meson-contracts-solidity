@@ -34,11 +34,9 @@ interface IMesonPools {
   /// @notice Lock tokens
   function lock(
     bytes memory encodedSwap,
+    address initiator,
     address outToken,
-    address recipient,
-    bytes32 r,
-    bytes32 s,
-    uint8 v
+    address recipient
   ) external;
 
   /// @notice Unlock tokens

@@ -49,11 +49,9 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
   /// @inheritdoc IMesonPools
   function lock(
     bytes memory encodedSwap,
+    address initiator,
     address token,
-    address recipient,
-    bytes32 r,
-    bytes32 s,
-    uint8 v
+    address recipient
   ) public override tokenSupported(token) {
     (uint256 amount, bytes32 outTokenHash, bytes32 recipientHash) = _decodeSwapOutput(encodedSwap);
 
@@ -70,7 +68,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     balanceOf[token][provider] = balanceOf[token][provider] - amount;
     uint256 ts = block.timestamp;
     lockingSwaps[swapId] = LockingSwap(
-      ecrecover(swapId, v, r, s),
+      initiator,
       provider,
       token,
       amount,

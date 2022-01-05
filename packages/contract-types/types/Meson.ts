@@ -26,7 +26,7 @@ export interface MesonInterface extends utils.Interface {
     "deposit(address,uint256)": FunctionFragment;
     "executeSwap(bytes32,bytes32,bytes32,uint8)": FunctionFragment;
     "getCoinType()": FunctionFragment;
-    "lock(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
+    "lock(bytes,address,address,address)": FunctionFragment;
     "lockingSwaps(bytes32)": FunctionFragment;
     "postSwap(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
     "release(bytes32,uint256,bytes32,bytes32,uint8)": FunctionFragment;
@@ -74,7 +74,7 @@ export interface MesonInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "lock",
-    values: [BytesLike, string, string, BytesLike, BytesLike, BigNumberish]
+    values: [BytesLike, string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "lockingSwaps",
@@ -279,11 +279,9 @@ export interface Meson extends BaseContract {
 
     lock(
       encodedSwap: BytesLike,
+      initiator: string,
       token: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -411,11 +409,9 @@ export interface Meson extends BaseContract {
 
   lock(
     encodedSwap: BytesLike,
+    initiator: string,
     token: string,
     recipient: string,
-    r: BytesLike,
-    s: BytesLike,
-    v: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -528,11 +524,9 @@ export interface Meson extends BaseContract {
 
     lock(
       encodedSwap: BytesLike,
+      initiator: string,
       token: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -701,11 +695,9 @@ export interface Meson extends BaseContract {
 
     lock(
       encodedSwap: BytesLike,
+      initiator: string,
       token: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -814,11 +806,9 @@ export interface Meson extends BaseContract {
 
     lock(
       encodedSwap: BytesLike,
+      initiator: string,
       token: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
