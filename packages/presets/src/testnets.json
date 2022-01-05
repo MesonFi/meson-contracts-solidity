@@ -145,12 +145,12 @@
     "tokens": [
       {
         "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
-        "name": "Okex USD-T",
+        "name": "FTM USD-T",
         "symbol": "USDT"
       },
       {
         "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
-        "name": "Okex USD Coin",
+        "name": "FTM USD Coin",
         "symbol": "USDC"
       }
       ]
@@ -171,12 +171,12 @@
       "tokens": [
         {
           "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
-          "name": "Okex USD-T",
+          "name": "MATIC USDT",
           "symbol": "USDT"
         },
         {
           "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
-          "name": "Okex USD Coin",
+          "name": "MATIC USD Coin",
           "symbol": "USDC"
         }
         ]
