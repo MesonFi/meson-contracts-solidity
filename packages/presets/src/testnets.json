@@ -128,6 +128,57 @@
         "decimals": 6
       }
     ]
-  }
-   
+  },{
+    "id": "fantom-testnet",
+    "name": "fantom Smart Chain Testnet",
+    "chainId": "0x4002",
+    "slip44": "0x800003ef",
+    "addressFormat": "hex",
+    "url": "https://rpc.testnet.fantom.network",
+    "explorer": "https://explorer.testnet.fantom.network/",
+    "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
+    "nativeCurrency": {
+      "name": "FTM",
+      "symbol": "FTM",
+      "decimals": 10
+    },
+    "tokens": [
+      {
+        "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
+        "name": "Okex USD-T",
+        "symbol": "USDT"
+      },
+      {
+        "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
+        "name": "Okex USD Coin",
+        "symbol": "USDC"
+      }
+      ]
+    },{
+      "id": "polygon-testnet",
+      "name": "polygon Smart Chain Testnet",
+      "chainId": "0x80001",
+      "slip44": "0x800003c6",
+      "addressFormat": "hex",
+      "url": "https://rpc.testnet.fantom.network",
+      "explorer": "https://mumbai.polygonscan.com",
+      "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
+      "nativeCurrency": {
+        "name": "MATIC",
+        "symbol": "MATIC",
+        "decimals": 18
+      },
+      "tokens": [
+        {
+          "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
+          "name": "Okex USD-T",
+          "symbol": "USDT"
+        },
+        {
+          "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
+          "name": "Okex USD Coin",
+          "symbol": "USDC"
+        }
+        ]
+      }
 ]
