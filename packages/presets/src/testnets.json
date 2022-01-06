@@ -28,8 +28,8 @@
   },
   {
     "id": "bsc-testnet",
-    "name": "Binance Smart Chain Testnet",
-    "alias": "BSC Testnet",
+    "name": "BSC Testnet",
+    "alias": "BSC",
     "chainId": "0x61",
     "slip44": "0x800002ca",
     "extensions": [
@@ -43,16 +43,16 @@
       "symbol": "tBNB",
       "decimals": 18
     },
-    "mesonAddress": "0x67272DBD6f29d9dbD6a13E49f81Cd898fb07ed55",
+    "mesonAddress": "0x5cFB4E7d815c9B7e3bFd56D9B7117E0219cbA8cd",
     "tokens": [
       {
-        "addr": "0x016d0Db781A6f2a199e7059505C8c5628e6E1d45",
+        "addr": "0xAf3b40385b7D338bbb23F72489D9948A8c1569Ab",
         "name": "BSC USDT",
         "symbol": "bUSDT",
         "decimals": 6
       },
       {
-        "addr": "0xA545E18CB2D473E47C6d8eE861269f2D65E90d95",
+        "addr": "0xF37eE9D96a307608AA65cfBd5D6BF9bd282098BE",
         "name": "BSC USDC",
         "symbol": "bUSDC",
         "decimals": 6
@@ -62,7 +62,7 @@
   {
     "id": "ftm-testnet",
     "name": "Fantom Testnet",
-    "alias": "Fantom Testnet",
+    "alias": "FTM",
     "chainId": "0xfa2",
     "slip44": "0x800003ef",
     "extensions": [
@@ -76,13 +76,26 @@
       "symbol": "FTM",
       "decimals": 18
     },
-    "mesonAddress": "",
-    "tokens": []
+    "mesonAddress": "0x21D828269A0A7EF69dC25d257299901f318fBbA8",
+    "tokens": [
+      {
+        "addr": "0x51820aEFc3Aa242D7416D7e522b75BFb32446d6e",
+        "name": "FTM USDT",
+        "symbol": "fUSDT",
+        "decimals": 6
+      },
+      {
+        "addr": "0x751DE3875aeF8C18d7FE983c6DeeFe366bed438f",
+        "name": "FTM USDC",
+        "symbol": "fUSDC",
+        "decimals": 6
+      }
+    ]
   },
   {
     "id": "avax-testnet",
-    "name": "Avalanche Fuji Testnet",
-    "alias": "Ava Fuji",
+    "name": "Avalanche Testnet (Fuji)",
+    "alias": "Ava",
     "chainId": "0xa869",
     "slip44": "0x80002328",
     "extensions": [
@@ -96,13 +109,26 @@
       "symbol": "AVAX",
       "decimals": 18
     },
-    "mesonAddress": "",
-    "tokens": []
+    "mesonAddress": "0x21D828269A0A7EF69dC25d257299901f318fBbA8",
+    "tokens": [
+      {
+        "addr": "0x51820aEFc3Aa242D7416D7e522b75BFb32446d6e",
+        "name": "Ava USDT",
+        "symbol": "aUSDT",
+        "decimals": 6
+      },
+      {
+        "addr": "0x751DE3875aeF8C18d7FE983c6DeeFe366bed438f",
+        "name": "Ava USDC",
+        "symbol": "aUSDC",
+        "decimals": 6
+      }
+    ]
   },
   {
     "id": "polygon-testnet",
-    "name": "Polygon Testnet Mumbai",
-    "alias": "Mumbai",
+    "name": "Polygon Testnet (Mumbai)",
+    "alias": "Matic",
     "chainId": "0x13881",
     "slip44": "0x800003c6",
     "extensions": [
@@ -116,13 +142,26 @@
       "symbol": "MATIC",
       "decimals": 18
     },
-    "mesonAddress": "",
-    "tokens": []
+    "mesonAddress": "0x21D828269A0A7EF69dC25d257299901f318fBbA8",
+    "tokens": [
+      {
+        "addr": "0x51820aEFc3Aa242D7416D7e522b75BFb32446d6e",
+        "name": "Matic USDT",
+        "symbol": "pUSDT",
+        "decimals": 6
+      },
+      {
+        "addr": "0x751DE3875aeF8C18d7FE983c6DeeFe366bed438f",
+        "name": "Matic USDC",
+        "symbol": "pUSDC",
+        "decimals": 6
+      }
+    ]
   },
   {
-    "id": "harmony-testnet",
+    "id": "one-testnet",
     "name": "Harmony Testnet",
-    "alias": "Harmony Testnet",
+    "alias": "One",
     "chainId": "0x6357d2e0",
     "slip44": "0x800003ff",
     "extensions": [
@@ -136,13 +175,26 @@
       "symbol": "ONE",
       "decimals": 18
     },
-    "mesonAddress": "",
-    "tokens": []
+    "mesonAddress": "0x21D828269A0A7EF69dC25d257299901f318fBbA8",
+    "tokens": [
+      {
+        "addr": "0x51820aEFc3Aa242D7416D7e522b75BFb32446d6e",
+        "name": "One USDT",
+        "symbol": "oUSDT",
+        "decimals": 6
+      },
+      {
+        "addr": "0x751DE3875aeF8C18d7FE983c6DeeFe366bed438f",
+        "name": "One USDC",
+        "symbol": "oUSDC",
+        "decimals": 6
+      }
+    ]
   },
   {
     "id": "cfx-testnet",
     "name": "Conflux Testnet",
-    "alias": "Cfx",
+    "alias": "CFX",
     "chainId": "0x1",
     "slip44": "0x800001f7",
     "extensions": [
@@ -167,8 +219,8 @@
   },
   {
     "id": "heco-testnet",
-    "name": "Huobi ECO Chain Testnet",
-    "alias": "Heco Testnet",
+    "name": "Heco Testnet",
+    "alias": "Heco",
     "chainId": "0x100",
     "slip44": "0x800003f2",
     "extensions": [
@@ -201,7 +253,7 @@
   {
     "id": "okex-testnet",
     "name": "OKExChain Testnet",
-    "alias": "OKEx Testnet",
+    "alias": "OK",
     "chainId": "0x41",
     "slip44": "0x800003e4",
     "extensions": [

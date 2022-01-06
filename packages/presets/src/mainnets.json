@@ -41,7 +41,7 @@
   },
   {
     "id": "gnosis",
-    "name": "Gnosis Chain (formerly xDai)",
+    "name": "Gnosis Chain (xDai)",
     "alias": "xDai",
     "chainId": "0x64",
     "slip44": "0x800002bc",
@@ -62,7 +62,7 @@
   {
     "id": "polygon",
     "name": "Polygon",
-    "alias": "MATIC",
+    "alias": "Matic",
     "chainId": "0x89",
     "slip44": "0x800003c6",
     "extensions": [
@@ -82,7 +82,7 @@
   {
     "id": "ftm",
     "name": "Fantom",
-    "alias": "ftm",
+    "alias": "Fantom",
     "chainId": "0xfa",
     "slip44": "0x800003ef",
     "extensions": [
@@ -120,8 +120,8 @@
     "tokens": []
   },
   {
-    "id": "harmony",
-    "name": "Harmony Mainnet Shard 0",
+    "id": "one",
+    "name": "Harmony Shard 0",
     "alias": "Harmony",
     "chainId": "0x63564c40",
     "slip44": "0x800003ff",
