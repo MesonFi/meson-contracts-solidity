@@ -33,12 +33,11 @@ interface IMesonPools {
 
   /// @notice Lock tokens
   function lock(
-    bytes memory encodedSwap,
-    address outToken,
-    address recipient,
-    bytes32 r,
-    bytes32 s,
-    uint8 v
+    bytes32 swapId,
+    address initiator,
+    uint256 amount,
+    address token,
+    address recipient
   ) external;
 
   /// @notice Unlock tokens
@@ -64,22 +63,7 @@ interface IMesonPools {
   /// @notice If a LP calls `executeSwap` before `release`, anyone can
   /// call this to punish the LP.
   /// @dev Designed to be used by anyone
-  /// @param provider The address of the liquidity provider
-  /// @param signature A signature that will unlock the swaps atomically on both chains
-  /// @param metaAmount The meta-amount of token to swap (not the exact releasing amount)
-  /// @param inToken The input token deposited by the user
-  /// @param outToken The output token the user wish to withdraw
-  /// @param receiver The address that will receive the output token
-  /// @param ts The block time the swap is initially requested
-  function challenge(
-    address provider,
-    bytes memory signature,
-    uint256 metaAmount,
-    bytes memory inToken,
-    address outToken,
-    address receiver,
-    uint256 ts
-  ) external;
+  function challenge() external;
 
   /// @notice Event when a swap request has been locked.
   /// Emit at the end of `lock()` calls.

@@ -5,6 +5,31 @@ import { Meson } from '@mesonfi/contract-abis'
 import mainnets from './mainnets.json'
 import testnets from './testnets.json'
 
+export interface Token {
+  addr: string
+  name: string
+  symbol: string
+  decimals: number
+}
+
+export interface Network {
+  id: string
+  name: string
+  chainId: string
+  slip44: string
+  extensions: string[]
+  addressFormat: string
+  url?: string
+  explorer?: string
+  mesonAddress: string
+  nativeCurrency?: {
+    name?: string
+    symbol: string
+    decimals: number
+  }
+  tokens: Token[]
+}
+
 export default class MesonPresets {
   private _useTestnet: boolean
   private _cache: Map<string, MesonClient>
@@ -18,7 +43,7 @@ export default class MesonPresets {
     this._useTestnet = v
   }
 
-  getAllNetworks () {
+  getAllNetworks (): Network[] {
     return this._useTestnet ? testnets : mainnets
   }
 

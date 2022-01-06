@@ -9,3 +9,4 @@ node_modules
 /docs
 
 /contracts/MesonConfig.sol
+.env

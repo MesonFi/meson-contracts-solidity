@@ -1,10 +1,18 @@
 import '@typechain/hardhat'
 import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-ethers'
+import 'hardhat-change-network'
 import '@openzeppelin/hardhat-upgrades'
 
 import { task } from 'hardhat/config';
+import testnets from '@mesonfi/presets/src/testnets.json'
 import config from './config.json'
+
+const networks = Object.fromEntries(
+  testnets
+    .filter(item => item.url)
+    .map(item => [item.id, { url: item.url }])
+)
 
 task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners()
@@ -64,6 +72,10 @@ export default {
       accounts: ['36a460fc4a89eec5d08b585eace1498a5db63a5950831691e4287343a0c58ce2'],
       timeout: 0,
     },
+    ropsten: {
+      url: `https://ropsten.infura.io/v3/cc547d769203404cb928ec965af26894`,
+    },
+    ...networks,
   },
   typechain: {
     outDir: 'packages/contract-types/types',

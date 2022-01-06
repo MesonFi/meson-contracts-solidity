@@ -2,21 +2,24 @@
   {
     "id": "ropsten",
     "name": "Ropsten",
+    "alias": "Ropsten",
     "chainId": "0x3",
     "slip44": "0x8000003c",
-    "extensions": ["metamask"],
+    "extensions": [
+      "metamask"
+    ],
     "addressFormat": "hex",
-    "mesonAddress": "0x9481bf780b1f9731a0c2baecbc8fc6406584b10d",
+    "mesonAddress": "0x0F6921AB1e3c8Ce4Ec5e7f7997589846F9DC0571",
     "tokens": [
       {
-        "addr": "0x751de3875aef8c18d7fe983c6deefe366bed438f",
-        "name": "Mock USDT",
+        "addr": "0x191FEE1FdE8162aeEe87c9be7C8B787996A4fbD6",
+        "name": "Ropsten USDT", 
         "symbol": "mUSDT",
         "decimals": 6
       },
       {
-        "addr": "0x21d828269a0a7ef69dc25d257299901f318fbba8",
-        "name": "Mock USDC",
+        "addr": "0x851444c494dD36995Fcf1b058513E7959BA3324B",
+        "name": "Ropsten USDC",
         "symbol": "mUSDC",
         "decimals": 6
       }
@@ -25,13 +28,16 @@
   {
     "id": "bsc-testnet",
     "name": "Binance Smart Chain Testnet",
+    "alias": "BSC",
     "chainId": "0x61",
     "slip44": "0x80000207",
-    "extensions": ["metamask"],
+    "extensions": [
+      "metamask"
+    ],
     "addressFormat": "hex",
     "url": "https://data-seed-prebsc-1-s1.binance.org:8545",
     "explorer": "https://testnet.bscscan.com",
-    "mesonAddress": "0xd2bb96c0f2b36f2af8d02184bae77bab76392a2e",
+    "mesonAddress": "0x67272DBD6f29d9dbD6a13E49f81Cd898fb07ed55",
     "nativeCurrency": {
       "name": "BNB",
       "symbol": "tBNB",
@@ -39,13 +45,13 @@
     },
     "tokens": [
       {
-        "addr": "0x6ee95fc14fbC9Cca8068C0Ef2066Af666cCB10FD",
+        "addr": "0x016d0Db781A6f2a199e7059505C8c5628e6E1d45",
         "name": "BSC USDT",
         "symbol": "bUSDT",
         "decimals": 6
       },
       {
-        "addr": "0x08fcc0970095412fdbf24c25c121704f5d7654c3",
+        "addr": "0xA545E18CB2D473E47C6d8eE861269f2D65E90d95",
         "name": "BSC USDC",
         "symbol": "bUSDC",
         "decimals": 6
@@ -54,39 +60,49 @@
   },
   {
     "id": "heco-testnet",
-    "name": "heco Smart Chain Testnet",
-    "chainId": "0x256",
+    "name": "Huobi ECO Chain Testnet",
+    "alias": "Heco",
+    "chainId": "0x100",
     "slip44": "0x800003f2",
+    "extensions": [
+      "metamask"
+    ],
     "addressFormat": "hex",
     "url": "https://http-testnet.hecochain.com",
-    "explorer": "https://scan-testnet.hecochain.com",
+    "explorer": "https://testnet.hecoinfo.com",
     "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
     "nativeCurrency": {
-      "name": "HT",
-      "symbol": "tHt",
+      "name": "Huobi Token",
+      "symbol": "htt",
       "decimals": 18
     },
     "tokens": [
       {
         "addr": "0x01aA3AF577e150F58a6aEa440179c3Cdaad3B8D7",
         "name": "heco USDT",
-        "symbol": "bUSDT"
+        "symbol": "hUSDT",
+        "decimals": 6
       },
       {
         "addr": "0x08fcc0970095412fdbf24c25c121704f5d7654c3",
         "name": "heco USDC",
-        "symbol": "bUSDC"
+        "symbol": "hUSDC",
+        "decimals": 6
       }
     ]
   },
   {
     "id": "okex-testnet",
-    "name": "okex Smart Chain Testnet",
-    "chainId": "0x256",
+    "name": "OKExChain Testnet",
+    "alias": "OKEx",
+    "chainId": "0x41",
     "slip44": "0x800003e4",
+    "extensions": [
+      "metamask"
+    ],
     "addressFormat": "hex",
     "url": "https://exchaintestrpc.okex.org",
-    "explorer": "https://www.oklink.com/oec-test/",
+    "explorer": "https://www.oklink.com/okexchain-test",
     "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
     "nativeCurrency": {
       "name": "OKT",
@@ -97,21 +113,25 @@
       {
         "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
         "name": "Okex USD-T",
-        "symbol": "USDT"
+        "symbol": "USDT",
+        "decimals": 6
       },
       {
         "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
         "name": "Okex USD Coin",
-        "symbol": "USDC"
+        "symbol": "USDC",
+        "decimals": 6
       }
-      ]
-    }
-      ,{
+    ]
+  },
+  {
     "id": "cfx-testnet",
     "name": "Conflux Testnet",
     "chainId": "0x1",
     "slip44": "0x800001f7",
-    "extensions": ["conflux-portal"],
+    "extensions": [
+      "conflux-portal"
+    ],
     "addressFormat": "cip37",
     "mesonAddress": "cfxtest:acf4e758reembkssv95w1nr15316uec702grzxh10x",
     "tokens": [
@@ -127,7 +147,7 @@
         "symbol": "cUSDC",
         "decimals": 6
       }
-    ]
+    ] 
   },{
     "id": "fantom-testnet",
     "name": "fantom Smart Chain Testnet",
@@ -180,5 +200,238 @@
           "symbol": "USDC"
         }
         ]
-      }
+      },{
+        "id": "xdai-testnet",
+        "name": "Gnosis Chain (formerly xDai)",
+        "chainId": "0x64",
+        "slip44": "0x800002bc",
+        "extensions": [
+          "metamask"
+        ],
+        "addressFormat": "hex",
+        "url": "https://rpc.xdaichain.com",
+        "explorer": "https://blockscout.com/xdai/mainnet",
+        "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
+        "nativeCurrency": {
+          "name": "XDAI",
+          "symbol": "XDAI",
+          "decimals": 18
+        },
+        "tokens": [
+          {
+            "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
+            "name": "MATIC USDT",
+            "symbol": "USDT"
+          },
+          {
+            "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
+            "name": "MATIC USD Coin",
+            "symbol": "USDC"
+          }
+          ]
+        },{
+          "id": "Fuse-testnet",
+          "name": "Fuse Sparkne",
+          "chainId": "0x7b",
+          "slip44": "",
+          "extensions": [
+            "metamask"
+          ],
+          "addressFormat": "hex",
+          "url": "https://rpc.fusespark.io",
+          "explorer": "https://explorer.fuse.io/",
+          "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
+          "nativeCurrency": {
+            "name": "SPARK",
+            "symbol": "SPARK",
+            "decimals": 18
+          },
+          "tokens": [
+            {
+              "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
+              "name": "MATIC USDT",
+              "symbol": "USDT"
+            },
+            {
+              "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
+              "name": "MATIC USD Coin",
+              "symbol": "USDC"
+            }
+            ]
+          },{
+            "id": "iotex-testnet",
+            "name": "IoTeX Network Testnet",
+            "chainId": "0x1252",
+            "slip44": "0x80000130",
+            "extensions": [
+              "metamask"
+            ],
+            "addressFormat": "hex",
+            "url": "https://babel-api.testnet.iotex.io",
+            "explorer": "https://testnet.iotexscan.io",
+            "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
+            "nativeCurrency": {
+              "name": "IOTX",
+              "symbol": "IOTX",
+              "decimals": 18
+            },
+            "tokens": [
+              {
+                "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
+                "name": "MATIC USDT",
+                "symbol": "USDT"
+              },
+              {
+                "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
+                "name": "MATIC USD Coin",
+                "symbol": "USDC"
+              }
+              ]
+            },{
+              "id": "Cronos-testnet",
+              "name": "Cronos Testnet",
+              "chainId": "0x152",
+              "slip44": "",
+              "extensions": [
+                "metamask"
+              ],
+              "addressFormat": "hex",
+              "url": "https://cronos-testnet-3.crypto.org:8545",
+              "explorer": "https://cronos.crypto.org/explorer/testnet3",
+              "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
+              "nativeCurrency": {
+                "name": "TCRO",
+                "symbol": "TCRO",
+                "decimals": 18
+              },
+              "tokens": [
+                {
+                  "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
+                  "name": "MATIC USDT",
+                  "symbol": "USDT"
+                },
+                {
+                  "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
+                  "name": "MATIC USD Coin",
+                  "symbol": "USDC"
+                }
+                ]
+              },{
+                "id": "Celo-testnet",
+                "name": "Celo Alfajores Testnet",
+                "chainId": "0xaef3",
+                "slip44": "0x8000ce10",
+                "extensions": [
+                  "metamask"
+                ],
+                "addressFormat": "hex",
+                "url": "https://alfajores-forno.celo-testnet.org",
+                "explorer": "https://alfajores-blockscout.celo-testnet.org/",
+                "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
+                "nativeCurrency": {
+                  "name": "CELO",
+                  "symbol": "CELO",
+                  "decimals": 18
+                },
+                "tokens": [
+                  {
+                    "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
+                    "name": "MATIC USDT",
+                    "symbol": "USDT"
+                  },
+                  {
+                    "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
+                    "name": "MATIC USD Coin",
+                    "symbol": "USDC"
+                  }
+                  ]
+                },{
+                  "id": "Harmony-testnet",
+                  "name": "Harmony Testnet Shard 0",
+                  "chainId": "0x6357d2e0",
+                  "slip44": "0x800003ff",
+                  "extensions": [
+                    "metamask"
+                  ],
+                  "addressFormat": "hex",
+                  "url": "https://api.s0.b.hmny.io",
+                  "explorer": "https://explorer.pops.one",
+                  "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
+                  "nativeCurrency": {
+                    "name": "ONE",
+                    "symbol": "ONE",
+                    "decimals": 18
+                  },
+                  "tokens": [
+                    {
+                      "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
+                      "name": "MATIC USDT",
+                      "symbol": "USDT"
+                    },
+                    {
+                      "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
+                      "name": "MATIC USD Coin",
+                      "symbol": "USDC"
+                    }
+                    ]
+                  } ,{
+                    "id": "Shiden-testnet",
+                    "name": "Shiden",
+                    "chainId": "0x6357d2e0",
+                    "slip44": "",
+                    "extensions": [
+                      "metamask"
+                    ],
+                    "addressFormat": "hex",
+                    "url": "https://rpc.shiden.astar.network:8545",
+                    "explorer": "https://shiden.subscan.io",
+                    "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
+                    "nativeCurrency": {
+                      "name": "SDN",
+                      "symbol": "SDN",
+                      "decimals": 18
+                    },
+                    "tokens": [
+                      {
+                        "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
+                        "name": "SDN USDT",
+                        "symbol": "USDT"
+                      },
+                      {
+                        "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
+                        "name": "SDN USD Coin",
+                        "symbol": "USDC"
+                      }
+                      ]
+                    },{
+                      "id": "Telos-testnet",
+                      "name": "Telos EVM Testnet",
+                      "chainId": "0x29",
+                      "slip44": "0x800001a8",
+                      "extensions": [
+                        "metamask"
+                      ],
+                      "addressFormat": "hex",
+                      "url": "https://testnet.telos.net/evm",
+                      "explorer": "https://testnet.teloscan.io/",
+                      "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
+                      "nativeCurrency": {
+                        "name": "TLOS",
+                        "symbol": "TLOS",
+                        "decimals": 18
+                      },
+                      "tokens": [
+                        {
+                          "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
+                          "name": "TLOS USDT",
+                          "symbol": "USDT"
+                        },
+                        {
+                          "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
+                          "name": "TLOS USD Coin",
+                          "symbol": "USDC"
+                        }
+                        ]
+                      }
+ 
 ]

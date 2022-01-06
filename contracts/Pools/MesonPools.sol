@@ -48,34 +48,25 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
 
   /// @inheritdoc IMesonPools
   function lock(
-    bytes memory encodedSwap,
+    bytes32 swapId,
+    address initiator,
+    uint256 amount,
     address token,
-    address recipient,
-    bytes32 r,
-    bytes32 s,
-    uint8 v
+    address recipient
   ) public override tokenSupported(token) {
-    (uint256 amount, bytes32 outTokenHash, bytes32 recipientHash) = _decodeSwapOutput(encodedSwap);
-
     require(amount > 0, "amount must be greater than zero");
-    require(keccak256(abi.encodePacked(token)) == outTokenHash, "token does not match");
-    require(keccak256(abi.encodePacked(recipient)) == recipientHash, "recipient does not match");
-
+    require(!_hasLockingSwap(swapId), "locking swap already exists");
     address provider = _msgSender();
     require(balanceOf[token][provider] >= amount, "insufficient balance");
 
-    bytes32 swapId = _getSwapId(encodedSwap);
-    require(!_hasLockingSwap(swapId), "locking swap already exists");
-
     balanceOf[token][provider] = balanceOf[token][provider] - amount;
-    uint256 ts = block.timestamp;
     lockingSwaps[swapId] = LockingSwap(
-      ecrecover(swapId, v, r, s),
+      initiator,
       provider,
       token,
       amount,
       recipient,
-      ts + LOCK_TIME_PERIOD
+      block.timestamp + LOCK_TIME_PERIOD
     );
 
     emit SwapLocked(swapId, provider);
@@ -136,26 +127,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
   }
 
   /// @inheritdoc IMesonPools
-  function challenge(
-    address provider,
-    bytes memory signature,
-    uint256 metaAmount,
-    bytes memory inToken,
-    address outToken,
-    address receiver,
-    uint256 ts
-  ) public override {
-    // bytes32 swapId =
-    //   _isSignatureValid(
-    //     provider,
-    //     signature,
-    //     metaAmount,
-    //     inToken,
-    //     outToken,
-    //     receiver,
-    //     ts,
-    //     epoch
-    //   );
+  function challenge() public override {
   }
 
   function _hasLockingSwap(bytes32 swapId) internal view returns (bool) {

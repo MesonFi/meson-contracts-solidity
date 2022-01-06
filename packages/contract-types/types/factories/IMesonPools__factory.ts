@@ -40,43 +40,7 @@ const _abi = [
     type: "event",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "provider",
-        type: "address",
-      },
-      {
-        internalType: "bytes",
-        name: "signature",
-        type: "bytes",
-      },
-      {
-        internalType: "uint256",
-        name: "metaAmount",
-        type: "uint256",
-      },
-      {
-        internalType: "bytes",
-        name: "inToken",
-        type: "bytes",
-      },
-      {
-        internalType: "address",
-        name: "outToken",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "receiver",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "ts",
-        type: "uint256",
-      },
-    ],
+    inputs: [],
     name: "challenge",
     outputs: [],
     stateMutability: "nonpayable",
@@ -103,34 +67,29 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "bytes",
-        name: "encodedSwap",
-        type: "bytes",
+        internalType: "bytes32",
+        name: "swapId",
+        type: "bytes32",
       },
       {
         internalType: "address",
-        name: "outToken",
+        name: "initiator",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "token",
         type: "address",
       },
       {
         internalType: "address",
         name: "recipient",
         type: "address",
-      },
-      {
-        internalType: "bytes32",
-        name: "r",
-        type: "bytes32",
-      },
-      {
-        internalType: "bytes32",
-        name: "s",
-        type: "bytes32",
-      },
-      {
-        internalType: "uint8",
-        name: "v",
-        type: "uint8",
       },
     ],
     name: "lock",

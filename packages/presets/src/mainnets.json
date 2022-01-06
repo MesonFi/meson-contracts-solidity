@@ -24,7 +24,7 @@
   },
   {
     "id": "bsc",
-    "name": "BSC Mainnet",
+    "name": "Binance Smart Chain",
     "chainId": "0x38",
     "slip44": "0x80000207",
     "extensions": ["metamask"],
@@ -74,6 +74,7 @@
   {
     "id": "one",
     "name": "Harmony",
+    "chainId": "unknown",
     "slip44": "0x800003ff",
     "extensions": [],
     "addressFormat": "hex",

@@ -19,33 +19,22 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface IMesonPoolsInterface extends utils.Interface {
   functions: {
-    "challenge(address,bytes,uint256,bytes,address,address,uint256)": FunctionFragment;
+    "challenge()": FunctionFragment;
     "deposit(address,uint256)": FunctionFragment;
-    "lock(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
+    "lock(bytes32,address,uint256,address,address)": FunctionFragment;
     "release(bytes32,uint256,bytes32,bytes32,uint8)": FunctionFragment;
     "unlock(bytes32)": FunctionFragment;
     "withdraw(address,uint256)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "challenge",
-    values: [
-      string,
-      BytesLike,
-      BigNumberish,
-      BytesLike,
-      string,
-      string,
-      BigNumberish
-    ]
-  ): string;
+  encodeFunctionData(functionFragment: "challenge", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "deposit",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "lock",
-    values: [BytesLike, string, string, BytesLike, BytesLike, BigNumberish]
+    values: [BytesLike, string, BigNumberish, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "release",
@@ -112,13 +101,6 @@ export interface IMesonPools extends BaseContract {
 
   functions: {
     challenge(
-      provider: string,
-      signature: BytesLike,
-      metaAmount: BigNumberish,
-      inToken: BytesLike,
-      outToken: string,
-      receiver: string,
-      ts: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -129,12 +111,11 @@ export interface IMesonPools extends BaseContract {
     ): Promise<ContractTransaction>;
 
     lock(
-      encodedSwap: BytesLike,
-      outToken: string,
+      swapId: BytesLike,
+      initiator: string,
+      amount: BigNumberish,
+      token: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -160,13 +141,6 @@ export interface IMesonPools extends BaseContract {
   };
 
   challenge(
-    provider: string,
-    signature: BytesLike,
-    metaAmount: BigNumberish,
-    inToken: BytesLike,
-    outToken: string,
-    receiver: string,
-    ts: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -177,12 +151,11 @@ export interface IMesonPools extends BaseContract {
   ): Promise<ContractTransaction>;
 
   lock(
-    encodedSwap: BytesLike,
-    outToken: string,
+    swapId: BytesLike,
+    initiator: string,
+    amount: BigNumberish,
+    token: string,
     recipient: string,
-    r: BytesLike,
-    s: BytesLike,
-    v: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -207,16 +180,7 @@ export interface IMesonPools extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    challenge(
-      provider: string,
-      signature: BytesLike,
-      metaAmount: BigNumberish,
-      inToken: BytesLike,
-      outToken: string,
-      receiver: string,
-      ts: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    challenge(overrides?: CallOverrides): Promise<void>;
 
     deposit(
       token: string,
@@ -225,12 +189,11 @@ export interface IMesonPools extends BaseContract {
     ): Promise<void>;
 
     lock(
-      encodedSwap: BytesLike,
-      outToken: string,
+      swapId: BytesLike,
+      initiator: string,
+      amount: BigNumberish,
+      token: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -265,13 +228,6 @@ export interface IMesonPools extends BaseContract {
 
   estimateGas: {
     challenge(
-      provider: string,
-      signature: BytesLike,
-      metaAmount: BigNumberish,
-      inToken: BytesLike,
-      outToken: string,
-      receiver: string,
-      ts: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -282,12 +238,11 @@ export interface IMesonPools extends BaseContract {
     ): Promise<BigNumber>;
 
     lock(
-      encodedSwap: BytesLike,
-      outToken: string,
+      swapId: BytesLike,
+      initiator: string,
+      amount: BigNumberish,
+      token: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -314,13 +269,6 @@ export interface IMesonPools extends BaseContract {
 
   populateTransaction: {
     challenge(
-      provider: string,
-      signature: BytesLike,
-      metaAmount: BigNumberish,
-      inToken: BytesLike,
-      outToken: string,
-      receiver: string,
-      ts: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -331,12 +279,11 @@ export interface IMesonPools extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     lock(
-      encodedSwap: BytesLike,
-      outToken: string,
+      swapId: BytesLike,
+      initiator: string,
+      amount: BigNumberish,
+      token: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

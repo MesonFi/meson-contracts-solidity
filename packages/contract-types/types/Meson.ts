@@ -22,11 +22,11 @@ export interface MesonInterface extends utils.Interface {
     "balanceOf(address,address)": FunctionFragment;
     "bondSwap(bytes32)": FunctionFragment;
     "cancelSwap(bytes32)": FunctionFragment;
-    "challenge(address,bytes,uint256,bytes,address,address,uint256)": FunctionFragment;
+    "challenge()": FunctionFragment;
     "deposit(address,uint256)": FunctionFragment;
     "executeSwap(bytes32,bytes32,bytes32,uint8)": FunctionFragment;
     "getCoinType()": FunctionFragment;
-    "lock(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
+    "lock(bytes32,address,uint256,address,address)": FunctionFragment;
     "lockingSwaps(bytes32)": FunctionFragment;
     "postSwap(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
     "release(bytes32,uint256,bytes32,bytes32,uint8)": FunctionFragment;
@@ -48,18 +48,7 @@ export interface MesonInterface extends utils.Interface {
     functionFragment: "cancelSwap",
     values: [BytesLike]
   ): string;
-  encodeFunctionData(
-    functionFragment: "challenge",
-    values: [
-      string,
-      BytesLike,
-      BigNumberish,
-      BytesLike,
-      string,
-      string,
-      BigNumberish
-    ]
-  ): string;
+  encodeFunctionData(functionFragment: "challenge", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "deposit",
     values: [string, BigNumberish]
@@ -74,7 +63,7 @@ export interface MesonInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "lock",
-    values: [BytesLike, string, string, BytesLike, BytesLike, BigNumberish]
+    values: [BytesLike, string, BigNumberish, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "lockingSwaps",
@@ -251,13 +240,6 @@ export interface Meson extends BaseContract {
     ): Promise<ContractTransaction>;
 
     challenge(
-      provider: string,
-      signature: BytesLike,
-      metaAmount: BigNumberish,
-      inToken: BytesLike,
-      outToken: string,
-      receiver: string,
-      ts: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -278,12 +260,11 @@ export interface Meson extends BaseContract {
     getCoinType(overrides?: CallOverrides): Promise<[string]>;
 
     lock(
-      encodedSwap: BytesLike,
+      swapId: BytesLike,
+      initiator: string,
+      amount: BigNumberish,
       token: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -383,13 +364,6 @@ export interface Meson extends BaseContract {
   ): Promise<ContractTransaction>;
 
   challenge(
-    provider: string,
-    signature: BytesLike,
-    metaAmount: BigNumberish,
-    inToken: BytesLike,
-    outToken: string,
-    receiver: string,
-    ts: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -410,12 +384,11 @@ export interface Meson extends BaseContract {
   getCoinType(overrides?: CallOverrides): Promise<string>;
 
   lock(
-    encodedSwap: BytesLike,
+    swapId: BytesLike,
+    initiator: string,
+    amount: BigNumberish,
     token: string,
     recipient: string,
-    r: BytesLike,
-    s: BytesLike,
-    v: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -499,16 +472,7 @@ export interface Meson extends BaseContract {
 
     cancelSwap(swapId: BytesLike, overrides?: CallOverrides): Promise<void>;
 
-    challenge(
-      provider: string,
-      signature: BytesLike,
-      metaAmount: BigNumberish,
-      inToken: BytesLike,
-      outToken: string,
-      receiver: string,
-      ts: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    challenge(overrides?: CallOverrides): Promise<void>;
 
     deposit(
       token: string,
@@ -527,12 +491,11 @@ export interface Meson extends BaseContract {
     getCoinType(overrides?: CallOverrides): Promise<string>;
 
     lock(
-      encodedSwap: BytesLike,
+      swapId: BytesLike,
+      initiator: string,
+      amount: BigNumberish,
       token: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -673,13 +636,6 @@ export interface Meson extends BaseContract {
     ): Promise<BigNumber>;
 
     challenge(
-      provider: string,
-      signature: BytesLike,
-      metaAmount: BigNumberish,
-      inToken: BytesLike,
-      outToken: string,
-      receiver: string,
-      ts: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -700,12 +656,11 @@ export interface Meson extends BaseContract {
     getCoinType(overrides?: CallOverrides): Promise<BigNumber>;
 
     lock(
-      encodedSwap: BytesLike,
+      swapId: BytesLike,
+      initiator: string,
+      amount: BigNumberish,
       token: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -786,13 +741,6 @@ export interface Meson extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     challenge(
-      provider: string,
-      signature: BytesLike,
-      metaAmount: BigNumberish,
-      inToken: BytesLike,
-      outToken: string,
-      receiver: string,
-      ts: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -813,12 +761,11 @@ export interface Meson extends BaseContract {
     getCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     lock(
-      encodedSwap: BytesLike,
+      swapId: BytesLike,
+      initiator: string,
+      amount: BigNumberish,
       token: string,
       recipient: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
