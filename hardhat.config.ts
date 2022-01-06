@@ -51,26 +51,6 @@ export default {
       url: 'http://localhost:62743',
       accounts: 'remote',
       timeout: 0,
-    }, 
-    fantom: {
-      url: 'https://rpc.testnet.fantom.network',
-      accounts: ['36a460fc4a89eec5d08b585eace1498a5db63a5950831691e4287343a0c58ce2'],
-      timeout: 0,
-    },
-    polygon: {
-      url: 'https://rpc.testnet.fantom.network',
-      accounts: ['36a460fc4a89eec5d08b585eace1498a5db63a5950831691e4287343a0c58ce2'],
-      timeout: 0,
-    },
-    Avalanche: {
-      url: 'https://rpc.testnet.fantom.network',
-      accounts: ['36a460fc4a89eec5d08b585eace1498a5db63a5950831691e4287343a0c58ce2'],
-      timeout: 0,
-    },
-    Xdai: {
-      url: 'https://rpc.xdaichain.com',
-      accounts: ['36a460fc4a89eec5d08b585eace1498a5db63a5950831691e4287343a0c58ce2'],
-      timeout: 0,
     },
     ropsten: {
       url: `https://ropsten.infura.io/v3/cc547d769203404cb928ec965af26894`,
