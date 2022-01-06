@@ -41,8 +41,7 @@ async function main() {
 
   const Meson = await ethers.getContractFactory('Meson', wallet)
   console.log('Deploying Meson...')
-  // const meson = await Meson.deploy([mockUSDT.address, mockUSDC.address])
-  const meson = await Meson.deploy([mockUSDT.address], { nonce: nonce + 2 })
+  const meson = await Meson.deploy([mockUSDT.address, mockUSDC.address], { nonce: nonce + 2 })
   console.log('Meson deployed to:', meson.address)
 
   testnet.mesonAddress = meson.address
