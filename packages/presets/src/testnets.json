@@ -13,7 +13,7 @@
     "tokens": [
       {
         "addr": "0x191FEE1FdE8162aeEe87c9be7C8B787996A4fbD6",
-        "name": "Ropsten USDT", 
+        "name": "Ropsten USDT",
         "symbol": "mUSDT",
         "decimals": 6
       },
@@ -28,21 +28,21 @@
   {
     "id": "bsc-testnet",
     "name": "Binance Smart Chain Testnet",
-    "alias": "BSC",
+    "alias": "BSC Testnet",
     "chainId": "0x61",
-    "slip44": "0x80000207",
+    "slip44": "0x800002ca",
     "extensions": [
       "metamask"
     ],
     "addressFormat": "hex",
     "url": "https://data-seed-prebsc-1-s1.binance.org:8545",
     "explorer": "https://testnet.bscscan.com",
-    "mesonAddress": "0x67272DBD6f29d9dbD6a13E49f81Cd898fb07ed55",
     "nativeCurrency": {
-      "name": "BNB",
+      "name": "Binance Chain Native Token",
       "symbol": "tBNB",
       "decimals": 18
     },
+    "mesonAddress": "0x67272DBD6f29d9dbD6a13E49f81Cd898fb07ed55",
     "tokens": [
       {
         "addr": "0x016d0Db781A6f2a199e7059505C8c5628e6E1d45",
@@ -59,9 +59,115 @@
     ]
   },
   {
+    "id": "ftm-testnet",
+    "name": "Fantom Testnet",
+    "alias": "Fantom Testnet",
+    "chainId": "0xfa2",
+    "slip44": "0x800003ef",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "hex",
+    "url": "https://rpc.testnet.fantom.network",
+    "explorer": "https://testnet.ftmscan.com/",
+    "nativeCurrency": {
+      "name": "Fantom",
+      "symbol": "FTM",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "tokens": []
+  },
+  {
+    "id": "avax-testnet",
+    "name": "Avalanche Fuji Testnet",
+    "alias": "Ava Fuji",
+    "chainId": "0xa869",
+    "slip44": "0x80002328",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "hex",
+    "url": "https://api.avax-test.network/ext/bc/C/rpc",
+    "explorer": "https://testnet.snowtrace.io/",
+    "nativeCurrency": {
+      "name": "Avalanche",
+      "symbol": "AVAX",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "tokens": []
+  },
+  {
+    "id": "polygon-testnet",
+    "name": "Polygon Testnet Mumbai",
+    "alias": "Mumbai",
+    "chainId": "0x13881",
+    "slip44": "0x800003c6",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "hex",
+    "url": "https://matic-mumbai.chainstacklabs.com",
+    "explorer": "https://mumbai.polygonscan.com/",
+    "nativeCurrency": {
+      "name": "MATIC",
+      "symbol": "MATIC",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "tokens": []
+  },
+  {
+    "id": "harmony-testnet",
+    "name": "Harmony Testnet",
+    "alias": "Harmony Testnet",
+    "chainId": "0x6357d2e0",
+    "slip44": "0x800003ff",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "hex",
+    "url": "https://api.s0.b.hmny.io",
+    "explorer": "https://explorer.pops.one",
+    "nativeCurrency": {
+      "name": "ONE",
+      "symbol": "ONE",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "tokens": []
+  },
+  {
+    "id": "cfx-testnet",
+    "name": "Conflux Testnet",
+    "alias": "Cfx",
+    "chainId": "0x1",
+    "slip44": "0x800001f7",
+    "extensions": [
+      "conflux-portal"
+    ],
+    "addressFormat": "cip37",
+    "mesonAddress": "cfxtest:acf4e758reembkssv95w1nr15316uec702grzxh10x",
+    "tokens": [
+      {
+        "addr": "cfxtest:acbwtbb88jeg6gu6c0j1he9c3cahyvbegjfvzx0svb",
+        "name": "Mock cUSDT",
+        "symbol": "cUSDT",
+        "decimals": 6
+      },
+      {
+        "addr": "cfxtest:acbh1myrek1dmd5kr1442e8c2zs239kxvjs2dk7x36",
+        "name": "Mock cUSDC",
+        "symbol": "cUSDC",
+        "decimals": 6
+      }
+    ]
+  },
+  {
     "id": "heco-testnet",
     "name": "Huobi ECO Chain Testnet",
-    "alias": "Heco",
+    "alias": "Heco Testnet",
     "chainId": "0x100",
     "slip44": "0x800003f2",
     "extensions": [
@@ -94,7 +200,7 @@
   {
     "id": "okex-testnet",
     "name": "OKExChain Testnet",
-    "alias": "OKEx",
+    "alias": "OKEx Testnet",
     "chainId": "0x41",
     "slip44": "0x800003e4",
     "extensions": [
@@ -123,315 +229,5 @@
         "decimals": 6
       }
     ]
-  },
-  {
-    "id": "cfx-testnet",
-    "name": "Conflux Testnet",
-    "chainId": "0x1",
-    "slip44": "0x800001f7",
-    "extensions": [
-      "conflux-portal"
-    ],
-    "addressFormat": "cip37",
-    "mesonAddress": "cfxtest:acf4e758reembkssv95w1nr15316uec702grzxh10x",
-    "tokens": [
-      {
-        "addr": "cfxtest:acbwtbb88jeg6gu6c0j1he9c3cahyvbegjfvzx0svb",
-        "name": "Mock cUSDT",
-        "symbol": "cUSDT",
-        "decimals": 6
-      },
-      {
-        "addr": "cfxtest:acbh1myrek1dmd5kr1442e8c2zs239kxvjs2dk7x36",
-        "name": "Mock cUSDC",
-        "symbol": "cUSDC",
-        "decimals": 6
-      }
-    ] 
-  },{
-    "id": "fantom-testnet",
-    "name": "fantom Smart Chain Testnet",
-    "chainId": "0x4002",
-    "slip44": "0x800003ef",
-    "addressFormat": "hex",
-    "url": "https://rpc.testnet.fantom.network",
-    "explorer": "https://explorer.testnet.fantom.network/",
-    "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
-    "nativeCurrency": {
-      "name": "FTM",
-      "symbol": "FTM",
-      "decimals": 10
-    },
-    "tokens": [
-      {
-        "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
-        "name": "FTM USD-T",
-        "symbol": "USDT"
-      },
-      {
-        "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
-        "name": "FTM USD Coin",
-        "symbol": "USDC"
-      }
-      ]
-    },{
-      "id": "polygon-testnet",
-      "name": "polygon Smart Chain Testnet",
-      "chainId": "0x80001",
-      "slip44": "0x800003c6",
-      "addressFormat": "hex",
-      "url": "https://rpc.testnet.fantom.network",
-      "explorer": "https://mumbai.polygonscan.com",
-      "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
-      "nativeCurrency": {
-        "name": "MATIC",
-        "symbol": "MATIC",
-        "decimals": 18
-      },
-      "tokens": [
-        {
-          "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
-          "name": "MATIC USDT",
-          "symbol": "USDT"
-        },
-        {
-          "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
-          "name": "MATIC USD Coin",
-          "symbol": "USDC"
-        }
-        ]
-      },{
-        "id": "xdai-testnet",
-        "name": "Gnosis Chain (formerly xDai)",
-        "chainId": "0x64",
-        "slip44": "0x800002bc",
-        "extensions": [
-          "metamask"
-        ],
-        "addressFormat": "hex",
-        "url": "https://rpc.xdaichain.com",
-        "explorer": "https://blockscout.com/xdai/mainnet",
-        "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
-        "nativeCurrency": {
-          "name": "XDAI",
-          "symbol": "XDAI",
-          "decimals": 18
-        },
-        "tokens": [
-          {
-            "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
-            "name": "MATIC USDT",
-            "symbol": "USDT"
-          },
-          {
-            "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
-            "name": "MATIC USD Coin",
-            "symbol": "USDC"
-          }
-          ]
-        },{
-          "id": "Fuse-testnet",
-          "name": "Fuse Sparkne",
-          "chainId": "0x7b",
-          "slip44": "",
-          "extensions": [
-            "metamask"
-          ],
-          "addressFormat": "hex",
-          "url": "https://rpc.fusespark.io",
-          "explorer": "https://explorer.fuse.io/",
-          "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
-          "nativeCurrency": {
-            "name": "SPARK",
-            "symbol": "SPARK",
-            "decimals": 18
-          },
-          "tokens": [
-            {
-              "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
-              "name": "MATIC USDT",
-              "symbol": "USDT"
-            },
-            {
-              "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
-              "name": "MATIC USD Coin",
-              "symbol": "USDC"
-            }
-            ]
-          },{
-            "id": "iotex-testnet",
-            "name": "IoTeX Network Testnet",
-            "chainId": "0x1252",
-            "slip44": "0x80000130",
-            "extensions": [
-              "metamask"
-            ],
-            "addressFormat": "hex",
-            "url": "https://babel-api.testnet.iotex.io",
-            "explorer": "https://testnet.iotexscan.io",
-            "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
-            "nativeCurrency": {
-              "name": "IOTX",
-              "symbol": "IOTX",
-              "decimals": 18
-            },
-            "tokens": [
-              {
-                "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
-                "name": "MATIC USDT",
-                "symbol": "USDT"
-              },
-              {
-                "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
-                "name": "MATIC USD Coin",
-                "symbol": "USDC"
-              }
-              ]
-            },{
-              "id": "Cronos-testnet",
-              "name": "Cronos Testnet",
-              "chainId": "0x152",
-              "slip44": "",
-              "extensions": [
-                "metamask"
-              ],
-              "addressFormat": "hex",
-              "url": "https://cronos-testnet-3.crypto.org:8545",
-              "explorer": "https://cronos.crypto.org/explorer/testnet3",
-              "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
-              "nativeCurrency": {
-                "name": "TCRO",
-                "symbol": "TCRO",
-                "decimals": 18
-              },
-              "tokens": [
-                {
-                  "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
-                  "name": "MATIC USDT",
-                  "symbol": "USDT"
-                },
-                {
-                  "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
-                  "name": "MATIC USD Coin",
-                  "symbol": "USDC"
-                }
-                ]
-              },{
-                "id": "Celo-testnet",
-                "name": "Celo Alfajores Testnet",
-                "chainId": "0xaef3",
-                "slip44": "0x8000ce10",
-                "extensions": [
-                  "metamask"
-                ],
-                "addressFormat": "hex",
-                "url": "https://alfajores-forno.celo-testnet.org",
-                "explorer": "https://alfajores-blockscout.celo-testnet.org/",
-                "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
-                "nativeCurrency": {
-                  "name": "CELO",
-                  "symbol": "CELO",
-                  "decimals": 18
-                },
-                "tokens": [
-                  {
-                    "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
-                    "name": "MATIC USDT",
-                    "symbol": "USDT"
-                  },
-                  {
-                    "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
-                    "name": "MATIC USD Coin",
-                    "symbol": "USDC"
-                  }
-                  ]
-                },{
-                  "id": "Harmony-testnet",
-                  "name": "Harmony Testnet Shard 0",
-                  "chainId": "0x6357d2e0",
-                  "slip44": "0x800003ff",
-                  "extensions": [
-                    "metamask"
-                  ],
-                  "addressFormat": "hex",
-                  "url": "https://api.s0.b.hmny.io",
-                  "explorer": "https://explorer.pops.one",
-                  "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
-                  "nativeCurrency": {
-                    "name": "ONE",
-                    "symbol": "ONE",
-                    "decimals": 18
-                  },
-                  "tokens": [
-                    {
-                      "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
-                      "name": "MATIC USDT",
-                      "symbol": "USDT"
-                    },
-                    {
-                      "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
-                      "name": "MATIC USD Coin",
-                      "symbol": "USDC"
-                    }
-                    ]
-                  } ,{
-                    "id": "Shiden-testnet",
-                    "name": "Shiden",
-                    "chainId": "0x6357d2e0",
-                    "slip44": "",
-                    "extensions": [
-                      "metamask"
-                    ],
-                    "addressFormat": "hex",
-                    "url": "https://rpc.shiden.astar.network:8545",
-                    "explorer": "https://shiden.subscan.io",
-                    "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
-                    "nativeCurrency": {
-                      "name": "SDN",
-                      "symbol": "SDN",
-                      "decimals": 18
-                    },
-                    "tokens": [
-                      {
-                        "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
-                        "name": "SDN USDT",
-                        "symbol": "USDT"
-                      },
-                      {
-                        "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
-                        "name": "SDN USD Coin",
-                        "symbol": "USDC"
-                      }
-                      ]
-                    },{
-                      "id": "Telos-testnet",
-                      "name": "Telos EVM Testnet",
-                      "chainId": "0x29",
-                      "slip44": "0x800001a8",
-                      "extensions": [
-                        "metamask"
-                      ],
-                      "addressFormat": "hex",
-                      "url": "https://testnet.telos.net/evm",
-                      "explorer": "https://testnet.teloscan.io/",
-                      "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
-                      "nativeCurrency": {
-                        "name": "TLOS",
-                        "symbol": "TLOS",
-                        "decimals": 18
-                      },
-                      "tokens": [
-                        {
-                          "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
-                          "name": "TLOS USDT",
-                          "symbol": "USDT"
-                        },
-                        {
-                          "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
-                          "name": "TLOS USD Coin",
-                          "symbol": "USDC"
-                        }
-                        ]
-                      }
- 
+  }
 ]
