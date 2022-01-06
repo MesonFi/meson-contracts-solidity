@@ -5,14 +5,14 @@ import { Meson } from '@mesonfi/contract-abis'
 import mainnets from './mainnets.json'
 import testnets from './testnets.json'
 
-type Token = {
+export interface Token {
   addr: string
   name: string
   symbol: string
   decimals: number
 }
 
-type Network = {
+export interface Network {
   id: string
   name: string
   chainId: string
@@ -21,7 +21,7 @@ type Network = {
   addressFormat: string
   url?: string
   explorer?: string
-  mesonAddress?: string
+  mesonAddress: string
   nativeCurrency?: {
     name?: string
     symbol: string
