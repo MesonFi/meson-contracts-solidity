@@ -88,27 +88,10 @@ describe('MesonPools', () => {
       const signedRequest = new SignedSwapRequest(exported)
       await token.approve(mesonInstance.address, signedRequest.amount)
       await mesonInstance.deposit(signedRequest.outToken, signedRequest.amount)
-      await mesonInstance.lock(signedRequest.encode(), signedRequest.outToken, signedRequest.recipient, ...signedRequest.signature)
+      await mesonInstance.lock(signedRequest.swapId, signedRequest.initiator, signedRequest.amount, signedRequest.outToken, signedRequest.recipient)
 
       expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
       expect(await mesonInstance.hasLockingSwap(swap.swapId)).to.equal(true)
-    })
-
-    it('refuses mismatch outToken or recipient', async () => {
-      const swap = userClient.requestSwap(outChain, getDefaultSwap({ outToken: token.address }))
-      const exported = await swap.exportRequest(initiator)
-
-      const signedRequest = new SignedSwapRequest(exported)
-      await token.approve(mesonInstance.address, signedRequest.amount)
-      await mesonInstance.deposit(signedRequest.outToken, signedRequest.amount)
-
-      // await expect(
-      //   contract.lock(swap.encode(), unsupportedToken.address, swap.recipient)
-      // ).to.be.revertedWith('outToken does not match')
-
-      await expect(
-        mesonInstance.lock(signedRequest.encode(), signedRequest.outToken, provider.address, ...signedRequest.signature)
-      ).to.be.revertedWith('recipient does not match')
     })
   })
 
@@ -120,7 +103,7 @@ describe('MesonPools', () => {
       const signedRequest = new SignedSwapRequest(exported)
       await token.approve(mesonInstance.address, signedRequest.amount)
       await mesonInstance.deposit(signedRequest.outToken, signedRequest.amount)
-      await mesonInstance.lock(signedRequest.encode(), signedRequest.outToken, signedRequest.recipient, ...signedRequest.signature)
+      await mesonInstance.lock(signedRequest.swapId, signedRequest.initiator, signedRequest.amount, signedRequest.outToken, signedRequest.recipient)
 
       const signedRelease = await swap.exportRelease(initiator)
       SignedSwapRequest.CheckReleaseSignature(signedRelease)
