@@ -9,6 +9,7 @@
       "metamask"
     ],
     "addressFormat": "hex",
+    "url": "https://ropsten.infura.io/v3/${INFURA_API_KEY}",
     "mesonAddress": "0x0F6921AB1e3c8Ce4Ec5e7f7997589846F9DC0571",
     "tokens": [
       {
