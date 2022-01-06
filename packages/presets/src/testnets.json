@@ -2,21 +2,24 @@
   {
     "id": "ropsten",
     "name": "Ropsten",
+    "alias": "Ropsten",
     "chainId": "0x3",
     "slip44": "0x8000003c",
-    "extensions": ["metamask"],
+    "extensions": [
+      "metamask"
+    ],
     "addressFormat": "hex",
-    "mesonAddress": "0x9481bf780b1f9731a0c2baecbc8fc6406584b10d",
+    "mesonAddress": "0x19605fCa019901C7A1bE5ed28e455B5ED56de8f4",
     "tokens": [
       {
-        "addr": "0x751de3875aef8c18d7fe983c6deefe366bed438f",
-        "name": "Mock USDT",
+        "addr": "0xAEF6943072f365620B18dfbEe3bb97a94FCF871f",
+        "name": "Ropsten USDT",
         "symbol": "mUSDT",
         "decimals": 6
       },
       {
-        "addr": "0x21d828269a0a7ef69dc25d257299901f318fbba8",
-        "name": "Mock USDC",
+        "addr": "0x51bA876CA2587E13E34E7c40bE1D428c603b94d6",
+        "name": "Ropsten USDC",
         "symbol": "mUSDC",
         "decimals": 6
       }
@@ -25,9 +28,12 @@
   {
     "id": "bsc-testnet",
     "name": "Binance Smart Chain Testnet",
+    "alias": "BSC",
     "chainId": "0x61",
     "slip44": "0x80000207",
-    "extensions": ["metamask"],
+    "extensions": [
+      "metamask"
+    ],
     "addressFormat": "hex",
     "url": "https://data-seed-prebsc-1-s1.binance.org:8545",
     "explorer": "https://testnet.bscscan.com",
@@ -55,9 +61,12 @@
   {
     "id": "heco-testnet",
     "name": "Huobi ECO Chain Testnet",
+    "alias": "Heco",
     "chainId": "0x100",
     "slip44": "0x800003f2",
-    "extensions": ["metamask"],
+    "extensions": [
+      "metamask"
+    ],
     "addressFormat": "hex",
     "url": "https://http-testnet.hecochain.com",
     "explorer": "https://testnet.hecoinfo.com",
@@ -85,9 +94,12 @@
   {
     "id": "okex-testnet",
     "name": "OKExChain Testnet",
+    "alias": "OKEx",
     "chainId": "0x41",
     "slip44": "0x800003e4",
-    "extensions": ["metamask"],
+    "extensions": [
+      "metamask"
+    ],
     "addressFormat": "hex",
     "url": "https://exchaintestrpc.okex.org",
     "explorer": "https://www.oklink.com/okexchain-test",
@@ -117,7 +129,9 @@
     "name": "Conflux Testnet",
     "chainId": "0x1",
     "slip44": "0x800001f7",
-    "extensions": ["conflux-portal"],
+    "extensions": [
+      "conflux-portal"
+    ],
     "addressFormat": "cip37",
     "mesonAddress": "cfxtest:acf4e758reembkssv95w1nr15316uec702grzxh10x",
     "tokens": [
