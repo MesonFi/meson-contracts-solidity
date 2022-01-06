@@ -1,8 +1,8 @@
 const path = require('path')
 const fs = require('fs')
 const { ethers } = require('hardhat')
-const mainnets = require('../packages/presets/src/mainnets.json')
-const testnets = require('../packages/presets/src/testnets.json')
+const mainnets = require('@mesonfi/presets/src/mainnets.json')
+const testnets = require('@mesonfi/presets/src/testnets.json')
 
 const networkId = process.env.NETWORK_ID
 

@@ -1,6 +1,6 @@
 const path = require('path')
 const fs = require('fs')
-const presets = require('../packages/presets/src/mainnets.json')
+const presets = require('@mesonfi/presets/src/mainnets.json')
 
 const networkId = process.env.NETWORK_ID
 
