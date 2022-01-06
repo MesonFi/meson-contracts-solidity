@@ -66,17 +66,12 @@ interface IMesonSwap {
   /// @param expireTs The timestamp the request will expire
   /// @param amount The contract address of either token0 or token1
   /// @param inToken The contract address of the given token
-  event SwapRequested(bytes32 swapId, uint256 expireTs, uint256 amount, address inToken);
+  event SwapRequested(
+    bytes32 swapId, uint256 expireTs, uint256 amount,
+    address inToken, bytes4 outChain, bytes32 outToken,
+    address initiator, string recipient);
 
-  event SwapBonded(bytes32 swapId);
-
-  /// @notice Event when a new swap request is posted.
-  /// Emit at the end of `postSwap()` calls.
-  /// @param swapId The ID of the swap
-  /// @param expireTs The timestamp the request will expire
-  /// @param amount The contract address of either token0 or token1
-  /// @param inToken The contract address of the given token
-  event SwapPosted(bytes32 swapId, uint256 expireTs, uint256 amount, address inToken);
+  event SwapBonded(bytes32 swapId, address bondedProvider);
 
   event SwapCancelled(bytes32 swapId);
 

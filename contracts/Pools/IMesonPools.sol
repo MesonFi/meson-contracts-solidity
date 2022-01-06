@@ -69,10 +69,12 @@ interface IMesonPools {
   /// Emit at the end of `lock()` calls.
   /// @param swapId The ID of the swap
   /// @param provider The address of the bonded provider
-  event SwapLocked(bytes32 swapId, address provider);
+  event SwapLocked(bytes32 swapId, address provider, address recipient);
+
+  event SwapUnlocked(bytes32 swapId);
 
   /// @notice Event when a swap request has been released.
   /// Emit at the end of `release()` calls.
   /// @param swapId The ID of the swap
-  event SwapReleased(bytes32 swapId);
+  event SwapReleased(bytes32 swapId, bytes4 inChain, bytes32 r, bytes32 s, uint8 v);
 }

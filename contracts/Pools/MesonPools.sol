@@ -85,6 +85,8 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
 
     balanceOf[token][provider] = LowGasSafeMath.add(balanceOf[token][provider], amount);
     delete lockingSwaps[swapId];
+
+    emit SwapUnlocked(swapId);
   }
 
   /// @inheritdoc IMesonPools
@@ -123,7 +125,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
 
     _safeTransfer(token, recipient, metaAmount);
 
-    emit SwapReleased(swapId);
+    emit SwapReleased(swapId, inChain, r, s, v);
   }
 
   /// @inheritdoc IMesonPools

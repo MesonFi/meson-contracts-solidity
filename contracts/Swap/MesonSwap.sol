@@ -38,9 +38,10 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
 
   function bondSwap(bytes32 swapId) public override swapExists(swapId) {
     require(requests[swapId].provider == address(0), "swap bonded to another provider");
-    requests[swapId].provider = _msgSender();
+    address provider = _msgSender();
+    requests[swapId].provider = provider;
 
-    emit SwapBonded(swapId);
+    emit SwapBonded(swapId, provider);
   }
 
   /// @inheritdoc IMesonSwap
@@ -61,7 +62,8 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
 
     _unsafeDepositToken(inToken, initiator, amount);
 
-    emit SwapPosted(swapId, expireTs, amount, inToken);
+    emit SwapRequested(swapId, expireTs, amount, inToken);
+    emit SwapBonded(swapId, provider);
     return swapId;
   }
 
