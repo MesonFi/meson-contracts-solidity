@@ -5,7 +5,6 @@ const mainnets = require('../packages/presets/src/mainnets.json')
 const testnets = require('../packages/presets/src/testnets.json')
 
 const networkId = process.env.NETWORK_ID
-const wallet = new ethers.Wallet(privateKey, ethers.provider)
 
 async function main() {
   const network = mainnets.find(item => item.id === networkId)
@@ -19,7 +18,9 @@ async function main() {
   }
 
   const testnet = testnets[index]
+  hre.changeNetwork(testnet.id)
 
+  const wallet = new ethers.Wallet(privateKey, ethers.provider)
   const MockToken = await ethers.getContractFactory('MockToken', wallet)
   const nonce = await ethers.provider.getTransactionCount(wallet.address)
   const tokens = []
