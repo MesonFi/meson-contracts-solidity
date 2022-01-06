@@ -1,2 +1,4 @@
-export { default as Meson } from './Meson.json'
-export { default as ERC20 } from './ERC20.json'
+const Meson = require('./Meson.json')
+const ERC20 = require('./ERC20.json')
+
+module.exports = { Meson, ERC20 }
