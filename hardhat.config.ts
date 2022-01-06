@@ -44,6 +44,9 @@ export default {
       accounts: 'remote',
       timeout: 0,
     },
+    ropsten: {
+      url: `https://ropsten.infura.io/v3/cc547d769203404cb928ec965af26894`,
+    }
   },
   typechain: {
     outDir: 'packages/contract-types/types',
