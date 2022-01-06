@@ -21,11 +21,11 @@ export interface MesonPoolsTestInterface extends utils.Interface {
   functions: {
     "addTokenToSwapList(address)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
-    "challenge(address,bytes,uint256,bytes,address,address,uint256)": FunctionFragment;
+    "challenge()": FunctionFragment;
     "deposit(address,uint256)": FunctionFragment;
     "getCoinType()": FunctionFragment;
     "hasLockingSwap(bytes32)": FunctionFragment;
-    "lock(bytes,address,address,address)": FunctionFragment;
+    "lock(bytes32,address,uint256,address,address)": FunctionFragment;
     "lockingSwaps(bytes32)": FunctionFragment;
     "release(bytes32,uint256,bytes32,bytes32,uint8)": FunctionFragment;
     "supportedTokens(address)": FunctionFragment;
@@ -43,18 +43,7 @@ export interface MesonPoolsTestInterface extends utils.Interface {
     functionFragment: "balanceOf",
     values: [string, string]
   ): string;
-  encodeFunctionData(
-    functionFragment: "challenge",
-    values: [
-      string,
-      BytesLike,
-      BigNumberish,
-      BytesLike,
-      string,
-      string,
-      BigNumberish
-    ]
-  ): string;
+  encodeFunctionData(functionFragment: "challenge", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "deposit",
     values: [string, BigNumberish]
@@ -69,7 +58,7 @@ export interface MesonPoolsTestInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "lock",
-    values: [BytesLike, string, string, string]
+    values: [BytesLike, string, BigNumberish, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "lockingSwaps",
@@ -192,13 +181,6 @@ export interface MesonPoolsTest extends BaseContract {
     ): Promise<[BigNumber]>;
 
     challenge(
-      provider: string,
-      signature: BytesLike,
-      metaAmount: BigNumberish,
-      inToken: BytesLike,
-      outToken: string,
-      receiver: string,
-      ts: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -216,8 +198,9 @@ export interface MesonPoolsTest extends BaseContract {
     ): Promise<[boolean]>;
 
     lock(
-      encodedSwap: BytesLike,
+      swapId: BytesLike,
       initiator: string,
+      amount: BigNumberish,
       token: string,
       recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -285,13 +268,6 @@ export interface MesonPoolsTest extends BaseContract {
   ): Promise<BigNumber>;
 
   challenge(
-    provider: string,
-    signature: BytesLike,
-    metaAmount: BigNumberish,
-    inToken: BytesLike,
-    outToken: string,
-    receiver: string,
-    ts: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -309,8 +285,9 @@ export interface MesonPoolsTest extends BaseContract {
   ): Promise<boolean>;
 
   lock(
-    encodedSwap: BytesLike,
+    swapId: BytesLike,
     initiator: string,
+    amount: BigNumberish,
     token: string,
     recipient: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -365,16 +342,7 @@ export interface MesonPoolsTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    challenge(
-      provider: string,
-      signature: BytesLike,
-      metaAmount: BigNumberish,
-      inToken: BytesLike,
-      outToken: string,
-      receiver: string,
-      ts: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    challenge(overrides?: CallOverrides): Promise<void>;
 
     deposit(
       token: string,
@@ -390,8 +358,9 @@ export interface MesonPoolsTest extends BaseContract {
     ): Promise<boolean>;
 
     lock(
-      encodedSwap: BytesLike,
+      swapId: BytesLike,
       initiator: string,
+      amount: BigNumberish,
       token: string,
       recipient: string,
       overrides?: CallOverrides
@@ -465,13 +434,6 @@ export interface MesonPoolsTest extends BaseContract {
     ): Promise<BigNumber>;
 
     challenge(
-      provider: string,
-      signature: BytesLike,
-      metaAmount: BigNumberish,
-      inToken: BytesLike,
-      outToken: string,
-      receiver: string,
-      ts: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -489,8 +451,9 @@ export interface MesonPoolsTest extends BaseContract {
     ): Promise<BigNumber>;
 
     lock(
-      encodedSwap: BytesLike,
+      swapId: BytesLike,
       initiator: string,
+      amount: BigNumberish,
       token: string,
       recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -550,13 +513,6 @@ export interface MesonPoolsTest extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     challenge(
-      provider: string,
-      signature: BytesLike,
-      metaAmount: BigNumberish,
-      inToken: BytesLike,
-      outToken: string,
-      receiver: string,
-      ts: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -574,8 +530,9 @@ export interface MesonPoolsTest extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     lock(
-      encodedSwap: BytesLike,
+      swapId: BytesLike,
       initiator: string,
+      amount: BigNumberish,
       token: string,
       recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
