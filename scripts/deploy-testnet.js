@@ -3,8 +3,10 @@ const fs = require('fs')
 const { ethers } = require('hardhat')
 const mainnets = require('@mesonfi/presets/src/mainnets.json')
 const testnets = require('@mesonfi/presets/src/testnets.json')
+require('dotenv').config()
 
 const networkId = process.env.NETWORK_ID
+const privateKey = process.env.PRIVATE_KEY
 
 async function main() {
   const network = mainnets.find(item => item.id === networkId)
