@@ -57,7 +57,7 @@ contract MesonStates is MesonHelpers {
   /// @notice Update demand for a given token; will be called when
   /// a swap is released
   function _updateDemand(address token, uint256 metaAmount) internal {
-    uint256 ts = block.timestamp;
+    uint64 ts = uint64(block.timestamp);
     bytes32 id = keccak256(abi.encodePacked(ts, token, metaAmount)); // TODO something else
     Swap memory swap = Swap(id, metaAmount, ts);
     _recentSwaps[token][id] = swap;
@@ -68,7 +68,7 @@ contract MesonStates is MesonHelpers {
   /// @notice Remove expired swaps and update demand for a given token;
   /// swaps will not count to total demands after TOTAL_DEMAND_CALC_PERIOD
   function _removeExpiredSwaps(address token) internal {
-    uint256 current = block.timestamp;
+    uint64 current = uint64(block.timestamp);
     List.Bytes32List storage list = _recentSwapLists[token];
 
     (bool success, bytes32 id) = list.getTail();

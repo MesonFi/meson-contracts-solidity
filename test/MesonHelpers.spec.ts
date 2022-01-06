@@ -26,9 +26,9 @@ describe('MesonHelpers', () => {
   describe('#encodeSwap', () => {
     it('returns same result as js function', async () => {
       const encodedSwapFromContract = await mesonInstance.encodeSwap(
-        swap.expireTs,
         swap.inToken,
         swap.amount,
+        swap.expireTs,
         swap.outChain,
         swap.outToken,
         swap.recipient
@@ -41,9 +41,9 @@ describe('MesonHelpers', () => {
   describe('#getSwapId', () => {
     it('returns same result as js function', async () => {
       const swapIdFromContract = await mesonInstance.getSwapId(
-        swap.expireTs,
         swap.inToken,
         swap.amount,
+        swap.expireTs,
         swap.outChain,
         swap.outToken,
         swap.recipient

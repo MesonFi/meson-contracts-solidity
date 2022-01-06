@@ -23,7 +23,7 @@ contract MesonHelpers is MesonConfig {
     );
 
   bytes32 internal constant SWAP_REQUEST_TYPEHASH =
-    keccak256(bytes("SwapRequest(uint256 expireTs,bytes inToken,uint256 amount,bytes4 outChain,bytes outToken,bytes recipient)"));
+    keccak256(bytes("SwapRequest(bytes inToken,uint256 amount,uint64 expireTs,bytes4 outChain,bytes outToken,bytes recipient)"));
 
   bytes32 internal constant SWAP_RELEASE_TYPEHASH = keccak256(bytes("SwapRelease(bytes32 swapId)"));
 
@@ -32,7 +32,7 @@ contract MesonHelpers is MesonConfig {
   struct Swap {
     bytes32 id;
     uint256 metaAmount;
-    uint256 ts;
+    uint64 ts;
   }
 
   /// @notice Safe transfers tokens from msg.sender to a recipient
@@ -58,16 +58,16 @@ contract MesonHelpers is MesonConfig {
     IERC20Minimal(token).transferFrom(sender, address(this), amount);
   }
 
-  function _decodeSwapInput(bytes memory encodedSwap) internal pure returns (uint256, bytes32, uint256) {
-    (bytes32 typehash, uint256 expireTs, bytes32 inTokenHash, uint256 amount, , ,) =
-      abi.decode(encodedSwap, (bytes32, uint256, bytes32, uint256, bytes4, bytes32, bytes32));
+  function _decodeSwapInput(bytes memory encodedSwap) internal pure returns (uint64, bytes32, uint256) {
+    (bytes32 typehash, bytes32 inTokenHash, uint256 amount, uint64 expireTs, , ,) =
+      abi.decode(encodedSwap, (bytes32, bytes32, uint256, uint64, bytes4, bytes32, bytes32));
     require(typehash == SWAP_REQUEST_TYPEHASH, "Invalid swap request typehash");
     return (expireTs, inTokenHash, amount);
   }
 
   function _decodeSwapOutput(bytes memory encodedSwap) internal pure returns (uint256, bytes32, bytes32) {
-    (bytes32 typehash, , , uint256 amount, , bytes32 outTokenHash, bytes32 recipientHash) =
-      abi.decode(encodedSwap, (bytes32, uint256, bytes32, uint256, bytes4, bytes32, bytes32));
+    (bytes32 typehash, , uint256 amount, , , bytes32 outTokenHash, bytes32 recipientHash) =
+      abi.decode(encodedSwap, (bytes32, bytes32, uint256, uint64, bytes4, bytes32, bytes32));
     require(typehash == SWAP_REQUEST_TYPEHASH, "Invalid swap request typehash");
     return (amount, outTokenHash, recipientHash);
   }

@@ -25,14 +25,14 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     tokenSupported(inToken)
     returns (bytes32)
   {
-    (bytes32 swapId, uint256 expireTs, uint256 amount) = _verifyEncodedSwap(encodedSwap, inToken);
+    (bytes32 swapId, uint64 expireTs, uint256 amount) = _verifyEncodedSwap(encodedSwap, inToken);
 
     address initiator = _msgSender();
-    requests[swapId] = SwapRequest(initiator, address(0), expireTs, inToken, amount);
+    requests[swapId] = SwapRequest(initiator, address(0), inToken, amount, expireTs);
 
     _unsafeDepositToken(inToken, initiator, amount);
 
-    emit SwapRequested(swapId, expireTs, amount, inToken);
+    emit SwapRequested(swapId);
     return swapId;
   }
 
@@ -52,12 +52,12 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     bytes32 s,
     uint8 v
   ) public override tokenSupported(inToken) returns (bytes32) {
-    (bytes32 swapId, uint256 expireTs, uint256 amount) = _verifyEncodedSwap(encodedSwap, inToken);
+    (bytes32 swapId, uint64 expireTs, uint256 amount) = _verifyEncodedSwap(encodedSwap, inToken);
 
     require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
 
     address provider = _msgSender();
-    requests[swapId] = SwapRequest(initiator, provider, expireTs, inToken, amount);
+    requests[swapId] = SwapRequest(initiator, provider, inToken, amount, expireTs);
 
     _unsafeDepositToken(inToken, initiator, amount);
 
@@ -68,14 +68,14 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
   function _verifyEncodedSwap(bytes memory encodedSwap, address inToken)
     private
     view
-    returns (bytes32, uint256, uint256)
+    returns (bytes32, uint64, uint256)
   {
-    (uint256 expireTs, bytes32 inTokenHash, uint256 amount) = _decodeSwapInput(encodedSwap);
+    (uint64 expireTs, bytes32 inTokenHash, uint256 amount) = _decodeSwapInput(encodedSwap);
 
     require(keccak256(abi.encodePacked(inToken)) == inTokenHash, "inToken does not match");
     require(amount > 0, "swap amount must be greater than zero");
 
-    uint256 ts = block.timestamp;
+    uint64 ts = uint64(block.timestamp);
     require(expireTs > ts + MIN_BOND_TIME_PERIOD, "expires ts too early");
     require(expireTs < ts + MAX_BOND_TIME_PERIOD, "expires ts too late");
 
@@ -108,9 +108,9 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     SwapRequest memory req = requests[swapId];
     _checkReleaseSignature(swapId, req.initiator, r, s, v);
 
-    uint256 amount = req.amount;
     address inToken = req.inToken;
     address provider = req.provider;
+    uint256 amount = req.amount;
 
     delete requests[swapId];
 
@@ -131,7 +131,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
 
   /// @dev Check the swap is bonded
   modifier swapExpired(bytes32 swapId) {
-    require(requests[swapId].expireTs < block.timestamp, "swap not expired");
+    require(requests[swapId].expireTs < uint64(block.timestamp), "swap not expired");
     _;
   }
 
