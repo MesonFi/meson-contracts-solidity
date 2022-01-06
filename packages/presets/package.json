@@ -15,6 +15,7 @@
   ],
   "scripts": {
     "build": "tsc",
+    "postinstall": "yarn build",
     "prepare": "yarn build"
   },
   "dependencies": {

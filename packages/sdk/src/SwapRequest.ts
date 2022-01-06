@@ -47,7 +47,7 @@ export class SwapRequest implements SwapRequestData {
     this.recipient = req.recipient
   }
 
-  encode(): BytesLike {
+  get encode(): BytesLike {
     if (!this._encoded) {
       this._encoded = _TypedDataEncoder.from(SWAP_REQUEST_TYPE).encode(this)
     }

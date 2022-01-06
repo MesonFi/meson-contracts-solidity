@@ -4,8 +4,9 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "build": "hardhat compile --config hardhat.config.ts",
-    "cleanbuild": "hardhat clean && hardhat compile --config hardhat.config.ts",
+    "build": "hardhat compile --config hardhat.config.ts && cp ./artifacts/contracts/Meson.sol/Meson.json packages/contract-abis/abis/Meson.json",
+    "clean": "hardhat clean",
+    "cleanbuild": "yarn clean && yarn build",
     "test": "hardhat --network hardhat test",
     "chain": "node scripts/set-chain-config.js",
     "chain:local": "NETWORK_ID=local yarn chain",
@@ -22,10 +23,10 @@
     "publish": "npm publish --workspaces"
   },
   "devDependencies": {
-    "@mesonfi/contract-abis": "0.1.2",
-    "@mesonfi/contract-types": "0.1.1",
-    "@mesonfi/presets": "0.1.5",
-    "@mesonfi/sdk": "0.1.0",
+    "@mesonfi/contract-abis": "^0.1.2",
+    "@mesonfi/contract-types": "^0.1.1",
+    "@mesonfi/presets": "^0.1.5",
+    "@mesonfi/sdk": "^0.1.0",
     "@nomiclabs/hardhat-ethers": "^2.0.3",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "^4.4.1",
