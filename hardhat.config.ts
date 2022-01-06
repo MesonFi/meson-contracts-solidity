@@ -3,15 +3,20 @@ import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-ethers'
 import 'hardhat-change-network'
 import '@openzeppelin/hardhat-upgrades'
+import dotenv from 'dotenv'
 
-import { task } from 'hardhat/config';
+import { task } from 'hardhat/config'
 import testnets from '@mesonfi/presets/src/testnets.json'
 import config from './config.json'
+
+dotenv.config()
+
+const INFURA_API_KEY = process.env.INFURA_API_KEY as string
 
 const networks = Object.fromEntries(
   testnets
     .filter(item => item.url)
-    .map(item => [item.id, { url: item.url }])
+    .map(item => [item.id, { url: item.url?.replace('${INFURA_API_KEY}', INFURA_API_KEY) }])
 )
 
 task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
@@ -51,9 +56,6 @@ export default {
       url: 'http://localhost:62743',
       accounts: 'remote',
       timeout: 0,
-    },
-    ropsten: {
-      url: `https://ropsten.infura.io/v3/cc547d769203404cb928ec965af26894`,
     },
     ...networks,
   },

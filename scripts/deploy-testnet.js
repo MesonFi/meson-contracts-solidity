@@ -47,6 +47,11 @@ async function main() {
   const meson = await Meson.deploy([mockUSDT.address, mockUSDC.address], { nonce: nonce + 2 })
   console.log('Meson deployed to:', meson.address)
 
+  const coinType = await meson.getCoinType()
+  if (coinType !== testnet.slip44) {
+    throw new Error('Coin type does not match')
+  }
+
   testnet.mesonAddress = meson.address
   testnet.tokens = tokens
   testnets.splice(index, 1, testnet)
