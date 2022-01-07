@@ -7,7 +7,7 @@ import testnets from './testnets.json'
 
 export interface PresetToken {
   addr: string
-  name: string
+  name?: string
   symbol: string
   decimals: number
 }
@@ -15,9 +15,9 @@ export interface PresetToken {
 export interface PresetNetwork {
   id: string
   name: string
-  chainId: string
+  chainId?: string
   slip44: string
-  extensions: string[]
+  extensions?: string[]
   addressFormat: string
   url?: string
   explorer?: string
