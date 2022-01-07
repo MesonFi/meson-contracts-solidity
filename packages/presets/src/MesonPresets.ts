@@ -5,14 +5,14 @@ import { Meson } from '@mesonfi/contract-abis'
 import mainnets from './mainnets.json'
 import testnets from './testnets.json'
 
-export interface Token {
+export interface PresetToken {
   addr: string
   name: string
   symbol: string
   decimals: number
 }
 
-export interface Network {
+export interface PresetNetwork {
   id: string
   name: string
   chainId: string
@@ -27,7 +27,7 @@ export interface Network {
     symbol: string
     decimals: number
   }
-  tokens: Token[]
+  tokens: PresetToken[]
 }
 
 export default class MesonPresets {
@@ -43,7 +43,7 @@ export default class MesonPresets {
     this._useTestnet = v
   }
 
-  getAllNetworks (): Network[] {
+  getAllNetworks (): PresetNetwork[] {
     return this._useTestnet ? testnets : mainnets
   }
 
