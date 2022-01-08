@@ -64,14 +64,14 @@ export default class MesonPresets {
     return match?.tokens || []
   }
 
-  getClient (id, Contract = EthersContract) {
+  getClient (id, provider, Contract = EthersContract) {
     const network = this.getNetwork(id)
     if (!network) {
       console.warn(`Unsupported network: ${id}`)
       return
     }
     if (!this._cache.get(id)) {
-      const instance = new Contract(network.mesonAddress, Meson.abi)
+      const instance = new Contract(network.mesonAddress, Meson.abi, provider)
       const client = new MesonClient(instance, Number(network.chainId), network.slip44)
       this._cache.set(id, client)
     }
