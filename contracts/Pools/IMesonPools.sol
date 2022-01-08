@@ -55,6 +55,7 @@ interface IMesonPools {
   function release(
     bytes32 swapId,
     uint256 metaAmount,
+    bytes32 domainHash,
     bytes32 r,
     bytes32 s,
     uint8 v

@@ -79,14 +79,15 @@ contract MesonHelpers is MesonConfig {
 
   function _checkReleaseSignature(
     bytes32 swapId,
+    bytes32 domainHash,
     address signer,
     bytes32 r,
     bytes32 s,
     uint8 v
-  ) internal view {
+  ) internal pure {
     require(signer != address(0), "signer cannot be empty address");
     bytes32 releaseHash = keccak256(abi.encode(SWAP_RELEASE_TYPEHASH, swapId));
-    bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, releaseHash));
+    bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainHash, releaseHash));
     require(signer == ecrecover(digest, v, r, s), "invalid signature");
   }
 

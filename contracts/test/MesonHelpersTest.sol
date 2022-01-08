@@ -69,6 +69,6 @@ contract MesonHelpersTest is MesonHelpers {
     bytes32 s,
     uint8 v
   ) public view {
-    _checkReleaseSignature(swapId, signer, r, s, v);
+    _checkReleaseSignature(swapId, DOMAIN_SEPARATOR, signer, r, s, v);
   }
 }

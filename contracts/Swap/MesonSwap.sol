@@ -106,7 +106,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     uint8 v
   ) public override swapExists(swapId) {
     SwapRequest memory req = requests[swapId];
-    _checkReleaseSignature(swapId, req.initiator, r, s, v);
+    _checkReleaseSignature(swapId, DOMAIN_SEPARATOR, req.initiator, r, s, v);
 
     uint256 amount = req.amount;
     address inToken = req.inToken;

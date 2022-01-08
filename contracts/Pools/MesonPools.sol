@@ -91,6 +91,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
   function release(
     bytes32 swapId,
     uint256 metaAmount,
+    bytes32 domainHash,
     bytes32 r,
     bytes32 s,
     uint8 v
@@ -102,7 +103,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
       "release amount cannot be greater than locking amount"
     );
 
-    _checkReleaseSignature(swapId, lockingSwap.initiator, r, s, v);
+    _checkReleaseSignature(swapId, domainHash, lockingSwap.initiator, r, s, v);
 
     address token = lockingSwap.token;
     address provider = lockingSwap.provider;
