@@ -36,11 +36,13 @@ export class SwapRequestWithSigner extends SwapRequest {
 
   async exportRelease(wallet: Wallet, initiator = wallet.address) {
     const signature = await this.signRelease(wallet)
+    const domainHash = await this.signer.getDomainHash()
     return {
       swapId: this.swapId,
       initiator: initiator.toLowerCase(),
       chainId: this.signer.chainId,
       mesonAddress: this.signer.mesonAddress,
+      domainHash,
       signature,
     } as SignedSwapReleaseData
   }

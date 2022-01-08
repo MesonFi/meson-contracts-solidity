@@ -26,6 +26,10 @@ export class SwapSigner {
     return this.domain.verifyingContract
   }
 
+  getDomainHash() {
+    return _TypedDataEncoder.hashDomain(this.domain)
+  }
+
   async signSwapRequest(swap: SwapRequestData, wallet: Wallet) {
     const signature = await wallet._signTypedData(this.domain, SWAP_REQUEST_TYPE, swap)
     return this._separateSignature(signature)

@@ -14,6 +14,7 @@ export interface SignedSwapRequestData extends SwapRequestData, SignedSwapCommon
 
 export interface SignedSwapReleaseData extends SignedSwapCommonData {
   swapId: string,
+  domainHash: string,
 }
 
 export class SignedSwapRequest extends SwapRequest {
