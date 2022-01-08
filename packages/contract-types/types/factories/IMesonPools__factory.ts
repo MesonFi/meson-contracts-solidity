@@ -111,6 +111,11 @@ const _abi = [
       },
       {
         internalType: "bytes32",
+        name: "domainHash",
+        type: "bytes32",
+      },
+      {
+        internalType: "bytes32",
         name: "r",
         type: "bytes32",
       },

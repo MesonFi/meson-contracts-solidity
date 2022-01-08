@@ -29,7 +29,7 @@ export interface MesonInterface extends utils.Interface {
     "lock(bytes32,address,uint256,address,address)": FunctionFragment;
     "lockingSwaps(bytes32)": FunctionFragment;
     "postSwap(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
-    "release(bytes32,uint256,bytes32,bytes32,uint8)": FunctionFragment;
+    "release(bytes32,uint256,bytes32,bytes32,bytes32,uint8)": FunctionFragment;
     "requestSwap(bytes,address)": FunctionFragment;
     "requests(bytes32)": FunctionFragment;
     "supportedTokens(address)": FunctionFragment;
@@ -75,7 +75,14 @@ export interface MesonInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "release",
-    values: [BytesLike, BigNumberish, BytesLike, BytesLike, BigNumberish]
+    values: [
+      BytesLike,
+      BigNumberish,
+      BytesLike,
+      BytesLike,
+      BytesLike,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "requestSwap",
@@ -295,6 +302,7 @@ export interface Meson extends BaseContract {
     release(
       swapId: BytesLike,
       metaAmount: BigNumberish,
+      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -419,6 +427,7 @@ export interface Meson extends BaseContract {
   release(
     swapId: BytesLike,
     metaAmount: BigNumberish,
+    domainHash: BytesLike,
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
@@ -526,6 +535,7 @@ export interface Meson extends BaseContract {
     release(
       swapId: BytesLike,
       metaAmount: BigNumberish,
+      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -682,6 +692,7 @@ export interface Meson extends BaseContract {
     release(
       swapId: BytesLike,
       metaAmount: BigNumberish,
+      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -787,6 +798,7 @@ export interface Meson extends BaseContract {
     release(
       swapId: BytesLike,
       metaAmount: BigNumberish,
+      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,

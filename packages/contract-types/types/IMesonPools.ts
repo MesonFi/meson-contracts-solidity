@@ -22,7 +22,7 @@ export interface IMesonPoolsInterface extends utils.Interface {
     "challenge()": FunctionFragment;
     "deposit(address,uint256)": FunctionFragment;
     "lock(bytes32,address,uint256,address,address)": FunctionFragment;
-    "release(bytes32,uint256,bytes32,bytes32,uint8)": FunctionFragment;
+    "release(bytes32,uint256,bytes32,bytes32,bytes32,uint8)": FunctionFragment;
     "unlock(bytes32)": FunctionFragment;
     "withdraw(address,uint256)": FunctionFragment;
   };
@@ -38,7 +38,14 @@ export interface IMesonPoolsInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "release",
-    values: [BytesLike, BigNumberish, BytesLike, BytesLike, BigNumberish]
+    values: [
+      BytesLike,
+      BigNumberish,
+      BytesLike,
+      BytesLike,
+      BytesLike,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(functionFragment: "unlock", values: [BytesLike]): string;
   encodeFunctionData(
@@ -122,6 +129,7 @@ export interface IMesonPools extends BaseContract {
     release(
       swapId: BytesLike,
       metaAmount: BigNumberish,
+      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -162,6 +170,7 @@ export interface IMesonPools extends BaseContract {
   release(
     swapId: BytesLike,
     metaAmount: BigNumberish,
+    domainHash: BytesLike,
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
@@ -200,6 +209,7 @@ export interface IMesonPools extends BaseContract {
     release(
       swapId: BytesLike,
       metaAmount: BigNumberish,
+      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -249,6 +259,7 @@ export interface IMesonPools extends BaseContract {
     release(
       swapId: BytesLike,
       metaAmount: BigNumberish,
+      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -290,6 +301,7 @@ export interface IMesonPools extends BaseContract {
     release(
       swapId: BytesLike,
       metaAmount: BigNumberish,
+      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
