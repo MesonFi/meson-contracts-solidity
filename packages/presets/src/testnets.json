@@ -10,16 +10,16 @@
     ],
     "addressFormat": "hex",
     "url": "https://ropsten.infura.io/v3/${INFURA_API_KEY}",
-    "mesonAddress": "0x26058C8fCF6Ee539738f651C2D555af4448FA91F",
+    "mesonAddress": "0x23c182bC5f18322A782Fdda636827c1eA690360E",
     "tokens": [
       {
-        "addr": "0x39e916A45507F578686F22a5bd2edfaC357Cb0f7",
+        "addr": "0xe12dfEB030E9222e76Cc4331B6FAc52A412C2816",
         "name": "Ropsten USDT",
         "symbol": "mUSDT",
         "decimals": 6
       },
       {
-        "addr": "0x7427ECEbA33f9799aEaf1A1029A16ec9633Ca147",
+        "addr": "0xFb34A815F96b0B308d5A7f0a221FF2Cd79eA48D4",
         "name": "Ropsten USDC",
         "symbol": "mUSDC",
         "decimals": 6
@@ -43,16 +43,16 @@
       "symbol": "tBNB",
       "decimals": 18
     },
-    "mesonAddress": "0x99Bc7819bf34622Cd912874f5ad5e7c7A20BfC42",
+    "mesonAddress": "0x718A525D6cE14e3A251A27d00E77b5fd7ae4BADE",
     "tokens": [
       {
-        "addr": "0xE6831bFB5b8d3A1c6b0DC6a34896b3b25653C4f7",
+        "addr": "0x5A5cFcfBBC90A986e9A64148239D90b403f34f2B",
         "name": "BSC USDT",
         "symbol": "bUSDT",
         "decimals": 6
       },
       {
-        "addr": "0x4ff74957e46F51AE4c4a9F24ce2924ef6bc89235",
+        "addr": "0x857E525a09d6ee1a02dEa3A3FD008643750A49EC",
         "name": "BSC USDC",
         "symbol": "bUSDC",
         "decimals": 6
@@ -76,16 +76,16 @@
       "symbol": "FTM",
       "decimals": 18
     },
-    "mesonAddress": "0x6F2Db76519Ea809122a152Ae643cbC6f499CD5Da",
+    "mesonAddress": "0xD9926c0Cd4BF8c21A29eF2753Bda4Db2f1665Bd6",
     "tokens": [
       {
-        "addr": "0xc24424C27Cf43e4403B42721C86dF782f7788B89",
+        "addr": "0xc3682116015e706F129c4B7E9A1aeF10Eeb38ab4",
         "name": "FTM USDT",
         "symbol": "fUSDT",
         "decimals": 6
       },
       {
-        "addr": "0xCF1511622929F4BA960dfA9b24Be84A8Fc620bd5",
+        "addr": "0x85bD6da81BFB4d1e45adFdac0345Caa297b5aDa1",
         "name": "FTM USDC",
         "symbol": "fUSDC",
         "decimals": 6
@@ -109,16 +109,16 @@
       "symbol": "AVAX",
       "decimals": 18
     },
-    "mesonAddress": "0xD9926c0Cd4BF8c21A29eF2753Bda4Db2f1665Bd6",
+    "mesonAddress": "0x5D4bD50bED01dc3bc7DAda2D1FC9288F79bE3325",
     "tokens": [
       {
-        "addr": "0xc3682116015e706F129c4B7E9A1aeF10Eeb38ab4",
+        "addr": "0x98CBaa81756165a166EFfe7AbAD13b8fA01841df",
         "name": "Ava USDT",
         "symbol": "aUSDT",
         "decimals": 6
       },
       {
-        "addr": "0x85bD6da81BFB4d1e45adFdac0345Caa297b5aDa1",
+        "addr": "0x93D321f0b42d2e012430B6a82A8cb9F5c782CF0A",
         "name": "Ava USDC",
         "symbol": "aUSDC",
         "decimals": 6
@@ -142,16 +142,16 @@
       "symbol": "MATIC",
       "decimals": 18
     },
-    "mesonAddress": "0x6F2Db76519Ea809122a152Ae643cbC6f499CD5Da",
+    "mesonAddress": "0xD9926c0Cd4BF8c21A29eF2753Bda4Db2f1665Bd6",
     "tokens": [
       {
-        "addr": "0xc24424C27Cf43e4403B42721C86dF782f7788B89",
+        "addr": "0xc3682116015e706F129c4B7E9A1aeF10Eeb38ab4",
         "name": "Matic USDT",
         "symbol": "pUSDT",
         "decimals": 6
       },
       {
-        "addr": "0xCF1511622929F4BA960dfA9b24Be84A8Fc620bd5",
+        "addr": "0x85bD6da81BFB4d1e45adFdac0345Caa297b5aDa1",
         "name": "Matic USDC",
         "symbol": "pUSDC",
         "decimals": 6
@@ -175,16 +175,16 @@
       "symbol": "ONE",
       "decimals": 18
     },
-    "mesonAddress": "0xD9926c0Cd4BF8c21A29eF2753Bda4Db2f1665Bd6",
+    "mesonAddress": "0x5D4bD50bED01dc3bc7DAda2D1FC9288F79bE3325",
     "tokens": [
       {
-        "addr": "0xc3682116015e706F129c4B7E9A1aeF10Eeb38ab4",
+        "addr": "0x98CBaa81756165a166EFfe7AbAD13b8fA01841df",
         "name": "One USDT",
         "symbol": "oUSDT",
         "decimals": 6
       },
       {
-        "addr": "0x85bD6da81BFB4d1e45adFdac0345Caa297b5aDa1",
+        "addr": "0x93D321f0b42d2e012430B6a82A8cb9F5c782CF0A",
         "name": "One USDC",
         "symbol": "oUSDC",
         "decimals": 6
