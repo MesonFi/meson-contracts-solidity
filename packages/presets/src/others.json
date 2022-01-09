@@ -1,0 +1,94 @@
+[
+  {
+    "id": "cfx-testnet",
+    "name": "Conflux Testnet",
+    "alias": "CFX",
+    "chainId": "0x1",
+    "slip44": "0x800001f7",
+    "extensions": [
+      "conflux-portal"
+    ],
+    "addressFormat": "cip37",
+    "mesonAddress": "cfxtest:acf4e758reembkssv95w1nr15316uec702grzxh10x",
+    "tokens": [
+      {
+        "addr": "cfxtest:acbwtbb88jeg6gu6c0j1he9c3cahyvbegjfvzx0svb",
+        "name": "Mock cUSDT",
+        "symbol": "cUSDT",
+        "decimals": 6
+      },
+      {
+        "addr": "cfxtest:acbh1myrek1dmd5kr1442e8c2zs239kxvjs2dk7x36",
+        "name": "Mock cUSDC",
+        "symbol": "cUSDC",
+        "decimals": 6
+      }
+    ]
+  },
+  {
+    "id": "heco-testnet",
+    "name": "Heco Testnet",
+    "alias": "Heco",
+    "chainId": "0x100",
+    "slip44": "0x800003f2",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "hex",
+    "url": "https://http-testnet.hecochain.com",
+    "explorer": "https://testnet.hecoinfo.com",
+    "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
+    "nativeCurrency": {
+      "name": "Huobi Token",
+      "symbol": "htt",
+      "decimals": 18
+    },
+    "tokens": [
+      {
+        "addr": "0x01aA3AF577e150F58a6aEa440179c3Cdaad3B8D7",
+        "name": "heco USDT",
+        "symbol": "hUSDT",
+        "decimals": 6
+      },
+      {
+        "addr": "0x08fcc0970095412fdbf24c25c121704f5d7654c3",
+        "name": "heco USDC",
+        "symbol": "hUSDC",
+        "decimals": 6
+      }
+    ]
+  },
+  {
+    "id": "okex-testnet",
+    "name": "OKExChain Testnet",
+    "alias": "OK",
+    "chainId": "0x41",
+    "slip44": "0x800003e4",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "hex",
+    "url": "https://exchaintestrpc.okex.org",
+    "explorer": "https://www.oklink.com/okexchain-test",
+    "mesonAddress": "0xF53689a0D982ff87e0528Ea4D28C218a487af368",
+    "nativeCurrency": {
+      "name": "OKT",
+      "symbol": "OKT",
+      "decimals": 18
+    },
+    "tokens": [
+      {
+        "addr": "0x2d5caa4b9358760247e1b6bef67427002fec2eb9",
+        "name": "Okex USD-T",
+        "symbol": "USDT",
+        "decimals": 6
+      },
+      {
+        "addr": "0x05f5b044ba60d2c5e9f01911825f362883c0cf66",
+        "name": "Okex USD Coin",
+        "symbol": "USDC",
+        "decimals": 6
+      }
+    ]
+  }
+]
