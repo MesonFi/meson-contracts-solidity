@@ -59,7 +59,7 @@ interface IMesonSwap {
     bytes32 r,
     bytes32 s,
     uint8 v,
-    bool deposit
+    bool depositToPool
   ) external;
 
   /// @notice Event when a new swap is requested.

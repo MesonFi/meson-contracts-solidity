@@ -58,12 +58,13 @@ export class MesonClient {
     )
   }
 
-  async executeSwap(signedRelease: SignedSwapReleaseData) {
+  async executeSwap(signedRelease: SignedSwapReleaseData, depositToPool: boolean = false) {
     this._check(signedRelease)
     return this.mesonInstance.executeSwap(
       signedRelease.swapId,
       signedRelease.recipient,
-      ...signedRelease.signature
+      ...signedRelease.signature,
+      depositToPool
     )
   }
 }
