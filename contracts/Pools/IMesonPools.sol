@@ -9,7 +9,7 @@ interface IMesonPools {
     address token;
     uint256 amount;
     address recipient;
-    uint256 until;
+    uint64 until;
   }
 
   /// @notice Deposit tokens into the liquidity pool. This is the

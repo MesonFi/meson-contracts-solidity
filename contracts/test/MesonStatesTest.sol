@@ -28,7 +28,7 @@ contract MesonStatesTest is MesonStates {
     _removeExpiredSwaps(token);
   }
 
-  function addRecentSwap(address token, bytes32 id, uint256 metaAmount, uint256 ts) public {
+  function addRecentSwap(address token, bytes32 id, uint256 metaAmount, uint64 ts) public {
     Swap memory swap = Swap(id, metaAmount, ts);
     _recentSwaps[token][id] = swap;
     _recentSwapLists[token].addItem(id);

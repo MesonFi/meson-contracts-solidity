@@ -66,7 +66,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
       token,
       amount,
       recipient,
-      block.timestamp + LOCK_TIME_PERIOD
+      uint64(block.timestamp) + LOCK_TIME_PERIOD
     );
 
     emit SwapLocked(swapId, provider);
@@ -77,7 +77,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     require(_hasLockingSwap(swapId), "swap does not exist");
 
     LockingSwap memory lockingSwap = lockingSwaps[swapId];
-    require(block.timestamp > lockingSwap.until, "The swap is still in lock");
+    require(uint64(block.timestamp) > lockingSwap.until, "The swap is still in lock");
 
     address token = lockingSwap.token;
     uint256 amount = lockingSwap.amount;

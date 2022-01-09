@@ -3,9 +3,9 @@ import { BytesLike } from '@ethersproject/bytes'
 
 export const SWAP_REQUEST_TYPE = {
   SwapRequest: [
-    { name: 'expireTs', type: 'uint256' },
     { name: 'inToken', type: 'bytes' },
     { name: 'amount', type: 'uint256' },
+    { name: 'expireTs', type: 'uint64' },
     { name: 'outChain', type: 'bytes4' },
     { name: 'outToken', type: 'bytes' },
     { name: 'recipient', type: 'bytes' },

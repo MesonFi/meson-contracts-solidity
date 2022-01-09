@@ -5,18 +5,18 @@ import "../utils/MesonHelpers.sol";
 
 contract MesonHelpersTest is MesonHelpers {
   function getSwapId(
-    uint256 expireTs,
     address inToken,
     uint256 amount,
+    uint64 expireTs,
     bytes4 outChain,
     bytes memory outToken,
     bytes memory recipient
   ) external view returns (bytes32) {
     return _getSwapId(
       encodeSwap(
-        expireTs,
         abi.encodePacked(inToken),
         amount,
+        expireTs,
         outChain,
         outToken,
         recipient
@@ -25,9 +25,9 @@ contract MesonHelpersTest is MesonHelpers {
   }
 
   function encodeSwap(
-    uint256 expireTs,
     bytes memory inToken,
     uint256 amount,
+    uint64 expireTs,
     bytes4 outChain,
     bytes memory outToken,
     bytes memory recipient
@@ -35,9 +35,9 @@ contract MesonHelpersTest is MesonHelpers {
     return
       abi.encode(
         SWAP_REQUEST_TYPEHASH,
-        expireTs,
         keccak256(inToken),
         amount,
+        expireTs,
         outChain,
         keccak256(outToken),
         keccak256(recipient)
