@@ -55,6 +55,7 @@ interface IMesonSwap {
   /// @param swapId The ID of the swap
   function executeSwap(
     bytes32 swapId,
+    bytes memory recipient,
     bytes32 r,
     bytes32 s,
     uint8 v

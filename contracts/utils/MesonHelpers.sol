@@ -23,9 +23,9 @@ contract MesonHelpers is MesonConfig {
     );
 
   bytes32 internal constant SWAP_REQUEST_TYPEHASH =
-    keccak256(bytes("SwapRequest(bytes inToken,uint256 amount,uint64 expireTs,bytes4 outChain,bytes outToken,bytes recipient)"));
+    keccak256(bytes("SwapRequest(bytes inToken,uint256 amount,uint64 expireTs,bytes4 outChain,bytes outToken)"));
 
-  bytes32 internal constant SWAP_RELEASE_TYPEHASH = keccak256(bytes("SwapRelease(bytes32 swapId)"));
+  bytes32 internal constant SWAP_RELEASE_TYPEHASH = keccak256(bytes("SwapRelease(bytes32 swapId,bytes recipient)"));
 
   bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
 
@@ -59,17 +59,17 @@ contract MesonHelpers is MesonConfig {
   }
 
   function _decodeSwapInput(bytes memory encodedSwap) internal pure returns (uint64, bytes32, uint256) {
-    (bytes32 typehash, bytes32 inTokenHash, uint256 amount, uint64 expireTs, , ,) =
-      abi.decode(encodedSwap, (bytes32, bytes32, uint256, uint64, bytes4, bytes32, bytes32));
+    (bytes32 typehash, bytes32 inTokenHash, uint256 amount, uint64 expireTs, ,) =
+      abi.decode(encodedSwap, (bytes32, bytes32, uint256, uint64, bytes4, bytes32));
     require(typehash == SWAP_REQUEST_TYPEHASH, "Invalid swap request typehash");
     return (expireTs, inTokenHash, amount);
   }
 
-  function _decodeSwapOutput(bytes memory encodedSwap) internal pure returns (uint256, bytes32, bytes32) {
-    (bytes32 typehash, , uint256 amount, , , bytes32 outTokenHash, bytes32 recipientHash) =
-      abi.decode(encodedSwap, (bytes32, bytes32, uint256, uint64, bytes4, bytes32, bytes32));
+  function _decodeSwapOutput(bytes memory encodedSwap) internal pure returns (uint256, bytes32) {
+    (bytes32 typehash, , uint256 amount, , , bytes32 outTokenHash) =
+      abi.decode(encodedSwap, (bytes32, bytes32, uint256, uint64, bytes4, bytes32));
     require(typehash == SWAP_REQUEST_TYPEHASH, "Invalid swap request typehash");
-    return (amount, outTokenHash, recipientHash);
+    return (amount, outTokenHash);
   }
 
   function _getSwapId(bytes memory encodedSwap) internal view returns (bytes32) {
@@ -79,6 +79,7 @@ contract MesonHelpers is MesonConfig {
 
   function _checkReleaseSignature(
     bytes32 swapId,
+    bytes32 recipientHash,
     bytes32 domainHash,
     address signer,
     bytes32 r,
@@ -86,7 +87,7 @@ contract MesonHelpers is MesonConfig {
     uint8 v
   ) internal pure {
     require(signer != address(0), "signer cannot be empty address");
-    bytes32 releaseHash = keccak256(abi.encode(SWAP_RELEASE_TYPEHASH, swapId));
+    bytes32 releaseHash = keccak256(abi.encode(SWAP_RELEASE_TYPEHASH, swapId, recipientHash));
     bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainHash, releaseHash));
     require(signer == ecrecover(digest, v, r, s), "invalid signature");
   }

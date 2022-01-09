@@ -9,8 +9,7 @@ contract MesonHelpersTest is MesonHelpers {
     uint256 amount,
     uint64 expireTs,
     bytes4 outChain,
-    bytes memory outToken,
-    bytes memory recipient
+    bytes memory outToken
   ) external view returns (bytes32) {
     return _getSwapId(
       encodeSwap(
@@ -18,8 +17,7 @@ contract MesonHelpersTest is MesonHelpers {
         amount,
         expireTs,
         outChain,
-        outToken,
-        recipient
+        outToken
       )
     );
   }
@@ -29,8 +27,7 @@ contract MesonHelpersTest is MesonHelpers {
     uint256 amount,
     uint64 expireTs,
     bytes4 outChain,
-    bytes memory outToken,
-    bytes memory recipient
+    bytes memory outToken
   ) public pure returns (bytes memory) {
     return
       abi.encode(
@@ -39,8 +36,7 @@ contract MesonHelpersTest is MesonHelpers {
         amount,
         expireTs,
         outChain,
-        keccak256(outToken),
-        keccak256(recipient)
+        keccak256(outToken)
       );
   }
 
@@ -64,11 +60,12 @@ contract MesonHelpersTest is MesonHelpers {
 
   function checkReleaseSignature(
     bytes32 swapId,
+    address recipient,
     address signer,
     bytes32 r,
     bytes32 s,
     uint8 v
   ) public view {
-    _checkReleaseSignature(swapId, DOMAIN_SEPARATOR, signer, r, s, v);
+    _checkReleaseSignature(swapId, keccak256(abi.encodePacked(recipient)), DOMAIN_SEPARATOR, signer, r, s, v);
   }
 }

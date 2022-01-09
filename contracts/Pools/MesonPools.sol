@@ -51,8 +51,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     bytes32 swapId,
     address initiator,
     uint256 amount,
-    address token,
-    address recipient
+    address token
   ) public override tokenSupported(token) {
     require(amount > 0, "amount must be greater than zero");
     require(!_hasLockingSwap(swapId), "locking swap already exists");
@@ -65,7 +64,6 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
       provider,
       token,
       amount,
-      recipient,
       uint64(block.timestamp) + LOCK_TIME_PERIOD
     );
 
@@ -90,6 +88,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
   /// @inheritdoc IMesonPools
   function release(
     bytes32 swapId,
+    address recipient,
     uint256 metaAmount,
     bytes32 domainHash,
     bytes32 r,
@@ -103,11 +102,10 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
       "release amount cannot be greater than locking amount"
     );
 
-    _checkReleaseSignature(swapId, domainHash, lockingSwap.initiator, r, s, v);
+    _checkReleaseSignature(swapId, keccak256(abi.encodePacked(recipient)), domainHash, lockingSwap.initiator, r, s, v);
 
     address token = lockingSwap.token;
     address provider = lockingSwap.provider;
-    address recipient = lockingSwap.recipient;
 
     // uint256 amount = _fromMetaAmount(token, metaAmount);
     // _updateDemand(token, metaAmount);

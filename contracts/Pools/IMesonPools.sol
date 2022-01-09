@@ -8,7 +8,6 @@ interface IMesonPools {
     address provider;
     address token;
     uint256 amount;
-    address recipient;
     uint64 until;
   }
 
@@ -36,8 +35,7 @@ interface IMesonPools {
     bytes32 swapId,
     address initiator,
     uint256 amount,
-    address token,
-    address recipient
+    address token
   ) external;
 
   /// @notice Unlock tokens
@@ -54,6 +52,7 @@ interface IMesonPools {
   /// @param metaAmount The meta-amount of token to swap (not the exact releasing amount)
   function release(
     bytes32 swapId,
+    address recipient,
     uint256 metaAmount,
     bytes32 domainHash,
     bytes32 r,

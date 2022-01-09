@@ -101,12 +101,13 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
   /// @inheritdoc IMesonSwap
   function executeSwap(
     bytes32 swapId,
+    bytes memory recipient,
     bytes32 r,
     bytes32 s,
     uint8 v
   ) public override swapExists(swapId) {
     SwapRequest memory req = requests[swapId];
-    _checkReleaseSignature(swapId, DOMAIN_SEPARATOR, req.initiator, r, s, v);
+    _checkReleaseSignature(swapId, keccak256(recipient), DOMAIN_SEPARATOR, req.initiator, r, s, v);
 
     address inToken = req.inToken;
     address provider = req.provider;
