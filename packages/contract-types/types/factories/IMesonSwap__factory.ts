@@ -57,9 +57,9 @@ const _abi = [
       },
       {
         indexed: false,
-        internalType: "uint256",
+        internalType: "uint64",
         name: "expireTs",
-        type: "uint256",
+        type: "uint64",
       },
       {
         indexed: false,
@@ -85,24 +85,6 @@ const _abi = [
         internalType: "bytes32",
         name: "swapId",
         type: "bytes32",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "expireTs",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "inToken",
-        type: "address",
       },
     ],
     name: "SwapRequested",
@@ -140,6 +122,11 @@ const _abi = [
         internalType: "bytes32",
         name: "swapId",
         type: "bytes32",
+      },
+      {
+        internalType: "bytes",
+        name: "recipient",
+        type: "bytes",
       },
       {
         internalType: "bytes32",

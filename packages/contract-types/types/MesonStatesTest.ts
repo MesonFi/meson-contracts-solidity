@@ -50,7 +50,7 @@ export type Bytes32ListStructOutput = [
 
 export interface MesonStatesTestInterface extends utils.Interface {
   functions: {
-    "addRecentSwap(address,bytes32,uint256,uint256)": FunctionFragment;
+    "addRecentSwap(address,bytes32,uint256,uint64)": FunctionFragment;
     "decreaseSupply(address,uint256)": FunctionFragment;
     "getCoinType()": FunctionFragment;
     "getRecentSwap(address,bytes32)": FunctionFragment;

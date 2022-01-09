@@ -86,11 +86,6 @@ const _abi = [
         name: "token",
         type: "address",
       },
-      {
-        internalType: "address",
-        name: "recipient",
-        type: "address",
-      },
     ],
     name: "lock",
     outputs: [],
@@ -103,6 +98,11 @@ const _abi = [
         internalType: "bytes32",
         name: "swapId",
         type: "bytes32",
+      },
+      {
+        internalType: "address",
+        name: "recipient",
+        type: "address",
       },
       {
         internalType: "uint256",

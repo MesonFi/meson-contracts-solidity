@@ -21,7 +21,7 @@ export interface IMesonSwapInterface extends utils.Interface {
   functions: {
     "bondSwap(bytes32)": FunctionFragment;
     "cancelSwap(bytes32)": FunctionFragment;
-    "executeSwap(bytes32,bytes32,bytes32,uint8)": FunctionFragment;
+    "executeSwap(bytes32,bytes,bytes32,bytes32,uint8)": FunctionFragment;
     "postSwap(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
     "requestSwap(bytes,address)": FunctionFragment;
   };
@@ -33,7 +33,7 @@ export interface IMesonSwapInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "executeSwap",
-    values: [BytesLike, BytesLike, BytesLike, BigNumberish]
+    values: [BytesLike, BytesLike, BytesLike, BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "postSwap",
@@ -60,8 +60,8 @@ export interface IMesonSwapInterface extends utils.Interface {
     "SwapBonded(bytes32)": EventFragment;
     "SwapCancelled(bytes32)": EventFragment;
     "SwapExecuted(bytes32)": EventFragment;
-    "SwapPosted(bytes32,uint256,uint256,address)": EventFragment;
-    "SwapRequested(bytes32,uint256,uint256,address)": EventFragment;
+    "SwapPosted(bytes32,uint64,uint256,address)": EventFragment;
+    "SwapRequested(bytes32)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "SwapBonded"): EventFragment;
@@ -90,10 +90,7 @@ export type SwapPostedEvent = TypedEvent<
 
 export type SwapPostedEventFilter = TypedEventFilter<SwapPostedEvent>;
 
-export type SwapRequestedEvent = TypedEvent<
-  [string, BigNumber, BigNumber, string],
-  { swapId: string; expireTs: BigNumber; amount: BigNumber; inToken: string }
->;
+export type SwapRequestedEvent = TypedEvent<[string], { swapId: string }>;
 
 export type SwapRequestedEventFilter = TypedEventFilter<SwapRequestedEvent>;
 
@@ -136,6 +133,7 @@ export interface IMesonSwap extends BaseContract {
 
     executeSwap(
       swapId: BytesLike,
+      recipient: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -171,6 +169,7 @@ export interface IMesonSwap extends BaseContract {
 
   executeSwap(
     swapId: BytesLike,
+    recipient: BytesLike,
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
@@ -200,6 +199,7 @@ export interface IMesonSwap extends BaseContract {
 
     executeSwap(
       swapId: BytesLike,
+      recipient: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -233,7 +233,7 @@ export interface IMesonSwap extends BaseContract {
     "SwapExecuted(bytes32)"(swapId?: null): SwapExecutedEventFilter;
     SwapExecuted(swapId?: null): SwapExecutedEventFilter;
 
-    "SwapPosted(bytes32,uint256,uint256,address)"(
+    "SwapPosted(bytes32,uint64,uint256,address)"(
       swapId?: null,
       expireTs?: null,
       amount?: null,
@@ -246,18 +246,8 @@ export interface IMesonSwap extends BaseContract {
       inToken?: null
     ): SwapPostedEventFilter;
 
-    "SwapRequested(bytes32,uint256,uint256,address)"(
-      swapId?: null,
-      expireTs?: null,
-      amount?: null,
-      inToken?: null
-    ): SwapRequestedEventFilter;
-    SwapRequested(
-      swapId?: null,
-      expireTs?: null,
-      amount?: null,
-      inToken?: null
-    ): SwapRequestedEventFilter;
+    "SwapRequested(bytes32)"(swapId?: null): SwapRequestedEventFilter;
+    SwapRequested(swapId?: null): SwapRequestedEventFilter;
   };
 
   estimateGas: {
@@ -273,6 +263,7 @@ export interface IMesonSwap extends BaseContract {
 
     executeSwap(
       swapId: BytesLike,
+      recipient: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -309,6 +300,7 @@ export interface IMesonSwap extends BaseContract {
 
     executeSwap(
       swapId: BytesLike,
+      recipient: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,

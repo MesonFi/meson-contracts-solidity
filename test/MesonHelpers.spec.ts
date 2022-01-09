@@ -1,5 +1,5 @@
 import { ethers, waffle } from 'hardhat'
-import { MesonClient, SwapRequestWithSigner } from '@mesonfi/sdk'
+import { MesonClient, PartialSwapRequest, SwapRequestWithSigner } from '@mesonfi/sdk'
 import mesonPresets from '@mesonfi/presets'
 import { MesonHelpersTest } from '@mesonfi/contract-types'
 
@@ -10,6 +10,7 @@ import { getDefaultSwap } from './shared/meson'
 describe('MesonHelpers', () => {
   let mesonInstance: MesonHelpersTest
   let mesonClient: MesonClient
+  let swapData: PartialSwapRequest
   let swap: SwapRequestWithSigner
 
   const fixture = async () => {
@@ -21,7 +22,8 @@ describe('MesonHelpers', () => {
     mesonInstance = await waffle.loadFixture(fixture)
     const outChain = await mesonInstance.getCoinType()
     mesonClient = await MesonClient.Create(mesonInstance)
-    swap = mesonClient.requestSwap(outChain, getDefaultSwap())
+    swapData = getDefaultSwap()
+    swap = mesonClient.requestSwap(outChain, swapData)
   })
 
   describe('#encodeSwap', () => {
@@ -31,8 +33,7 @@ describe('MesonHelpers', () => {
         swap.amount,
         swap.expireTs,
         swap.outChain,
-        swap.outToken,
-        swap.recipient
+        swap.outToken
       )
 
       expect(encodedSwapFromContract).to.equal(swap.encode())
@@ -61,8 +62,7 @@ describe('MesonHelpers', () => {
         swap.amount,
         swap.expireTs,
         swap.outChain,
-        swap.outToken,
-        swap.recipient
+        swap.outToken
       )
 
       expect(swapIdFromContract).to.equal(swap.swapId)
@@ -87,8 +87,8 @@ describe('MesonHelpers', () => {
 
   describe('#checkReleaseSignature', () => {
     it('validates a release signature', async () => {
-      const sigs = await swap.signRelease(wallet)
-      await mesonInstance.checkReleaseSignature(swap.swapId, wallet.address, ...sigs)
+      const sigs = await swap.signRelease(wallet, swapData.recipient)
+      await mesonInstance.checkReleaseSignature(swap.swapId, swapData.recipient, wallet.address, ...sigs)
     })
   })
 })

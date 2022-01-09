@@ -54,14 +54,15 @@ describe('MesonSwap', () => {
 
   describe('#executeSwap', () => {
     it('can execute a swap', async () => {
-      const swap = userClient.requestSwap(outChain, getDefaultSwap({ inToken: token.address }))
+      const swapData = getDefaultSwap({ inToken: token.address })
+      const swap = userClient.requestSwap(outChain, swapData)
       const exported = await swap.exportRequest(initiator)
       
       const signedRequest = new SignedSwapRequest(exported)
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
-      const signedRelease = await swap.exportRelease(initiator)
+      const signedRelease = await swap.exportRelease(initiator, swapData.recipient)
       SignedSwapRequest.CheckReleaseSignature(signedRelease)
       await lpClient.executeSwap(signedRelease)
 

@@ -25,9 +25,9 @@ export interface MesonPoolsTestInterface extends utils.Interface {
     "deposit(address,uint256)": FunctionFragment;
     "getCoinType()": FunctionFragment;
     "hasLockingSwap(bytes32)": FunctionFragment;
-    "lock(bytes32,address,uint256,address,address)": FunctionFragment;
+    "lock(bytes32,address,uint256,address)": FunctionFragment;
     "lockingSwaps(bytes32)": FunctionFragment;
-    "release(bytes32,uint256,bytes32,bytes32,bytes32,uint8)": FunctionFragment;
+    "release(bytes32,address,uint256,bytes32,bytes32,bytes32,uint8)": FunctionFragment;
     "supportedTokens(address)": FunctionFragment;
     "totalDemandFor(address)": FunctionFragment;
     "totalSupplyFor(address)": FunctionFragment;
@@ -58,7 +58,7 @@ export interface MesonPoolsTestInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "lock",
-    values: [BytesLike, string, BigNumberish, string, string]
+    values: [BytesLike, string, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "lockingSwaps",
@@ -68,6 +68,7 @@ export interface MesonPoolsTestInterface extends utils.Interface {
     functionFragment: "release",
     values: [
       BytesLike,
+      string,
       BigNumberish,
       BytesLike,
       BytesLike,
@@ -209,7 +210,6 @@ export interface MesonPoolsTest extends BaseContract {
       initiator: string,
       amount: BigNumberish,
       token: string,
-      recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -217,18 +217,18 @@ export interface MesonPoolsTest extends BaseContract {
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, BigNumber, string, BigNumber] & {
+      [string, string, string, BigNumber, BigNumber] & {
         initiator: string;
         provider: string;
         token: string;
         amount: BigNumber;
-        recipient: string;
         until: BigNumber;
       }
     >;
 
     release(
       swapId: BytesLike,
+      recipient: string,
       metaAmount: BigNumberish,
       domainHash: BytesLike,
       r: BytesLike,
@@ -297,7 +297,6 @@ export interface MesonPoolsTest extends BaseContract {
     initiator: string,
     amount: BigNumberish,
     token: string,
-    recipient: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -305,18 +304,18 @@ export interface MesonPoolsTest extends BaseContract {
     arg0: BytesLike,
     overrides?: CallOverrides
   ): Promise<
-    [string, string, string, BigNumber, string, BigNumber] & {
+    [string, string, string, BigNumber, BigNumber] & {
       initiator: string;
       provider: string;
       token: string;
       amount: BigNumber;
-      recipient: string;
       until: BigNumber;
     }
   >;
 
   release(
     swapId: BytesLike,
+    recipient: string,
     metaAmount: BigNumberish,
     domainHash: BytesLike,
     r: BytesLike,
@@ -371,7 +370,6 @@ export interface MesonPoolsTest extends BaseContract {
       initiator: string,
       amount: BigNumberish,
       token: string,
-      recipient: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -379,18 +377,18 @@ export interface MesonPoolsTest extends BaseContract {
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, BigNumber, string, BigNumber] & {
+      [string, string, string, BigNumber, BigNumber] & {
         initiator: string;
         provider: string;
         token: string;
         amount: BigNumber;
-        recipient: string;
         until: BigNumber;
       }
     >;
 
     release(
       swapId: BytesLike,
+      recipient: string,
       metaAmount: BigNumberish,
       domainHash: BytesLike,
       r: BytesLike,
@@ -465,7 +463,6 @@ export interface MesonPoolsTest extends BaseContract {
       initiator: string,
       amount: BigNumberish,
       token: string,
-      recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -476,6 +473,7 @@ export interface MesonPoolsTest extends BaseContract {
 
     release(
       swapId: BytesLike,
+      recipient: string,
       metaAmount: BigNumberish,
       domainHash: BytesLike,
       r: BytesLike,
@@ -545,7 +543,6 @@ export interface MesonPoolsTest extends BaseContract {
       initiator: string,
       amount: BigNumberish,
       token: string,
-      recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -556,6 +553,7 @@ export interface MesonPoolsTest extends BaseContract {
 
     release(
       swapId: BytesLike,
+      recipient: string,
       metaAmount: BigNumberish,
       domainHash: BytesLike,
       r: BytesLike,

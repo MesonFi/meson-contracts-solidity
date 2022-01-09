@@ -88,7 +88,7 @@ describe('MesonPools', () => {
       const signedRequest = new SignedSwapRequest(exported)
       await token.approve(mesonInstance.address, signedRequest.amount)
       await mesonInstance.deposit(signedRequest.outToken, signedRequest.amount)
-      await mesonInstance.lock(signedRequest.swapId, signedRequest.initiator, signedRequest.amount, signedRequest.outToken, signedRequest.recipient)
+      await mesonInstance.lock(signedRequest.swapId, signedRequest.initiator, signedRequest.amount, signedRequest.outToken)
 
       expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
       expect(await mesonInstance.hasLockingSwap(swap.swapId)).to.equal(true)
@@ -97,20 +97,21 @@ describe('MesonPools', () => {
 
   describe('#release', async () => {
     it('accepts a release', async () => {
-      const swap = userClient.requestSwap(outChain, getDefaultSwap({ outToken: token.address }))
+      const swapData = getDefaultSwap({ outToken: token.address })
+      const swap = userClient.requestSwap(outChain, swapData)
       const exported = await swap.exportRequest(initiator)
       
       const signedRequest = new SignedSwapRequest(exported)
       await token.approve(mesonInstance.address, signedRequest.amount)
       await mesonInstance.deposit(signedRequest.outToken, signedRequest.amount)
-      await mesonInstance.lock(signedRequest.swapId, signedRequest.initiator, signedRequest.amount, signedRequest.outToken, signedRequest.recipient)
+      await mesonInstance.lock(signedRequest.swapId, signedRequest.initiator, signedRequest.amount, signedRequest.outToken)
 
-      const signedRelease = await swap.exportRelease(initiator)
+      const signedRelease = await swap.exportRelease(initiator, swapData.recipient)
       SignedSwapRequest.CheckReleaseSignature(signedRelease)
-      await mesonInstance.release(signedRelease.swapId, swap.amount, signedRelease.domainHash, ...signedRelease.signature)
+      await mesonInstance.release(signedRelease.swapId, signedRelease.recipient, swap.amount, signedRelease.domainHash, ...signedRelease.signature)
 
       expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
-      expect(await token.balanceOf(swap.recipient)).to.equal(swap.amount)
+      expect(await token.balanceOf(swapData.recipient)).to.equal(swap.amount)
     })
   })
 })
