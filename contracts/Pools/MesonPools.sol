@@ -14,8 +14,6 @@ import "../utils/MesonPricing.sol";
 /// Methods in this class will be executed by LPs when users want to
 /// swap into the current chain.
 contract MesonPools is Context, IMesonPools, MesonPricing {
-  mapping(address => mapping(address => uint256)) public balanceOf;
-
   mapping(bytes32 => LockingSwap) public lockingSwaps;
 
   /// @inheritdoc IMesonPools

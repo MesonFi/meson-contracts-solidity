@@ -13,6 +13,8 @@ contract MesonStates is MesonHelpers {
 
   mapping(address => bool) public supportedTokens;
 
+  mapping(address => mapping(address => uint256)) public balanceOf;
+
   mapping(address => mapping(bytes32 => Swap)) internal _recentSwaps;
   mapping(address => List.Bytes32List) internal _recentSwapLists;
 

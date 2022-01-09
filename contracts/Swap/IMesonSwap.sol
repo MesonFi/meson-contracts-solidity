@@ -35,7 +35,8 @@ interface IMesonSwap {
     address initiator,
     bytes32 r,
     bytes32 s,
-    uint8 v
+    uint8 v,
+    bool deposit
   ) external returns (bytes32 swapId);
 
   /// @notice Cancel a swap

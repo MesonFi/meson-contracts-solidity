@@ -104,7 +104,8 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     bytes memory recipient,
     bytes32 r,
     bytes32 s,
-    uint8 v
+    uint8 v,
+    bool deposit
   ) public override swapExists(swapId) {
     SwapRequest memory req = requests[swapId];
     _checkReleaseSignature(swapId, keccak256(recipient), DOMAIN_SEPARATOR, req.initiator, r, s, v);
@@ -115,7 +116,11 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
 
     delete requests[swapId];
 
-    _safeTransfer(inToken, provider, amount);
+    if (deposit) {
+      balanceOf[inToken][provider] = LowGasSafeMath.add(balanceOf[inToken][provider], amount);
+    } else {
+      _safeTransfer(inToken, provider, amount);
+    }
 
     emit SwapExecuted(swapId);
   }
