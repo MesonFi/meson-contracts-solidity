@@ -5,42 +5,49 @@ const mainnets = require('@mesonfi/presets/src/mainnets.json')
 const testnets = require('@mesonfi/presets/src/testnets.json')
 require('dotenv').config()
 
-const networkId = process.env.NETWORK_ID
-const privateKey = process.env.PRIVATE_KEY
+const { NETWORK_ID, PRIVATE_KEY, DEPOSIT_ON_DEPLOY } = process.env
 
 async function main() {
-  const network = mainnets.find(item => item.id === networkId)
+  const network = mainnets.find(item => item.id === NETWORK_ID)
   if (!network) {
-    throw new Error(`Invalid network: ${networkId}`)
+    throw new Error(`Invalid network: ${NETWORK_ID}`)
   }
 
   const index = testnets.findIndex(item => item.slip44 === network.slip44)
   if (index === -1) {
-    throw new Error(`Invalid network: ${networkId}`)
+    throw new Error(`Invalid network: ${NETWORK_ID}`)
   }
 
   const testnet = testnets[index]
   hre.changeNetwork(testnet.id)
 
-  const wallet = new ethers.Wallet(privateKey, ethers.provider)
+  const wallet = new ethers.Wallet(PRIVATE_KEY, ethers.provider)
   const MockToken = await ethers.getContractFactory('MockToken', wallet)
   const nonce = await ethers.provider.getTransactionCount(wallet.address)
   const tokens = []
-  let name, symbol
+  const totalSupply = ethers.utils.parseUnits('1000000', 6)
   
-  name = `${testnet.alias} USDT`
-  symbol = `${networkId[0]}USDT`
-  console.log(`Deploying ${name}...`)
-  const mockUSDT = await MockToken.deploy(name, symbol, ethers.utils.parseUnits('1000000', 6), { nonce })
-  tokens.push({ addr: mockUSDT.address, name, symbol, decimals: 6 })
-  console.log(`${name} deployed to:`, mockUSDT.address)
+  const usdt = {
+    name: `${testnet.alias} USDT`,
+    symbol: `${NETWORK_ID[0]}USDT`,
+    decimals: 6
+  }
+  console.log(`Deploying ${usdt.name}...`)
+  const mockUSDT = await MockToken.deploy(usdt.name, usdt.symbol, totalSupply, { nonce })
+  usdt.addr = mockUSDT.address
+  tokens.push(usdt)
+  console.log(`${usdt.name} deployed to:`, mockUSDT.address)
 
-  name = `${testnet.alias} USDC`
-  symbol = `${networkId[0]}USDC`
-  console.log(`Deploying ${name}...`)
-  const mockUSDC = await MockToken.deploy(name, symbol, ethers.utils.parseUnits('1000000', 6), { nonce: nonce + 1 })
-  tokens.push({ addr: mockUSDC.address, name, symbol, decimals: 6 })
-  console.log(`${name} deployed to:`, mockUSDC.address)
+  const usdc = {
+    name: `${testnet.alias} USDC`,
+    symbol: `${NETWORK_ID[0]}USDC`,
+    decimals: 6
+  }
+  console.log(`Deploying ${usdc.name}...`)
+  const mockUSDC = await MockToken.deploy(usdc.name, usdc.symbol, totalSupply, { nonce: nonce + 1 })
+  usdc.addr = mockUSDC.address
+  tokens.push(usdc)
+  console.log(`${usdc.name} deployed to:`, mockUSDC.address)
 
   const Meson = await ethers.getContractFactory('Meson', wallet)
   console.log('Deploying Meson...')
@@ -50,6 +57,20 @@ async function main() {
   const coinType = await meson.getCoinType()
   if (coinType !== testnet.slip44) {
     throw new Error('Coin type does not match')
+  }
+
+  if (DEPOSIT_ON_DEPLOY) {
+    const depositAmount = ethers.utils.parseUnits(DEPOSIT_ON_DEPLOY, 6)
+
+    console.log(`Approving and depositing ${depositAmount} ${usdt.symbol} to Meson...`)
+    await (await mockUSDT.approve(meson.address, depositAmount, { nonce: nonce + 3 })).wait()
+    await meson.deposit(mockUSDT.address, depositAmount, { nonce: nonce + 4 })
+    console.log(`${depositAmount} ${usdt.symbol} deposited`)
+
+    console.log(`Approving and depositing ${depositAmount} ${usdc.symbol} to Meson...`)
+    await (await mockUSDC.approve(meson.address, depositAmount, { nonce: nonce + 5 })).wait()
+    await meson.deposit(mockUSDC.address, depositAmount, { nonce: nonce + 6 })
+    console.log(`${depositAmount} ${usdc.symbol} deposited`)
   }
 
   testnet.mesonAddress = meson.address
