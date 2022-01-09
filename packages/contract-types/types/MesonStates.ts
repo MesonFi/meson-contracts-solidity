@@ -16,12 +16,17 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface MesonStatesInterface extends utils.Interface {
   functions: {
+    "balanceOf(address,address)": FunctionFragment;
     "getCoinType()": FunctionFragment;
     "supportedTokens(address)": FunctionFragment;
     "totalDemandFor(address)": FunctionFragment;
     "totalSupplyFor(address)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "balanceOf",
+    values: [string, string]
+  ): string;
   encodeFunctionData(
     functionFragment: "getCoinType",
     values?: undefined
@@ -39,6 +44,7 @@ export interface MesonStatesInterface extends utils.Interface {
     values: [string]
   ): string;
 
+  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getCoinType",
     data: BytesLike
@@ -86,6 +92,12 @@ export interface MesonStates extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    balanceOf(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     getCoinType(overrides?: CallOverrides): Promise<[string]>;
 
     supportedTokens(
@@ -104,6 +116,12 @@ export interface MesonStates extends BaseContract {
     ): Promise<[BigNumber]>;
   };
 
+  balanceOf(
+    arg0: string,
+    arg1: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   getCoinType(overrides?: CallOverrides): Promise<string>;
 
   supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
@@ -113,6 +131,12 @@ export interface MesonStates extends BaseContract {
   totalSupplyFor(token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
+    balanceOf(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getCoinType(overrides?: CallOverrides): Promise<string>;
 
     supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
@@ -131,6 +155,12 @@ export interface MesonStates extends BaseContract {
   filters: {};
 
   estimateGas: {
+    balanceOf(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getCoinType(overrides?: CallOverrides): Promise<BigNumber>;
 
     supportedTokens(
@@ -150,6 +180,12 @@ export interface MesonStates extends BaseContract {
   };
 
   populateTransaction: {
+    balanceOf(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     supportedTokens(

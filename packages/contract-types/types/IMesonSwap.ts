@@ -21,7 +21,7 @@ export interface IMesonSwapInterface extends utils.Interface {
   functions: {
     "bondSwap(bytes32)": FunctionFragment;
     "cancelSwap(bytes32)": FunctionFragment;
-    "executeSwap(bytes32,bytes,bytes32,bytes32,uint8)": FunctionFragment;
+    "executeSwap(bytes32,bytes,bytes32,bytes32,uint8,bool)": FunctionFragment;
     "postSwap(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
     "requestSwap(bytes,address)": FunctionFragment;
   };
@@ -33,7 +33,7 @@ export interface IMesonSwapInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "executeSwap",
-    values: [BytesLike, BytesLike, BytesLike, BytesLike, BigNumberish]
+    values: [BytesLike, BytesLike, BytesLike, BytesLike, BigNumberish, boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "postSwap",
@@ -137,6 +137,7 @@ export interface IMesonSwap extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      depositToPool: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -173,6 +174,7 @@ export interface IMesonSwap extends BaseContract {
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
+    depositToPool: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -203,6 +205,7 @@ export interface IMesonSwap extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      depositToPool: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -267,6 +270,7 @@ export interface IMesonSwap extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      depositToPool: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -304,6 +308,7 @@ export interface IMesonSwap extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      depositToPool: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

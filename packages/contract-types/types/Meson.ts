@@ -24,7 +24,7 @@ export interface MesonInterface extends utils.Interface {
     "cancelSwap(bytes32)": FunctionFragment;
     "challenge()": FunctionFragment;
     "deposit(address,uint256)": FunctionFragment;
-    "executeSwap(bytes32,bytes,bytes32,bytes32,uint8)": FunctionFragment;
+    "executeSwap(bytes32,bytes,bytes32,bytes32,uint8,bool)": FunctionFragment;
     "getCoinType()": FunctionFragment;
     "lock(bytes32,address,uint256,address)": FunctionFragment;
     "lockingSwaps(bytes32)": FunctionFragment;
@@ -55,7 +55,7 @@ export interface MesonInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "executeSwap",
-    values: [BytesLike, BytesLike, BytesLike, BytesLike, BigNumberish]
+    values: [BytesLike, BytesLike, BytesLike, BytesLike, BigNumberish, boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "getCoinType",
@@ -260,6 +260,7 @@ export interface Meson extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      depositToPool: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -385,6 +386,7 @@ export interface Meson extends BaseContract {
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
+    depositToPool: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -493,6 +495,7 @@ export interface Meson extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      depositToPool: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -649,6 +652,7 @@ export interface Meson extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      depositToPool: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -756,6 +760,7 @@ export interface Meson extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      depositToPool: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

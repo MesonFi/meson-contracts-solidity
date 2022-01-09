@@ -143,6 +143,11 @@ const _abi = [
         name: "v",
         type: "uint8",
       },
+      {
+        internalType: "bool",
+        name: "depositToPool",
+        type: "bool",
+      },
     ],
     name: "executeSwap",
     outputs: [],

@@ -51,6 +51,7 @@ export type Bytes32ListStructOutput = [
 export interface MesonStatesTestInterface extends utils.Interface {
   functions: {
     "addRecentSwap(address,bytes32,uint256,uint64)": FunctionFragment;
+    "balanceOf(address,address)": FunctionFragment;
     "decreaseSupply(address,uint256)": FunctionFragment;
     "getCoinType()": FunctionFragment;
     "getRecentSwap(address,bytes32)": FunctionFragment;
@@ -66,6 +67,10 @@ export interface MesonStatesTestInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "addRecentSwap",
     values: [string, BytesLike, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "balanceOf",
+    values: [string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "decreaseSupply",
@@ -112,6 +117,7 @@ export interface MesonStatesTestInterface extends utils.Interface {
     functionFragment: "addRecentSwap",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "decreaseSupply",
     data: BytesLike
@@ -191,6 +197,12 @@ export interface MesonStatesTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    balanceOf(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     decreaseSupply(
       token: string,
       amount: BigNumberish,
@@ -251,6 +263,12 @@ export interface MesonStatesTest extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  balanceOf(
+    arg0: string,
+    arg1: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   decreaseSupply(
     token: string,
     amount: BigNumberish,
@@ -301,6 +319,12 @@ export interface MesonStatesTest extends BaseContract {
       ts: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    balanceOf(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     decreaseSupply(
       token: string,
@@ -357,6 +381,12 @@ export interface MesonStatesTest extends BaseContract {
       metaAmount: BigNumberish,
       ts: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    balanceOf(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     decreaseSupply(
@@ -418,6 +448,12 @@ export interface MesonStatesTest extends BaseContract {
       metaAmount: BigNumberish,
       ts: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    balanceOf(
+      arg0: string,
+      arg1: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     decreaseSupply(
