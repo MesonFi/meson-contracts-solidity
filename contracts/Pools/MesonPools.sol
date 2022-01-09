@@ -17,7 +17,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
   mapping(bytes32 => LockingSwap) public lockingSwaps;
 
   /// @inheritdoc IMesonPools
-  function deposit(address token, uint256 amount) public override tokenSupported(token) {
+  function deposit(address token, uint256 amount) external override tokenSupported(token) {
     address provider = _msgSender();
     balanceOf[token][provider] = LowGasSafeMath.add(balanceOf[token][provider], amount);
     _increaseSupply(token, amount);
@@ -25,7 +25,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
   }
 
   /// @inheritdoc IMesonPools
-  function withdraw(address token, uint256 amount) public override tokenSupported(token) {
+  function withdraw(address token, uint256 amount) external override tokenSupported(token) {
     address provider = _msgSender(); // this may not be the correct msg.sender
     _decreaseSupply(token, amount);
     _withdrawTo(provider, provider, token, amount);
@@ -50,7 +50,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     address initiator,
     uint256 amount,
     address token
-  ) public override tokenSupported(token) {
+  ) external override tokenSupported(token) {
     require(amount > 0, "amount must be greater than zero");
     require(!_hasLockingSwap(swapId), "locking swap already exists");
     address provider = _msgSender();
@@ -69,7 +69,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
   }
 
   /// @inheritdoc IMesonPools
-  function unlock(bytes32 swapId) public override {
+  function unlock(bytes32 swapId) external override {
     require(_hasLockingSwap(swapId), "swap does not exist");
 
     LockingSwap memory lockingSwap = lockingSwaps[swapId];
@@ -92,7 +92,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     bytes32 r,
     bytes32 s,
     uint8 v
-  ) public override {
+  ) external override {
     LockingSwap memory lockingSwap = lockingSwaps[swapId];
     require(_hasLockingSwap(swapId), "swap does not exist");
     require(
@@ -124,7 +124,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
   }
 
   /// @inheritdoc IMesonPools
-  function challenge() public override {
+  function challenge() external override {
   }
 
   function _hasLockingSwap(bytes32 swapId) internal view returns (bool) {

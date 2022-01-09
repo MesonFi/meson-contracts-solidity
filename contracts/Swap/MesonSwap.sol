@@ -20,7 +20,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
 
   /// @inheritdoc IMesonSwap
   function requestSwap(bytes memory encodedSwap, address inToken)
-    public
+    external
     override
     tokenSupported(inToken)
     returns (bytes32)
@@ -51,7 +51,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     bytes32 r,
     bytes32 s,
     uint8 v
-  ) public override tokenSupported(inToken) returns (bytes32) {
+  ) external override tokenSupported(inToken) returns (bytes32) {
     (bytes32 swapId, uint64 expireTs, uint256 amount) = _verifyEncodedSwap(encodedSwap, inToken);
 
     require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
@@ -86,7 +86,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
   }
 
   /// @inheritdoc IMesonSwap
-  function cancelSwap(bytes32 swapId) public override swapExists(swapId) swapExpired(swapId) {
+  function cancelSwap(bytes32 swapId) external override swapExists(swapId) swapExpired(swapId) {
     SwapRequest memory req = requests[swapId];
     address inToken = req.inToken;
     address initiator = req.initiator;
@@ -106,7 +106,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     bytes32 s,
     uint8 v,
     bool deposit
-  ) public override swapExists(swapId) {
+  ) external override swapExists(swapId) {
     SwapRequest memory req = requests[swapId];
     _checkReleaseSignature(swapId, keccak256(recipient), DOMAIN_SEPARATOR, req.initiator, r, s, v);
 
