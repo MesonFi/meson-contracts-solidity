@@ -1,10 +1,10 @@
-import { Wallet } from '@ethersproject/wallet'
+import type { Wallet } from '@ethersproject/wallet'
+import type { TypedDataDomain } from '@ethersproject/abstract-signer'
 import { _TypedDataEncoder } from '@ethersproject/hash'
 import { recoverAddress } from '@ethersproject/transactions'
-import { BytesLike } from '@ethersproject/bytes'
-import { TypedDataDomain } from '@ethersproject/abstract-signer'
 
 import { SwapRequestData, SWAP_REQUEST_TYPE, SWAP_RELEASE_TYPE } from './SwapRequest'
+import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwapRequest'
 
 export class SwapSigner {
   readonly domain: TypedDataDomain
@@ -35,8 +35,8 @@ export class SwapSigner {
     return this._separateSignature(signature)
   }
 
-  async signSwapRelease(swapId: string, wallet: Wallet) {
-    const signature = await wallet._signTypedData(this.domain, SWAP_RELEASE_TYPE, { swapId })
+  async signSwapRelease(swapId: string, recipient: string, wallet: Wallet) {
+    const signature = await wallet._signTypedData(this.domain, SWAP_RELEASE_TYPE, { swapId, recipient })
     return this._separateSignature(signature)
   }
 
@@ -51,12 +51,14 @@ export class SwapSigner {
     return _TypedDataEncoder.hash(this.domain, SWAP_REQUEST_TYPE, swap)
   }
 
-  recoverFromRequestSignature(swap: SwapRequestData, [r, s, v]: [string, string, number]) {
+  recoverFromRequestSignature(swap: SignedSwapRequestData) {
+    const [r, s, v] = swap.signature
     return recoverAddress(this.getSwapId(swap), { r, s, v }).toLowerCase()
   }
 
-  recoverFromReleaseSignature(swapId: BytesLike, [r, s, v]: [string, string, number]) {
-    const digest = _TypedDataEncoder.hash(this.domain, SWAP_RELEASE_TYPE, { swapId })
+  recoverFromReleaseSignature(release: SignedSwapReleaseData) {
+    const digest = _TypedDataEncoder.hash(this.domain, SWAP_RELEASE_TYPE, release)
+    const [r, s, v] = release.signature
     return recoverAddress(digest, { r, s, v }).toLowerCase()
   }
 }

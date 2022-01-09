@@ -9,7 +9,7 @@ export interface PartialSwapRequest {
   inToken: BytesLike,
   amount: string,
   outToken: BytesLike,
-  recipient: BytesLike,
+  recipient: string,
 }
 
 export class MesonClient {
@@ -60,6 +60,10 @@ export class MesonClient {
 
   async executeSwap(signedRelease: SignedSwapReleaseData) {
     this._check(signedRelease)
-    return this.mesonInstance.executeSwap(signedRelease.swapId, ...signedRelease.signature)
+    return this.mesonInstance.executeSwap(
+      signedRelease.swapId,
+      signedRelease.recipient,
+      ...signedRelease.signature
+    )
   }
 }

@@ -18,8 +18,8 @@ export class SwapRequestWithSigner extends SwapRequest {
     return await this.signer.signSwapRequest(this, wallet)
   }
 
-  async signRelease(wallet: Wallet) {
-    return await this.signer.signSwapRelease(this.swapId, wallet)
+  async signRelease(wallet: Wallet, recipient: string) {
+    return await this.signer.signSwapRelease(this.swapId, recipient, wallet)
   }
 
   async exportRequest(wallet: Wallet, initiator = wallet.address) {
@@ -34,11 +34,12 @@ export class SwapRequestWithSigner extends SwapRequest {
     } as SignedSwapRequestData
   }
 
-  async exportRelease(wallet: Wallet, initiator = wallet.address) {
-    const signature = await this.signRelease(wallet)
+  async exportRelease(wallet: Wallet, recipient: string, initiator = wallet.address) {
+    const signature = await this.signRelease(wallet, recipient)
     const domainHash = this.signer.getDomainHash()
     return {
       swapId: this.swapId,
+      recipient,
       initiator: initiator.toLowerCase(),
       chainId: this.signer.chainId,
       mesonAddress: this.signer.mesonAddress,
@@ -51,7 +52,7 @@ export class SwapRequestWithSigner extends SwapRequest {
     return JSON.stringify(await this.exportRequest(wallet))
   }
 
-  async serializeRelease(wallet: Wallet) {
-    return JSON.stringify(await this.exportRelease(wallet))
+  async serializeRelease(wallet: Wallet, recipient: string) {
+    return JSON.stringify(await this.exportRelease(wallet, recipient))
   }
 }

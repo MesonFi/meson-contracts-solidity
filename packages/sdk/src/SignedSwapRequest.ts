@@ -14,6 +14,7 @@ export interface SignedSwapRequestData extends SwapRequestData, SignedSwapCommon
 
 export interface SignedSwapReleaseData extends SignedSwapCommonData {
   swapId: string,
+  recipient: string,
   domainHash: string,
 }
 
@@ -47,7 +48,7 @@ export class SignedSwapRequest extends SwapRequest {
     }
 
     const signer = new SwapSigner(signedReq.mesonAddress, Number(signedReq.chainId))
-    const recovered = signer.recoverFromRequestSignature(signedReq, signedReq.signature)
+    const recovered = signer.recoverFromRequestSignature(signedReq)
     if (recovered !== signedReq.initiator) {
       throw new Error('Invalid signature')
     }
@@ -61,9 +62,9 @@ export class SignedSwapRequest extends SwapRequest {
     this.signature = signedReq.signature
   }
 
-  static CheckReleaseSignature (signedRelease: any) {
+  static CheckReleaseSignature (signedRelease: SignedSwapReleaseData) {
     const signer = new SwapSigner(signedRelease.mesonAddress, Number(signedRelease.chainId))
-    const recovered = signer.recoverFromReleaseSignature(signedRelease.swapId, signedRelease.signature)
+    const recovered = signer.recoverFromReleaseSignature(signedRelease)
     if (recovered !== signedRelease.initiator) {
       throw new Error('Invalid signature')
     }
