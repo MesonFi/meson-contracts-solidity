@@ -1,5 +1,6 @@
 import { ethers, waffle } from 'hardhat'
 import { MesonClient, SwapRequestWithSigner } from '@mesonfi/sdk'
+import mesonPresets from '@mesonfi/presets'
 import { MesonHelpersTest } from '@mesonfi/contract-types'
 
 import { expect } from './shared/expect'
@@ -35,6 +36,21 @@ describe('MesonHelpers', () => {
       )
 
       expect(encodedSwapFromContract).to.equal(swap.encode())
+    })
+  })
+
+  describe('#decodeSwap (from mesonPresets)', () => {
+    it('decodes a swap', async () => {
+      mesonPresets._addTokenToHashTable(swap.inToken)
+      mesonPresets._addTokenToHashTable(swap.outToken)
+
+      const decoded = mesonPresets.decodeSwap(swap.encode() as string)
+      
+      expect(decoded.amount).to.equal(swap.amount)
+      expect(decoded.expireTs).to.equal(swap.expireTs)
+      expect(decoded.inToken).to.equal(swap.inToken)
+      expect(decoded.outToken).to.equal(swap.outToken)
+      expect(decoded.outChain).to.equal(swap.outChain)
     })
   })
 

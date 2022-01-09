@@ -1,4 +1,6 @@
 import { Contract as EthersContract } from '@ethersproject/contracts'
+import { defaultAbiCoder } from '@ethersproject/abi'
+import { keccak256 } from '@ethersproject/keccak256'
 import { MesonClient } from '@mesonfi/sdk'
 import { Meson } from '@mesonfi/contract-abis'
 
@@ -30,17 +32,36 @@ export interface PresetNetwork {
   tokens: PresetToken[]
 }
 
-export default class MesonPresets {
+export class MesonPresets {
   private _useTestnet: boolean
   private _cache: Map<string, MesonClient>
+  private _tokenHashes: Map<string, string>
 
   constructor () {
     this._useTestnet = false
     this._cache = new Map()
+    this._tokenHashes = new Map()
   }
 
   useTestnet(v) {
     this._useTestnet = v
+  }
+
+  calcAllTokenHashes() {
+    const networks = this.getAllNetworks()
+    networks.forEach(n => {
+      if (n.addressFormat !== 'hex') {
+        return
+      }
+      n.tokens.forEach(t => {
+        this._addTokenToHashTable(t.addr)
+      })
+    })
+    console.log(this._tokenHashes.entries())
+  }
+
+  _addTokenToHashTable (address) {
+    this._tokenHashes.set(keccak256(address), address)
   }
 
   getAllNetworks (): PresetNetwork[] {
@@ -48,20 +69,37 @@ export default class MesonPresets {
   }
 
   getNetwork (id) {
-    const presets = this.getAllNetworks()
-    return presets.find(item => item.id === id)
+    const networks = this.getAllNetworks()
+    return networks.find(item => item.id === id)
   }
 
   getNetworkFromChainId (chainId) {
     const hexChainId = `0x${Number(chainId).toString(16)}`
-    const presets = this.getAllNetworks()
-    return presets.find(item => item.chainId === hexChainId)
+    const networks = this.getAllNetworks()
+    return networks.find(item => item.chainId === hexChainId)
   }
 
   getTokensForNetwork (id) {
-    const presets = this.getAllNetworks()
-    const match = presets.find(item => item.id === id)
+    const networks = this.getAllNetworks()
+    const match = networks.find(item => item.id === id)
     return match?.tokens || []
+  }
+
+  getTokenFromHash (hash) {
+    return this._tokenHashes.get(hash)
+  }
+
+  decodeSwap (encoded: string) {
+    const [_, inTokenHash, amount, expireTs, outChain, outTokenHash, recipientHash] =
+      defaultAbiCoder.decode(
+        ['bytes32', 'bytes32', 'uint256', 'uint32', 'bytes4', 'bytes32', 'bytes32'],
+        encoded
+      )
+    
+    const inToken = this.getTokenFromHash(inTokenHash)
+    const outToken = this.getTokenFromHash(outTokenHash)
+    
+    return { expireTs, inToken, amount, outChain, outToken, recipientHash }
   }
 
   getClient (id, provider, Contract = EthersContract) {
@@ -78,3 +116,5 @@ export default class MesonPresets {
     return this._cache.get(id)
   }
 }
+
+export default new MesonPresets()

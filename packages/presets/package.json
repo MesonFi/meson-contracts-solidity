@@ -18,7 +18,9 @@
     "prepare": "yarn build"
   },
   "dependencies": {
+    "@ethersproject/abi": "5.5.0",
     "@ethersproject/contracts": "5.5.0",
+    "@ethersproject/keccak256": "5.5.0",
     "@mesonfi/contract-abis": "^0.1.0",
     "@mesonfi/sdk": "^0.1.0"
   },
