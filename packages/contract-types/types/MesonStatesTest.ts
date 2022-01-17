@@ -4,11 +4,8 @@
 import {
   BaseContract,
   BigNumber,
-  BigNumberish,
   BytesLike,
   CallOverrides,
-  ContractTransaction,
-  Overrides,
   PopulatedTransaction,
   Signer,
   utils,
@@ -17,145 +14,33 @@ import { FunctionFragment, Result } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export type SwapStruct = {
-  id: BytesLike;
-  metaAmount: BigNumberish;
-  ts: BigNumberish;
-};
-
-export type SwapStructOutput = [string, BigNumber, BigNumber] & {
-  id: string;
-  metaAmount: BigNumber;
-  ts: BigNumber;
-};
-
-export type Bytes32ListStruct = {
-  _length: BigNumberish;
-  _tail: BigNumberish;
-  _head: BigNumberish;
-  _items: BytesLike[];
-};
-
-export type Bytes32ListStructOutput = [
-  BigNumber,
-  BigNumber,
-  BigNumber,
-  string[]
-] & {
-  _length: BigNumber;
-  _tail: BigNumber;
-  _head: BigNumber;
-  _items: string[];
-};
-
 export interface MesonStatesTestInterface extends utils.Interface {
   functions: {
-    "addRecentSwap(address,bytes32,uint256,uint64)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
-    "decreaseSupply(address,uint256)": FunctionFragment;
     "getCoinType()": FunctionFragment;
-    "getRecentSwap(address,bytes32)": FunctionFragment;
-    "getRecentSwapList(address)": FunctionFragment;
-    "increaseSupply(address,uint256)": FunctionFragment;
-    "removeExpiredSwaps(address)": FunctionFragment;
     "supportedTokens(address)": FunctionFragment;
-    "totalDemandFor(address)": FunctionFragment;
-    "totalSupplyFor(address)": FunctionFragment;
-    "updateDemand(address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "addRecentSwap",
-    values: [string, BytesLike, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "balanceOf",
     values: [string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "decreaseSupply",
-    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getCoinType",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getRecentSwap",
-    values: [string, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getRecentSwapList",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "increaseSupply",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "removeExpiredSwaps",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "supportedTokens",
     values: [string]
   ): string;
-  encodeFunctionData(
-    functionFragment: "totalDemandFor",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "totalSupplyFor",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "updateDemand",
-    values: [string, BigNumberish]
-  ): string;
 
-  decodeFunctionResult(
-    functionFragment: "addRecentSwap",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "decreaseSupply",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "getCoinType",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getRecentSwap",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getRecentSwapList",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "increaseSupply",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "removeExpiredSwaps",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "supportedTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "totalDemandFor",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "totalSupplyFor",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "updateDemand",
     data: BytesLike
   ): Result;
 
@@ -189,79 +74,19 @@ export interface MesonStatesTest extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    addRecentSwap(
-      token: string,
-      id: BytesLike,
-      metaAmount: BigNumberish,
-      ts: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     balanceOf(
       arg0: string,
       arg1: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    decreaseSupply(
-      token: string,
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     getCoinType(overrides?: CallOverrides): Promise<[string]>;
-
-    getRecentSwap(
-      token: string,
-      id: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[SwapStructOutput]>;
-
-    getRecentSwapList(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<[Bytes32ListStructOutput]>;
-
-    increaseSupply(
-      token: string,
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    removeExpiredSwaps(
-      token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     supportedTokens(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    updateDemand(
-      token: string,
-      metaAmount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
   };
-
-  addRecentSwap(
-    token: string,
-    id: BytesLike,
-    metaAmount: BigNumberish,
-    ts: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   balanceOf(
     arg0: string,
@@ -269,242 +94,51 @@ export interface MesonStatesTest extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  decreaseSupply(
-    token: string,
-    amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   getCoinType(overrides?: CallOverrides): Promise<string>;
-
-  getRecentSwap(
-    token: string,
-    id: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<SwapStructOutput>;
-
-  getRecentSwapList(
-    token: string,
-    overrides?: CallOverrides
-  ): Promise<Bytes32ListStructOutput>;
-
-  increaseSupply(
-    token: string,
-    amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  removeExpiredSwaps(
-    token: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
-  totalDemandFor(token: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  totalSupplyFor(token: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  updateDemand(
-    token: string,
-    metaAmount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   callStatic: {
-    addRecentSwap(
-      token: string,
-      id: BytesLike,
-      metaAmount: BigNumberish,
-      ts: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     balanceOf(
       arg0: string,
       arg1: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    decreaseSupply(
-      token: string,
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     getCoinType(overrides?: CallOverrides): Promise<string>;
 
-    getRecentSwap(
-      token: string,
-      id: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<SwapStructOutput>;
-
-    getRecentSwapList(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<Bytes32ListStructOutput>;
-
-    increaseSupply(
-      token: string,
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    removeExpiredSwaps(token: string, overrides?: CallOverrides): Promise<void>;
-
     supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    updateDemand(
-      token: string,
-      metaAmount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
   };
 
   filters: {};
 
   estimateGas: {
-    addRecentSwap(
-      token: string,
-      id: BytesLike,
-      metaAmount: BigNumberish,
-      ts: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     balanceOf(
       arg0: string,
       arg1: string,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    decreaseSupply(
-      token: string,
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     getCoinType(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getRecentSwap(
-      token: string,
-      id: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getRecentSwapList(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    increaseSupply(
-      token: string,
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    removeExpiredSwaps(
-      token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     supportedTokens(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    updateDemand(
-      token: string,
-      metaAmount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    addRecentSwap(
-      token: string,
-      id: BytesLike,
-      metaAmount: BigNumberish,
-      ts: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     balanceOf(
       arg0: string,
       arg1: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    decreaseSupply(
-      token: string,
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     getCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getRecentSwap(
-      token: string,
-      id: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getRecentSwapList(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    increaseSupply(
-      token: string,
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    removeExpiredSwaps(
-      token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
 
     supportedTokens(
       arg0: string,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    updateDemand(
-      token: string,
-      metaAmount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }
