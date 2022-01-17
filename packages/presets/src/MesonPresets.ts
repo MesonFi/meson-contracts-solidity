@@ -90,16 +90,16 @@ export class MesonPresets {
   }
 
   decodeSwap (encoded: string) {
-    const [_, inTokenHash, amount, expireTs, outChain, outTokenHash] =
+    const [_, inTokenHash, amount, fee, expireTs, outChain, outTokenHash] =
       defaultAbiCoder.decode(
-        ['bytes32', 'bytes32', 'uint256', 'uint32', 'bytes4', 'bytes32'],
+        ['bytes32', 'bytes32', 'uint128', 'uint48', 'uint48', 'bytes4', 'bytes32'],
         encoded
       )
     
     const inToken = this.getTokenFromHash(inTokenHash)
     const outToken = this.getTokenFromHash(outTokenHash)
     
-    return { expireTs, inToken, amount, outChain, outToken }
+    return { inToken, amount, fee, expireTs, outChain, outToken }
   }
 
   getClient (id, provider, Contract = EthersContract) {

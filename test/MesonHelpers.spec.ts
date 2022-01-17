@@ -31,6 +31,7 @@ describe('MesonHelpers', () => {
       const encodedSwapFromContract = await mesonInstance.encodeSwap(
         swap.inToken,
         swap.amount,
+        swap.fee,
         swap.expireTs,
         swap.outChain,
         swap.outToken
@@ -46,8 +47,9 @@ describe('MesonHelpers', () => {
       mesonPresets._addTokenToHashTable(swap.outToken)
 
       const decoded = mesonPresets.decodeSwap(swap.encode() as string)
-      
+
       expect(decoded.amount).to.equal(swap.amount)
+      expect(decoded.fee.toString()).to.equal(swap.fee)
       expect(decoded.expireTs).to.equal(swap.expireTs)
       expect(decoded.inToken).to.equal(swap.inToken)
       expect(decoded.outToken).to.equal(swap.outToken)
@@ -60,6 +62,7 @@ describe('MesonHelpers', () => {
       const swapIdFromContract = await mesonInstance.getSwapId(
         swap.inToken,
         swap.amount,
+        swap.fee,
         swap.expireTs,
         swap.outChain,
         swap.outToken
@@ -72,9 +75,10 @@ describe('MesonHelpers', () => {
   describe('#decodeSwapInput', () => {
     it('returns decoded swap data', async () => {
       const decoded = await mesonInstance.decodeSwapInput(swap.encode())
-      expect(decoded[0]).to.equal(swap.expireTs)
-      expect(decoded[1].toLowerCase()).to.equal(ethers.utils.keccak256(swap.inToken))
-      expect(decoded[2]).to.equal(swap.amount)
+      expect(decoded[0].toLowerCase()).to.equal(ethers.utils.keccak256(swap.inToken))
+      expect(decoded[1]).to.equal(swap.amount)
+      expect(decoded[2].toString()).to.equal(swap.fee)
+      expect(decoded[3]).to.equal(swap.expireTs)
     })
   })
 

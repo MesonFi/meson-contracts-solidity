@@ -8,13 +8,13 @@ import "../libraries/LowGasSafeMath.sol";
 import "../interfaces/IERC20Minimal.sol";
 
 import "./IMesonSwap.sol";
-import "../utils/MesonPricing.sol";
+import "../utils/MesonStates.sol";
 
 /// @title MesonSwap
 /// @notice The class to receive and process swap requests.
 /// Methods in this class will be executed by users or LPs when
 /// users initiate swaps in the current chain.
-contract MesonSwap is Context, IMesonSwap, MesonPricing {
+contract MesonSwap is Context, IMesonSwap, MesonStates {
   /// @notice swap requests by swapIds
   mapping(bytes32 => SwapRequest) public requests;
 
@@ -25,12 +25,14 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     tokenSupported(inToken)
     returns (bytes32)
   {
-    (bytes32 swapId, uint64 expireTs, uint256 amount) = _verifyEncodedSwap(encodedSwap, inToken);
+    (bytes32 swapId, uint128 amount, uint48 fee, uint48 expireTs) = _verifyEncodedSwap(encodedSwap, inToken);
 
     address initiator = _msgSender();
-    requests[swapId] = SwapRequest(initiator, address(0), inToken, amount, expireTs);
 
-    _unsafeDepositToken(inToken, initiator, amount);
+    uint128 total = LowGasSafeMath.add(amount, fee);
+    requests[swapId] = SwapRequest(initiator, address(0), inToken, total, expireTs);
+
+    _unsafeDepositToken(inToken, initiator, total);
 
     emit SwapRequested(swapId);
     return swapId;
@@ -52,25 +54,26 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     bytes32 s,
     uint8 v
   ) external override tokenSupported(inToken) returns (bytes32) {
-    (bytes32 swapId, uint64 expireTs, uint256 amount) = _verifyEncodedSwap(encodedSwap, inToken);
+    (bytes32 swapId, uint128 amount, uint48 fee, uint48 expireTs) = _verifyEncodedSwap(encodedSwap, inToken);
 
     require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
 
     address provider = _msgSender();
-    requests[swapId] = SwapRequest(initiator, provider, inToken, amount, expireTs);
+    uint128 total = LowGasSafeMath.add(amount, fee);
+    requests[swapId] = SwapRequest(initiator, provider, inToken, total, expireTs);
 
-    _unsafeDepositToken(inToken, initiator, amount);
+    _unsafeDepositToken(inToken, initiator, total);
 
-    emit SwapPosted(swapId, expireTs, amount, inToken);
+    emit SwapPosted(swapId);
     return swapId;
   }
 
   function _verifyEncodedSwap(bytes memory encodedSwap, address inToken)
     private
     view
-    returns (bytes32, uint64, uint256)
+    returns (bytes32, uint128, uint48, uint48)
   {
-    (uint64 expireTs, bytes32 inTokenHash, uint256 amount) = _decodeSwapInput(encodedSwap);
+    (bytes32 inTokenHash, uint128 amount, uint48 fee, uint48 expireTs) = _decodeSwapInput(encodedSwap);
 
     require(keccak256(abi.encodePacked(inToken)) == inTokenHash, "inToken does not match");
     require(amount > 0, "swap amount must be greater than zero");
@@ -82,7 +85,7 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     bytes32 swapId = _getSwapId(encodedSwap);
     require(!_hasSwap(swapId), "swap conflict"); // TODO: prevent duplication attack
 
-    return (swapId, expireTs, amount);
+    return (swapId, amount, fee, expireTs);
   }
 
   /// @inheritdoc IMesonSwap
@@ -90,10 +93,10 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
     SwapRequest memory req = requests[swapId];
     address inToken = req.inToken;
     address initiator = req.initiator;
-    uint256 amount = req.amount;
+    uint128 total = req.total;
     delete requests[swapId];
 
-    _safeTransfer(inToken, initiator, amount);
+    _safeTransfer(inToken, initiator, total);
 
     emit SwapCancelled(swapId);
   }
@@ -112,14 +115,14 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
 
     address inToken = req.inToken;
     address provider = req.provider;
-    uint256 amount = req.amount;
+    uint128 total = req.total;
 
     delete requests[swapId];
 
     if (depositToPool) {
-      balanceOf[inToken][provider] = LowGasSafeMath.add(balanceOf[inToken][provider], amount);
+      balanceOf[inToken][provider] = LowGasSafeMath.add(balanceOf[inToken][provider], total);
     } else {
-      _safeTransfer(inToken, provider, amount);
+      _safeTransfer(inToken, provider, total);
     }
 
     emit SwapExecuted(swapId);
@@ -142,6 +145,6 @@ contract MesonSwap is Context, IMesonSwap, MesonPricing {
   }
 
   function _hasSwap(bytes32 swapId) internal view returns (bool) {
-    return requests[swapId].amount > 0;
+    return requests[swapId].total > 0;
   }
 }

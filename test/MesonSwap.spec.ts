@@ -31,7 +31,7 @@ describe('MesonSwap', () => {
 
   describe('#postSwap', () => {
     it('posts a swap', async () => {
-      const swap = userClient.requestSwap(outChain, getDefaultSwap({ inToken: token.address }))
+      const swap = userClient.requestSwap(outChain, getDefaultSwap({ inToken: token.address, fee: '0' }))
       const exported = await swap.exportRequest(initiator)
 
       const signedRequest = new SignedSwapRequest(exported)
@@ -43,7 +43,7 @@ describe('MesonSwap', () => {
     })
 
     it('refuses unsupported token', async () => {
-      const swap = userClient.requestSwap(outChain, getDefaultSwap({ inToken: unsupportedToken.address }))
+      const swap = userClient.requestSwap(outChain, getDefaultSwap({ inToken: unsupportedToken.address, fee: '0' }))
       const exported = await swap.exportRequest(initiator)
 
       const signedRequest = new SignedSwapRequest(exported)
@@ -54,7 +54,7 @@ describe('MesonSwap', () => {
 
   describe('#executeSwap', () => {
     it('can execute a swap', async () => {
-      const swapData = getDefaultSwap({ inToken: token.address })
+      const swapData = getDefaultSwap({ inToken: token.address, fee: '0' })
       const swap = userClient.requestSwap(outChain, swapData)
       const exported = await swap.exportRequest(initiator)
       

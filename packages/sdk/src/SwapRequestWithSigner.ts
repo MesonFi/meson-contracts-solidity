@@ -41,9 +41,9 @@ export class SwapRequestWithSigner extends SwapRequest {
       swapId: this.swapId,
       recipient,
       initiator: initiator.toLowerCase(),
+      domainHash,
       chainId: this.signer.chainId,
       mesonAddress: this.signer.mesonAddress,
-      domainHash,
       signature,
     } as SignedSwapReleaseData
   }

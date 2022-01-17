@@ -39,9 +39,9 @@ describe('MesonPools', () => {
     })
   })
 
-  describe('#totalSupplyFor', () => {
+  describe('#token balance', () => {
     it('is zero', async () => {
-      expect(await mesonInstance.totalSupplyFor(token.address)).to.equal(0)
+      expect(await token.balanceOf(mesonInstance.address)).to.equal(0)
     })
   })
 
@@ -50,7 +50,7 @@ describe('MesonPools', () => {
       await token.approve(mesonInstance.address, 1000)
       await mesonInstance.deposit(token.address, 1000)
       expect(await mesonInstance.balanceOf(token.address, provider.address)).to.equal(1000)
-      expect(await mesonInstance.totalSupplyFor(token.address)).to.equal(1000)
+      expect(await token.balanceOf(mesonInstance.address)).to.equal(1000)
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.sub(1000))
 
       await expect(mesonInstance.deposit(token.address, 1)).to.be.reverted
@@ -69,7 +69,7 @@ describe('MesonPools', () => {
       await token.approve(mesonInstance.address, 1000)
       await mesonInstance.deposit(token.address, 1000)
       await mesonInstance.withdraw(token.address, 1000)
-      expect(await mesonInstance.totalSupplyFor(token.address)).to.equal(0)
+      expect(await token.balanceOf(mesonInstance.address)).to.equal(0)
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE)
 
       await expect(mesonInstance.withdraw(token.address, 1)).to.be.revertedWith('overdrawn')
