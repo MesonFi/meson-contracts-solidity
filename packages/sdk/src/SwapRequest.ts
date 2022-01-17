@@ -53,7 +53,7 @@ export class SwapRequest implements SwapRequestData {
     return this._encoded
   }
 
-  toObject() {
+  toObject(): SwapRequestData {
     return {
       expireTs: this.expireTs,
       inChain: this.inChain,
@@ -64,7 +64,7 @@ export class SwapRequest implements SwapRequestData {
     }
   }
 
-  serialize() {
+  serialize(): string {
     return JSON.stringify(this.toObject())
   }
 }

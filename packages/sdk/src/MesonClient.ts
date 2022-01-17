@@ -21,7 +21,7 @@ export class MesonClient {
   static async Create(mesonInstance: Contract) {
     const network = await mesonInstance.provider.getNetwork()
     const coinType = await mesonInstance.getCoinType()
-    return new MesonClient(mesonInstance, Number(network.chainId), coinType)
+    return new MesonClient(mesonInstance, network.chainId, coinType)
   }
 
   constructor(mesonInstance: Contract, chainId: number, coinType: BytesLike) {
