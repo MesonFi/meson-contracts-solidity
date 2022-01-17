@@ -85,6 +85,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockToken__factory>;
     getContractFactory(
+      name: "Testtt",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Testtt__factory>;
+    getContractFactory(
       name: "UpgradableMeson",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.UpgradableMeson__factory>;
@@ -191,6 +195,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.MockToken>;
+    getContractAt(
+      name: "Testtt",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Testtt>;
     getContractAt(
       name: "UpgradableMeson",
       address: string,
