@@ -12,8 +12,7 @@ export interface SignedSwapCommonData {
   signature: Signature,
 }
 
-export interface SignedSwapRequestData extends SwapRequestData, SignedSwapCommonData {
-}
+export interface SignedSwapRequestData extends SwapRequestData, SignedSwapCommonData {}
 
 export interface SignedSwapReleaseData extends SignedSwapCommonData {
   recipient: string,
