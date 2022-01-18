@@ -5,6 +5,7 @@ import { SwapSigner } from './SwapSigner'
 import { SwapRequest, SwapRequestData } from './SwapRequest'
 
 export interface SignedSwapCommonData {
+  swapId: string,
   initiator: BytesLike,
   chainId: number,
   mesonAddress: string,
@@ -12,11 +13,9 @@ export interface SignedSwapCommonData {
 }
 
 export interface SignedSwapRequestData extends SwapRequestData, SignedSwapCommonData {
-  swapId: string,
 }
 
 export interface SignedSwapReleaseData extends SignedSwapCommonData {
-  swapId: string,
   recipient: string,
   domainHash: string,
 }
