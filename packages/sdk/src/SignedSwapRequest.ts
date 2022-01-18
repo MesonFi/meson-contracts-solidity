@@ -50,7 +50,7 @@ export class SignedSwapRequest extends SwapRequest {
       throw new Error('Missing signature')
     }
 
-    const signer = new SwapSigner(signedReq.mesonAddress, signedReq.chainId)
+    const signer = new SwapSigner(signedReq.mesonAddress, Number(signedReq.chainId))
     const recovered = signer.recoverFromRequestSignature(signedReq)
     if (recovered !== signedReq.initiator) {
       throw new Error('Invalid signature')
@@ -66,7 +66,7 @@ export class SignedSwapRequest extends SwapRequest {
   }
 
   static CheckReleaseSignature (signedRelease: SignedSwapReleaseData) {
-    const signer = new SwapSigner(signedRelease.mesonAddress, signedRelease.chainId)
+    const signer = new SwapSigner(signedRelease.mesonAddress, Number(signedRelease.chainId))
     const recovered = signer.recoverFromReleaseSignature(signedRelease)
     if (recovered !== signedRelease.initiator) {
       throw new Error('Invalid signature')

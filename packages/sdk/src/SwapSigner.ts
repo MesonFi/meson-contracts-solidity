@@ -26,7 +26,7 @@ export class SwapSigner {
   }
 
   get chainId(): number {
-    return this.domain.chainId
+    return Number(this.domain.chainId)
   }
 
   get mesonAddress(): string {
