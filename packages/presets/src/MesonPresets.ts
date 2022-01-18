@@ -57,7 +57,6 @@ export class MesonPresets {
         this._addTokenToHashTable(t.addr)
       })
     })
-    console.log(this._tokenHashes.entries())
   }
 
   _addTokenToHashTable (address) {
