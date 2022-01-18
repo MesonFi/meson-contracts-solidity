@@ -62,12 +62,14 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
       provider,
       token,
       amount,
-      uint64(block.timestamp) + LOCK_TIME_PERIOD
+      uint64(block.timestamp+ LOCK_TIME_PERIOD) 
     );
 
     emit SwapLocked(swapId, provider);
   }
 
+  
+ 
   /// @inheritdoc IMesonPools
   function unlock(bytes32 swapId) external override {
     require(_hasLockingSwap(swapId), "swap does not exist");

@@ -8,9 +8,9 @@ type OptionalSwapRequestData = {
 
 export function getDefaultSwap({ inToken, outToken }: OptionalSwapRequestData = {}): PartialSwapRequest {
   return {
-    inToken: inToken || '0x943f0cabc0675f3642927e25abfa9a7ae15e8672',
+    inToken: inToken || '0x5FbDB2315678afecb367f032d93F642f64180aa3',
     amount: '100',
-    outToken: outToken || '0x2151166224670b37ec76c8ee2011bbbf4bbf2a52',
+    outToken: outToken || '0x5FbDB2315678afecb367f032d93F642f64180aa3',
     recipient: '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211',
   }
 }
