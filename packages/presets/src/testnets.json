@@ -10,6 +10,7 @@
     ],
     "addressFormat": "hex",
     "url": "https://ropsten.infura.io/v3/${INFURA_API_KEY}",
+    "explorer": "https://ropsten.etherscan.io",
     "mesonAddress": "0x9e298D59DEd116b8565D6926e00C1E5C7998A08c",
     "tokens": [
       {
@@ -70,7 +71,7 @@
     ],
     "addressFormat": "hex",
     "url": "https://rpc.testnet.fantom.network",
-    "explorer": "https://testnet.ftmscan.com/",
+    "explorer": "https://testnet.ftmscan.com",
     "nativeCurrency": {
       "name": "Fantom",
       "symbol": "FTM",
@@ -103,7 +104,7 @@
     ],
     "addressFormat": "hex",
     "url": "https://api.avax-test.network/ext/bc/C/rpc",
-    "explorer": "https://testnet.snowtrace.io/",
+    "explorer": "https://testnet.snowtrace.io",
     "nativeCurrency": {
       "name": "Avalanche",
       "symbol": "AVAX",
@@ -136,7 +137,7 @@
     ],
     "addressFormat": "hex",
     "url": "https://matic-mumbai.chainstacklabs.com",
-    "explorer": "https://mumbai.polygonscan.com/",
+    "explorer": "https://mumbai.polygonscan.com",
     "nativeCurrency": {
       "name": "MATIC",
       "symbol": "MATIC",
