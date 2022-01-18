@@ -1,4 +1,5 @@
-import { Wallet } from '@ethersproject/wallet'
+import type { Wallet } from '@ethersproject/wallet'
+import type { Signature } from './SwapSigner'
 
 import { SwapSigner } from './SwapSigner'
 import { SwapRequest, SwapRequestData } from './SwapRequest'
@@ -14,11 +15,11 @@ export class SwapRequestWithSigner extends SwapRequest {
     this.swapId = signer.getSwapId(req)
   }
 
-  async signRequest(wallet: Wallet): Promise<[string, string, number]> {
+  async signRequest(wallet: Wallet): Promise<Signature> {
     return await this.signer.signSwapRequest(this, wallet)
   }
 
-  async signRelease(wallet: Wallet, recipient: string): Promise<[string, string, number]> {
+  async signRelease(wallet: Wallet, recipient: string): Promise<Signature> {
     return await this.signer.signSwapRelease(this.swapId, recipient, wallet)
   }
 

@@ -1,4 +1,5 @@
-import { BytesLike } from '@ethersproject/bytes'
+import type { BytesLike } from '@ethersproject/bytes'
+import type { Signature } from './SwapSigner'
 
 import { SwapSigner } from './SwapSigner'
 import { SwapRequest, SwapRequestData } from './SwapRequest'
@@ -7,7 +8,7 @@ export interface SignedSwapCommonData {
   initiator: BytesLike,
   chainId: number,
   mesonAddress: string,
-  signature: [string, string, number],
+  signature: Signature,
 }
 
 export interface SignedSwapRequestData extends SwapRequestData, SignedSwapCommonData {
@@ -26,7 +27,7 @@ export class SignedSwapRequest extends SwapRequest {
   readonly chainId: number
   readonly mesonAddress: string
   readonly initiator: BytesLike
-  readonly signature: [string, string, number]
+  readonly signature: Signature
 
   static FromSerialized (json: string) {
     let parsed: SignedSwapRequestData

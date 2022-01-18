@@ -11,6 +11,8 @@ interface MesonTypedDataDomain extends TypedDataDomain {
   verifyingContract: string;
 }
 
+export type Signature = [string, string, number]
+
 export class SwapSigner {
   readonly domain: MesonTypedDataDomain
 
@@ -35,12 +37,12 @@ export class SwapSigner {
     return _TypedDataEncoder.hashDomain(this.domain)
   }
 
-  async signSwapRequest(swap: SwapRequestData, wallet: Wallet): Promise<[string, string, number]> {
+  async signSwapRequest(swap: SwapRequestData, wallet: Wallet): Promise<Signature> {
     const signature = await wallet._signTypedData(this.domain, SWAP_REQUEST_TYPE, swap)
     return this._separateSignature(signature)
   }
 
-  async signSwapRelease(swapId: string, recipient: string, wallet: Wallet): Promise<[string, string, number]> {
+  async signSwapRelease(swapId: string, recipient: string, wallet: Wallet): Promise<Signature> {
     const signature = await wallet._signTypedData(this.domain, SWAP_RELEASE_TYPE, { swapId, recipient })
     return this._separateSignature(signature)
   }
@@ -49,7 +51,7 @@ export class SwapSigner {
     const r = '0x' + signature.substring(2, 66)
     const s = '0x' + signature.substring(66, 130)
     const v = parseInt(signature.substring(130, 132), 16)
-    return [r, s, v] as [string, string, number]
+    return [r, s, v] as Signature
   }
 
   getSwapId(swap: SwapRequestData): string {
