@@ -29,7 +29,7 @@ contract MesonSwap is Context, IMesonSwap, MesonStates {
 
     address initiator = _msgSender();
 
-    uint128 total = LowGasSafeMath.add(amount, fee);
+    uint128 total = LowGasSafeMath.add(amount, fee); // TODO: fee to meson protocol
     requests[swapId] = SwapRequest(initiator, address(0), inToken, total, expireTs);
 
     _unsafeDepositToken(inToken, initiator, total);
@@ -59,7 +59,7 @@ contract MesonSwap is Context, IMesonSwap, MesonStates {
     require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
 
     address provider = _msgSender();
-    uint128 total = LowGasSafeMath.add(amount, fee);
+    uint128 total = LowGasSafeMath.add(amount, fee); // TODO: fee to meson protocol
     requests[swapId] = SwapRequest(initiator, provider, inToken, total, expireTs);
 
     _unsafeDepositToken(inToken, initiator, total);
