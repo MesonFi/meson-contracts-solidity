@@ -57,7 +57,7 @@ export class SwapRequest implements SwapRequestData {
     return this._encoded
   }
 
-  toObject() {
+  toObject(): SwapRequestData {
     return {
       inChain: this.inChain,
       inToken: this.inToken,
@@ -69,7 +69,7 @@ export class SwapRequest implements SwapRequestData {
     }
   }
 
-  serialize() {
+  serialize(): string {
     return JSON.stringify(this.toObject())
   }
 }
