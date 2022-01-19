@@ -78,7 +78,7 @@ contract MesonSwap is Context, IMesonSwap, MesonStates {
     require(keccak256(abi.encodePacked(inToken)) == inTokenHash, "inToken does not match");
     require(amount > 0, "swap amount must be greater than zero");
 
-    uint64 ts = uint64(block.timestamp);
+    uint48 ts = uint48(block.timestamp);
     require(expireTs > ts + MIN_BOND_TIME_PERIOD, "expires ts too early");
     require(expireTs < ts + MAX_BOND_TIME_PERIOD, "expires ts too late");
 
