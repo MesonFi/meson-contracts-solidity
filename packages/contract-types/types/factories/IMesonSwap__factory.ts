@@ -144,9 +144,9 @@ const _abi = [
         type: "bytes",
       },
       {
-        internalType: "address",
-        name: "inToken",
-        type: "address",
+        internalType: "uint8",
+        name: "inTokenIndex",
+        type: "uint8",
       },
       {
         internalType: "address",
@@ -170,13 +170,7 @@ const _abi = [
       },
     ],
     name: "postSwap",
-    outputs: [
-      {
-        internalType: "bytes32",
-        name: "swapId",
-        type: "bytes32",
-      },
-    ],
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -188,9 +182,9 @@ const _abi = [
         type: "bytes",
       },
       {
-        internalType: "address",
-        name: "inToken",
-        type: "address",
+        internalType: "uint8",
+        name: "inTokenIndex",
+        type: "uint8",
       },
     ],
     name: "requestSwap",
