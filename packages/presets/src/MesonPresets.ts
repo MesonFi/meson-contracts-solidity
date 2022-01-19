@@ -57,7 +57,6 @@ export class MesonPresets {
         this._addTokenToHashTable(t.addr)
       })
     })
-    console.log(this._tokenHashes.entries())
   }
 
   _addTokenToHashTable (address) {
@@ -79,10 +78,20 @@ export class MesonPresets {
     return networks.find(item => item.chainId === hexChainId)
   }
 
+  getNetworkFromCoinType (coinType) {
+    const networks = this.getAllNetworks()
+    return networks.find(item => item.slip44 === coinType)
+  }
+
   getTokensForNetwork (id) {
     const networks = this.getAllNetworks()
     const match = networks.find(item => item.id === id)
     return match?.tokens || []
+  }
+
+  getToken (networkId, addr) {
+    const tokens = this.getTokensForNetwork(networkId)
+    return tokens.find(token => token.addr.toLowerCase() === addr.toLowerCase())
   }
 
   getTokenFromHash (hash) {
