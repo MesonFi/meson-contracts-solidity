@@ -29,12 +29,13 @@ async function main() {
   const userClient = await MesonClient.Create(MesonSwapTest)
   const lpClient = await MesonClient.Create(MesonSwapTest)
 
-  //##########################---requestSwap---###########################
-  const swap = userClient.requestSwap(outChain, getDefaultSwap({
+  const swapData = getDefaultSwap({
     inToken: MockTokenAddress.address,
     outToken: MockTokenAddress.address
-  }))
+  })
 
+  //##########################---requestSwap---###########################
+  const swap = userClient.requestSwap(outChain, swapData)
   const exported = await swap.exportRequest(signer)
   const signedRequest = new SignedSwapRequest(exported)
   const approveTx = await MockTokenAddress.approve(MesonSwapTest.address, swap.amount)
@@ -51,13 +52,10 @@ async function main() {
   const lock = await MesonPoolsTest.lock(signedRequest.swapId, signedRequest.initiator, signedRequest.amount, signedRequest.outToken)
   getUsedGas('lock', lock.hash)
 
-  //###########################---用户释放签名---###########################
+  //###########################---publish release sig---###########################
+  const signedRelease = await swap.exportRelease(signer, swapData.recipient)
 
   //###########################---Release---###########################
-  const swapData = getDefaultSwap({
-    outToken: MockTokenAddress.address
-  })
-  const signedRelease = await swap.exportRelease(signer, swapData.recipient)
   SignedSwapRequest.CheckReleaseSignature(signedRelease)
   const release = await MesonPoolsTest.release(signedRelease.swapId, signedRelease.recipient, swap.amount, signedRelease.domainHash, ...signedRelease.signature)
   getUsedGas('release', release.hash)
