@@ -7,10 +7,11 @@ import "../interfaces/IERC20Minimal.sol";
 interface IMesonSwap {
   struct SwapRequest {
     address initiator;
-    uint32 providerIndex;
-    uint8 inTokenIndex;
-    uint128 total;
-    uint48 expireTs;
+    uint256 packed;
+    // uint32 providerIndex;
+    // uint8 inTokenIndex;
+    // uint128 total;
+    // uint48 expireTs;
   }
 
   function requestSwap(bytes memory encodedSwap, uint8 inTokenIndex) external returns (bytes32 swapId);
@@ -30,11 +31,11 @@ interface IMesonSwap {
   /// @param initiator The address for the initiator of the swap
   function postSwap(
     bytes memory encodedSwap,
-    uint8 inTokenIndex,
     address initiator,
     bytes32 r,
     bytes32 s,
-    uint8 v
+    uint8 v,
+    uint8 inTokenIndex
   ) external;
 
   /// @notice Cancel a swap

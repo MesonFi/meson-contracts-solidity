@@ -15,10 +15,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
   /// @notice swap requests by swapIds
   mapping(bytes32 => SwapRequest) public requests;
   mapping(bytes32 => address) public initiatorForSwap;
-  mapping(bytes32 => uint32) public providerIndexForSwap;
-  mapping(bytes32 => uint128) public totalForSwap;
-  mapping(bytes32 => uint8) public tokenIndexForSwap;
-  mapping(bytes32 => uint48) public expireTsForSwap;
+  mapping(bytes32 => uint256) public packedForSwap;
 
   /// @inheritdoc IMesonSwap
   function requestSwap(bytes memory encodedSwap, uint8 inTokenIndex)
@@ -50,37 +47,46 @@ contract MesonSwap is IMesonSwap, MesonStates {
   /// @inheritdoc IMesonSwap
   function postSwap(
     bytes memory encodedSwap,
-    uint8 inTokenIndex,
     address initiator,
     bytes32 r,
     bytes32 s,
-    uint8 v
+    uint8 v,
+    uint8 inTokenIndex
   ) external override {
     address inToken = tokens[inTokenIndex];
+    // before has 31463
+
+    // gas 5724
     (bytes32 swapId, uint128 amount, uint48 fee, uint48 expireTs) = _verifyEncodedSwap(encodedSwap, inToken);
 
-    require(initiator == ecrecover(swapId, v, r, s), "invalid signature"); // gas 3335
+    // gas 3724
+    require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
 
-    uint32 providerIndex = indexOfAddress[_msgSender()];
-    uint128 total = LowGasSafeMath.add(amount, fee); // TODO: fee to meson protocol
-    
-    // initiatorForSwap[swapId] = initiator;
-    // providerIndexForSwap[swapId] = providerIndex;
-    // tokenIndexForSwap[swapId] = inTokenIndex;
-    // totalForSwap[swapId] = total;
-    // expireTsForSwap[swapId] = expireTs;
+    // gas 2285
+    uint32 providerIndex = indexOfAddress[_msgSender()]; // gas
 
-    requests[swapId] = SwapRequest(
-      initiator,
-      providerIndex,
-      inTokenIndex,
-      total,
-      expireTs
-    ); // gas 55095
+    // TODO: fee to meson protocol
+    // gas 311
+    uint128 total = LowGasSafeMath.add(amount, fee);
 
-    _unsafeDepositToken(inToken, initiator, total); // gas 23355
+    // gas 658
+    uint256 packed =
+      uint256(total) << 128 +
+      uint256(providerIndex) << 64 +
+      uint256(expireTs) << 8 +
+      inTokenIndex;
 
-    emit SwapPosted(swapId); // 1051
+    initiatorForSwap[swapId] = initiator;
+    packedForSwap[swapId] = packed;
+
+    // gas 24541
+    // requests[swapId] = SwapRequest(initiator, packed);
+
+    // gas 24991
+    _unsafeDepositToken(inToken, initiator, total);
+
+    // gas 1197
+    // emit SwapPosted(swapId);
   }
 
   function _verifyEncodedSwap(bytes memory encodedSwap, address inToken)
