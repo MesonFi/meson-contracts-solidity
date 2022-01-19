@@ -44,10 +44,23 @@ async function main() {
   const exported = await swap.exportRequest(signer)
   const signedRequest = new SignedSwapRequest(exported)
 
+  const swapData2 = getDefaultSwap({
+    amount: '200',
+    inToken: tokenContract.address,
+    outToken: tokenContract.address
+  })
+  const swap2 = mesonClient.requestSwap(outChain, swapData2)
+  const exported2 = await swap2.exportRequest(signer)
+  const signedRequest2 = new SignedSwapRequest(exported2)
+
   // postSwap
-  const postSwapTx = await mesonClient.postSwap(signedRequest)
-  getUsedGas('postSwap', postSwapTx.hash)
-  await postSwapTx.wait(1)
+  const postSwapTx1 = await mesonClient.postSwap(signedRequest)
+  getUsedGas('first postSwap', postSwapTx1.hash)
+  await postSwapTx1.wait(1)
+
+  const postSwapTx2 = await mesonClient.postSwap(signedRequest2)
+  getUsedGas('another postSwap', postSwapTx2.hash)
+  await postSwapTx2.wait(1)
 
   // lock
   const lockTx = await mesonContract.lock(signedRequest.swapId, signedRequest.initiator, signedRequest.amount, signedRequest.outToken)
