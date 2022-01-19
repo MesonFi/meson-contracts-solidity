@@ -4,13 +4,14 @@ import { PartialSwapRequest } from '@mesonfi/sdk'
 type OptionalSwapRequestData = {
   inToken?: BytesLike,
   outToken?: BytesLike,
+  amount?: string,
   fee?: string,
 }
 
-export function getDefaultSwap({ inToken, outToken, fee }: OptionalSwapRequestData = {}): PartialSwapRequest {
+export function getDefaultSwap({ inToken, outToken, amount, fee }: OptionalSwapRequestData = {}): PartialSwapRequest {
   return {
     inToken: inToken || '0x943f0cabc0675f3642927e25abfa9a7ae15e8672',
-    amount: '100',
+    amount: amount || '100',
     fee: fee || '1',
     outToken: outToken || '0x2151166224670b37ec76c8ee2011bbbf4bbf2a52',
     recipient: '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211',
