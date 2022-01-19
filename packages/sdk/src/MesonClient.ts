@@ -53,7 +53,7 @@ export class MesonClient {
     this._check(signedRequest)
     return this.mesonInstance.postSwap(
       signedRequest.encode(),
-      signedRequest.inToken,
+      0,// signedRequest.inToken,
       signedRequest.initiator,
       ...signedRequest.signature
     )

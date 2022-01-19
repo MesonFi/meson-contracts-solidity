@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
-
 import "../libraries/LowGasSafeMath.sol";
 import "../interfaces/IERC20Minimal.sol";
 
@@ -14,23 +11,23 @@ import "../utils/MesonStates.sol";
 /// @notice The class to receive and process swap requests.
 /// Methods in this class will be executed by users or LPs when
 /// users initiate swaps in the current chain.
-contract MesonSwap is Context, IMesonSwap, MesonStates {
+contract MesonSwap is IMesonSwap, MesonStates {
   /// @notice swap requests by swapIds
   mapping(bytes32 => SwapRequest) public requests;
 
   /// @inheritdoc IMesonSwap
-  function requestSwap(bytes memory encodedSwap, address inToken)
+  function requestSwap(bytes memory encodedSwap, uint8 inTokenIndex)
     external
     override
-    tokenSupported(inToken)
     returns (bytes32)
   {
+    address inToken = tokens[inTokenIndex];
     (bytes32 swapId, uint128 amount, uint48 fee, uint48 expireTs) = _verifyEncodedSwap(encodedSwap, inToken);
 
     address initiator = _msgSender();
 
     uint128 total = LowGasSafeMath.add(amount, fee); // TODO: fee to meson protocol
-    requests[swapId] = SwapRequest(initiator, address(0), inToken, total, expireTs);
+    requests[swapId] = SwapRequest(initiator, 0, inTokenIndex, total, expireTs);
 
     _unsafeDepositToken(inToken, initiator, total);
 
@@ -39,8 +36,8 @@ contract MesonSwap is Context, IMesonSwap, MesonStates {
   }
 
   function bondSwap(bytes32 swapId) public override swapExists(swapId) {
-    require(requests[swapId].provider == address(0), "swap bonded to another provider");
-    requests[swapId].provider = _msgSender();
+    require(requests[swapId].providerIndex == 0, "swap bonded to another provider");
+    requests[swapId].providerIndex = indexOfAddress[_msgSender()];
 
     emit SwapBonded(swapId);
   }
@@ -48,24 +45,31 @@ contract MesonSwap is Context, IMesonSwap, MesonStates {
   /// @inheritdoc IMesonSwap
   function postSwap(
     bytes memory encodedSwap,
-    address inToken,
+    uint8 inTokenIndex,
     address initiator,
     bytes32 r,
     bytes32 s,
     uint8 v
-  ) external override tokenSupported(inToken) returns (bytes32) {
+  ) external override {
+    address inToken = tokens[inTokenIndex];
     (bytes32 swapId, uint128 amount, uint48 fee, uint48 expireTs) = _verifyEncodedSwap(encodedSwap, inToken);
 
-    require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
+    require(initiator == ecrecover(swapId, v, r, s), "invalid signature"); // gas 3335
 
-    address provider = _msgSender();
+    uint32 providerIndex = indexOfAddress[_msgSender()];
     uint128 total = LowGasSafeMath.add(amount, fee); // TODO: fee to meson protocol
-    requests[swapId] = SwapRequest(initiator, provider, inToken, total, expireTs);
+    
+    requests[swapId] = SwapRequest(
+      initiator,
+      providerIndex,
+      inTokenIndex,
+      total,
+      expireTs
+    ); // gas 55095
 
-    _unsafeDepositToken(inToken, initiator, total);
+    _unsafeDepositToken(inToken, initiator, total); // gas 23355
 
-    emit SwapPosted(swapId);
-    return swapId;
+    emit SwapPosted(swapId); // 1051
   }
 
   function _verifyEncodedSwap(bytes memory encodedSwap, address inToken)
@@ -91,7 +95,7 @@ contract MesonSwap is Context, IMesonSwap, MesonStates {
   /// @inheritdoc IMesonSwap
   function cancelSwap(bytes32 swapId) external override swapExists(swapId) swapExpired(swapId) {
     SwapRequest memory req = requests[swapId];
-    address inToken = req.inToken;
+    address inToken = tokens[req.inTokenIndex];
     address initiator = req.initiator;
     uint128 total = req.total;
     delete requests[swapId];
@@ -113,8 +117,8 @@ contract MesonSwap is Context, IMesonSwap, MesonStates {
     SwapRequest memory req = requests[swapId];
     _checkReleaseSignature(swapId, keccak256(recipient), DOMAIN_SEPARATOR, req.initiator, r, s, v);
 
-    address inToken = req.inToken;
-    address provider = req.provider;
+    address inToken = tokens[req.inTokenIndex];
+    address provider = addressOfIndex[req.providerIndex];
     uint128 total = req.total;
 
     delete requests[swapId];
