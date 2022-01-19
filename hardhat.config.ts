@@ -56,11 +56,6 @@ export default {
       url: 'http://localhost:62743',
       accounts: 'remote',
       timeout: 0,
-    }, 
-    kovan: {
-      url: 'https://kovan.infura.io/v3/5edf63dd8807423f9e95cacfc0560360',
-      accounts: ['4719806c5b87c68e046b7b958d4416f66ff752ce60a36d28c0b9c5f29cbc9ab0'],
-      timeout: 0,
     },
     ...networks,
   },
