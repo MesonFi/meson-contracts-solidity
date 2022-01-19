@@ -67,7 +67,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
 
     emit SwapLocked(swapId, provider);
   }
- 
+
   /// @inheritdoc IMesonPools
   function unlock(bytes32 swapId) external override {
     require(_hasLockingSwap(swapId), "swap does not exist");
