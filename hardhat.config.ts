@@ -49,7 +49,7 @@ export default {
       },
     },
   },
-  defaultNetwork: 'hardhat',
+  defaultNetwork: 'obsidians',
   networks: {
     hardhat: {},
     obsidians: {
