@@ -63,7 +63,7 @@ async function main() {
   await postSwapTx2.wait(1)
 
   // lock
-  const lockTx = await mesonContract.lock(signedRequest.swapId, signedRequest.initiator, signedRequest.amount, signedRequest.outToken)
+  const lockTx = await mesonClient.lock(signedRequest)
   getUsedGas('lock', lockTx.hash)
   await lockTx.wait(1)
 
@@ -72,7 +72,7 @@ async function main() {
 
   // Release
   const signedRelease = new SignedSwapRelease(exportedRelease)
-  const releaseTx = await mesonContract.release(signedRelease.swapId, signedRelease.recipient, swap.amount, signedRelease.domainHash, ...signedRelease.signature)
+  const releaseTx = await mesonClient.release(signedRelease, swap.amount)
   getUsedGas('release', releaseTx.hash)
 }
 

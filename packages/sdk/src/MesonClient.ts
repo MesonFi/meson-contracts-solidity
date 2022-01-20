@@ -67,4 +67,25 @@ export class MesonClient {
       depositToPool
     )
   }
+
+  async lock(signedRequest: SignedSwapRequest) {
+    this._check(signedRequest)
+    return this.mesonInstance.lock(
+      signedRequest.swapId,
+      signedRequest.initiator,
+      signedRequest.amount,
+      signedRequest.outToken
+    )
+  }
+
+  async release(signedRelease: SignedSwapReleaseData, amount: string) {
+    this._check(signedRelease)
+    return this.mesonInstance.release(
+      signedRelease.swapId,
+      signedRelease.recipient,
+      amount,
+      signedRelease.domainHash,
+      ...signedRelease.signature
+    )
+  }
 }

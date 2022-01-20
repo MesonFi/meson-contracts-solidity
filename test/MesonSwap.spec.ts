@@ -21,11 +21,11 @@ describe('MesonSwap', () => {
     ]))
     token = result.token1.connect(initiator)
     unsupportedToken = result.token2.connect(initiator)
-    mesonInstance = result.swap.connect(provider)
+    mesonInstance = result.swap // default account is signer
 
     outChain = await mesonInstance.getCoinType()
-    userClient = await MesonClient.Create(result.swap)
-    lpClient = await MesonClient.Create(mesonInstance)
+    userClient = await MesonClient.Create(mesonInstance) // user is default account
+    lpClient = await MesonClient.Create(mesonInstance.connect(provider))
   })
 
 
