@@ -1,5 +1,5 @@
 import { waffle } from 'hardhat'
-import { MesonClient, SignedSwapRequest } from '@mesonfi/sdk'
+import { MesonClient, SignedSwapRequest, SignedSwapRelease } from '@mesonfi/sdk'
 import { MockToken, MesonPoolsTest } from '@mesonfi/contract-typs'
 
 import { expect } from './shared/expect'
@@ -106,8 +106,8 @@ describe('MesonPools', () => {
       await mesonInstance.deposit(signedRequest.outToken, signedRequest.amount)
       await mesonInstance.lock(signedRequest.swapId, signedRequest.initiator, signedRequest.amount, signedRequest.outToken)
 
-      const signedRelease = await swap.exportRelease(initiator, swapData.recipient)
-      SignedSwapRequest.CheckReleaseSignature(signedRelease)
+      const exportedRelease = await swap.exportRelease(initiator, swapData.recipient)
+      const signedRelease = new SignedSwapRelease(exportedRelease)
       await mesonInstance.release(signedRelease.swapId, signedRelease.recipient, swap.amount, signedRelease.domainHash, ...signedRelease.signature)
 
       expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
