@@ -3,7 +3,7 @@ import { BytesLike } from '@ethersproject/bytes'
 
 import { SwapSigner } from './SwapSigner'
 import { SwapRequestWithSigner } from './SwapRequestWithSigner'
-import { SignedSwapCommonData, SignedSwapRequest, SignedSwapReleaseData } from './SignedSwapRequest'
+import { SignedSwapCommonData, SignedSwapRequest, SignedSwapReleaseData } from './SignedSwap'
 
 export interface PartialSwapRequest {
   inToken: BytesLike,
