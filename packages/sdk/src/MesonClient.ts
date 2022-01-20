@@ -3,7 +3,7 @@ import { BytesLike } from '@ethersproject/bytes'
 
 import { SwapSigner } from './SwapSigner'
 import { SwapRequestWithSigner } from './SwapRequestWithSigner'
-import { SignedSwapCommonData, SignedSwapRequest, SignedSwapReleaseData } from './SignedSwapRequest'
+import { SignedSwapCommonData, SignedSwapRequest, SignedSwapReleaseData } from './SignedSwap'
 
 export interface PartialSwapRequest {
   inToken: BytesLike,
@@ -66,6 +66,27 @@ export class MesonClient {
       signedRelease.recipient,
       ...signedRelease.signature,
       depositToPool
+    )
+  }
+
+  async lock(signedRequest: SignedSwapRequest) {
+    this._check(signedRequest)
+    return this.mesonInstance.lock(
+      signedRequest.swapId,
+      signedRequest.initiator,
+      signedRequest.amount,
+      signedRequest.outToken
+    )
+  }
+
+  async release(signedRelease: SignedSwapReleaseData, amount: string) {
+    this._check(signedRelease)
+    return this.mesonInstance.release(
+      signedRelease.swapId,
+      signedRelease.recipient,
+      amount,
+      signedRelease.domainHash,
+      ...signedRelease.signature
     )
   }
 }

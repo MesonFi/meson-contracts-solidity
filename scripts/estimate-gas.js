@@ -1,4 +1,4 @@
-const { MesonClient, SignedSwapRequest } = require('@mesonfi/sdk/src')
+const { MesonClient, SignedSwapRequest, SignedSwapRelease } = require('@mesonfi/sdk/src')
 const { getDefaultSwap } = require('../test/shared/meson')
 
 const ethers = hre.ethers
@@ -63,16 +63,16 @@ async function main() {
   await postSwapTx2.wait(1)
 
   // lock
-  const lockTx = await mesonContract.lock(signedRequest.swapId, signedRequest.initiator, signedRequest.amount, signedRequest.outToken)
+  const lockTx = await mesonClient.lock(signedRequest)
   getUsedGas('lock', lockTx.hash)
   await lockTx.wait(1)
 
   // release signature (no gas)
-  const signedRelease = await swap.exportRelease(signer, swapData.recipient)
+  const exportedRelease = await swap.exportRelease(signer, swapData.recipient)
 
   // Release
-  SignedSwapRequest.CheckReleaseSignature(signedRelease)
-  const releaseTx = await mesonContract.release(signedRelease.swapId, signedRelease.recipient, swap.amount, signedRelease.domainHash, ...signedRelease.signature)
+  const signedRelease = new SignedSwapRelease(exportedRelease)
+  const releaseTx = await mesonClient.release(signedRelease, swap.amount)
   getUsedGas('release', releaseTx.hash)
 }
 

@@ -1,5 +1,5 @@
 import { waffle } from 'hardhat'
-import { MesonClient, SignedSwapRequest } from '@mesonfi/sdk'
+import { MesonClient, SignedSwapRequest, SignedSwapRelease } from '@mesonfi/sdk'
 import { MockToken, MesonSwapTest } from '@mesonfi/contract-typs'
 
 import { expect } from './shared/expect'
@@ -21,11 +21,11 @@ describe('MesonSwap', () => {
     ]))
     token = result.token1.connect(initiator)
     unsupportedToken = result.token2.connect(initiator)
-    mesonInstance = result.swap.connect(provider)
+    mesonInstance = result.swap // default account is signer
 
     outChain = await mesonInstance.getCoinType()
-    userClient = await MesonClient.Create(result.swap)
-    lpClient = await MesonClient.Create(mesonInstance)
+    userClient = await MesonClient.Create(mesonInstance) // user is default account
+    lpClient = await MesonClient.Create(mesonInstance.connect(provider))
   })
 
 
@@ -62,8 +62,8 @@ describe('MesonSwap', () => {
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
-      const signedRelease = await swap.exportRelease(initiator, swapData.recipient)
-      SignedSwapRequest.CheckReleaseSignature(signedRelease)
+      const exportedRelease = await swap.exportRelease(initiator, swapData.recipient)
+      const signedRelease = new SignedSwapRelease(exportedRelease)
       await lpClient.executeSwap(signedRelease, false)
 
       expect(await mesonInstance.hasSwap(swap.swapId)).to.equal(false)
