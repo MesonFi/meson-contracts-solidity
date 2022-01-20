@@ -19,8 +19,19 @@ export interface SignedSwapReleaseData extends SignedSwapCommonData {
   domainHash: string,
 }
 
-export class SignedSwapRequest extends SwapRequest {
-  readonly signer: SwapSigner
+function checkCommonData(request: SignedSwapCommonData) {
+  if (!request.chainId) {
+    throw new Error('Missing chain id')
+  } else if (!request.mesonAddress) {
+    throw new Error('Missing meson contract address')
+  } else if (!request.initiator) {
+    throw new Error('Missing initiator')
+  } else if (!request.signature) {
+    throw new Error('Missing signature')
+  }
+}
+
+export class SignedSwapRequest extends SwapRequest implements SignedSwapRequestData {
   readonly swapId: string
   readonly chainId: number
   readonly mesonAddress: string
@@ -37,36 +48,55 @@ export class SignedSwapRequest extends SwapRequest {
     return new SignedSwapRequest(parsed)
   }
 
-  constructor (signedReq: SignedSwapRequestData) {
-    if (!signedReq.chainId) {
-      throw new Error('Missing chain id')
-    } else if (!signedReq.mesonAddress) {
-      throw new Error('Missing meson contract address')
-    } else if (!signedReq.initiator) {
-      throw new Error('Missing initiator')
-    } else if (!signedReq.signature) {
-      throw new Error('Missing signature')
-    }
-
-    const signer = new SwapSigner(signedReq.mesonAddress, Number(signedReq.chainId))
-    const recovered = signer.recoverFromRequestSignature(signedReq)
-    if (recovered !== signedReq.initiator) {
-      throw new Error('Invalid signature')
-    }
-
+  constructor(signedReq: SignedSwapRequestData) {
+    checkCommonData(signedReq)
     super(signedReq)
-    this.signer = signer
-    this.swapId = signer.getSwapId(this)
+    this.swapId = signedReq.swapId
     this.chainId = signedReq.chainId
     this.mesonAddress = signedReq.mesonAddress
     this.initiator = signedReq.initiator
     this.signature = signedReq.signature
   }
 
-  static CheckReleaseSignature (signedRelease: SignedSwapReleaseData) {
-    const signer = new SwapSigner(signedRelease.mesonAddress, Number(signedRelease.chainId))
-    const recovered = signer.recoverFromReleaseSignature(signedRelease)
-    if (recovered !== signedRelease.initiator) {
+  checkRequestSignature() {
+    const signer = new SwapSigner(this.mesonAddress, Number(this.chainId))
+    const recovered = signer.recoverFromRequestSignature(this)
+    if (recovered !== this.initiator) {
+      throw new Error('Invalid signature')
+    }
+  }
+}
+
+export class SignedSwapRelease implements SignedSwapReleaseData {
+  readonly swapId: string
+  readonly chainId: number
+  readonly mesonAddress: string
+  readonly initiator: BytesLike
+  readonly signature: Signature
+
+  readonly recipient: string;
+  readonly domainHash: string;
+
+  constructor(signedRelease: SignedSwapReleaseData) {
+    checkCommonData(signedRelease)
+    if (!signedRelease.recipient) {
+      throw new Error('Missing recipient')
+    } else if (!signedRelease.domainHash) {
+      throw new Error('Missing meson domain hash')
+    }
+    this.swapId = signedRelease.swapId
+    this.chainId = signedRelease.chainId
+    this.mesonAddress = signedRelease.mesonAddress
+    this.initiator = signedRelease.initiator
+    this.signature = signedRelease.signature
+    this.recipient = signedRelease.recipient
+    this.domainHash = signedRelease.domainHash
+  }
+
+  checkReleaseSignature() {
+    const signer = new SwapSigner(this.mesonAddress, Number(this.chainId))
+    const recovered = signer.recoverFromReleaseSignature(this)
+    if (recovered !== this.initiator) {
       throw new Error('Invalid signature')
     }
   }

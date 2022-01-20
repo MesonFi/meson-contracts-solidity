@@ -38,6 +38,20 @@ export class SwapRequest implements SwapRequestData {
   private _encoded: BytesLike = ''
 
   constructor(req: SwapRequestData) {
+    if (!req.expireTs) {
+      throw new Error('Missing expireTs')
+    } else if (!req.inChain) {
+      throw new Error('Missing inChain')
+    } else if (!req.inToken) {
+      throw new Error('Missing inToken')
+    } else if (!req.amount) {
+      throw new Error('Missing amount')
+    } else if (!req.outChain) {
+      throw new Error('Missing outChain')
+    } else if (!req.outToken) {
+      throw new Error('Missing outToken')
+    }
+
     this.expireTs = req.expireTs
     this.inChain = req.inChain
     this.inToken = req.inToken
