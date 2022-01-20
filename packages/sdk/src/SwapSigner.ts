@@ -1,10 +1,9 @@
 import type { Wallet } from '@ethersproject/wallet'
 import type { TypedDataDomain } from '@ethersproject/abstract-signer'
 import { _TypedDataEncoder } from '@ethersproject/hash'
-import { recoverAddress } from '@ethersproject/transactions'
 
 import { SwapRequestData, SWAP_REQUEST_TYPE, SWAP_RELEASE_TYPE } from './SwapRequest'
-import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwapRequest'
+import { SignedSwapReleaseData } from './SignedSwap'
 
 interface MesonTypedDataDomain extends TypedDataDomain {
   chainId: number;
@@ -58,14 +57,7 @@ export class SwapSigner {
     return _TypedDataEncoder.hash(this.domain, SWAP_REQUEST_TYPE, swap)
   }
 
-  recoverFromRequestSignature(swap: SignedSwapRequestData): string {
-    const [r, s, v] = swap.signature
-    return recoverAddress(this.getSwapId(swap), { r, s, v }).toLowerCase()
-  }
-
-  recoverFromReleaseSignature(release: SignedSwapReleaseData): string {
-    const digest = _TypedDataEncoder.hash(this.domain, SWAP_RELEASE_TYPE, release)
-    const [r, s, v] = release.signature
-    return recoverAddress(digest, { r, s, v }).toLowerCase()
+  hashRelease(release: SignedSwapReleaseData): string {
+    return _TypedDataEncoder.hash(this.domain, SWAP_RELEASE_TYPE, release)
   }
 }

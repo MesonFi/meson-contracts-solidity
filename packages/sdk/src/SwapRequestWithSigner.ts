@@ -3,7 +3,7 @@ import type { Signature } from './SwapSigner'
 
 import { SwapSigner } from './SwapSigner'
 import { SwapRequest, SwapRequestData } from './SwapRequest'
-import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwapRequest'
+import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwap'
 
 export class SwapRequestWithSigner extends SwapRequest {
   readonly signer: SwapSigner
