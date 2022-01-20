@@ -53,11 +53,11 @@ export class SwapSigner {
     return [r, s, v]
   }
 
-  getSwapId(swap: SwapRequestData): string {
-    return _TypedDataEncoder.hash(this.domain, SWAP_REQUEST_TYPE, swap)
+  hashRequest(swapRequest: SwapRequestData): string {
+    return _TypedDataEncoder.hash(this.domain, SWAP_REQUEST_TYPE, swapRequest)
   }
 
-  hashRelease(release: SignedSwapReleaseData): string {
-    return _TypedDataEncoder.hash(this.domain, SWAP_RELEASE_TYPE, release)
+  hashRelease(swapRelease: SignedSwapReleaseData): string {
+    return _TypedDataEncoder.hash(this.domain, SWAP_RELEASE_TYPE, swapRelease)
   }
 }

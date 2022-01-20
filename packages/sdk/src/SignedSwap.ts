@@ -29,7 +29,7 @@ class SignedSwapCommon implements SignedSwapCommonData {
   readonly signature: Signature
   readonly signer: SwapSigner
 
-  constructor(data: SignedSwapCommonData) {
+  constructor (data: SignedSwapCommonData) {
     if (!data.chainId) {
       throw new Error('Missing chain id')
     } else if (!data.mesonAddress) {
@@ -46,6 +46,16 @@ class SignedSwapCommon implements SignedSwapCommonData {
     this.signature = data.signature
     this.signer = new SwapSigner(this.mesonAddress, Number(this.chainId))
   }
+
+  get digest () { return '' }
+
+  _checkSignature () {
+    const [r, s, v] = this.signature
+    const recovered = recoverAddress(this.digest, { r, s, v }).toLowerCase()
+    if (recovered !== this.initiator) {
+      throw new Error('Invalid signature')
+    }
+  }
 }
 
 export class SignedSwapRequest extends SignedSwapCommon {
@@ -61,16 +71,18 @@ export class SignedSwapRequest extends SignedSwapCommon {
     return new SignedSwapRequest(parsed)
   }
 
-  constructor(signedReq: SignedSwapRequestData) {
+  constructor (signedReq: SignedSwapRequestData) {
     super(signedReq)
     this.req = new SwapRequest(signedReq)
 
-    if (signedReq.swapId !== this.signer.getSwapId(signedReq)) {
+    if (signedReq.swapId !== this.signer.hashRequest(signedReq)) {
       throw new Error('Invalid swap id')
     }
 
-    this._checkRequestSignature()
+    this._checkSignature()
   }
+
+  get digest () { return this.swapId }
 
   encode () { return this.req.encode() }
   get expireTs () { return this.req.expireTs }
@@ -79,22 +91,15 @@ export class SignedSwapRequest extends SignedSwapCommon {
   get amount () { return this.req.amount }
   get outChain () { return this.req.outChain }
   get outToken () { return this.req.outToken }
-
-  _checkRequestSignature() {
-    const [r, s, v] = this.signature
-    const recovered = recoverAddress(this.swapId, { r, s, v }).toLowerCase()
-    if (recovered !== this.initiator) {
-      throw new Error('Invalid signature')
-    }
-  }
 }
 
 export class SignedSwapRelease extends SignedSwapCommon implements SignedSwapReleaseData {
   readonly recipient: string;
   readonly domainHash: string;
 
-  constructor(signedRelease: SignedSwapReleaseData) {
+  constructor (signedRelease: SignedSwapReleaseData) {
     super(signedRelease)
+    
     if (!signedRelease.recipient) {
       throw new Error('Missing recipient')
     } else if (!signedRelease.domainHash) {
@@ -103,15 +108,8 @@ export class SignedSwapRelease extends SignedSwapCommon implements SignedSwapRel
     this.recipient = signedRelease.recipient
     this.domainHash = signedRelease.domainHash
 
-    this._checkReleaseSignature()
+    this._checkSignature()
   }
 
-  _checkReleaseSignature() {
-    const digest = this.signer.hashRelease(this)
-    const [r, s, v] = this.signature
-    const recovered = recoverAddress(digest, { r, s, v }).toLowerCase()
-    if (recovered !== this.initiator) {
-      throw new Error('Invalid signature')
-    }
-  }
+  get digest () { return this.signer.hashRelease(this) }
 }
