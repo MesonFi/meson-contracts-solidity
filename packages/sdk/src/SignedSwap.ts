@@ -56,6 +56,16 @@ class SignedSwapCommon implements SignedSwapCommonData {
       throw new Error('Invalid signature')
     }
   }
+
+  toData(): SignedSwapCommonData {
+    return {
+      swapId: this.swapId,
+      initiator: this.initiator,
+      chainId: this.chainId,
+      mesonAddress: this.mesonAddress,
+      signature: this.signature,
+    }
+  }
 }
 
 export class SignedSwapRequest extends SignedSwapCommon {
@@ -89,6 +99,13 @@ export class SignedSwapRequest extends SignedSwapCommon {
   get amount () { return this.req.amount }
   get outChain () { return this.req.outChain }
   get outToken () { return this.req.outToken }
+
+  toData(): SignedSwapRequestData {
+    return {
+      ...super.toData(),
+      ...this.req.toObject(),
+    }
+  }
 }
 
 export class SignedSwapRelease extends SignedSwapCommon implements SignedSwapReleaseData {
@@ -108,4 +125,12 @@ export class SignedSwapRelease extends SignedSwapCommon implements SignedSwapRel
   }
 
   get digest () { return this.signer.hashRelease(this) }
+
+  toData(): SignedSwapReleaseData {
+    return {
+      ...super.toData(),
+      recipient: this.recipient,
+      domainHash: this.domainHash,
+    }
+  }
 }
