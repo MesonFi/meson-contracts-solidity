@@ -57,7 +57,7 @@ class SignedSwapCommon implements SignedSwapCommonData {
     }
   }
 
-  toData(): SignedSwapCommonData {
+  toObject (): SignedSwapCommonData {
     return {
       swapId: this.swapId,
       initiator: this.initiator,
@@ -100,9 +100,9 @@ export class SignedSwapRequest extends SignedSwapCommon {
   get outChain () { return this.req.outChain }
   get outToken () { return this.req.outToken }
 
-  toData(): SignedSwapRequestData {
+  toObject (): SignedSwapRequestData {
     return {
-      ...super.toData(),
+      ...super.toObject(),
       ...this.req.toObject(),
     }
   }
@@ -126,9 +126,9 @@ export class SignedSwapRelease extends SignedSwapCommon implements SignedSwapRel
 
   get digest () { return this.signer.hashRelease(this) }
 
-  toData(): SignedSwapReleaseData {
+  toObject (): SignedSwapReleaseData {
     return {
-      ...super.toData(),
+      ...super.toObject(),
       recipient: this.recipient,
       domainHash: this.domainHash,
     }
