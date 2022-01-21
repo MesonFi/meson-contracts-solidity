@@ -1,6 +1,6 @@
 {
   "name": "meson-contracts-solidity",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "index.js",
   "private": true,
   "scripts": {
@@ -28,9 +28,9 @@
     "publish": "npm publish --workspaces"
   },
   "devDependencies": {
-    "@mesonfi/contract-abis": "^0.1.5",
-    "@mesonfi/contract-types": "^0.1.5",
-    "@mesonfi/presets": "^0.1.15",
+    "@mesonfi/contract-abis": "^0.1.6",
+    "@mesonfi/contract-types": "^0.1.6",
+    "@mesonfi/presets": "^0.1.16",
     "@mesonfi/sdk": "^0.1.6",
     "@nomiclabs/hardhat-ethers": "^2.0.3",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
