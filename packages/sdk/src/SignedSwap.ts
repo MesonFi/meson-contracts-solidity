@@ -49,7 +49,7 @@ class SignedSwapCommon implements SignedSwapCommonData {
 
   get digest () { return '' }
 
-  _checkSignature () {
+  checkSignature () {
     const [r, s, v] = this.signature
     const recovered = recoverAddress(this.digest, { r, s, v }).toLowerCase()
     if (recovered !== this.initiator) {
@@ -78,8 +78,6 @@ export class SignedSwapRequest extends SignedSwapCommon {
     if (signedReq.swapId !== this.signer.hashRequest(signedReq)) {
       throw new Error('Invalid swap id')
     }
-
-    this._checkSignature()
   }
 
   get digest () { return this.swapId }
@@ -99,7 +97,7 @@ export class SignedSwapRelease extends SignedSwapCommon implements SignedSwapRel
 
   constructor (signedRelease: SignedSwapReleaseData) {
     super(signedRelease)
-    
+
     if (!signedRelease.recipient) {
       throw new Error('Missing recipient')
     } else if (!signedRelease.domainHash) {
@@ -107,8 +105,6 @@ export class SignedSwapRelease extends SignedSwapCommon implements SignedSwapRel
     }
     this.recipient = signedRelease.recipient
     this.domainHash = signedRelease.domainHash
-
-    this._checkSignature()
   }
 
   get digest () { return this.signer.hashRelease(this) }
