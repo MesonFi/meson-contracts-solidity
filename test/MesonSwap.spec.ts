@@ -35,6 +35,7 @@ describe('MesonSwap', () => {
       const exported = await swap.exportRequest(initiator)
 
       const signedRequest = new SignedSwapRequest(exported)
+      signedRequest.checkSignature()
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
@@ -47,6 +48,7 @@ describe('MesonSwap', () => {
       const exported = await swap.exportRequest(initiator)
 
       const signedRequest = new SignedSwapRequest(exported)
+      signedRequest.checkSignature()
       await unsupportedToken.approve(mesonInstance.address, swap.amount)
       await expect(lpClient.postSwap(signedRequest)).to.be.revertedWith('unsupported token')
     })
@@ -59,11 +61,13 @@ describe('MesonSwap', () => {
       const exported = await swap.exportRequest(initiator)
       
       const signedRequest = new SignedSwapRequest(exported)
+      signedRequest.checkSignature()
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
       const exportedRelease = await swap.exportRelease(initiator, swapData.recipient)
       const signedRelease = new SignedSwapRelease(exportedRelease)
+      signedRelease.checkSignature()
       await lpClient.executeSwap(signedRelease, false)
 
       expect(await mesonInstance.hasSwap(swap.swapId)).to.equal(false)
