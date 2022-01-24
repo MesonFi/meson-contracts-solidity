@@ -11,16 +11,7 @@ contract MesonHelpers is MesonConfig {
   bytes32 internal constant EIP712_DOMAIN_TYPEHASH =
     keccak256(bytes("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"));
 
-  bytes32 internal DOMAIN_SEPARATOR =
-    keccak256(
-      abi.encode(
-        EIP712_DOMAIN_TYPEHASH,
-        keccak256(bytes("Meson Fi")),
-        keccak256(bytes("1")),
-        block.chainid,
-        address(this)
-      )
-    );
+  bytes32 internal DOMAIN_SEPARATOR ;
 
   bytes32 internal constant SWAP_REQUEST_TYPEHASH =
     keccak256(bytes("SwapRequest(bytes inToken,uint256 amount,uint64 expireTs,bytes4 outChain,bytes outToken)"));
