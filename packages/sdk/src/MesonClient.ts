@@ -1,3 +1,4 @@
+import type { Wallet } from '@ethersproject/wallet'
 import type { Meson } from '@mesonfi/contract-types'
 
 import { SwapSigner } from './SwapSigner'
@@ -86,5 +87,20 @@ export class MesonClient {
       signedRelease.domainHash,
       ...signedRelease.signature
     )
+  }
+
+  async cancelSwap(swapId: string, signer?: Wallet) {
+    if (signer) {
+      return await this.mesonInstance.connect(signer).cancelSwap(swapId)
+    }
+    return await this.mesonInstance.cancelSwap(swapId)
+  }
+
+  async getSwap(swapId: string) {
+    return await this.mesonInstance.requests(swapId)
+  }
+
+  async getLockingSwap(swapId: string) {
+    return await this.mesonInstance.lockingSwaps(swapId)
   }
 }
