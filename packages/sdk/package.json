@@ -19,11 +19,10 @@
   },
   "dependencies": {
     "@ethersproject/abstract-signer": "5.5.0",
-    "@ethersproject/bytes": "5.5.0",
-    "@ethersproject/contracts": "5.5.0",
     "@ethersproject/hash": "5.5.0",
     "@ethersproject/transactions": "5.5.0",
-    "@ethersproject/wallet": "5.5.0"
+    "@ethersproject/wallet": "5.5.0",
+    "@mesonfi/contract-types": "^0.1.6"
   },
   "devDependencies": {
     "typescript": "^4.5.4"

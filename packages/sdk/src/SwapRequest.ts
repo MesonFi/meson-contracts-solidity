@@ -1,4 +1,3 @@
-import type { BytesLike } from '@ethersproject/bytes'
 import { _TypedDataEncoder } from '@ethersproject/hash'
 
 export const SWAP_REQUEST_TYPE = {
@@ -20,22 +19,22 @@ export const SWAP_RELEASE_TYPE = {
 
 export interface SwapRequestData {
   expireTs: number,
-  inChain: BytesLike,
-  inToken: BytesLike,
+  inChain: string,
+  inToken: string,
   amount: string,
-  outChain: BytesLike,
-  outToken: BytesLike,
+  outChain: string,
+  outToken: string,
 }
 
 export class SwapRequest implements SwapRequestData {
   readonly expireTs: number
-  readonly inChain: BytesLike
-  readonly inToken: BytesLike
+  readonly inChain: string
+  readonly inToken: string
   readonly amount: string
-  readonly outChain: BytesLike
-  readonly outToken: BytesLike
+  readonly outChain: string
+  readonly outToken: string
 
-  private _encoded: BytesLike = ''
+  private _encoded: string = ''
 
   constructor(req: SwapRequestData) {
     if (!req.expireTs) {
@@ -60,7 +59,7 @@ export class SwapRequest implements SwapRequestData {
     this.outToken = req.outToken
   }
 
-  encode(): BytesLike {
+  encode(): string {
     if (!this._encoded) {
       this._encoded = _TypedDataEncoder.from(SWAP_REQUEST_TYPE).encode(this)
     }
