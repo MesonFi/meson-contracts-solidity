@@ -1,9 +1,11 @@
-import { defaultAbiCoder } from '@ethersproject/abi'
+import type { Provider } from '@ethersproject/providers'
+import type { SwapRequestData } from '@mesonfi/sdk'
+
 import { Contract as EthersContract } from '@ethersproject/contracts'
+import { defaultAbiCoder } from '@ethersproject/abi'
 import { keccak256 } from '@ethersproject/keccak256'
-import { Provider } from '@ethersproject/providers'
+import { MesonClient } from '@mesonfi/sdk'
 import { Meson } from '@mesonfi/contract-abis'
-import { MesonClient, SwapRequestData } from '@mesonfi/sdk'
 import mainnets from './mainnets.json'
 
 export interface PresetToken {
