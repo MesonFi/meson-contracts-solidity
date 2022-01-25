@@ -6,6 +6,8 @@ import { defaultAbiCoder } from '@ethersproject/abi'
 import { keccak256 } from '@ethersproject/keccak256'
 import { MesonClient } from '@mesonfi/sdk'
 import { Meson } from '@mesonfi/contract-abis'
+
+import testnets from './testnets.json'
 import mainnets from './mainnets.json'
 
 export interface PresetToken {
@@ -42,6 +44,10 @@ export class MesonPresets {
     this._networks = networks
     this._cache = new Map()
     this._tokenHashes = new Map()
+  }
+
+  useTestnet(testnet) {
+    this._networks = testnet ? testnets : mainnets
   }
 
   calcAllTokenHashes(): void {
