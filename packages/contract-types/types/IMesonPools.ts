@@ -20,11 +20,11 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface IMesonPoolsInterface extends utils.Interface {
   functions: {
     "challenge()": FunctionFragment;
-    "deposit(address,uint256)": FunctionFragment;
-    "lock(bytes32,address,uint256,address)": FunctionFragment;
-    "release(bytes32,address,uint256,bytes32,bytes32,bytes32,uint8)": FunctionFragment;
+    "deposit(address,uint128)": FunctionFragment;
+    "lock(bytes32,address,uint128,address)": FunctionFragment;
+    "release(bytes32,address,uint128,bytes32,bytes32,bytes32,uint8)": FunctionFragment;
     "unlock(bytes32)": FunctionFragment;
-    "withdraw(address,uint256)": FunctionFragment;
+    "withdraw(address,uint128)": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "challenge", values?: undefined): string;

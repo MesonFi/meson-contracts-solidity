@@ -24,23 +24,21 @@ export interface UpgradableMesonInterface extends utils.Interface {
     "bondSwap(bytes32)": FunctionFragment;
     "cancelSwap(bytes32)": FunctionFragment;
     "challenge()": FunctionFragment;
-    "deposit(address,uint256)": FunctionFragment;
+    "deposit(address,uint128)": FunctionFragment;
     "executeSwap(bytes32,bytes,bytes32,bytes32,uint8,bool)": FunctionFragment;
     "getCoinType()": FunctionFragment;
     "initialize(address[])": FunctionFragment;
-    "lock(bytes32,address,uint256,address)": FunctionFragment;
+    "lock(bytes32,address,uint128,address)": FunctionFragment;
     "lockingSwaps(bytes32)": FunctionFragment;
     "postSwap(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
-    "release(bytes32,address,uint256,bytes32,bytes32,bytes32,uint8)": FunctionFragment;
+    "release(bytes32,address,uint128,bytes32,bytes32,bytes32,uint8)": FunctionFragment;
     "requestSwap(bytes,address)": FunctionFragment;
     "requests(bytes32)": FunctionFragment;
     "supportedTokens(address)": FunctionFragment;
-    "totalDemandFor(address)": FunctionFragment;
-    "totalSupplyFor(address)": FunctionFragment;
     "unlock(bytes32)": FunctionFragment;
     "upgradeTo(address)": FunctionFragment;
     "upgradeToAndCall(address,bytes)": FunctionFragment;
-    "withdraw(address,uint256)": FunctionFragment;
+    "withdraw(address,uint128)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -102,14 +100,6 @@ export interface UpgradableMesonInterface extends utils.Interface {
     functionFragment: "supportedTokens",
     values: [string]
   ): string;
-  encodeFunctionData(
-    functionFragment: "totalDemandFor",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "totalSupplyFor",
-    values: [string]
-  ): string;
   encodeFunctionData(functionFragment: "unlock", values: [BytesLike]): string;
   encodeFunctionData(functionFragment: "upgradeTo", values: [string]): string;
   encodeFunctionData(
@@ -151,14 +141,6 @@ export interface UpgradableMesonInterface extends utils.Interface {
     functionFragment: "supportedTokens",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "totalDemandFor",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "totalSupplyFor",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "unlock", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "upgradeTo", data: BytesLike): Result;
   decodeFunctionResult(
@@ -174,7 +156,7 @@ export interface UpgradableMesonInterface extends utils.Interface {
     "SwapCancelled(bytes32)": EventFragment;
     "SwapExecuted(bytes32)": EventFragment;
     "SwapLocked(bytes32,address)": EventFragment;
-    "SwapPosted(bytes32,uint64,uint256,address)": EventFragment;
+    "SwapPosted(bytes32)": EventFragment;
     "SwapReleased(bytes32)": EventFragment;
     "SwapRequested(bytes32)": EventFragment;
     "Upgraded(address)": EventFragment;
@@ -222,10 +204,7 @@ export type SwapLockedEvent = TypedEvent<
 
 export type SwapLockedEventFilter = TypedEventFilter<SwapLockedEvent>;
 
-export type SwapPostedEvent = TypedEvent<
-  [string, BigNumber, BigNumber, string],
-  { swapId: string; expireTs: BigNumber; amount: BigNumber; inToken: string }
->;
+export type SwapPostedEvent = TypedEvent<[string], { swapId: string }>;
 
 export type SwapPostedEventFilter = TypedEventFilter<SwapPostedEvent>;
 
@@ -363,12 +342,12 @@ export interface UpgradableMeson extends BaseContract {
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, BigNumber, BigNumber] & {
+      [string, string, string, BigNumber, number] & {
         initiator: string;
         provider: string;
         inToken: string;
-        amount: BigNumber;
-        expireTs: BigNumber;
+        total: BigNumber;
+        expireTs: number;
       }
     >;
 
@@ -376,16 +355,6 @@ export interface UpgradableMeson extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
 
     unlock(
       swapId: BytesLike,
@@ -505,20 +474,16 @@ export interface UpgradableMeson extends BaseContract {
     arg0: BytesLike,
     overrides?: CallOverrides
   ): Promise<
-    [string, string, string, BigNumber, BigNumber] & {
+    [string, string, string, BigNumber, number] & {
       initiator: string;
       provider: string;
       inToken: string;
-      amount: BigNumber;
-      expireTs: BigNumber;
+      total: BigNumber;
+      expireTs: number;
     }
   >;
 
   supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
-
-  totalDemandFor(token: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  totalSupplyFor(token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   unlock(
     swapId: BytesLike,
@@ -630,26 +595,16 @@ export interface UpgradableMeson extends BaseContract {
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, BigNumber, BigNumber] & {
+      [string, string, string, BigNumber, number] & {
         initiator: string;
         provider: string;
         inToken: string;
-        amount: BigNumber;
-        expireTs: BigNumber;
+        total: BigNumber;
+        expireTs: number;
       }
     >;
 
     supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     unlock(swapId: BytesLike, overrides?: CallOverrides): Promise<void>;
 
@@ -701,18 +656,8 @@ export interface UpgradableMeson extends BaseContract {
     ): SwapLockedEventFilter;
     SwapLocked(swapId?: null, provider?: null): SwapLockedEventFilter;
 
-    "SwapPosted(bytes32,uint64,uint256,address)"(
-      swapId?: null,
-      expireTs?: null,
-      amount?: null,
-      inToken?: null
-    ): SwapPostedEventFilter;
-    SwapPosted(
-      swapId?: null,
-      expireTs?: null,
-      amount?: null,
-      inToken?: null
-    ): SwapPostedEventFilter;
+    "SwapPosted(bytes32)"(swapId?: null): SwapPostedEventFilter;
+    SwapPosted(swapId?: null): SwapPostedEventFilter;
 
     "SwapReleased(bytes32)"(swapId?: null): SwapReleasedEventFilter;
     SwapReleased(swapId?: null): SwapReleasedEventFilter;
@@ -812,16 +757,6 @@ export interface UpgradableMeson extends BaseContract {
 
     supportedTokens(
       arg0: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    totalSupplyFor(
-      token: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -939,16 +874,6 @@ export interface UpgradableMeson extends BaseContract {
 
     supportedTokens(
       arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    totalSupplyFor(
-      token: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

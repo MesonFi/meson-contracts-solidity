@@ -60,7 +60,7 @@ export interface IMesonSwapInterface extends utils.Interface {
     "SwapBonded(bytes32)": EventFragment;
     "SwapCancelled(bytes32)": EventFragment;
     "SwapExecuted(bytes32)": EventFragment;
-    "SwapPosted(bytes32,uint64,uint256,address)": EventFragment;
+    "SwapPosted(bytes32)": EventFragment;
     "SwapRequested(bytes32)": EventFragment;
   };
 
@@ -83,10 +83,7 @@ export type SwapExecutedEvent = TypedEvent<[string], { swapId: string }>;
 
 export type SwapExecutedEventFilter = TypedEventFilter<SwapExecutedEvent>;
 
-export type SwapPostedEvent = TypedEvent<
-  [string, BigNumber, BigNumber, string],
-  { swapId: string; expireTs: BigNumber; amount: BigNumber; inToken: string }
->;
+export type SwapPostedEvent = TypedEvent<[string], { swapId: string }>;
 
 export type SwapPostedEventFilter = TypedEventFilter<SwapPostedEvent>;
 
@@ -236,18 +233,8 @@ export interface IMesonSwap extends BaseContract {
     "SwapExecuted(bytes32)"(swapId?: null): SwapExecutedEventFilter;
     SwapExecuted(swapId?: null): SwapExecutedEventFilter;
 
-    "SwapPosted(bytes32,uint64,uint256,address)"(
-      swapId?: null,
-      expireTs?: null,
-      amount?: null,
-      inToken?: null
-    ): SwapPostedEventFilter;
-    SwapPosted(
-      swapId?: null,
-      expireTs?: null,
-      amount?: null,
-      inToken?: null
-    ): SwapPostedEventFilter;
+    "SwapPosted(bytes32)"(swapId?: null): SwapPostedEventFilter;
+    SwapPosted(swapId?: null): SwapPostedEventFilter;
 
     "SwapRequested(bytes32)"(swapId?: null): SwapRequestedEventFilter;
     SwapRequested(swapId?: null): SwapRequestedEventFilter;

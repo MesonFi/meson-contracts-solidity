@@ -6,8 +6,9 @@ import "../utils/MesonHelpers.sol";
 contract MesonHelpersTest is MesonHelpers {
   function getSwapId(
     address inToken,
-    uint256 amount,
-    uint64 expireTs,
+    uint128 amount,
+    uint48 fee,
+    uint48 expireTs,
     bytes4 outChain,
     bytes memory outToken
   ) external view returns (bytes32) {
@@ -15,6 +16,7 @@ contract MesonHelpersTest is MesonHelpers {
       encodeSwap(
         abi.encodePacked(inToken),
         amount,
+        fee,
         expireTs,
         outChain,
         outToken
@@ -24,8 +26,9 @@ contract MesonHelpersTest is MesonHelpers {
 
   function encodeSwap(
     bytes memory inToken,
-    uint256 amount,
-    uint64 expireTs,
+    uint128 amount,
+    uint48 fee,
+    uint48 expireTs,
     bytes4 outChain,
     bytes memory outToken
   ) public pure returns (bytes memory) {
@@ -34,6 +37,7 @@ contract MesonHelpersTest is MesonHelpers {
         SWAP_REQUEST_TYPEHASH,
         keccak256(inToken),
         amount,
+        fee,
         expireTs,
         outChain,
         keccak256(outToken)
@@ -43,7 +47,7 @@ contract MesonHelpersTest is MesonHelpers {
   function decodeSwapInput(bytes memory encodedSwap)
     external
     pure
-    returns (uint256, bytes32, uint256)
+    returns (bytes32, uint128, uint48, uint48)
   {
     return _decodeSwapInput(encodedSwap);
   }

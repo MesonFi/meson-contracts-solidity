@@ -61,10 +61,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MesonSwap__factory>;
     getContractFactory(
-      name: "ListTest",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ListTest__factory>;
-    getContractFactory(
       name: "MesonHelpersTest",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MesonHelpersTest__factory>;
@@ -92,10 +88,6 @@ declare module "hardhat/types/runtime" {
       name: "MesonHelpers",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MesonHelpers__factory>;
-    getContractFactory(
-      name: "MesonPricing",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.MesonPricing__factory>;
     getContractFactory(
       name: "MesonStates",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -162,11 +154,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.MesonSwap>;
     getContractAt(
-      name: "ListTest",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ListTest>;
-    getContractAt(
       name: "MesonHelpersTest",
       address: string,
       signer?: ethers.Signer
@@ -201,11 +188,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.MesonHelpers>;
-    getContractAt(
-      name: "MesonPricing",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.MesonPricing>;
     getContractAt(
       name: "MesonStates",
       address: string,

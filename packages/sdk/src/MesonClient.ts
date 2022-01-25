@@ -8,6 +8,7 @@ import { SignedSwapCommonData, SignedSwapRequest, SignedSwapReleaseData } from '
 export interface PartialSwapRequest {
   inToken: string,
   amount: string,
+  fee: string,
   outToken: string,
   recipient: string,
 }
