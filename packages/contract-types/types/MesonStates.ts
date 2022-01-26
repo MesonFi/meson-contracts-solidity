@@ -19,8 +19,6 @@ export interface MesonStatesInterface extends utils.Interface {
     "balanceOf(address,address)": FunctionFragment;
     "getCoinType()": FunctionFragment;
     "supportedTokens(address)": FunctionFragment;
-    "totalDemandFor(address)": FunctionFragment;
-    "totalSupplyFor(address)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -35,14 +33,6 @@ export interface MesonStatesInterface extends utils.Interface {
     functionFragment: "supportedTokens",
     values: [string]
   ): string;
-  encodeFunctionData(
-    functionFragment: "totalDemandFor",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "totalSupplyFor",
-    values: [string]
-  ): string;
 
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
@@ -51,14 +41,6 @@ export interface MesonStatesInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "supportedTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "totalDemandFor",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "totalSupplyFor",
     data: BytesLike
   ): Result;
 
@@ -104,16 +86,6 @@ export interface MesonStates extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
   };
 
   balanceOf(
@@ -126,10 +98,6 @@ export interface MesonStates extends BaseContract {
 
   supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
-  totalDemandFor(token: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  totalSupplyFor(token: string, overrides?: CallOverrides): Promise<BigNumber>;
-
   callStatic: {
     balanceOf(
       arg0: string,
@@ -140,16 +108,6 @@ export interface MesonStates extends BaseContract {
     getCoinType(overrides?: CallOverrides): Promise<string>;
 
     supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
   };
 
   filters: {};
@@ -167,16 +125,6 @@ export interface MesonStates extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -190,16 +138,6 @@ export interface MesonStates extends BaseContract {
 
     supportedTokens(
       arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    totalSupplyFor(
-      token: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

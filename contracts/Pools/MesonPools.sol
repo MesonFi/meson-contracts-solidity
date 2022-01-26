@@ -7,27 +7,25 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "../libraries/LowGasSafeMath.sol";
 
 import "./IMesonPools.sol";
-import "../utils/MesonPricing.sol";
+import "../utils/MesonStates.sol";
 
 /// @title MesonPools
 /// @notice The class to manage liquidity pools for providers.
 /// Methods in this class will be executed by LPs when users want to
 /// swap into the current chain.
-contract MesonPools is Context, IMesonPools, MesonPricing {
+contract MesonPools is Context, IMesonPools, MesonStates {
   mapping(bytes32 => LockingSwap) public lockingSwaps;
 
   /// @inheritdoc IMesonPools
-  function deposit(address token, uint256 amount) external override tokenSupported(token) {
+  function deposit(address token, uint128 amount) external override tokenSupported(token) {
     address provider = _msgSender();
     balanceOf[token][provider] = LowGasSafeMath.add(balanceOf[token][provider], amount);
-    _increaseSupply(token, amount);
     _unsafeDepositToken(token, provider, amount);
   }
 
   /// @inheritdoc IMesonPools
-  function withdraw(address token, uint256 amount) external override tokenSupported(token) {
+  function withdraw(address token, uint128 amount) external override tokenSupported(token) {
     address provider = _msgSender(); // this may not be the correct msg.sender
-    _decreaseSupply(token, amount);
     _withdrawTo(provider, provider, token, amount);
   }
 
@@ -36,7 +34,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     address receiver,
     address provider,
     address token,
-    uint256 amount
+    uint128 amount
   ) private {
     require(balanceOf[token][provider] >= amount, "overdrawn");
 
@@ -48,7 +46,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
   function lock(
     bytes32 swapId,
     address initiator,
-    uint256 amount,
+    uint128 amount,
     address token
   ) external override tokenSupported(token) {
     require(amount > 0, "amount must be greater than zero");
@@ -76,7 +74,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
     require(uint64(block.timestamp) > lockingSwap.until, "The swap is still in lock");
 
     address token = lockingSwap.token;
-    uint256 amount = lockingSwap.amount;
+    uint128 amount = lockingSwap.amount;
     address provider = lockingSwap.provider;
 
     balanceOf[token][provider] = LowGasSafeMath.add(balanceOf[token][provider], amount);
@@ -87,7 +85,7 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
   function release(
     bytes32 swapId,
     address recipient,
-    uint256 metaAmount,
+    uint128 metaAmount,
     bytes32 domainHash,
     bytes32 r,
     bytes32 s,
@@ -104,10 +102,6 @@ contract MesonPools is Context, IMesonPools, MesonPricing {
 
     address token = lockingSwap.token;
     address provider = lockingSwap.provider;
-
-    // uint256 amount = _fromMetaAmount(token, metaAmount);
-    // _updateDemand(token, metaAmount);
-    // _decreaseSupply(token, amount);
 
     if (metaAmount < lockingSwap.amount) {
       balanceOf[token][provider] = LowGasSafeMath.add(

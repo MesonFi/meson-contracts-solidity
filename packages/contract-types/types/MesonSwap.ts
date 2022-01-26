@@ -28,8 +28,6 @@ export interface MesonSwapInterface extends utils.Interface {
     "requestSwap(bytes,address)": FunctionFragment;
     "requests(bytes32)": FunctionFragment;
     "supportedTokens(address)": FunctionFragment;
-    "totalDemandFor(address)": FunctionFragment;
-    "totalSupplyFor(address)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -62,14 +60,6 @@ export interface MesonSwapInterface extends utils.Interface {
     functionFragment: "supportedTokens",
     values: [string]
   ): string;
-  encodeFunctionData(
-    functionFragment: "totalDemandFor",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "totalSupplyFor",
-    values: [string]
-  ): string;
 
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bondSwap", data: BytesLike): Result;
@@ -92,20 +82,12 @@ export interface MesonSwapInterface extends utils.Interface {
     functionFragment: "supportedTokens",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "totalDemandFor",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "totalSupplyFor",
-    data: BytesLike
-  ): Result;
 
   events: {
     "SwapBonded(bytes32)": EventFragment;
     "SwapCancelled(bytes32)": EventFragment;
     "SwapExecuted(bytes32)": EventFragment;
-    "SwapPosted(bytes32,uint64,uint256,address)": EventFragment;
+    "SwapPosted(bytes32)": EventFragment;
     "SwapRequested(bytes32)": EventFragment;
   };
 
@@ -128,10 +110,7 @@ export type SwapExecutedEvent = TypedEvent<[string], { swapId: string }>;
 
 export type SwapExecutedEventFilter = TypedEventFilter<SwapExecutedEvent>;
 
-export type SwapPostedEvent = TypedEvent<
-  [string, BigNumber, BigNumber, string],
-  { swapId: string; expireTs: BigNumber; amount: BigNumber; inToken: string }
->;
+export type SwapPostedEvent = TypedEvent<[string], { swapId: string }>;
 
 export type SwapPostedEventFilter = TypedEventFilter<SwapPostedEvent>;
 
@@ -214,12 +193,12 @@ export interface MesonSwap extends BaseContract {
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, BigNumber, BigNumber] & {
+      [string, string, string, BigNumber, number] & {
         initiator: string;
         provider: string;
         inToken: string;
-        amount: BigNumber;
-        expireTs: BigNumber;
+        total: BigNumber;
+        expireTs: number;
       }
     >;
 
@@ -227,16 +206,6 @@ export interface MesonSwap extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
   };
 
   balanceOf(
@@ -287,20 +256,16 @@ export interface MesonSwap extends BaseContract {
     arg0: BytesLike,
     overrides?: CallOverrides
   ): Promise<
-    [string, string, string, BigNumber, BigNumber] & {
+    [string, string, string, BigNumber, number] & {
       initiator: string;
       provider: string;
       inToken: string;
-      amount: BigNumber;
-      expireTs: BigNumber;
+      total: BigNumber;
+      expireTs: number;
     }
   >;
 
   supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
-
-  totalDemandFor(token: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  totalSupplyFor(token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
     balanceOf(
@@ -345,26 +310,16 @@ export interface MesonSwap extends BaseContract {
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, BigNumber, BigNumber] & {
+      [string, string, string, BigNumber, number] & {
         initiator: string;
         provider: string;
         inToken: string;
-        amount: BigNumber;
-        expireTs: BigNumber;
+        total: BigNumber;
+        expireTs: number;
       }
     >;
 
     supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
   };
 
   filters: {
@@ -377,18 +332,8 @@ export interface MesonSwap extends BaseContract {
     "SwapExecuted(bytes32)"(swapId?: null): SwapExecutedEventFilter;
     SwapExecuted(swapId?: null): SwapExecutedEventFilter;
 
-    "SwapPosted(bytes32,uint64,uint256,address)"(
-      swapId?: null,
-      expireTs?: null,
-      amount?: null,
-      inToken?: null
-    ): SwapPostedEventFilter;
-    SwapPosted(
-      swapId?: null,
-      expireTs?: null,
-      amount?: null,
-      inToken?: null
-    ): SwapPostedEventFilter;
+    "SwapPosted(bytes32)"(swapId?: null): SwapPostedEventFilter;
+    SwapPosted(swapId?: null): SwapPostedEventFilter;
 
     "SwapRequested(bytes32)"(swapId?: null): SwapRequestedEventFilter;
     SwapRequested(swapId?: null): SwapRequestedEventFilter;
@@ -445,16 +390,6 @@ export interface MesonSwap extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -509,16 +444,6 @@ export interface MesonSwap extends BaseContract {
 
     supportedTokens(
       arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    totalSupplyFor(
-      token: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

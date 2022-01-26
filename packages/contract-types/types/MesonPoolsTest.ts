@@ -22,17 +22,15 @@ export interface MesonPoolsTestInterface extends utils.Interface {
     "addTokenToSwapList(address)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "challenge()": FunctionFragment;
-    "deposit(address,uint256)": FunctionFragment;
+    "deposit(address,uint128)": FunctionFragment;
     "getCoinType()": FunctionFragment;
     "hasLockingSwap(bytes32)": FunctionFragment;
-    "lock(bytes32,address,uint256,address)": FunctionFragment;
+    "lock(bytes32,address,uint128,address)": FunctionFragment;
     "lockingSwaps(bytes32)": FunctionFragment;
-    "release(bytes32,address,uint256,bytes32,bytes32,bytes32,uint8)": FunctionFragment;
+    "release(bytes32,address,uint128,bytes32,bytes32,bytes32,uint8)": FunctionFragment;
     "supportedTokens(address)": FunctionFragment;
-    "totalDemandFor(address)": FunctionFragment;
-    "totalSupplyFor(address)": FunctionFragment;
     "unlock(bytes32)": FunctionFragment;
-    "withdraw(address,uint256)": FunctionFragment;
+    "withdraw(address,uint128)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -80,14 +78,6 @@ export interface MesonPoolsTestInterface extends utils.Interface {
     functionFragment: "supportedTokens",
     values: [string]
   ): string;
-  encodeFunctionData(
-    functionFragment: "totalDemandFor",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "totalSupplyFor",
-    values: [string]
-  ): string;
   encodeFunctionData(functionFragment: "unlock", values: [BytesLike]): string;
   encodeFunctionData(
     functionFragment: "withdraw",
@@ -117,14 +107,6 @@ export interface MesonPoolsTestInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportedTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "totalDemandFor",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "totalSupplyFor",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unlock", data: BytesLike): Result;
@@ -242,16 +224,6 @@ export interface MesonPoolsTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
     unlock(
       swapId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -326,10 +298,6 @@ export interface MesonPoolsTest extends BaseContract {
 
   supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
 
-  totalDemandFor(token: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  totalSupplyFor(token: string, overrides?: CallOverrides): Promise<BigNumber>;
-
   unlock(
     swapId: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -398,16 +366,6 @@ export interface MesonPoolsTest extends BaseContract {
     ): Promise<void>;
 
     supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     unlock(swapId: BytesLike, overrides?: CallOverrides): Promise<void>;
 
@@ -487,16 +445,6 @@ export interface MesonPoolsTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    totalSupplyFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     unlock(
       swapId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -564,16 +512,6 @@ export interface MesonPoolsTest extends BaseContract {
 
     supportedTokens(
       arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    totalDemandFor(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    totalSupplyFor(
-      token: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

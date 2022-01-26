@@ -7,7 +7,7 @@ interface IMesonPools {
     address initiator;
     address provider;
     address token;
-    uint256 amount;
+    uint128 amount;
     uint64 until;
   }
 
@@ -17,7 +17,7 @@ interface IMesonPools {
   /// @dev Designed to be used by liquidity providers
   /// @param token The contract address of the depositing token
   /// @param amount The amount to be added to the pool
-  function deposit(address token, uint256 amount) external;
+  function deposit(address token, uint128 amount) external;
 
   /// @notice Withdraw tokens from the liquidity pool. In order to make sure
   /// pending swaps can be satisfied, withdraw have a rate limit that
@@ -28,13 +28,13 @@ interface IMesonPools {
   /// @dev Designed to be used by liquidity providers
   /// @param token The contract address of the withdrawing token
   /// @param amount The amount to be removed from the pool
-  function withdraw(address token, uint256 amount) external;
+  function withdraw(address token, uint128 amount) external;
 
   /// @notice Lock tokens
   function lock(
     bytes32 swapId,
     address initiator,
-    uint256 amount,
+    uint128 amount,
     address token
   ) external;
 
@@ -53,7 +53,7 @@ interface IMesonPools {
   function release(
     bytes32 swapId,
     address recipient,
-    uint256 metaAmount,
+    uint128 metaAmount,
     bytes32 domainHash,
     bytes32 r,
     bytes32 s,

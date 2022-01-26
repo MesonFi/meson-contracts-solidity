@@ -14,17 +14,11 @@ contract MesonHelpers is MesonConfig {
   bytes32 internal DOMAIN_SEPARATOR ;
 
   bytes32 internal constant SWAP_REQUEST_TYPEHASH =
-    keccak256(bytes("SwapRequest(bytes inToken,uint256 amount,uint64 expireTs,bytes4 outChain,bytes outToken)"));
+    keccak256(bytes("SwapRequest(bytes inToken,uint128 amount,uint48 fee,uint48 expireTs,bytes4 outChain,bytes outToken)"));
 
   bytes32 internal constant SWAP_RELEASE_TYPEHASH = keccak256(bytes("SwapRelease(bytes32 swapId,bytes recipient)"));
 
   bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
-
-  struct Swap {
-    bytes32 id;
-    uint256 metaAmount;
-    uint64 ts;
-  }
 
   /// @notice Safe transfers tokens from msg.sender to a recipient
   /// for interacting with ERC20 tokens that do not consistently return true/false
@@ -34,9 +28,9 @@ contract MesonHelpers is MesonConfig {
   function _safeTransfer(
     address token,
     address recipient,
-    uint256 amount
+    uint128 amount
   ) internal {
-    (bool success, bytes memory data) = token.call(abi.encodeWithSelector(ERC20_TRANSFER_SELECTOR, recipient, amount));
+    (bool success, bytes memory data) = token.call(abi.encodeWithSelector(ERC20_TRANSFER_SELECTOR, recipient, uint256(amount)));
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
   }
 
@@ -44,21 +38,21 @@ contract MesonHelpers is MesonConfig {
   function _unsafeDepositToken(
     address token,
     address sender,
-    uint256 amount
+    uint128 amount
   ) internal {
-    IERC20Minimal(token).transferFrom(sender, address(this), amount);
+    IERC20Minimal(token).transferFrom(sender, address(this), uint256(amount));
   }
 
-  function _decodeSwapInput(bytes memory encodedSwap) internal pure returns (uint64, bytes32, uint256) {
-    (bytes32 typehash, bytes32 inTokenHash, uint256 amount, uint64 expireTs, ,) =
-      abi.decode(encodedSwap, (bytes32, bytes32, uint256, uint64, bytes4, bytes32));
+  function _decodeSwapInput(bytes memory encodedSwap) internal pure returns (bytes32, uint128, uint48, uint48) {
+    (bytes32 typehash, bytes32 inTokenHash, uint128 amount, uint48 fee, uint48 expireTs, ,) =
+      abi.decode(encodedSwap, (bytes32, bytes32, uint128, uint48, uint48, bytes4, bytes32));
     require(typehash == SWAP_REQUEST_TYPEHASH, "Invalid swap request typehash");
-    return (expireTs, inTokenHash, amount);
+    return (inTokenHash, amount, fee, expireTs);
   }
 
-  function _decodeSwapOutput(bytes memory encodedSwap) internal pure returns (uint256, bytes32) {
-    (bytes32 typehash, , uint256 amount, , , bytes32 outTokenHash) =
-      abi.decode(encodedSwap, (bytes32, bytes32, uint256, uint64, bytes4, bytes32));
+  function _decodeSwapOutput(bytes memory encodedSwap) internal pure returns (uint128, bytes32) {
+    (bytes32 typehash, , uint128 amount, , , , bytes32 outTokenHash) =
+      abi.decode(encodedSwap, (bytes32, bytes32, uint128, uint48, uint48, bytes4, bytes32));
     require(typehash == SWAP_REQUEST_TYPEHASH, "Invalid swap request typehash");
     return (amount, outTokenHash);
   }

@@ -1,4 +1,3 @@
-import type { BytesLike } from '@ethersproject/bytes'
 import type { Signature } from './SwapSigner'
 
 import { recoverAddress } from '@ethersproject/transactions'
@@ -8,7 +7,7 @@ import { SwapSigner } from './SwapSigner'
 
 export interface SignedSwapCommonData {
   swapId: string,
-  initiator: BytesLike,
+  initiator: string,
   chainId: number,
   mesonAddress: string,
   signature: Signature,
@@ -25,7 +24,7 @@ class SignedSwapCommon implements SignedSwapCommonData {
   readonly swapId: string
   readonly chainId: number
   readonly mesonAddress: string
-  readonly initiator: BytesLike
+  readonly initiator: string
   readonly signature: Signature
   readonly signer: SwapSigner
 

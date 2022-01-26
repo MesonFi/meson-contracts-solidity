@@ -9,8 +9,9 @@ interface IMesonSwap {
     address initiator;
     address provider;
     address inToken;
-    uint256 amount;
-    uint64 expireTs;
+    uint128 total;
+    // uint48 fee;
+    uint48 expireTs;
   }
 
   function requestSwap(bytes memory encodedSwap, address inToken) external returns (bytes32 swapId);
@@ -72,10 +73,7 @@ interface IMesonSwap {
   /// @notice Event when a new swap request is posted.
   /// Emit at the end of `postSwap()` calls.
   /// @param swapId The ID of the swap
-  /// @param expireTs The timestamp the request will expire
-  /// @param amount The contract address of either token0 or token1
-  /// @param inToken The contract address of the given token
-  event SwapPosted(bytes32 swapId, uint64 expireTs, uint256 amount, address inToken);
+  event SwapPosted(bytes32 swapId);
 
   event SwapCancelled(bytes32 swapId);
 
