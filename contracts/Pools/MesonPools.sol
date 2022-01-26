@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
-
 import "../libraries/LowGasSafeMath.sol";
 
 import "./IMesonPools.sol";
@@ -13,7 +10,7 @@ import "../utils/MesonStates.sol";
 /// @notice The class to manage liquidity pools for providers.
 /// Methods in this class will be executed by LPs when users want to
 /// swap into the current chain.
-contract MesonPools is Context, IMesonPools, MesonStates {
+contract MesonPools is IMesonPools, MesonStates {
   mapping(bytes32 => LockingSwap) public lockingSwaps;
 
   /// @inheritdoc IMesonPools

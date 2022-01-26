@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
-
 import "../libraries/LowGasSafeMath.sol";
 import "../interfaces/IERC20Minimal.sol";
 
@@ -14,7 +11,7 @@ import "../utils/MesonStates.sol";
 /// @notice The class to receive and process swap requests.
 /// Methods in this class will be executed by users or LPs when
 /// users initiate swaps in the current chain.
-contract MesonSwap is Context, IMesonSwap, MesonStates {
+contract MesonSwap is IMesonSwap, MesonStates {
   /// @notice swap requests by swapIds
   mapping(bytes32 => SwapRequest) public requests;
 

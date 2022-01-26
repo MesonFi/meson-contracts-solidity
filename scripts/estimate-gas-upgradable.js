@@ -1,4 +1,4 @@
-const { ethers } = require('hardhat')
+const { ethers, upgrades } = require('hardhat')
 const { MesonClient, SignedSwapRequest, SignedSwapRelease } = require('@mesonfi/sdk/src')
 const { getDefaultSwap } = require('../test/shared/meson')
 
@@ -12,10 +12,11 @@ async function main() {
   const tokenContract = await MockToken.deploy('Mock Token', 'MT', totalSupply)
   console.log('MockToken deployed to:', tokenContract.address)
 
-  const mesonFactory = await ethers.getContractFactory('Meson')
-  console.log('Deploying Meson...')
-  const mesonContract = await mesonFactory.deploy([tokenContract.address])
-  console.log('Meson deployed to:', mesonContract.address)
+  const mesonFactory = await ethers.getContractFactory('UpgradableMeson')
+  console.log('Deploying UpgradableMeson...')
+  const mesonContract = await upgrades.deployProxy(mesonFactory, [[tokenContract.address]], { kind: 'uups' })
+  await mesonContract.deployed()
+  console.log('UpgradableMeson deployed to:', mesonContract.address)
   const mesonClient = await MesonClient.Create(mesonContract)
 
 
