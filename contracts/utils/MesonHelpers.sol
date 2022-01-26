@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-
 import "../MesonConfig.sol";
 import "../interfaces/IERC20Minimal.sol";
 
@@ -79,5 +77,13 @@ contract MesonHelpers is MesonConfig {
 
   function getCoinType() external pure returns (bytes4) {
     return COIN_TYPE;
+  }
+
+  function _msgSender() internal view returns (address) {
+    return msg.sender;
+  }
+
+  function _msgData() internal pure returns (bytes calldata) {
+    return msg.data;
   }
 }
