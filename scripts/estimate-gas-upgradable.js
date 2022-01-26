@@ -1,7 +1,6 @@
+const { ethers, upgrades } = require('hardhat')
 const { MesonClient, SignedSwapRequest, SignedSwapRelease } = require('@mesonfi/sdk/src')
 const { getDefaultSwap } = require('../test/shared/meson')
-
-const ethers = hre.ethers
 
 async function main() {
   // use hardhat default wallet (see test/shared/wallet.ts)
@@ -13,10 +12,9 @@ async function main() {
   const tokenContract = await MockToken.deploy('Mock Token', 'MT', totalSupply)
   console.log('MockToken deployed to:', tokenContract.address)
 
- 
   const mesonFactory = await ethers.getContractFactory('UpgradableMeson')
   console.log('Deploying UpgradableMeson...')
-  const MesonSwapTest = await upgrades.deployProxy(mesonFactory, [ [ tokenContract.address ]], { kind: 'uups' })
+  const MesonSwapTest = await upgrades.deployProxy(mesonFactory, [[tokenContract.address]], { kind: 'uups' })
   await MesonSwapTest.deployed()
   console.log('UpgradableMeson deployed to:', MesonSwapTest.address)
   const mesonClient = await MesonClient.Create(MesonSwapTest)

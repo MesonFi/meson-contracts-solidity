@@ -1,7 +1,6 @@
+const { ethers } = require('hardhat')
 const { MesonClient, SignedSwapRequest, SignedSwapRelease } = require('@mesonfi/sdk/src')
 const { getDefaultSwap } = require('../test/shared/meson')
-
-const ethers = hre.ethers
 
 async function main() {
   // use hardhat default wallet (see test/shared/wallet.ts)
@@ -16,8 +15,8 @@ async function main() {
   const mesonFactory = await ethers.getContractFactory('Meson')
   const mesonContract = await mesonFactory.deploy([tokenContract.address])
   console.log('Meson deployed to:', mesonContract.address)
-
   const mesonClient = await MesonClient.Create(mesonContract)
+
 
   // approve
   const approveTx = await tokenContract.approve(mesonContract.address, totalSupply)
