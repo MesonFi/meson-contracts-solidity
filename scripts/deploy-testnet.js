@@ -34,6 +34,7 @@ async function main() {
   }
   console.log(`Deploying ${usdt.name}...`)
   const mockUSDT = await MockToken.deploy(usdt.name, usdt.symbol, totalSupply, { nonce })
+  await mockUSDT.deployed()
   usdt.addr = mockUSDT.address
   tokens.push(usdt)
   console.log(`${usdt.name} deployed to:`, mockUSDT.address)
@@ -45,6 +46,7 @@ async function main() {
   }
   console.log(`Deploying ${usdc.name}...`)
   const mockUSDC = await MockToken.deploy(usdc.name, usdc.symbol, totalSupply, { nonce: nonce + 1 })
+  await mockUSDC.deployed()
   usdc.addr = mockUSDC.address
   tokens.push(usdc)
   console.log(`${usdc.name} deployed to:`, mockUSDC.address)

@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-
 import "../MesonConfig.sol";
 import "../interfaces/IERC20Minimal.sol";
 
@@ -11,16 +9,7 @@ contract MesonHelpers is MesonConfig {
   bytes32 internal constant EIP712_DOMAIN_TYPEHASH =
     keccak256(bytes("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"));
 
-  bytes32 internal DOMAIN_SEPARATOR =
-    keccak256(
-      abi.encode(
-        EIP712_DOMAIN_TYPEHASH,
-        keccak256(bytes("Meson Fi")),
-        keccak256(bytes("1")),
-        block.chainid,
-        address(this)
-      )
-    );
+  bytes32 internal DOMAIN_SEPARATOR;
 
   bytes32 internal constant SWAP_REQUEST_TYPEHASH =
     keccak256(bytes("SwapRequest(bytes inToken,uint128 amount,uint48 fee,uint48 expireTs,bytes4 outChain,bytes outToken)"));
@@ -88,5 +77,13 @@ contract MesonHelpers is MesonConfig {
 
   function getCoinType() external pure returns (bytes4) {
     return COIN_TYPE;
+  }
+
+  function _msgSender() internal view returns (address) {
+    return msg.sender;
+  }
+
+  function _msgData() internal pure returns (bytes calldata) {
+    return msg.data;
   }
 }
