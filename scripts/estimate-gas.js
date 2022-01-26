@@ -13,6 +13,7 @@ async function main() {
   console.log('MockToken deployed to:', tokenContract.address)
 
   const mesonFactory = await ethers.getContractFactory('Meson')
+  console.log('Deploying Meson...')
   const mesonContract = await mesonFactory.deploy([tokenContract.address])
   console.log('Meson deployed to:', mesonContract.address)
   const mesonClient = await MesonClient.Create(mesonContract)

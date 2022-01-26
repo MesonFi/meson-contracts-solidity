@@ -14,24 +14,24 @@ async function main() {
 
   const mesonFactory = await ethers.getContractFactory('UpgradableMeson')
   console.log('Deploying UpgradableMeson...')
-  const MesonSwapTest = await upgrades.deployProxy(mesonFactory, [[tokenContract.address]], { kind: 'uups' })
-  await MesonSwapTest.deployed()
-  console.log('UpgradableMeson deployed to:', MesonSwapTest.address)
-  const mesonClient = await MesonClient.Create(MesonSwapTest)
+  const mesonContract = await upgrades.deployProxy(mesonFactory, [[tokenContract.address]], { kind: 'uups' })
+  await mesonContract.deployed()
+  console.log('UpgradableMeson deployed to:', mesonContract.address)
+  const mesonClient = await MesonClient.Create(mesonContract)
 
 
   // approve
-  const approveTx = await tokenContract.approve(MesonSwapTest.address, totalSupply)
+  const approveTx = await tokenContract.approve(mesonContract.address, totalSupply)
   getUsedGas('approve', approveTx.hash)
   await approveTx.wait(1)
 
   // deposits
   const swapAmount = '1000000000'
-  const depositTx1 = await MesonSwapTest.deposit(tokenContract.address, swapAmount)
+  const depositTx1 = await mesonContract.deposit(tokenContract.address, swapAmount)
   getUsedGas('first deposit', depositTx1.hash)
   await depositTx1.wait(1)
 
-  const depositTx2 = await MesonSwapTest.deposit(tokenContract.address, swapAmount)
+  const depositTx2 = await mesonContract.deposit(tokenContract.address, swapAmount)
   getUsedGas('another deposit', depositTx2.hash)
   await depositTx2.wait(1)
 
@@ -40,7 +40,7 @@ async function main() {
     inToken: tokenContract.address,
     outToken: tokenContract.address
   })
-  const outChain = await MesonSwapTest.getCoinType()
+  const outChain = await mesonContract.getCoinType()
   const swap = mesonClient.requestSwap(outChain, swapData)
   const exported = await swap.exportRequest(signer)
   const signedRequest = new SignedSwapRequest(exported)
