@@ -1,15 +1,88 @@
+const path = require('path')
+const fs = require('fs')
 const { ethers, upgrades } = require('hardhat')
+const mainnets = require('@mesonfi/presets/src/mainnets.json')
+const testnets = require('@mesonfi/presets/src/testnets.json')
+require('dotenv').config()
 
-const tokens = [
-  '0xbff1e190dbe45d3d74d4f3d9624e740366063c28'
-]
+const { NETWORK_ID, PRIVATE_KEY, DEPOSIT_ON_DEPLOY } = process.env
 
 async function main() {
-  const Meson = await ethers.getContractFactory('UpgradableMeson')
+  const network = mainnets.find(item => item.id === NETWORK_ID)
+  if (!network) {
+    throw new Error(`Invalid network: ${NETWORK_ID}`)
+  }
+
+  const index = testnets.findIndex(item => item.slip44 === network.slip44)
+  if (index === -1) {
+    throw new Error(`Invalid network: ${NETWORK_ID}`)
+  }
+
+  const testnet = testnets[index]
+  hre.changeNetwork(testnet.id)
+
+  const wallet = new ethers.Wallet(PRIVATE_KEY, ethers.provider)
+  const MockToken = await ethers.getContractFactory('MockToken', wallet)
+  const nonce = await ethers.provider.getTransactionCount(wallet.address)
+  const tokens = []
+  const totalSupply = ethers.utils.parseUnits('1000000', 6)
+  
+  const usdt = {
+    name: `${testnet.alias} USDT`,
+    symbol: `${NETWORK_ID[0]}USDT`,
+    decimals: 6
+  }
+  console.log(`Deploying ${usdt.name}...`)
+  const mockUSDT = await MockToken.deploy(usdt.name, usdt.symbol, totalSupply, { nonce })
+  usdt.addr = mockUSDT.address
+  tokens.push(usdt)
+  console.log(`${usdt.name} deployed to:`, mockUSDT.address)
+
+  const usdc = {
+    name: `${testnet.alias} USDC`,
+    symbol: `${NETWORK_ID[0]}USDC`,
+    decimals: 6
+  }
+  console.log(`Deploying ${usdc.name}...`)
+  const mockUSDC = await MockToken.deploy(usdc.name, usdc.symbol, totalSupply, { nonce: nonce + 1 })
+  usdc.addr = mockUSDC.address
+  tokens.push(usdc)
+  console.log(`${usdc.name} deployed to:`, mockUSDC.address)
+
+  const mesonFactory = await ethers.getContractFactory('UpgradableMeson', wallet)
   console.log('Deploying UpgradableMeson...')
-  const meson = await upgrades.deployProxy(Meson, [tokens], { kind: 'uups' })
+  const meson = await upgrades.deployProxy(
+    mesonFactory,
+    [[mockUSDT.address, mockUSDC.address]],
+    { kind: 'uups', nonce: nonce + 2 }
+  )
   await meson.deployed()
   console.log('UpgradableMeson deployed to:', meson.address)
+
+  const coinType = await meson.getCoinType()
+  if (coinType !== testnet.slip44) {
+    throw new Error('Coin type does not match')
+  }
+
+  if (DEPOSIT_ON_DEPLOY) {
+    const depositAmount = ethers.utils.parseUnits(DEPOSIT_ON_DEPLOY, 6)
+
+    console.log(`Approving and depositing ${depositAmount} ${usdt.symbol} to Meson...`)
+    await (await mockUSDT.approve(meson.address, depositAmount, { nonce: nonce + 3 })).wait()
+    await meson.deposit(mockUSDT.address, depositAmount, { nonce: nonce + 4 })
+    console.log(`${depositAmount} ${usdt.symbol} deposited`)
+
+    console.log(`Approving and depositing ${depositAmount} ${usdc.symbol} to Meson...`)
+    await (await mockUSDC.approve(meson.address, depositAmount, { nonce: nonce + 5 })).wait()
+    await meson.deposit(mockUSDC.address, depositAmount, { nonce: nonce + 6 })
+    console.log(`${depositAmount} ${usdc.symbol} deposited`)
+  }
+
+  testnet.mesonAddress = meson.address
+  testnet.tokens = tokens
+  testnets.splice(index, 1, testnet)
+  const testnetsPath = path.join(__dirname, '../packages/presets/src/testnets.json')
+  fs.writeFileSync(testnetsPath, JSON.stringify(testnets, null, 2))
 }
 
 main()
