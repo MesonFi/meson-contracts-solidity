@@ -8,6 +8,7 @@
     "postbuild": "cp artifacts/contracts/Meson.sol/Meson.json packages/contract-abis/abis/Meson.json",
     "cleanbuild": "hardhat clean && yarn build",
     "estimate": "hardhat --network hardhat run scripts/estimate-gas.js",
+    "estimate2": "hardhat --network hardhat run scripts/estimate-gas-upgradable.js",
     "test": "hardhat --network hardhat test",
     "chain": "node scripts/set-chain-config.js",
     "chain:local": "NETWORK_ID=local yarn chain",
