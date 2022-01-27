@@ -7,8 +7,8 @@ import "../interfaces/IERC20Minimal.sol";
 interface IMesonSwap {
   struct SwapRequest {
     address initiator;
-    uint256 packed;
-    // uint32 providerIndex;
+    // uint256 data;
+    uint32 providerIndex;
     // uint8 inTokenIndex;
     // uint128 total;
     // uint48 expireTs;
@@ -30,12 +30,12 @@ interface IMesonSwap {
   /// @param encodedSwap The abi encoded swap
   /// @param initiator The address for the initiator of the swap
   function postSwap(
-    bytes memory encodedSwap,
+    bytes calldata encodedSwap,
     address initiator,
     bytes32 r,
     bytes32 s,
     uint8 v,
-    uint8 inTokenIndex
+    uint32 providerIndex
   ) external;
 
   /// @notice Cancel a swap
@@ -54,6 +54,7 @@ interface IMesonSwap {
   /// @dev Designed to be used by the current bonding LP
   /// @param swapId The ID of the swap
   function executeSwap(
+    bytes calldata encodedSwap,
     bytes32 swapId,
     bytes memory recipient,
     bytes32 r,

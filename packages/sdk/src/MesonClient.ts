@@ -55,13 +55,14 @@ export class MesonClient {
       signedRequest.encode(),
       signedRequest.initiator,
       ...signedRequest.signature,
-      0 // signedRequest.inToken,
+      1 // provider index
     )
   }
 
-  async executeSwap(signedRelease: SignedSwapReleaseData, depositToPool: boolean = false) {
+  async executeSwap(signedRelease: SignedSwapReleaseData, encoded: string, depositToPool: boolean = false) {
     this._check(signedRelease)
     return this.mesonInstance.executeSwap(
+      encoded,
       signedRelease.swapId,
       signedRelease.recipient,
       ...signedRelease.signature,

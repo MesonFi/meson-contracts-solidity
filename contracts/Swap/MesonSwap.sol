@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
+import "@openzeppelin/contracts/utils/Strings.sol";
+
 import "../libraries/LowGasSafeMath.sol";
 import "../interfaces/IERC20Minimal.sol";
 
@@ -13,9 +15,7 @@ import "../utils/MesonStates.sol";
 /// users initiate swaps in the current chain.
 contract MesonSwap is IMesonSwap, MesonStates {
   /// @notice swap requests by swapIds
-  mapping(bytes32 => SwapRequest) public requests;
-  mapping(bytes32 => address) public initiatorForSwap;
-  mapping(bytes32 => uint256) public packedForSwap;
+  mapping(bytes32 => SwapRequest) internal _swapRequests;
 
   /// @inheritdoc IMesonSwap
   function requestSwap(bytes memory encodedSwap, uint8 inTokenIndex)
@@ -37,7 +37,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
     // return swapId;
   }
 
-  function bondSwap(bytes32 swapId) public override swapExists(swapId) {
+  function bondSwap(bytes32 swapId) public override {
     // require(requests[swapId].providerIndex == 0, "swap bonded to another provider");
     // requests[swapId].providerIndex = indexOfAddress[_msgSender()];
 
@@ -46,76 +46,44 @@ contract MesonSwap is IMesonSwap, MesonStates {
 
   /// @inheritdoc IMesonSwap
   function postSwap(
-    bytes memory encodedSwap,
+    bytes calldata encodedSwap,
     address initiator,
     bytes32 r,
     bytes32 s,
     uint8 v,
-    uint8 inTokenIndex
+    uint32 providerIndex
   ) external override {
-    address inToken = tokens[inTokenIndex];
-    // before has 31463
-
-    // gas 5724
-    (bytes32 swapId, uint128 amount, uint48 fee, uint48 expireTs) = _verifyEncodedSwap(encodedSwap, inToken);
-
-    // gas 3724
+    bytes32 swapId = _getSwapId(encodedSwap);
+    require(_swapRequests[swapId].initiator == address(0), "swap conflict");
     require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
 
-    // gas 2285
-    uint32 providerIndex = indexOfAddress[_msgSender()]; // gas
-
-    // TODO: fee to meson protocol
-    // gas 311
-    uint128 total = LowGasSafeMath.add(amount, fee);
-
-    // gas 658
-    uint256 packed =
-      uint256(total) << 128 +
-      uint256(providerIndex) << 64 +
-      uint256(expireTs) << 8 +
-      inTokenIndex;
-
-    initiatorForSwap[swapId] = initiator;
-    packedForSwap[swapId] = packed;
-
-    // gas 24541
-    // requests[swapId] = SwapRequest(initiator, packed);
-
-    // gas 24991
-    _unsafeDepositToken(inToken, initiator, total);
-
-    // gas 1197
-    // emit SwapPosted(swapId);
-  }
-
-  function _verifyEncodedSwap(bytes memory encodedSwap, address inToken)
-    private
-    view
-    returns (bytes32, uint128, uint48, uint48)
-  {
-    (bytes32 inTokenHash, uint128 amount, uint48 fee, uint48 expireTs) = _decodeSwapInput(encodedSwap);
-
-    require(keccak256(abi.encodePacked(inToken)) == inTokenHash, "inToken does not match");
-    require(amount > 0, "swap amount must be greater than zero");
+     // TODO: use may make more requests
+    (bytes32 inTokenHash, uint128 amountWithFee, uint48 expireTs) = _decodeSwapInput(encodedSwap);
+    address inToken = _tokenAddressByHash[inTokenHash];
+    require(inToken != address(0), "token unsupported");
+    require(amountWithFee > 0, "swap amount must be greater than zero");
 
     uint48 ts = uint48(block.timestamp);
-    require(expireTs > ts + MIN_BOND_TIME_PERIOD, "expires ts too early");
-    require(expireTs < ts + MAX_BOND_TIME_PERIOD, "expires ts too late");
+    require(expireTs > ts + MIN_BOND_TIME_PERIOD, "expire ts too early");
+    require(expireTs < ts + MAX_BOND_TIME_PERIOD, "expire ts too late");
 
-    bytes32 swapId = _getSwapId(encodedSwap);
-    require(!_hasSwap(swapId), "swap conflict"); // TODO: prevent duplication attack
+    _swapRequests[swapId] = SwapRequest(initiator, providerIndex);
 
-    return (swapId, amount, fee, expireTs);
+    _unsafeDepositToken(inToken, initiator, amountWithFee);
+
+    emit SwapPosted(swapId);
   }
 
   /// @inheritdoc IMesonSwap
-  function cancelSwap(bytes32 swapId) external override swapExists(swapId) swapExpired(swapId) {
-    // SwapRequest memory req = requests[swapId];
-    // address inToken = tokens[req.inTokenIndex];
-    // address initiator = req.initiator;
-    // uint128 total = req.total;
-    // delete requests[swapId];
+  function cancelSwap(bytes32 swapId) external override {
+    // (uint128 total,, uint48 expireTs, uint8 inTokenIndex) = _unpackSwapData(swapData[swapId]);
+    // address inToken = tokens[inTokenIndex];
+    // address initiator = swapInitiator[swapId];
+
+    // // check expireTs
+
+    // delete swapInitiator[swapId];
+    // // delete swapData[swapId];
 
     // _safeTransfer(inToken, initiator, total);
 
@@ -124,48 +92,37 @@ contract MesonSwap is IMesonSwap, MesonStates {
 
   /// @inheritdoc IMesonSwap
   function executeSwap(
+    bytes calldata encodedSwap,
     bytes32 swapId,
     bytes memory recipient,
     bytes32 r,
     bytes32 s,
     uint8 v,
     bool depositToPool
-  ) external override swapExists(swapId) {
-    // SwapRequest memory req = requests[swapId];
-    // _checkReleaseSignature(swapId, keccak256(recipient), DOMAIN_SEPARATOR, req.initiator, r, s, v);
+  ) external override {
+    require(swapId == _getSwapId(encodedSwap), 'swap id does not match');
 
-    // address inToken = tokens[req.inTokenIndex];
-    // address provider = addressOfIndex[req.providerIndex];
-    // uint128 total = req.total;
+    address initiator = _swapRequests[swapId].initiator;
+    uint32 providerIndex = _swapRequests[swapId].providerIndex;
+    require(providerIndex != 0, "swap not found or not bonded");
 
-    // delete requests[swapId];
+    _checkReleaseSignature(swapId, keccak256(recipient), DOMAIN_SEPARATOR, initiator, r, s, v);
 
-    // if (depositToPool) {
-    //   balanceOf[inToken][provider] = LowGasSafeMath.add(balanceOf[inToken][provider], total);
-    // } else {
-    //   _safeTransfer(inToken, provider, total);
-    // }
+    (bytes32 inTokenHash, uint128 amountWithFee,) = _decodeSwapInput(encodedSwap);
 
-    // emit SwapExecuted(swapId);
-  }
+    // TODO: fee to meson protocol
 
-  function _deleteRequest(bytes32 swapId) internal {
-    delete requests[swapId];
-  }
+    delete _swapRequests[swapId];
 
-  /// @dev Check the swap for the given swapId exsits
-  modifier swapExists(bytes32 swapId) {
-    require(_hasSwap(swapId), "swap not found");
-    _;
-  }
+    if (depositToPool) {
+      _tokenBalanceOf[0][providerIndex]
+        = LowGasSafeMath.add(_tokenBalanceOf[0][providerIndex], amountWithFee);
+    } else {
+      address provider = addressOfIndex[providerIndex];
+      address inToken = _tokenAddressByHash[inTokenHash];
+      _safeTransfer(inToken, provider, amountWithFee);
+    }
 
-  /// @dev Check the swap is bonded
-  modifier swapExpired(bytes32 swapId) {
-    // require(requests[swapId].expireTs < uint64(block.timestamp), "swap not expired");
-    _;
-  }
-
-  function _hasSwap(bytes32 swapId) internal view returns (bool) {
-    // return requests[swapId].total > 0;
+    emit SwapExecuted(swapId);
   }
 }

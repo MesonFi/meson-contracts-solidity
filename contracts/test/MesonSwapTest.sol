@@ -9,6 +9,6 @@ contract MesonSwapTest is MesonSwap {
   }
 
   function hasSwap(bytes32 swapId) external view returns (bool) {
-    return _hasSwap(swapId);
+    return _swapRequests[swapId].initiator != address(0);
   }
 }

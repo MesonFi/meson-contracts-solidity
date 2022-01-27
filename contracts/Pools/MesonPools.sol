@@ -16,27 +16,19 @@ contract MesonPools is IMesonPools, MesonStates {
   /// @inheritdoc IMesonPools
   function deposit(address token, uint128 amount) external override tokenSupported(token) {
     address provider = _msgSender();
-    balanceOf[token][provider] = LowGasSafeMath.add(balanceOf[token][provider], amount);
+    uint32 providerIndex = indexOfAddress[provider];
+    balanceOf[token][providerIndex] = LowGasSafeMath.add(balanceOf[token][providerIndex], amount);
     _unsafeDepositToken(token, provider, amount);
   }
 
   /// @inheritdoc IMesonPools
   function withdraw(address token, uint128 amount) external override tokenSupported(token) {
     address provider = _msgSender(); // this may not be the correct msg.sender
-    _withdrawTo(provider, provider, token, amount);
-  }
+    uint32 providerIndex = indexOfAddress[provider];
+    require(balanceOf[token][providerIndex] >= amount, "overdrawn");
+    balanceOf[token][providerIndex] = LowGasSafeMath.sub(balanceOf[token][providerIndex], amount);
 
-  /// @notice Perform the withdraw operations and update internal states
-  function _withdrawTo(
-    address receiver,
-    address provider,
-    address token,
-    uint128 amount
-  ) private {
-    require(balanceOf[token][provider] >= amount, "overdrawn");
-
-    balanceOf[token][provider] = LowGasSafeMath.sub(balanceOf[token][provider], amount);
-    _safeTransfer(token, receiver, amount);
+    _safeTransfer(token, provider, amount);
   }
 
   /// @inheritdoc IMesonPools
@@ -49,9 +41,10 @@ contract MesonPools is IMesonPools, MesonStates {
     require(amount > 0, "amount must be greater than zero");
     require(!_hasLockingSwap(swapId), "locking swap already exists");
     address provider = _msgSender();
-    require(balanceOf[token][provider] >= amount, "insufficient balance");
+    uint32 providerIndex = indexOfAddress[provider];
+    require(balanceOf[token][providerIndex] >= amount, "insufficient balance");
 
-    balanceOf[token][provider] = balanceOf[token][provider] - amount;
+    balanceOf[token][providerIndex] = balanceOf[token][providerIndex] - amount;
     lockingSwaps[swapId] = LockingSwap(
       initiator,
       provider,
@@ -73,8 +66,9 @@ contract MesonPools is IMesonPools, MesonStates {
     address token = lockingSwap.token;
     uint128 amount = lockingSwap.amount;
     address provider = lockingSwap.provider;
+    uint32 providerIndex = indexOfAddress[provider];
 
-    balanceOf[token][provider] = LowGasSafeMath.add(balanceOf[token][provider], amount);
+    balanceOf[token][providerIndex] = LowGasSafeMath.add(balanceOf[token][providerIndex], amount);
     delete lockingSwaps[swapId];
   }
 
@@ -83,7 +77,7 @@ contract MesonPools is IMesonPools, MesonStates {
     bytes32 swapId,
     address recipient,
     uint128 metaAmount,
-    bytes32 domainHash,
+    bytes32 domainHash, // TODO: need to give allowed values?
     bytes32 r,
     bytes32 s,
     uint8 v
@@ -99,10 +93,11 @@ contract MesonPools is IMesonPools, MesonStates {
 
     address token = lockingSwap.token;
     address provider = lockingSwap.provider;
+    uint32 providerIndex = indexOfAddress[provider];
 
     if (metaAmount < lockingSwap.amount) {
-      balanceOf[token][provider] = LowGasSafeMath.add(
-        balanceOf[token][provider],
+      balanceOf[token][providerIndex] = LowGasSafeMath.add(
+        balanceOf[token][providerIndex],
         LowGasSafeMath.sub(lockingSwap.amount, metaAmount)
       );
     }
