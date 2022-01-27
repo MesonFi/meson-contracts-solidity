@@ -8,7 +8,8 @@
     "truffle": "",
     "evmVersion": "istanbul",
     "optimizer": {
-      "enabled": false
+      "enabled": true,
+      "runs": 100000
     }
   },
   "linter": "solhint",
