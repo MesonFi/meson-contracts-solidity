@@ -57,7 +57,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
     require(_swapRequests[swapId].initiator == address(0), "swap conflict");
     require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
 
-     // TODO: use may make more requests
+     // TODO: user may make more requests
     (bytes32 inTokenHash, uint128 amountWithFee, uint48 expireTs) = _decodeSwapInput(encodedSwap);
     address inToken = _tokenAddressByHash[inTokenHash];
     require(inToken != address(0), "token unsupported");
