@@ -17,17 +17,21 @@ contract MesonPools is IMesonPools, MesonStates {
   function deposit(address token, uint128 amount) external override tokenSupported(token) {
     address provider = _msgSender();
     uint32 providerIndex = indexOfAddress[provider];
-    balanceOf[token][providerIndex] = LowGasSafeMath.add(balanceOf[token][providerIndex], amount);
+    bytes32 tokenHash = _tokenHashByAddress[token];
+    _tokenBalanceOf[tokenHash][providerIndex] = LowGasSafeMath.add(
+      _tokenBalanceOf[tokenHash][providerIndex], amount
+    );
     _unsafeDepositToken(token, provider, amount);
   }
 
   /// @inheritdoc IMesonPools
   function withdraw(address token, uint128 amount) external override tokenSupported(token) {
-    address provider = _msgSender(); // this may not be the correct msg.sender
+    address provider = _msgSender();
     uint32 providerIndex = indexOfAddress[provider];
-    require(balanceOf[token][providerIndex] >= amount, "overdrawn");
-    balanceOf[token][providerIndex] = LowGasSafeMath.sub(balanceOf[token][providerIndex], amount);
-
+    bytes32 tokenHash = _tokenHashByAddress[token];
+    _tokenBalanceOf[tokenHash][providerIndex] = LowGasSafeMath.sub(
+      _tokenBalanceOf[tokenHash][providerIndex], amount
+    );
     _safeTransfer(token, provider, amount);
   }
 
@@ -36,24 +40,24 @@ contract MesonPools is IMesonPools, MesonStates {
     bytes32 swapId,
     address initiator,
     uint128 amount,
-    address token
-  ) external override tokenSupported(token) {
+    bytes32 tokenHash
+  ) external override {
+    // tokenSupported(token)
     require(amount > 0, "amount must be greater than zero");
     require(!_hasLockingSwap(swapId), "locking swap already exists");
-    address provider = _msgSender();
-    uint32 providerIndex = indexOfAddress[provider];
-    require(balanceOf[token][providerIndex] >= amount, "insufficient balance");
+    uint32 providerIndex = indexOfAddress[_msgSender()];
+    require(_tokenBalanceOf[tokenHash][providerIndex] >= amount, "insufficient balance");
 
-    balanceOf[token][providerIndex] = balanceOf[token][providerIndex] - amount;
+    _tokenBalanceOf[tokenHash][providerIndex] = _tokenBalanceOf[tokenHash][providerIndex] - amount;
     lockingSwaps[swapId] = LockingSwap(
       initiator,
-      provider,
-      token,
+      tokenHash,
       amount,
-      uint64(block.timestamp) + LOCK_TIME_PERIOD
+      providerIndex,
+      uint48(block.timestamp) + LOCK_TIME_PERIOD
     );
 
-    emit SwapLocked(swapId, provider);
+    emit SwapLocked(swapId);
   }
 
   /// @inheritdoc IMesonPools
@@ -61,14 +65,15 @@ contract MesonPools is IMesonPools, MesonStates {
     require(_hasLockingSwap(swapId), "swap does not exist");
 
     LockingSwap memory lockingSwap = lockingSwaps[swapId];
-    require(uint64(block.timestamp) > lockingSwap.until, "The swap is still in lock");
+    require(uint48(block.timestamp) > lockingSwap.until, "The swap is still in lock");
 
-    address token = lockingSwap.token;
+    bytes32 tokenHash = lockingSwap.tokenHash;
     uint128 amount = lockingSwap.amount;
-    address provider = lockingSwap.provider;
-    uint32 providerIndex = indexOfAddress[provider];
+    uint32 providerIndex = lockingSwap.providerIndex;
 
-    balanceOf[token][providerIndex] = LowGasSafeMath.add(balanceOf[token][providerIndex], amount);
+    _tokenBalanceOf[tokenHash][providerIndex] = LowGasSafeMath.add(
+      _tokenBalanceOf[tokenHash][providerIndex], amount
+    );
     delete lockingSwaps[swapId];
   }
 
@@ -76,7 +81,6 @@ contract MesonPools is IMesonPools, MesonStates {
   function release(
     bytes32 swapId,
     address recipient,
-    uint128 metaAmount,
     bytes32 domainHash, // TODO: need to give allowed values?
     bytes32 r,
     bytes32 s,
@@ -84,27 +88,16 @@ contract MesonPools is IMesonPools, MesonStates {
   ) external override {
     LockingSwap memory lockingSwap = lockingSwaps[swapId];
     require(_hasLockingSwap(swapId), "swap does not exist");
-    require(
-      metaAmount <= lockingSwap.amount,
-      "release amount cannot be greater than locking amount"
-    );
 
     _checkReleaseSignature(swapId, keccak256(abi.encodePacked(recipient)), domainHash, lockingSwap.initiator, r, s, v);
 
-    address token = lockingSwap.token;
-    address provider = lockingSwap.provider;
-    uint32 providerIndex = indexOfAddress[provider];
-
-    if (metaAmount < lockingSwap.amount) {
-      balanceOf[token][providerIndex] = LowGasSafeMath.add(
-        balanceOf[token][providerIndex],
-        LowGasSafeMath.sub(lockingSwap.amount, metaAmount)
-      );
-    }
+    address token = _tokenAddressByHash[lockingSwap.tokenHash];
+    uint128 amount = lockingSwap.amount;
+    uint32 providerIndex = lockingSwap.providerIndex;
 
     delete lockingSwaps[swapId];
 
-    _safeTransfer(token, recipient, metaAmount);
+    _safeTransfer(token, recipient, amount);
 
     emit SwapReleased(swapId);
   }

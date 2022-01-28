@@ -72,7 +72,7 @@ async function main() {
 
   // release
   const signedRelease = new SignedSwapRelease(exportedRelease)
-  const releaseTx = await mesonClient.release(signedRelease, swap.amount)
+  const releaseTx = await mesonClient.release(signedRelease)
   getUsedGas('release', releaseTx.hash)
 
   // executeSwap

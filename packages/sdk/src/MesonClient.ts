@@ -76,16 +76,15 @@ export class MesonClient {
       signedRequest.swapId,
       signedRequest.initiator,
       signedRequest.amount,
-      signedRequest.outToken
+      keccak256(signedRequest.outToken)
     )
   }
 
-  async release(signedRelease: SignedSwapReleaseData, amount: string) {
+  async release(signedRelease: SignedSwapReleaseData) {
     this._check(signedRelease)
     return this.mesonInstance.release(
       signedRelease.swapId,
       signedRelease.recipient,
-      amount,
       signedRelease.domainHash,
       ...signedRelease.signature
     )

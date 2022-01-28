@@ -5,10 +5,10 @@ pragma solidity 0.8.6;
 interface IMesonPools {
   struct LockingSwap {
     address initiator;
-    address provider;
-    address token;
+    bytes32 tokenHash;
     uint128 amount;
-    uint64 until;
+    uint32 providerIndex;
+    uint48 until;
   }
 
   /// @notice Deposit tokens into the liquidity pool. This is the
@@ -35,7 +35,7 @@ interface IMesonPools {
     bytes32 swapId,
     address initiator,
     uint128 amount,
-    address token
+    bytes32 tokenHash
   ) external;
 
   /// @notice Unlock tokens
@@ -49,11 +49,9 @@ interface IMesonPools {
   /// in `executeSwap`.
   /// @dev Designed to be used by liquidity providers
   /// @param swapId The ID of the swap
-  /// @param metaAmount The meta-amount of token to swap (not the exact releasing amount)
   function release(
     bytes32 swapId,
     address recipient,
-    uint128 metaAmount,
     bytes32 domainHash,
     bytes32 r,
     bytes32 s,
@@ -68,8 +66,7 @@ interface IMesonPools {
   /// @notice Event when a swap request has been locked.
   /// Emit at the end of `lock()` calls.
   /// @param swapId The ID of the swap
-  /// @param provider The address of the bonded provider
-  event SwapLocked(bytes32 swapId, address provider);
+  event SwapLocked(bytes32 swapId);
 
   /// @notice Event when a swap request has been released.
   /// Emit at the end of `release()` calls.
