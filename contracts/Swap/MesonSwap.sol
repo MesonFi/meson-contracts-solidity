@@ -77,13 +77,12 @@ contract MesonSwap is IMesonSwap, MesonStates {
   /// @inheritdoc IMesonSwap
   function cancelSwap(bytes calldata encodedSwap) external override {
     bytes32 swapId = _getSwapId(encodedSwap);
-    require(_swapRequests[swapId].initiator != address(0), "no swap");
+    address initiator = _swapRequests[swapId].initiator;
+    require(initiator != address(0), "no swap");
 
     (bytes32 inTokenHash, uint128 amountWithFee, uint48 expireTs) = _decodeSwapInput(encodedSwap);
     require(expireTs < uint48(block.timestamp), "swap is locked");
-
     address inToken = _tokenAddressByHash[inTokenHash];
-    address initiator = _swapRequests[swapId].initiator;
 
     delete _swapRequests[swapId];
 
