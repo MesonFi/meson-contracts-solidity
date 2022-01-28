@@ -18,30 +18,24 @@ contract MesonSwap is IMesonSwap, MesonStates {
   mapping(bytes32 => SwapRequest) internal _swapRequests;
 
   /// @inheritdoc IMesonSwap
-  function requestSwap(bytes memory encodedSwap, uint8 inTokenIndex)
-    external
-    override
-    returns (bytes32)
-  {
-    // address inToken = tokens[inTokenIndex];
-    // (bytes32 swapId, uint128 amount, uint48 fee, uint48 expireTs) = _verifyEncodedSwap(encodedSwap, inToken);
+  function requestSwap(bytes calldata encodedSwap) external override {
+    bytes32 swapId = _getSwapId(encodedSwap);
+    require(_swapRequests[swapId].initiator == address(0), "swap conflict");
 
-    // address initiator = _msgSender();
+    (address inToken, uint128 amountWithFee) = _checkSwapRequest(encodedSwap);
+    address initiator = _msgSender();
 
-    // uint128 total = LowGasSafeMath.add(amount, fee); // TODO: fee to meson protocol
-    // requests[swapId] = SwapRequest(initiator, 0, inTokenIndex, total, expireTs);
-
-    // _unsafeDepositToken(inToken, initiator, total);
-
-    // emit SwapRequested(swapId);
-    // return swapId;
+    _swapRequests[swapId] = SwapRequest(initiator, 0);
+    _unsafeDepositToken(inToken, initiator, amountWithFee);
+    emit SwapRequested(swapId);
   }
 
-  function bondSwap(bytes32 swapId) public override {
-    // require(requests[swapId].providerIndex == 0, "swap bonded to another provider");
-    // requests[swapId].providerIndex = indexOfAddress[_msgSender()];
-
-    // emit SwapBonded(swapId);
+  function bondSwap(bytes32 swapId, uint32 providerIndex) public override {
+    require(_swapRequests[swapId].initiator != address(0), "no swap");
+    require(_swapRequests[swapId].providerIndex == 0, "swap bonded to another provider");
+    
+    _swapRequests[swapId].providerIndex = providerIndex;
+    emit SwapBonded(swapId);
   }
 
   /// @inheritdoc IMesonSwap
@@ -57,6 +51,16 @@ contract MesonSwap is IMesonSwap, MesonStates {
     require(_swapRequests[swapId].initiator == address(0), "swap conflict");
     require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
 
+    (address inToken, uint128 amountWithFee) = _checkSwapRequest(encodedSwap);
+
+    _swapRequests[swapId] = SwapRequest(initiator, providerIndex);
+    _unsafeDepositToken(inToken, initiator, amountWithFee);
+    emit SwapPosted(swapId);
+  }
+
+  function _checkSwapRequest(bytes calldata encodedSwap) internal view
+    returns (address, uint128)
+  {
      // TODO: user may make more requests
     (bytes32 inTokenHash, uint128 amountWithFee, uint48 expireTs) = _decodeSwapInput(encodedSwap);
     address inToken = _tokenAddressByHash[inTokenHash];
@@ -67,15 +71,14 @@ contract MesonSwap is IMesonSwap, MesonStates {
     require(expireTs > ts + MIN_BOND_TIME_PERIOD, "expire ts too early");
     require(expireTs < ts + MAX_BOND_TIME_PERIOD, "expire ts too late");
 
-    _swapRequests[swapId] = SwapRequest(initiator, providerIndex);
-
-    _unsafeDepositToken(inToken, initiator, amountWithFee);
-
-    emit SwapPosted(swapId);
+    return (inToken, amountWithFee);
   }
 
   /// @inheritdoc IMesonSwap
-  function cancelSwap(bytes32 swapId) external override {
+  function cancelSwap(bytes calldata encodedSwap) external override {
+    bytes32 swapId = _getSwapId(encodedSwap);
+    require(_swapRequests[swapId].initiator != address(0), "no swap");
+
     // (uint128 total,, uint48 expireTs, uint8 inTokenIndex) = _unpackSwapData(swapData[swapId]);
     // address inToken = tokens[inTokenIndex];
     // address initiator = swapInitiator[swapId];
@@ -93,30 +96,28 @@ contract MesonSwap is IMesonSwap, MesonStates {
   /// @inheritdoc IMesonSwap
   function executeSwap(
     bytes calldata encodedSwap,
-    bytes32 swapId,
-    bytes memory recipient,
+    bytes32 recipientHash,
     bytes32 r,
     bytes32 s,
     uint8 v,
     bool depositToPool
   ) external override {
-    require(swapId == _getSwapId(encodedSwap), 'swap id does not match');
-
+    bytes32 swapId = _getSwapId(encodedSwap);
     address initiator = _swapRequests[swapId].initiator;
     uint32 providerIndex = _swapRequests[swapId].providerIndex;
     require(providerIndex != 0, "swap not found or not bonded");
 
-    _checkReleaseSignature(swapId, keccak256(recipient), DOMAIN_SEPARATOR, initiator, r, s, v);
+    _checkReleaseSignature(swapId, recipientHash, DOMAIN_SEPARATOR, initiator, r, s, v);
 
     (bytes32 inTokenHash, uint128 amountWithFee,) = _decodeSwapInput(encodedSwap);
 
-    // TODO: fee to meson protocol
-
     delete _swapRequests[swapId];
 
+    // TODO: fee to meson protocol
+
     if (depositToPool) {
-      _tokenBalanceOf[0][providerIndex]
-        = LowGasSafeMath.add(_tokenBalanceOf[0][providerIndex], amountWithFee);
+      _tokenBalanceOf[inTokenHash][providerIndex]
+        = LowGasSafeMath.add(_tokenBalanceOf[inTokenHash][providerIndex], amountWithFee);
     } else {
       address provider = addressOfIndex[providerIndex];
       address inToken = _tokenAddressByHash[inTokenHash];

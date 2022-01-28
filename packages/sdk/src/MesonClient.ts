@@ -1,6 +1,7 @@
 import type { Wallet } from '@ethersproject/wallet'
 import type { Meson } from '@mesonfi/contract-types'
 
+import { keccak256 } from '@ethersproject/keccak256'
 import { SwapSigner } from './SwapSigner'
 import { SwapRequestWithSigner } from './SwapRequestWithSigner'
 import { SignedSwapCommonData, SignedSwapRequest, SignedSwapReleaseData } from './SignedSwap'
@@ -63,8 +64,7 @@ export class MesonClient {
     this._check(signedRelease)
     return this.mesonInstance.executeSwap(
       encoded,
-      signedRelease.swapId,
-      signedRelease.recipient,
+      keccak256(signedRelease.recipient),
       ...signedRelease.signature,
       depositToPool
     )
@@ -99,7 +99,7 @@ export class MesonClient {
   }
 
   async getSwap(swapId: string) {
-    return await this.mesonInstance.requests(swapId)
+    // return await this.mesonInstance.requests(swapId)
   }
 
   async getLockingSwap(swapId: string) {

@@ -7,16 +7,12 @@ import "../interfaces/IERC20Minimal.sol";
 interface IMesonSwap {
   struct SwapRequest {
     address initiator;
-    // uint256 data;
     uint32 providerIndex;
-    // uint8 inTokenIndex;
-    // uint128 total;
-    // uint48 expireTs;
   }
 
-  function requestSwap(bytes memory encodedSwap, uint8 inTokenIndex) external returns (bytes32 swapId);
+  function requestSwap(bytes calldata encodedSwap) external;
 
-  function bondSwap(bytes32 swapId) external;
+  function bondSwap(bytes32 swapId, uint32 providerIndex) external;
 
   /// @notice A liquidity provider can call this method to post the swap and bond it
   /// to himself.
@@ -40,8 +36,8 @@ interface IMesonSwap {
 
   /// @notice Cancel a swap
   /// @dev Designed to be used by users
-  /// @param swapId The ID of the swap
-  function cancelSwap(bytes32 swapId) external;
+  /// @param encodedSwap The abi encoded swap
+  function cancelSwap(bytes calldata encodedSwap) external;
 
   /// @notice Execute the swap by providing a signature.
   /// This is step 4️⃣  in a swap.
@@ -52,11 +48,10 @@ interface IMesonSwap {
   /// in `release`.
   /// Otherwise, other people can use the signature to `challenge` the LP.
   /// @dev Designed to be used by the current bonding LP
-  /// @param swapId The ID of the swap
+  /// @param encodedSwap The abi encoded swap
   function executeSwap(
     bytes calldata encodedSwap,
-    bytes32 swapId,
-    bytes memory recipient,
+    bytes32 recipientHash,
     bytes32 r,
     bytes32 s,
     uint8 v,

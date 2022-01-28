@@ -11,11 +11,12 @@ contract MesonStates is MesonHelpers {
   address[] internal _tokenListByHash;
   mapping(bytes32 => address) internal _tokenAddressByHash;
 
+  mapping(bytes32 => mapping(uint32 => uint128)) internal _tokenBalanceOf;
+
   mapping(address => uint32) public indexOfAddress;
   mapping(uint32 => address) public addressOfIndex;
 
   mapping(address => mapping(uint32 => uint128)) public balanceOf;
-  mapping(uint8 => mapping(uint32 => uint128)) internal _tokenBalanceOf;
 
   function registerAddress(uint32 index) external {
     address addr = _msgSender();
