@@ -13,14 +13,14 @@ contract MesonStates is MesonHelpers {
   mapping(bytes32 => address) internal _tokenAddressByHash;
   mapping(address => bytes32) internal _tokenHashByAddress;
 
-  mapping(bytes32 => mapping(uint32 => uint128)) internal _tokenBalanceOf;
+  mapping(bytes32 => mapping(uint40 => uint128)) internal _tokenBalanceOf;
 
-  mapping(address => uint32) public indexOfAddress;
-  mapping(uint32 => address) public addressOfIndex;
+  mapping(address => uint40) public indexOfAddress;
+  mapping(uint40 => address) public addressOfIndex;
 
   function balanceOf(address token, address addr) external view returns (uint128) {
     bytes32 tokenHash = _tokenHashByAddress[token];
-    uint32 index = indexOfAddress[addr];
+    uint40 index = indexOfAddress[addr];
     return _tokenBalanceOf[tokenHash][index];
   } 
 

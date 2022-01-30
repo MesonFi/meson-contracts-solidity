@@ -30,7 +30,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
     emit SwapRequested(swapId);
   }
 
-  function bondSwap(bytes32 swapId, uint32 providerIndex) public override {
+  function bondSwap(bytes32 swapId, uint40 providerIndex) public override {
     require(_swapRequests[swapId].initiator != address(0), "no swap");
     require(_swapRequests[swapId].providerIndex == 0, "swap bonded to another provider");
     
@@ -45,7 +45,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
     bytes32 r,
     bytes32 s,
     uint8 v,
-    uint32 providerIndex
+    uint40 providerIndex
   ) external override {
     bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
     require(_swapRequests[swapId].initiator == address(0), "swap conflict");
@@ -102,7 +102,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
   ) external override {
     bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
     address initiator = _swapRequests[swapId].initiator;
-    uint32 providerIndex = _swapRequests[swapId].providerIndex;
+    uint40 providerIndex = _swapRequests[swapId].providerIndex;
     require(providerIndex != 0, "swap not found or not bonded");
 
     _checkReleaseSignature(swapId, recipientHash, DOMAIN_SEPARATOR, initiator, r, s, v);
@@ -129,7 +129,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
     returns (address initiator, address provider)
   {
     initiator = _swapRequests[swapId].initiator;
-    uint32 providerIndex = _swapRequests[swapId].providerIndex;
+    uint40 providerIndex = _swapRequests[swapId].providerIndex;
     provider = addressOfIndex[providerIndex];
   }
 }

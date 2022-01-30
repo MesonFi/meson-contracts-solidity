@@ -4,7 +4,7 @@ pragma solidity 0.8.6;
 /// @title MesonPools Interface
 interface IMesonPools {
   struct LockedSwap {
-    uint32 providerIndex;
+    uint40 providerIndex;
     uint48 until;
   }
 
@@ -16,7 +16,7 @@ interface IMesonPools {
   /// @param amount The amount to be added to the pool
   function deposit(address token, uint128 amount) external;
 
-  function depositAndRegister(address token, uint128 amount, uint32 providerIndex) external;
+  function depositAndRegister(address token, uint128 amount, uint40 providerIndex) external;
 
   /// @notice Withdraw tokens from the liquidity pool. In order to make sure
   /// pending swaps can be satisfied, withdraw have a rate limit that

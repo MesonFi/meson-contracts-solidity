@@ -16,16 +16,17 @@ contract MesonPools is IMesonPools, MesonStates {
   /// @inheritdoc IMesonPools
   function deposit(address token, uint128 amount) external override tokenSupported(token) {
     address provider = _msgSender();
-    uint32 providerIndex = indexOfAddress[provider];
+    uint40 providerIndex = indexOfAddress[provider];
     require(providerIndex != 0, 'address not registered');
 
     _addProviderBalance(token, amount, providerIndex);
     _unsafeDepositToken(token, provider, amount);
   }
 
-  function depositAndRegister(address token, uint128 amount, uint32 providerIndex)
+  function depositAndRegister(address token, uint128 amount, uint40 providerIndex)
     external override tokenSupported(token)
   {
+    // possible attack: register a lot index and withdraw funds
     address provider = _msgSender();
     require(providerIndex != 0, "Cannot use index 0");
     require(addressOfIndex[providerIndex] == address(0), "Index already registered");
@@ -40,7 +41,7 @@ contract MesonPools is IMesonPools, MesonStates {
   function _addProviderBalance(
     address token,
     uint128 amount,
-    uint32 providerIndex
+    uint40 providerIndex
   ) internal {
     bytes32 tokenHash = _tokenHashByAddress[token];
     _tokenBalanceOf[tokenHash][providerIndex] = LowGasSafeMath.add(
@@ -51,7 +52,7 @@ contract MesonPools is IMesonPools, MesonStates {
   /// @inheritdoc IMesonPools
   function withdraw(address token, uint128 amount) external override tokenSupported(token) {
     address provider = _msgSender();
-    uint32 providerIndex = indexOfAddress[provider];
+    uint40 providerIndex = indexOfAddress[provider];
     require(providerIndex != 0, 'address not registered');
     bytes32 tokenHash = _tokenHashByAddress[token];
     _tokenBalanceOf[tokenHash][providerIndex] = LowGasSafeMath.sub(
@@ -76,7 +77,7 @@ contract MesonPools is IMesonPools, MesonStates {
     require(amount > 0, "amount must be greater than zero");
     require(_lockedSwaps[swapId].providerIndex == 0, "locking swap already exists");
 
-    uint32 providerIndex = indexOfAddress[_msgSender()];
+    uint40 providerIndex = indexOfAddress[_msgSender()];
     require(_tokenBalanceOf[tokenHash][providerIndex] >= amount, "insufficient balance");
 
     _tokenBalanceOf[tokenHash][providerIndex] = _tokenBalanceOf[tokenHash][providerIndex] - amount;
@@ -97,7 +98,7 @@ contract MesonPools is IMesonPools, MesonStates {
     bytes32 swapId = _getSwapId(encodedSwap, domainHash);
 
     LockedSwap memory lockedSwap = _lockedSwaps[swapId];
-    uint32 providerIndex = lockedSwap.providerIndex;
+    uint40 providerIndex = lockedSwap.providerIndex;
 
     require(providerIndex != 0, "swap does not exist");
     require(uint48(block.timestamp) > lockedSwap.until, "The swap is still in lock");
@@ -141,7 +142,7 @@ contract MesonPools is IMesonPools, MesonStates {
     returns (address provider, uint48 until)
   {
     LockedSwap memory lockedSwap = _lockedSwaps[swapId];
-    uint32 providerIndex = lockedSwap.providerIndex;
+    uint40 providerIndex = lockedSwap.providerIndex;
     provider = addressOfIndex[providerIndex];
     until = lockedSwap.until;
   }

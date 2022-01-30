@@ -7,12 +7,12 @@ import "../interfaces/IERC20Minimal.sol";
 interface IMesonSwap {
   struct SwapRequest {
     address initiator;
-    uint32 providerIndex;
+    uint40 providerIndex;
   }
 
   function requestSwap(bytes calldata encodedSwap) external;
 
-  function bondSwap(bytes32 swapId, uint32 providerIndex) external;
+  function bondSwap(bytes32 swapId, uint40 providerIndex) external;
 
   /// @notice A liquidity provider can call this method to post the swap and bond it
   /// to himself.
@@ -31,7 +31,7 @@ interface IMesonSwap {
     bytes32 r,
     bytes32 s,
     uint8 v,
-    uint32 providerIndex
+    uint40 providerIndex
   ) external;
 
   /// @notice Cancel a swap
