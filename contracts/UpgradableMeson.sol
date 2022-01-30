@@ -10,7 +10,7 @@ contract UpgradableMeson is UUPSUpgradeable, MesonSwap, MesonPools {
   bool private _initialized;
   address private _owner;
 
-  function initialize(address[] memory _supportedTokens) public {
+  function initialize(address[] memory supportedTokens) public {
     require(!_initialized, "Contract instance has already been initialized");
     _initialized = true;
 
@@ -27,8 +27,8 @@ contract UpgradableMeson is UUPSUpgradeable, MesonSwap, MesonPools {
         )
       );
 
-    for (uint i = 0; i < _supportedTokens.length; i++) {
-      _addTokenToSwapList(_supportedTokens[i]);
+    for (uint i = 0; i < supportedTokens.length; i++) {
+      _addSupportToken(supportedTokens[i]);
     }
   }
 

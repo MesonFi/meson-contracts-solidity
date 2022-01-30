@@ -4,8 +4,8 @@ pragma solidity =0.8.6;
 import "../Pools/MesonPools.sol";
 
 contract MesonPoolsTest is MesonPools {
-  function addTokenToSwapList(address token) external {
-    _addTokenToSwapList(token);
+  function addSupportToken(address token) external {
+    _addSupportToken(token);
   }
 
   function hasLockedSwap(bytes32 swapId) external view returns (bool) {

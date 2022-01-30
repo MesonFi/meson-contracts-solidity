@@ -8,7 +8,7 @@ import "./MesonHelpers.sol";
 /// @notice The class that keeps track of token supplies and swap requests,
 contract MesonStates is MesonHelpers {
   mapping(address => bool) internal _supportedTokens;
-  address[] internal _tokenListByHash;
+  address[] internal _tokenList;
 
   mapping(bytes32 => address) internal _tokenAddressByHash;
   mapping(address => bytes32) internal _tokenHashByAddress;
@@ -24,7 +24,7 @@ contract MesonStates is MesonHelpers {
     return _tokenBalanceOf[tokenHash][index];
   } 
 
-  function _addTokenToSwapList(address token) internal {
+  function _addSupportToken(address token) internal {
     _supportedTokens[token] = true;
     bytes32 tokenHash = keccak256(abi.encodePacked(token));
     _tokenAddressByHash[tokenHash] = token;

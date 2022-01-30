@@ -17,8 +17,8 @@ contract MesonSwapTest is MesonSwap {
       );
   }
 
-  function addTokenToSwapList(address token) external {
-    _addTokenToSwapList(token);
+  function addSupportToken(address token) external {
+    _addSupportToken(token);
   }
 
   function hasSwap(bytes32 swapId) external view returns (bool) {

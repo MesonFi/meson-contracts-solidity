@@ -5,7 +5,7 @@ import "./Swap/MesonSwap.sol";
 import "./Pools/MesonPools.sol";
 
 contract Meson is MesonSwap, MesonPools {
-  constructor(address[] memory _supportedTokens) {
+  constructor(address[] memory supportedTokens) {
     DOMAIN_SEPARATOR =
       keccak256(
         abi.encode(
@@ -17,8 +17,8 @@ contract Meson is MesonSwap, MesonPools {
         )
       );
       
-    for (uint i = 0; i < _supportedTokens.length; i++) {
-      _addTokenToSwapList(_supportedTokens[i]);
+    for (uint i = 0; i < supportedTokens.length; i++) {
+      _addSupportToken(supportedTokens[i]);
     }
   }
 }
