@@ -19,7 +19,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
 
   /// @inheritdoc IMesonSwap
   function requestSwap(bytes calldata encodedSwap) external override {
-    bytes32 swapId = _getSwapId(encodedSwap);
+    bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
     require(_swapRequests[swapId].initiator == address(0), "swap conflict");
 
     (address inToken, uint128 amountWithFee) = _checkSwapRequest(encodedSwap);
@@ -47,7 +47,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
     uint8 v,
     uint32 providerIndex
   ) external override {
-    bytes32 swapId = _getSwapId(encodedSwap);
+    bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
     require(_swapRequests[swapId].initiator == address(0), "swap conflict");
     require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
 
@@ -76,7 +76,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
 
   /// @inheritdoc IMesonSwap
   function cancelSwap(bytes calldata encodedSwap) external override {
-    bytes32 swapId = _getSwapId(encodedSwap);
+    bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
     address initiator = _swapRequests[swapId].initiator;
     require(initiator != address(0), "no swap");
 
@@ -100,7 +100,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
     uint8 v,
     bool depositToPool
   ) external override {
-    bytes32 swapId = _getSwapId(encodedSwap);
+    bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
     address initiator = _swapRequests[swapId].initiator;
     uint32 providerIndex = _swapRequests[swapId].providerIndex;
     require(providerIndex != 0, "swap not found or not bonded");

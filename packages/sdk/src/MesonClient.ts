@@ -59,7 +59,7 @@ export class MesonClient {
       1 // provider index
     )
   }
-  
+
   async lock(signedRequest: SignedSwapRequest) {
     this._check(signedRequest)
     return this.mesonInstance.lock(

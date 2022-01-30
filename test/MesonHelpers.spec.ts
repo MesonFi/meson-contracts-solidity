@@ -21,7 +21,7 @@ describe('MesonHelpers', () => {
   beforeEach('deploy MesonHelpersTest', async () => {
     mesonInstance = await waffle.loadFixture(fixture)
     const outChain = await mesonInstance.getCoinType()
-    mesonClient = await MesonClient.Create(mesonInstance)
+    mesonClient = await MesonClient.Create(mesonInstance as any)
     swapData = getDefaultSwap()
     swap = mesonClient.requestSwap(outChain, swapData)
   })
@@ -59,15 +59,7 @@ describe('MesonHelpers', () => {
 
   describe('#getSwapId', () => {
     it('returns same result as js function', async () => {
-      const swapIdFromContract = await mesonInstance.getSwapId(
-        swap.inToken,
-        swap.amount,
-        swap.fee,
-        swap.expireTs,
-        swap.outChain,
-        swap.outToken
-      )
-
+      const swapIdFromContract = await mesonInstance.getSwapId(swap.encode())
       expect(swapIdFromContract).to.equal(swap.swapId)
     })
   })
@@ -77,8 +69,15 @@ describe('MesonHelpers', () => {
       const decoded = await mesonInstance.decodeSwapInput(swap.encode())
       expect(decoded[0].toLowerCase()).to.equal(ethers.utils.keccak256(swap.inToken))
       expect(decoded[1]).to.equal(swap.amount)
-      expect(decoded[2].toString()).to.equal(swap.fee)
-      expect(decoded[3]).to.equal(swap.expireTs)
+      expect(decoded[2]).to.equal(swap.expireTs)
+    })
+  })
+
+  describe('#decodeSwapOutput', () => {
+    it('returns decoded swap data', async () => {
+      const decoded = await mesonInstance.decodeSwapOutput(swap.encode())
+      expect(decoded[0]).to.equal(swap.amount)
+      expect(decoded[1].toLowerCase()).to.equal(ethers.utils.keccak256(swap.outToken))
     })
   })
 

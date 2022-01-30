@@ -44,7 +44,7 @@ contract MesonPools is IMesonPools, MesonStates {
     bytes32 s,
     uint8 v
   ) external override {
-    bytes32 swapId = _getSwapId2(encodedSwap, domainHash);
+    bytes32 swapId = _getSwapId(encodedSwap, domainHash);
     require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
 
     (uint128 amount, bytes32 tokenHash) = _decodeSwapOutput(encodedSwap);
@@ -69,7 +69,7 @@ contract MesonPools is IMesonPools, MesonStates {
     bytes calldata encodedSwap,
     bytes32 domainHash
   ) external override {
-    bytes32 swapId = _getSwapId2(encodedSwap, domainHash);
+    bytes32 swapId = _getSwapId(encodedSwap, domainHash);
 
     LockedSwap memory lockedSwap = _lockedSwaps[swapId];
     uint32 providerIndex = lockedSwap.providerIndex;
@@ -95,7 +95,7 @@ contract MesonPools is IMesonPools, MesonStates {
     bytes32 s,
     uint8 v
   ) external override {
-    bytes32 swapId = _getSwapId2(encodedSwap, domainHash);
+    bytes32 swapId = _getSwapId(encodedSwap, domainHash);
 
     LockedSwap memory lockedSwap = _lockedSwaps[swapId];
     // require(lockedSwap.providerIndex != 0, "swap does not exist");

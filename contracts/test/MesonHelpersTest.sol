@@ -4,53 +4,54 @@ pragma solidity =0.8.6;
 import "../utils/MesonHelpers.sol";
 
 contract MesonHelpersTest is MesonHelpers {
-  // function getSwapId(
-  //   address inToken,
-  //   uint128 amount,
-  //   uint48 fee,
-  //   uint48 expireTs,
-  //   bytes4 outChain,
-  //   bytes memory outToken
-  // ) external view returns (bytes32) {
-  //   return _getSwapId(
-  //     encodeSwap(
-  //       abi.encodePacked(inToken),
-  //       amount,
-  //       fee,
-  //       expireTs,
-  //       outChain,
-  //       outToken
-  //     )
-  //   );
-  // }
+  constructor() {
+    DOMAIN_SEPARATOR =
+      keccak256(
+        abi.encode(
+          EIP712_DOMAIN_TYPEHASH,
+          keccak256(bytes("Meson Fi")),
+          keccak256(bytes("1")),
+          block.chainid,
+          address(this)
+        )
+      );
+  }
 
-  // function encodeSwap(
-  //   bytes memory inToken,
-  //   uint128 amount,
-  //   uint48 fee,
-  //   uint48 expireTs,
-  //   bytes4 outChain,
-  //   bytes memory outToken
-  // ) public pure returns (bytes memory) {
-  //   return
-  //     abi.encode(
-  //       SWAP_REQUEST_TYPEHASH,
-  //       keccak256(inToken),
-  //       amount,
-  //       fee,
-  //       expireTs,
-  //       outChain,
-  //       keccak256(outToken)
-  //     );
-  // }
+  function getSwapId(bytes calldata encodedSwap) external view returns (bytes32) {
+    return _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
+  }
 
-  // function decodeSwapInput(bytes calldata encodedSwap)
-  //   external
-  //   pure
-  //   returns (bytes32, uint128, uint48, uint48)
-  // {
-  //   return _decodeSwapInput(encodedSwap);
-  // }
+  function encodeSwap(
+    bytes memory inToken,
+    uint128 amount,
+    uint48 fee,
+    uint48 expireTs,
+    bytes4 outChain,
+    bytes memory outToken
+  ) external pure returns (bytes memory) {
+    return
+      abi.encode(
+        SWAP_REQUEST_TYPEHASH,
+        keccak256(inToken),
+        amount,
+        fee,
+        expireTs,
+        outChain,
+        keccak256(outToken)
+      );
+  }
+
+  function decodeSwapInput(bytes calldata encodedSwap) external pure
+    returns (bytes32, uint128, uint48)
+  {
+    return _decodeSwapInput(encodedSwap);
+  }
+
+  function decodeSwapOutput(bytes calldata encodedSwap) external pure
+    returns (uint128, bytes32)
+  {
+    return _decodeSwapOutput(encodedSwap);
+  }
 
   function checkRequestSignature(
     bytes32 swapId,
