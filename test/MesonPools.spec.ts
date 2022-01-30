@@ -26,6 +26,7 @@ describe('MesonPools', () => {
     outChain = await mesonInstance.getCoinType()
     userClient = await MesonClient.Create(result.pools) // user is default account
     lpClient = await MesonClient.Create(mesonInstance)
+    await lpClient.registerAddress(1)
   })
 
   describe('#token total supply', () => {
@@ -74,7 +75,7 @@ describe('MesonPools', () => {
       expect(await token.balanceOf(mesonInstance.address)).to.equal(0)
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE)
 
-      await expect(mesonInstance.withdraw(token.address, 1)).to.be.revertedWith('overdrawn')
+      await expect(mesonInstance.withdraw(token.address, 1)).to.be.reverted
     })
 
     it('refuses unsupported token', async () => {
@@ -94,7 +95,7 @@ describe('MesonPools', () => {
       await lpClient.lock(signedRequest)
 
       expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
-      expect(await mesonInstance.hasLockingSwap(swap.swapId)).to.equal(true)
+      expect(await mesonInstance.hasLockedSwap(swap.swapId)).to.equal(true)
     })
   })
 

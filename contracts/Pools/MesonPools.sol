@@ -17,6 +17,7 @@ contract MesonPools is IMesonPools, MesonStates {
   function deposit(address token, uint128 amount) external override tokenSupported(token) {
     address provider = _msgSender();
     uint32 providerIndex = indexOfAddress[provider];
+    require(providerIndex != 0, 'address not registered');
     bytes32 tokenHash = _tokenHashByAddress[token];
     _tokenBalanceOf[tokenHash][providerIndex] = LowGasSafeMath.add(
       _tokenBalanceOf[tokenHash][providerIndex], amount
@@ -28,6 +29,7 @@ contract MesonPools is IMesonPools, MesonStates {
   function withdraw(address token, uint128 amount) external override tokenSupported(token) {
     address provider = _msgSender();
     uint32 providerIndex = indexOfAddress[provider];
+    require(providerIndex != 0, 'address not registered');
     bytes32 tokenHash = _tokenHashByAddress[token];
     _tokenBalanceOf[tokenHash][providerIndex] = LowGasSafeMath.sub(
       _tokenBalanceOf[tokenHash][providerIndex], amount
