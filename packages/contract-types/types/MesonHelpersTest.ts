@@ -19,10 +19,7 @@ export interface MesonHelpersTestInterface extends utils.Interface {
   functions: {
     "checkReleaseSignature(bytes32,address,address,bytes32,bytes32,uint8)": FunctionFragment;
     "checkRequestSignature(bytes32,address,bytes32,bytes32,uint8)": FunctionFragment;
-    "decodeSwapInput(bytes)": FunctionFragment;
-    "encodeSwap(bytes,uint128,uint48,uint48,bytes4,bytes)": FunctionFragment;
     "getCoinType()": FunctionFragment;
-    "getSwapId(address,uint128,uint48,uint48,bytes4,bytes)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -34,34 +31,8 @@ export interface MesonHelpersTestInterface extends utils.Interface {
     values: [BytesLike, string, BytesLike, BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "decodeSwapInput",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "encodeSwap",
-    values: [
-      BytesLike,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
-  ): string;
-  encodeFunctionData(
     functionFragment: "getCoinType",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getSwapId",
-    values: [
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
   ): string;
 
   decodeFunctionResult(
@@ -73,15 +44,9 @@ export interface MesonHelpersTestInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "decodeSwapInput",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "encodeSwap", data: BytesLike): Result;
-  decodeFunctionResult(
     functionFragment: "getCoinType",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getSwapId", data: BytesLike): Result;
 
   events: {};
 }
@@ -132,32 +97,7 @@ export interface MesonHelpersTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[void]>;
 
-    decodeSwapInput(
-      encodedSwap: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber, number, number]>;
-
-    encodeSwap(
-      inToken: BytesLike,
-      amount: BigNumberish,
-      fee: BigNumberish,
-      expireTs: BigNumberish,
-      outChain: BytesLike,
-      outToken: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
     getCoinType(overrides?: CallOverrides): Promise<[string]>;
-
-    getSwapId(
-      inToken: string,
-      amount: BigNumberish,
-      fee: BigNumberish,
-      expireTs: BigNumberish,
-      outChain: BytesLike,
-      outToken: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
   };
 
   checkReleaseSignature(
@@ -179,32 +119,7 @@ export interface MesonHelpersTest extends BaseContract {
     overrides?: CallOverrides
   ): Promise<void>;
 
-  decodeSwapInput(
-    encodedSwap: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<[string, BigNumber, number, number]>;
-
-  encodeSwap(
-    inToken: BytesLike,
-    amount: BigNumberish,
-    fee: BigNumberish,
-    expireTs: BigNumberish,
-    outChain: BytesLike,
-    outToken: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
   getCoinType(overrides?: CallOverrides): Promise<string>;
-
-  getSwapId(
-    inToken: string,
-    amount: BigNumberish,
-    fee: BigNumberish,
-    expireTs: BigNumberish,
-    outChain: BytesLike,
-    outToken: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<string>;
 
   callStatic: {
     checkReleaseSignature(
@@ -226,32 +141,7 @@ export interface MesonHelpersTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    decodeSwapInput(
-      encodedSwap: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber, number, number]>;
-
-    encodeSwap(
-      inToken: BytesLike,
-      amount: BigNumberish,
-      fee: BigNumberish,
-      expireTs: BigNumberish,
-      outChain: BytesLike,
-      outToken: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     getCoinType(overrides?: CallOverrides): Promise<string>;
-
-    getSwapId(
-      inToken: string,
-      amount: BigNumberish,
-      fee: BigNumberish,
-      expireTs: BigNumberish,
-      outChain: BytesLike,
-      outToken: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
   };
 
   filters: {};
@@ -276,32 +166,7 @@ export interface MesonHelpersTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    decodeSwapInput(
-      encodedSwap: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    encodeSwap(
-      inToken: BytesLike,
-      amount: BigNumberish,
-      fee: BigNumberish,
-      expireTs: BigNumberish,
-      outChain: BytesLike,
-      outToken: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     getCoinType(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getSwapId(
-      inToken: string,
-      amount: BigNumberish,
-      fee: BigNumberish,
-      expireTs: BigNumberish,
-      outChain: BytesLike,
-      outToken: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -324,31 +189,6 @@ export interface MesonHelpersTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    decodeSwapInput(
-      encodedSwap: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    encodeSwap(
-      inToken: BytesLike,
-      amount: BigNumberish,
-      fee: BigNumberish,
-      expireTs: BigNumberish,
-      outChain: BytesLike,
-      outToken: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     getCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getSwapId(
-      inToken: string,
-      amount: BigNumberish,
-      fee: BigNumberish,
-      expireTs: BigNumberish,
-      outChain: BytesLike,
-      outToken: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
   };
 }

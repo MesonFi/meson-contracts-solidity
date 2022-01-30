@@ -16,12 +16,6 @@ const _abi = [
         name: "swapId",
         type: "bytes32",
       },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "provider",
-        type: "address",
-      },
     ],
     name: "SwapLocked",
     type: "event",
@@ -38,13 +32,6 @@ const _abi = [
     ],
     name: "SwapReleased",
     type: "event",
-  },
-  {
-    inputs: [],
-    name: "challenge",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
   },
   {
     inputs: [
@@ -67,8 +54,13 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "bytes",
+        name: "encodedSwap",
+        type: "bytes",
+      },
+      {
         internalType: "bytes32",
-        name: "swapId",
+        name: "domainHash",
         type: "bytes32",
       },
       {
@@ -77,14 +69,19 @@ const _abi = [
         type: "address",
       },
       {
-        internalType: "uint128",
-        name: "amount",
-        type: "uint128",
+        internalType: "bytes32",
+        name: "r",
+        type: "bytes32",
       },
       {
-        internalType: "address",
-        name: "token",
-        type: "address",
+        internalType: "bytes32",
+        name: "s",
+        type: "bytes32",
+      },
+      {
+        internalType: "uint8",
+        name: "v",
+        type: "uint8",
       },
     ],
     name: "lock",
@@ -95,24 +92,24 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "bytes32",
-        name: "swapId",
-        type: "bytes32",
-      },
-      {
-        internalType: "address",
-        name: "recipient",
-        type: "address",
-      },
-      {
-        internalType: "uint128",
-        name: "metaAmount",
-        type: "uint128",
+        internalType: "bytes",
+        name: "encodedSwap",
+        type: "bytes",
       },
       {
         internalType: "bytes32",
         name: "domainHash",
         type: "bytes32",
+      },
+      {
+        internalType: "address",
+        name: "initiator",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "recipient",
+        type: "address",
       },
       {
         internalType: "bytes32",
@@ -138,8 +135,13 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "bytes",
+        name: "encodedSwap",
+        type: "bytes",
+      },
+      {
         internalType: "bytes32",
-        name: "swapId",
+        name: "domainHash",
         type: "bytes32",
       },
     ],

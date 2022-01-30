@@ -79,6 +79,11 @@ const _abi = [
         name: "swapId",
         type: "bytes32",
       },
+      {
+        internalType: "uint32",
+        name: "providerIndex",
+        type: "uint32",
+      },
     ],
     name: "bondSwap",
     outputs: [],
@@ -88,9 +93,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "bytes32",
-        name: "swapId",
-        type: "bytes32",
+        internalType: "bytes",
+        name: "encodedSwap",
+        type: "bytes",
       },
     ],
     name: "cancelSwap",
@@ -101,14 +106,14 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "bytes32",
-        name: "swapId",
-        type: "bytes32",
+        internalType: "bytes",
+        name: "encodedSwap",
+        type: "bytes",
       },
       {
-        internalType: "bytes",
-        name: "recipient",
-        type: "bytes",
+        internalType: "bytes32",
+        name: "recipientHash",
+        type: "bytes32",
       },
       {
         internalType: "bytes32",
@@ -144,11 +149,6 @@ const _abi = [
         type: "bytes",
       },
       {
-        internalType: "uint8",
-        name: "inTokenIndex",
-        type: "uint8",
-      },
-      {
         internalType: "address",
         name: "initiator",
         type: "address",
@@ -168,6 +168,11 @@ const _abi = [
         name: "v",
         type: "uint8",
       },
+      {
+        internalType: "uint32",
+        name: "providerIndex",
+        type: "uint32",
+      },
     ],
     name: "postSwap",
     outputs: [],
@@ -181,20 +186,9 @@ const _abi = [
         name: "encodedSwap",
         type: "bytes",
       },
-      {
-        internalType: "uint8",
-        name: "inTokenIndex",
-        type: "uint8",
-      },
     ],
     name: "requestSwap",
-    outputs: [
-      {
-        internalType: "bytes32",
-        name: "swapId",
-        type: "bytes32",
-      },
-    ],
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },

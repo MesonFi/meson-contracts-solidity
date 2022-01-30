@@ -19,14 +19,17 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface IMesonSwapInterface extends utils.Interface {
   functions: {
-    "bondSwap(bytes32)": FunctionFragment;
-    "cancelSwap(bytes32)": FunctionFragment;
-    "executeSwap(bytes32,bytes,bytes32,bytes32,uint8,bool)": FunctionFragment;
-    "postSwap(bytes,uint8,address,bytes32,bytes32,uint8)": FunctionFragment;
-    "requestSwap(bytes,uint8)": FunctionFragment;
+    "bondSwap(bytes32,uint32)": FunctionFragment;
+    "cancelSwap(bytes)": FunctionFragment;
+    "executeSwap(bytes,bytes32,bytes32,bytes32,uint8,bool)": FunctionFragment;
+    "postSwap(bytes,address,bytes32,bytes32,uint8,uint32)": FunctionFragment;
+    "requestSwap(bytes)": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "bondSwap", values: [BytesLike]): string;
+  encodeFunctionData(
+    functionFragment: "bondSwap",
+    values: [BytesLike, BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "cancelSwap",
     values: [BytesLike]
@@ -39,16 +42,16 @@ export interface IMesonSwapInterface extends utils.Interface {
     functionFragment: "postSwap",
     values: [
       BytesLike,
-      BigNumberish,
       string,
       BytesLike,
       BytesLike,
+      BigNumberish,
       BigNumberish
     ]
   ): string;
   encodeFunctionData(
     functionFragment: "requestSwap",
-    values: [BytesLike, BigNumberish]
+    values: [BytesLike]
   ): string;
 
   decodeFunctionResult(functionFragment: "bondSwap", data: BytesLike): Result;
@@ -127,17 +130,18 @@ export interface IMesonSwap extends BaseContract {
   functions: {
     bondSwap(
       swapId: BytesLike,
+      providerIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     cancelSwap(
-      swapId: BytesLike,
+      encodedSwap: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     executeSwap(
-      swapId: BytesLike,
-      recipient: BytesLike,
+      encodedSwap: BytesLike,
+      recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -147,34 +151,34 @@ export interface IMesonSwap extends BaseContract {
 
     postSwap(
       encodedSwap: BytesLike,
-      inTokenIndex: BigNumberish,
       initiator: string,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      providerIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     requestSwap(
       encodedSwap: BytesLike,
-      inTokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
   bondSwap(
     swapId: BytesLike,
+    providerIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   cancelSwap(
-    swapId: BytesLike,
+    encodedSwap: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   executeSwap(
-    swapId: BytesLike,
-    recipient: BytesLike,
+    encodedSwap: BytesLike,
+    recipientHash: BytesLike,
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
@@ -184,28 +188,34 @@ export interface IMesonSwap extends BaseContract {
 
   postSwap(
     encodedSwap: BytesLike,
-    inTokenIndex: BigNumberish,
     initiator: string,
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
+    providerIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   requestSwap(
     encodedSwap: BytesLike,
-    inTokenIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    bondSwap(swapId: BytesLike, overrides?: CallOverrides): Promise<void>;
+    bondSwap(
+      swapId: BytesLike,
+      providerIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    cancelSwap(swapId: BytesLike, overrides?: CallOverrides): Promise<void>;
+    cancelSwap(
+      encodedSwap: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     executeSwap(
-      swapId: BytesLike,
-      recipient: BytesLike,
+      encodedSwap: BytesLike,
+      recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -215,19 +225,18 @@ export interface IMesonSwap extends BaseContract {
 
     postSwap(
       encodedSwap: BytesLike,
-      inTokenIndex: BigNumberish,
       initiator: string,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      providerIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     requestSwap(
       encodedSwap: BytesLike,
-      inTokenIndex: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<void>;
   };
 
   filters: {
@@ -250,17 +259,18 @@ export interface IMesonSwap extends BaseContract {
   estimateGas: {
     bondSwap(
       swapId: BytesLike,
+      providerIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     cancelSwap(
-      swapId: BytesLike,
+      encodedSwap: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     executeSwap(
-      swapId: BytesLike,
-      recipient: BytesLike,
+      encodedSwap: BytesLike,
+      recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -270,17 +280,16 @@ export interface IMesonSwap extends BaseContract {
 
     postSwap(
       encodedSwap: BytesLike,
-      inTokenIndex: BigNumberish,
       initiator: string,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      providerIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     requestSwap(
       encodedSwap: BytesLike,
-      inTokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -288,17 +297,18 @@ export interface IMesonSwap extends BaseContract {
   populateTransaction: {
     bondSwap(
       swapId: BytesLike,
+      providerIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     cancelSwap(
-      swapId: BytesLike,
+      encodedSwap: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     executeSwap(
-      swapId: BytesLike,
-      recipient: BytesLike,
+      encodedSwap: BytesLike,
+      recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -308,17 +318,16 @@ export interface IMesonSwap extends BaseContract {
 
     postSwap(
       encodedSwap: BytesLike,
-      inTokenIndex: BigNumberish,
       initiator: string,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      providerIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     requestSwap(
       encodedSwap: BytesLike,
-      inTokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
