@@ -17,7 +17,6 @@ async function main() {
   const mesonContract = await mesonFactory.deploy([tokenContract.address])
   console.log('Meson deployed to:', mesonContract.address)
   const mesonClient = await MesonClient.Create(mesonContract)
-  await mesonClient.registerAddress(1)
 
   // approve
   const approveTx = await tokenContract.approve(mesonContract.address, totalSupply)
@@ -26,7 +25,7 @@ async function main() {
 
   // deposits
   const swapAmount = '1000000000'
-  const depositTx1 = await mesonContract.deposit(tokenContract.address, swapAmount)
+  const depositTx1 = await mesonContract.depositAndRegister(tokenContract.address, swapAmount, 1)
   getUsedGas('first deposit', depositTx1.hash)
   await depositTx1.wait(1)
 

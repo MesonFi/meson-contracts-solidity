@@ -16,6 +16,8 @@ interface IMesonPools {
   /// @param amount The amount to be added to the pool
   function deposit(address token, uint128 amount) external;
 
+  function depositAndRegister(address token, uint128 amount, uint32 providerIndex) external;
+
   /// @notice Withdraw tokens from the liquidity pool. In order to make sure
   /// pending swaps can be satisfied, withdraw have a rate limit that
   /// in each epoch, total amounts to release (to users) and withdraw

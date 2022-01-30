@@ -18,11 +18,34 @@ contract MesonPools is IMesonPools, MesonStates {
     address provider = _msgSender();
     uint32 providerIndex = indexOfAddress[provider];
     require(providerIndex != 0, 'address not registered');
+
+    _addProviderBalance(token, amount, providerIndex);
+    _unsafeDepositToken(token, provider, amount);
+  }
+
+  function depositAndRegister(address token, uint128 amount, uint32 providerIndex)
+    external override tokenSupported(token)
+  {
+    address provider = _msgSender();
+    require(providerIndex != 0, "Cannot use index 0");
+    require(addressOfIndex[providerIndex] == address(0), "Index already registered");
+    require(indexOfAddress[provider] == 0, "Address already registered");
+    addressOfIndex[providerIndex] = provider;
+    indexOfAddress[provider] = providerIndex;
+
+    _addProviderBalance(token, amount, providerIndex);
+    _unsafeDepositToken(token, provider, amount);
+  }
+
+  function _addProviderBalance(
+    address token,
+    uint128 amount,
+    uint32 providerIndex
+  ) internal {
     bytes32 tokenHash = _tokenHashByAddress[token];
     _tokenBalanceOf[tokenHash][providerIndex] = LowGasSafeMath.add(
       _tokenBalanceOf[tokenHash][providerIndex], amount
     );
-    _unsafeDepositToken(token, provider, amount);
   }
 
   /// @inheritdoc IMesonPools
@@ -100,7 +123,7 @@ contract MesonPools is IMesonPools, MesonStates {
     bytes32 swapId = _getSwapId(encodedSwap, domainHash);
 
     LockedSwap memory lockedSwap = _lockedSwaps[swapId];
-    // require(lockedSwap.providerIndex != 0, "swap does not exist");
+    require(lockedSwap.providerIndex != 0, "swap does not exist");
 
     _checkReleaseSignature(swapId, keccak256(abi.encodePacked(recipient)), domainHash, initiator, r, s, v);
 

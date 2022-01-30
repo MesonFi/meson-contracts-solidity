@@ -22,15 +22,6 @@ contract MesonStates is MesonHelpers {
     bytes32 tokenHash = _tokenHashByAddress[token];
     uint32 index = indexOfAddress[addr];
     return _tokenBalanceOf[tokenHash][index];
-  } 
-
-  function registerAddress(uint32 index) external {
-    address addr = _msgSender();
-    require(index > 0, "Cannot use index 0");
-    require(addressOfIndex[index] == address(0), "Index already registered");
-    require(indexOfAddress[addr] == 0, "Address already registered");
-    addressOfIndex[index] = addr;
-    indexOfAddress[addr] = index;
   }
 
   function _addTokenToSwapList(address token) internal {
