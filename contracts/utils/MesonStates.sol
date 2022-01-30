@@ -22,7 +22,7 @@ contract MesonStates is MesonHelpers {
     bytes32 tokenHash = _tokenHashByAddress[token];
     uint32 index = indexOfAddress[addr];
     return _tokenBalanceOf[tokenHash][index];
-  }
+  } 
 
   function _addTokenToSwapList(address token) internal {
     _supportedTokens[token] = true;

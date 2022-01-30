@@ -107,7 +107,7 @@ export class MesonClient {
     // return await this.mesonInstance.requests(swapId)
   }
 
-  async getLockingSwap(swapId: string) {
-    // return await this.mesonInstance.lockingSwaps(swapId)
+  async getLockedSwap(swapId: string) {
+    // return await this.mesonInstance.lockedSwaps(swapId)
   }
 }

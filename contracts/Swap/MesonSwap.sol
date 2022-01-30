@@ -124,4 +124,12 @@ contract MesonSwap is IMesonSwap, MesonStates {
 
     emit SwapExecuted(swapId);
   }
+
+  function getSwap(bytes32 swapId) external view
+    returns (address initiator, address provider)
+  {
+    initiator = _swapRequests[swapId].initiator;
+    uint32 providerIndex = _swapRequests[swapId].providerIndex;
+    provider = addressOfIndex[providerIndex];
+  }
 }

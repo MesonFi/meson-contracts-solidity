@@ -136,4 +136,13 @@ contract MesonPools is IMesonPools, MesonStates {
 
     emit SwapReleased(swapId);
   }
+
+  function getLockedSwap(bytes32 swapId) external view
+    returns (address provider, uint48 until)
+  {
+    LockedSwap memory lockedSwap = _lockedSwaps[swapId];
+    uint32 providerIndex = lockedSwap.providerIndex;
+    provider = addressOfIndex[providerIndex];
+    until = lockedSwap.until;
+  }
 }
