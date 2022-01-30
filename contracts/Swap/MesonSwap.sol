@@ -64,7 +64,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
      // TODO: user may make more requests
     (bytes32 inTokenHash, uint128 amountWithFee, uint48 expireTs) = _decodeSwapInput(encodedSwap);
     address inToken = _tokenAddressByHash[inTokenHash];
-    require(inToken != address(0), "token unsupported");
+    require(inToken != address(0), "unsupported token");
     require(amountWithFee > 0, "swap amount must be greater than zero");
 
     uint48 ts = uint48(block.timestamp);

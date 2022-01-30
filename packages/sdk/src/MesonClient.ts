@@ -50,13 +50,25 @@ export class MesonClient {
     }
   }
 
+  async registerAddress(index: number) {
+    if (index <= 0) {
+      throw new Error('Index must be a positive number')
+    }
+    return this.mesonInstance.registerAddress(index)
+  }
+
   async postSwap(signedRequest: SignedSwapRequest) {
     this._check(signedRequest)
+    const providerAddress = await this.mesonInstance.signer.getAddress()
+    const providerIndex = await this.mesonInstance.indexOfAddress(providerAddress)
+    if (!providerIndex) {
+      throw new Error(`Address ${providerAddress} not registered. Please call registerAddress first.`)
+    }
     return this.mesonInstance.postSwap(
       signedRequest.encode(),
       signedRequest.initiator,
       ...signedRequest.signature,
-      1 // provider index
+      providerIndex
     )
   }
 

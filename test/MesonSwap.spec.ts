@@ -26,6 +26,7 @@ describe('MesonSwap', () => {
     outChain = await mesonInstance.getCoinType()
     userClient = await MesonClient.Create(mesonInstance) // user is default account
     lpClient = await MesonClient.Create(mesonInstance.connect(provider))
+    await lpClient.registerAddress(1)
   })
 
 
