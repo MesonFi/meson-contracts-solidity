@@ -113,7 +113,7 @@ describe('MesonPools', () => {
       const exportedRelease = await swap.exportRelease(initiator, swapData.recipient)
       const signedRelease = new SignedSwapRelease(exportedRelease)
       signedRelease.checkSignature()
-      await lpClient.release(signedRelease, swap.amount)
+      await lpClient.release(signedRelease)
 
       expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
       expect(await token.balanceOf(swapData.recipient)).to.equal(swap.amount)

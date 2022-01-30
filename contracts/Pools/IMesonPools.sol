@@ -3,10 +3,7 @@ pragma solidity 0.8.6;
 
 /// @title MesonPools Interface
 interface IMesonPools {
-  struct LockingSwap {
-    address initiator;
-    bytes32 tokenHash;
-    uint128 amount;
+  struct LockedSwap {
     uint32 providerIndex;
     uint48 until;
   }
@@ -32,14 +29,19 @@ interface IMesonPools {
 
   /// @notice Lock tokens
   function lock(
-    bytes32 swapId,
+    bytes calldata encodedSwap,
+    bytes32 domainHash,
     address initiator,
-    uint128 amount,
-    bytes32 tokenHash
+    bytes32 r,
+    bytes32 s,
+    uint8 v
   ) external;
 
   /// @notice Unlock tokens
-  function unlock(bytes32 swapId) external;
+  function unlock(
+    bytes calldata encodedSwap,
+    bytes32 domainHash
+  ) external;
 
   /// @notice Release tokens to satisfy a user's swap request.
   /// This is step 3️⃣  in a swap.
@@ -48,20 +50,15 @@ interface IMesonPools {
   /// For a single swap, signature given here is identical to the one used
   /// in `executeSwap`.
   /// @dev Designed to be used by liquidity providers
-  /// @param swapId The ID of the swap
   function release(
-    bytes32 swapId,
-    address recipient,
+    bytes calldata encodedSwap,
     bytes32 domainHash,
+    address initiator,
+    address recipient,
     bytes32 r,
     bytes32 s,
     uint8 v
   ) external;
-
-  /// @notice If a LP calls `executeSwap` before `release`, anyone can
-  /// call this to punish the LP.
-  /// @dev Designed to be used by anyone
-  function challenge() external;
 
   /// @notice Event when a swap request has been locked.
   /// Emit at the end of `lock()` calls.

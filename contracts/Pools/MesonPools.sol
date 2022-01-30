@@ -11,7 +11,7 @@ import "../utils/MesonStates.sol";
 /// Methods in this class will be executed by LPs when users want to
 /// swap into the current chain.
 contract MesonPools is IMesonPools, MesonStates {
-  mapping(bytes32 => LockingSwap) public lockingSwaps;
+  mapping(bytes32 => LockedSwap) internal _lockedSwaps;
 
   /// @inheritdoc IMesonPools
   function deposit(address token, uint128 amount) external override tokenSupported(token) {
@@ -37,22 +37,26 @@ contract MesonPools is IMesonPools, MesonStates {
 
   /// @inheritdoc IMesonPools
   function lock(
-    bytes32 swapId,
+    bytes calldata encodedSwap,
+    bytes32 domainHash,
     address initiator,
-    uint128 amount,
-    bytes32 tokenHash
+    bytes32 r,
+    bytes32 s,
+    uint8 v
   ) external override {
-    // tokenSupported(token)
+    bytes32 swapId = _getSwapId2(encodedSwap, domainHash);
+    require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
+
+    (uint128 amount, bytes32 tokenHash) = _decodeSwapOutput(encodedSwap);
     require(amount > 0, "amount must be greater than zero");
-    require(!_hasLockingSwap(swapId), "locking swap already exists");
+    require(_lockedSwaps[swapId].providerIndex == 0, "locking swap already exists");
+
     uint32 providerIndex = indexOfAddress[_msgSender()];
     require(_tokenBalanceOf[tokenHash][providerIndex] >= amount, "insufficient balance");
 
     _tokenBalanceOf[tokenHash][providerIndex] = _tokenBalanceOf[tokenHash][providerIndex] - amount;
-    lockingSwaps[swapId] = LockingSwap(
-      initiator,
-      tokenHash,
-      amount,
+    
+    _lockedSwaps[swapId] = LockedSwap(
       providerIndex,
       uint48(block.timestamp) + LOCK_TIME_PERIOD
     );
@@ -61,52 +65,50 @@ contract MesonPools is IMesonPools, MesonStates {
   }
 
   /// @inheritdoc IMesonPools
-  function unlock(bytes32 swapId) external override {
-    require(_hasLockingSwap(swapId), "swap does not exist");
+  function unlock(
+    bytes calldata encodedSwap,
+    bytes32 domainHash
+  ) external override {
+    bytes32 swapId = _getSwapId2(encodedSwap, domainHash);
 
-    LockingSwap memory lockingSwap = lockingSwaps[swapId];
-    require(uint48(block.timestamp) > lockingSwap.until, "The swap is still in lock");
+    LockedSwap memory lockedSwap = _lockedSwaps[swapId];
+    uint32 providerIndex = lockedSwap.providerIndex;
 
-    bytes32 tokenHash = lockingSwap.tokenHash;
-    uint128 amount = lockingSwap.amount;
-    uint32 providerIndex = lockingSwap.providerIndex;
+    require(providerIndex != 0, "swap does not exist");
+    require(uint48(block.timestamp) > lockedSwap.until, "The swap is still in lock");
+
+    (uint128 amount, bytes32 tokenHash) = _decodeSwapOutput(encodedSwap);
 
     _tokenBalanceOf[tokenHash][providerIndex] = LowGasSafeMath.add(
       _tokenBalanceOf[tokenHash][providerIndex], amount
     );
-    delete lockingSwaps[swapId];
+    delete _lockedSwaps[swapId];
   }
 
   /// @inheritdoc IMesonPools
   function release(
-    bytes32 swapId,
+    bytes calldata encodedSwap,
+    bytes32 domainHash,
+    address initiator,
     address recipient,
-    bytes32 domainHash, // TODO: need to give allowed values?
     bytes32 r,
     bytes32 s,
     uint8 v
   ) external override {
-    LockingSwap memory lockingSwap = lockingSwaps[swapId];
-    require(_hasLockingSwap(swapId), "swap does not exist");
+    bytes32 swapId = _getSwapId2(encodedSwap, domainHash);
 
-    _checkReleaseSignature(swapId, keccak256(abi.encodePacked(recipient)), domainHash, lockingSwap.initiator, r, s, v);
+    LockedSwap memory lockedSwap = _lockedSwaps[swapId];
+    // require(lockedSwap.providerIndex != 0, "swap does not exist");
 
-    address token = _tokenAddressByHash[lockingSwap.tokenHash];
-    uint128 amount = lockingSwap.amount;
-    uint32 providerIndex = lockingSwap.providerIndex;
+    _checkReleaseSignature(swapId, keccak256(abi.encodePacked(recipient)), domainHash, initiator, r, s, v);
 
-    delete lockingSwaps[swapId];
+    (uint128 amount, bytes32 tokenHash) = _decodeSwapOutput(encodedSwap);
+    address token = _tokenAddressByHash[tokenHash];
+
+    delete _lockedSwaps[swapId];
 
     _safeTransfer(token, recipient, amount);
 
     emit SwapReleased(swapId);
-  }
-
-  /// @inheritdoc IMesonPools
-  function challenge() external override {
-  }
-
-  function _hasLockingSwap(bytes32 swapId) internal view returns (bool) {
-    return lockingSwaps[swapId].amount > 0;
   }
 }

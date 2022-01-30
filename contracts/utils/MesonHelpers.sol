@@ -60,6 +60,12 @@ contract MesonHelpers is MesonConfig {
     return keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, swapHash));
   }
 
+
+  function _getSwapId2(bytes calldata encodedSwap, bytes32 domainHash) internal view returns (bytes32) {
+    bytes32 swapHash = keccak256(encodedSwap);
+    return keccak256(abi.encodePacked("\x19\x01", domainHash, swapHash));
+  }
+
   function _checkReleaseSignature(
     bytes32 swapId,
     bytes32 recipientHash,
