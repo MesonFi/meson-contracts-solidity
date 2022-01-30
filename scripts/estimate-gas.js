@@ -17,7 +17,7 @@ async function main() {
   const mesonContract = await mesonFactory.deploy([tokenContract.address])
   console.log('Meson deployed to:', mesonContract.address)
   const mesonClient = await MesonClient.Create(mesonContract)
-
+  await mesonClient.registerAddress(1)
 
   // approve
   const approveTx = await tokenContract.approve(mesonContract.address, totalSupply)

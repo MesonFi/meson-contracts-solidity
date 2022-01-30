@@ -18,7 +18,7 @@ async function main() {
   await mesonContract.deployed()
   console.log('UpgradableMeson deployed to:', mesonContract.address)
   const mesonClient = await MesonClient.Create(mesonContract)
-
+  await mesonClient.registerAddress(1)
 
   // approve
   const approveTx = await tokenContract.approve(mesonContract.address, totalSupply)
