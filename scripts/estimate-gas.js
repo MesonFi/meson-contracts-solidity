@@ -43,6 +43,7 @@ async function main() {
   const swap = mesonClient.requestSwap(outChain, swapData)
   const exported = await swap.exportRequest(signer)
   const signedRequest = new SignedSwapRequest(exported)
+  signedRequest.checkSignature()
 
   const swapData2 = getDefaultSwap({
     amount: '200',
@@ -52,6 +53,7 @@ async function main() {
   const swap2 = mesonClient.requestSwap(outChain, swapData2)
   const exported2 = await swap2.exportRequest(signer)
   const signedRequest2 = new SignedSwapRequest(exported2)
+  signedRequest2.checkSignature()
 
   // postSwap
   const postSwapTx1 = await mesonClient.postSwap(signedRequest)
@@ -63,19 +65,22 @@ async function main() {
   await postSwapTx2.wait(1)
 
   // lock
-  const exportedRelease = await swap.exportRelease(signer, swapData.recipient)
-  const lockTx = await mesonClient.lock(signedRequest, exportedRelease.domainHash)
+  const lockTx = await mesonClient.lock(signedRequest)
   getUsedGas('lock', lockTx.hash)
   await lockTx.wait(1)
 
-  // release
+  // export release signature
+  const exportedRelease = await swap.exportRelease(signer, swapData.recipient)
   const signedRelease = new SignedSwapRelease(exportedRelease)
-  const releaseTx = await mesonClient.release(signedRequest, signedRelease)
+  signedRelease.checkSignature()
+
+  // release
+  const releaseTx = await mesonClient.release(signedRelease)
   getUsedGas('release', releaseTx.hash)
 
 
   // executeSwap
-  const executeTx = await mesonClient.executeSwap(signedRelease, signedRequest.encode(), true)
+  const executeTx = await mesonClient.executeSwap(signedRelease, true)
   getUsedGas('execute', executeTx.hash)
 }
 

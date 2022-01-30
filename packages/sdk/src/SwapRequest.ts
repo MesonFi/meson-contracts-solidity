@@ -39,28 +39,30 @@ export class SwapRequest implements SwapRequestData {
 
   private _encoded: string = ''
 
-  constructor(req: SwapRequestData) {
-    if (!req.expireTs) {
+  constructor(data: SwapRequestData) {
+    if (!data.expireTs) {
       throw new Error('Missing expireTs')
-    } else if (!req.inChain) {
+    } else if (!data.inChain) {
       throw new Error('Missing inChain')
-    } else if (!req.inToken) {
+    } else if (!data.inToken) {
       throw new Error('Missing inToken')
-    } else if (!req.amount) {
+    } else if (!data.amount) {
       throw new Error('Missing amount')
-    } else if (!req.outChain) {
+    } else if (!data.fee) {
+      throw new Error('Missing fee')
+    } else if (!data.outChain) {
       throw new Error('Missing outChain')
-    } else if (!req.outToken) {
+    } else if (!data.outToken) {
       throw new Error('Missing outToken')
     }
 
-    this.inChain = req.inChain
-    this.inToken = req.inToken
-    this.amount = req.amount
-    this.fee = req.fee
-    this.expireTs = req.expireTs
-    this.outChain = req.outChain
-    this.outToken = req.outToken
+    this.inChain = data.inChain
+    this.inToken = data.inToken
+    this.amount = data.amount
+    this.fee = data.fee
+    this.expireTs = data.expireTs
+    this.outChain = data.outChain
+    this.outToken = data.outToken
   }
 
   encode(): string {

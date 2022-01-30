@@ -23,28 +23,30 @@ export class SwapRequestWithSigner extends SwapRequest {
     return await this.signer.signSwapRelease(this.swapId, recipient, wallet)
   }
 
-  async exportRequest(wallet: Wallet, initiator = wallet.address): Promise<SignedSwapRequestData> {
-    const signature = await this.signRequest(wallet)
+  _exportBasics(initiator: string): SignedSwapRequestData {
     return {
-      ...this.toObject(),
+      ...super.toObject(),
       swapId: this.swapId,
       initiator: initiator.toLowerCase(),
       chainId: this.signer.chainId,
       mesonAddress: this.signer.mesonAddress,
+      signature: ['', '', 0]
+    }
+  }
+
+  async exportRequest(wallet: Wallet, initiator = wallet.address): Promise<SignedSwapRequestData> {
+    const signature = await this.signRequest(wallet)
+    return {
+      ...this._exportBasics(initiator),
       signature,
     }
   }
 
   async exportRelease(wallet: Wallet, recipient: string, initiator = wallet.address): Promise<SignedSwapReleaseData> {
     const signature = await this.signRelease(wallet, recipient)
-    const domainHash = this.signer.getDomainHash()
     return {
-      swapId: this.swapId,
+      ...this._exportBasics(initiator),
       recipient,
-      initiator: initiator.toLowerCase(),
-      domainHash,
-      chainId: this.signer.chainId,
-      mesonAddress: this.signer.mesonAddress,
       signature,
     }
   }

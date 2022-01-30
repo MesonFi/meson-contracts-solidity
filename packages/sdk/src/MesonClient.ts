@@ -4,7 +4,7 @@ import type { Meson } from '@mesonfi/contract-types'
 import { keccak256 } from '@ethersproject/keccak256'
 import { SwapSigner } from './SwapSigner'
 import { SwapRequestWithSigner } from './SwapRequestWithSigner'
-import { SignedSwapCommonData, SignedSwapRequest, SignedSwapReleaseData } from './SignedSwap'
+import { SignedSwapRequest, SignedSwapRelease } from './SignedSwap'
 
 export interface PartialSwapRequest {
   inToken: string,
@@ -42,7 +42,7 @@ export class MesonClient {
     }, this.signer)
   }
 
-  private _check (swap: SignedSwapCommonData) {
+  private _check (swap: SignedSwapRequest) {
     if (this.chainId !== swap.chainId) {
       throw new Error('Mismatch chain id')
     } else if (this.mesonInstance.address !== swap.mesonAddress) {
@@ -59,35 +59,35 @@ export class MesonClient {
       1 // provider index
     )
   }
-
-  async executeSwap(signedRelease: SignedSwapReleaseData, encoded: string, depositToPool: boolean = false) {
-    this._check(signedRelease)
-    return this.mesonInstance.executeSwap(
-      encoded,
-      keccak256(signedRelease.recipient),
-      ...signedRelease.signature,
-      depositToPool
-    )
-  }
   
-  async lock(signedRequest: SignedSwapRequest, domainHash: string) {
+  async lock(signedRequest: SignedSwapRequest) {
     this._check(signedRequest)
     return this.mesonInstance.lock(
       signedRequest.encode(),
-      domainHash,
+      signedRequest.domainHash,
       signedRequest.initiator,
       ...signedRequest.signature
     )
   }
 
-  async release(signedRequest: SignedSwapRequest, signedRelease: SignedSwapReleaseData) {
+  async release(signedRelease: SignedSwapRelease) {
     this._check(signedRelease)
     return this.mesonInstance.release(
-      signedRequest.encode(),
+      signedRelease.encode(),
       signedRelease.domainHash,
-      signedRequest.initiator,
+      signedRelease.initiator,
       signedRelease.recipient,
       ...signedRelease.signature
+    )
+  }
+
+  async executeSwap(signedRelease: SignedSwapRelease, depositToPool: boolean = false) {
+    this._check(signedRelease)
+    return this.mesonInstance.executeSwap(
+      signedRelease.encode(),
+      keccak256(signedRelease.recipient),
+      ...signedRelease.signature,
+      depositToPool
     )
   }
 
@@ -103,6 +103,6 @@ export class MesonClient {
   }
 
   async getLockingSwap(swapId: string) {
-    return await this.mesonInstance.lockingSwaps(swapId)
+    // return await this.mesonInstance.lockingSwaps(swapId)
   }
 }
