@@ -54,7 +54,9 @@ async function main() {
   const Meson = await ethers.getContractFactory('Meson', wallet)
   console.log('Deploying Meson...')
   const meson = await Meson.deploy([mockUSDT.address, mockUSDC.address], { nonce: nonce + 2 })
+  await meson.deployed()
   console.log('Meson deployed to:', meson.address)
+  await (await meson.registerAddress(1)).wait(1)
 
   const coinType = await meson.getCoinType()
   if (coinType !== testnet.slip44) {
@@ -65,13 +67,15 @@ async function main() {
     const depositAmount = ethers.utils.parseUnits(DEPOSIT_ON_DEPLOY, 6)
 
     console.log(`Approving and depositing ${depositAmount} ${usdt.symbol} to Meson...`)
-    await (await mockUSDT.approve(meson.address, depositAmount, { nonce: nonce + 3 })).wait()
-    await meson.deposit(mockUSDT.address, depositAmount, { nonce: nonce + 4 })
+    await (await mockUSDT.approve(meson.address, depositAmount)).wait(1)
+    console.log('xx')
+    await (await meson.deposit(mockUSDT.address, depositAmount)).wait(1)
     console.log(`${depositAmount} ${usdt.symbol} deposited`)
 
     console.log(`Approving and depositing ${depositAmount} ${usdc.symbol} to Meson...`)
-    await (await mockUSDC.approve(meson.address, depositAmount, { nonce: nonce + 5 })).wait()
-    await meson.deposit(mockUSDC.address, depositAmount, { nonce: nonce + 6 })
+    await (await mockUSDC.approve(meson.address, depositAmount)).wait(1)
+    console.log('xx')
+    await meson.deposit(mockUSDC.address, depositAmount)
     console.log(`${depositAmount} ${usdc.symbol} deposited`)
   }
 
