@@ -13,26 +13,26 @@ import "../utils/MesonStates.sol";
 /// users initiate swaps in the current chain.
 contract MesonSwap is IMesonSwap, MesonStates {
   /// @notice swap requests by swapIds
-  mapping(bytes32 => SwapRequest) internal _swapRequests;
+  mapping(bytes32 => uint200) internal _swapRequests;
 
   /// @inheritdoc IMesonSwap
   function requestSwap(uint256 encodedSwap) external override {
     bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
-    require(_swapRequests[swapId].initiator == address(0), "swap conflict");
+    require(_swapRequests[swapId] == 0, "swap conflict");
 
     (uint128 amountWithFee, address inToken) = _checkSwapRequest(encodedSwap);
     address initiator = _msgSender();
-
-    _swapRequests[swapId] = SwapRequest(initiator, 0);
+    _swapRequests[swapId] = uint200(uint160(initiator)) << 40;
     _unsafeDepositToken(inToken, initiator, amountWithFee);
     emit SwapRequested(swapId);
   }
 
   function bondSwap(bytes32 swapId, uint40 providerIndex) public override {
-    require(_swapRequests[swapId].initiator != address(0), "no swap");
-    require(_swapRequests[swapId].providerIndex == 0, "swap bonded to another provider");
-    
-    _swapRequests[swapId].providerIndex = providerIndex;
+    uint200 req = _swapRequests[swapId];
+    require(req != 0, "no swap");
+    require(uint40(req) == 0, "swap bonded to another provider");
+
+    _swapRequests[swapId] = req | providerIndex;
     emit SwapBonded(swapId);
   }
 
@@ -46,12 +46,12 @@ contract MesonSwap is IMesonSwap, MesonStates {
     uint40 providerIndex // TODO register providerIndex on the initial chain
   ) external override {
     bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
-    require(_swapRequests[swapId].initiator == address(0), "swap conflict");
+    require(_swapRequests[swapId] == 0, "swap conflict");
     require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
 
+    _swapRequests[swapId] = (uint200(uint160(initiator)) << 40) | providerIndex;
     (uint128 amountWithFee, address inToken) = _checkSwapRequest(encodedSwap);
 
-    _swapRequests[swapId] = SwapRequest(initiator, providerIndex);
     _unsafeDepositToken(inToken, initiator, amountWithFee);
     emit SwapPosted(swapId);
   }
@@ -78,8 +78,10 @@ contract MesonSwap is IMesonSwap, MesonStates {
   /// @inheritdoc IMesonSwap
   function cancelSwap(uint256 encodedSwap) external override {
     bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
-    address initiator = _swapRequests[swapId].initiator;
-    require(initiator != address(0), "no swap");
+    uint200 req = _swapRequests[swapId];
+    require(req != 0, "no swap");
+
+    address initiator = address(uint160(req >> 40));
 
     uint128 amountWithFee = uint128(encodedSwap >> 128);
     uint40 expireTs = uint40(encodedSwap >> 48);
@@ -88,7 +90,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
     require(expireTs < uint40(block.timestamp), "swap is locked");
     address inToken = _tokenList[inTokenIndex];
 
-    delete _swapRequests[swapId];
+    _swapRequests[swapId] = 0;
 
     _safeTransfer(inToken, initiator, amountWithFee);
 
@@ -104,17 +106,20 @@ contract MesonSwap is IMesonSwap, MesonStates {
     uint8 v,
     bool depositToPool
   ) external override {
-    bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
-    address initiator = _swapRequests[swapId].initiator;
-    uint40 providerIndex = _swapRequests[swapId].providerIndex;
+    bytes32 domainSeparator = DOMAIN_SEPARATOR;
+    bytes32 swapId = _getSwapId(encodedSwap, domainSeparator);
+
+    uint200 req = _swapRequests[swapId];
+    uint40 providerIndex = uint40(req);
     require(providerIndex != 0, "swap not found or not bonded");
 
-    _checkReleaseSignature(swapId, recipientHash, DOMAIN_SEPARATOR, initiator, r, s, v);
+    address initiator = address(uint160(req >> 40));
+    _checkReleaseSignature(swapId, recipientHash, domainSeparator, initiator, r, s, v);
 
     uint128 amountWithFee = uint128(encodedSwap >> 128);
     uint8 inTokenIndex = uint8(encodedSwap);
 
-    delete _swapRequests[swapId];
+    _swapRequests[swapId] = 0;
 
     // TODO: fee to meson protocol
 
@@ -133,8 +138,8 @@ contract MesonSwap is IMesonSwap, MesonStates {
   function getSwap(bytes32 swapId) external view
     returns (address initiator, address provider)
   {
-    initiator = _swapRequests[swapId].initiator;
-    uint40 providerIndex = _swapRequests[swapId].providerIndex;
-    provider = addressOfIndex[providerIndex];
+    uint200 req = _swapRequests[swapId];
+    provider = addressOfIndex[uint40(req)];
+    initiator = address(uint160(req >> 40));
   }
 }

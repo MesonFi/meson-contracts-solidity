@@ -5,11 +5,6 @@ import "../interfaces/IERC20Minimal.sol";
 
 /// @title MesonSwap Interface
 interface IMesonSwap {
-  struct SwapRequest {
-    address initiator;
-    uint40 providerIndex;
-  }
-
   function requestSwap(uint256 encodedSwap) external;
 
   function bondSwap(bytes32 swapId, uint40 providerIndex) external;

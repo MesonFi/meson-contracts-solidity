@@ -11,7 +11,7 @@ import "../utils/MesonStates.sol";
 /// Methods in this class will be executed by LPs when users want to
 /// swap into the current chain.
 contract MesonPools is IMesonPools, MesonStates {
-  mapping(bytes32 => LockedSwap) internal _lockedSwaps;
+  mapping(bytes32 => uint80) internal _lockedSwaps;
 
   /// @inheritdoc IMesonPools
   function deposit(address token, uint128 amount) external override tokenSupported(token) {
@@ -76,16 +76,13 @@ contract MesonPools is IMesonPools, MesonStates {
     uint128 amount = uint128(encodedSwap >> 128);
     uint8 tokenIndex = uint8(encodedSwap >> 8);
     require(amount > 0, "amount must be greater than zero");
-    require(_lockedSwaps[swapId].providerIndex == 0, "locking swap already exists");
+    require(_lockedSwaps[swapId] == 0, "locking swap already exists");
 
     uint40 providerIndex = indexOfAddress[_msgSender()];
     require(_tokenBalanceOf[tokenIndex][providerIndex] >= amount, "insufficient balance");
     _tokenBalanceOf[tokenIndex][providerIndex] = _tokenBalanceOf[tokenIndex][providerIndex] - amount;
     
-    _lockedSwaps[swapId] = LockedSwap(
-      providerIndex,
-      uint40(block.timestamp) + LOCK_TIME_PERIOD
-    );
+    _lockedSwaps[swapId] = ((uint80(block.timestamp) + LOCK_TIME_PERIOD) << 40) | providerIndex;
 
     emit SwapLocked(swapId);
   }
@@ -97,19 +94,18 @@ contract MesonPools is IMesonPools, MesonStates {
   ) external override {
     bytes32 swapId = _getSwapId(encodedSwap, domainHash);
 
-    LockedSwap memory lockedSwap = _lockedSwaps[swapId];
-    uint40 providerIndex = lockedSwap.providerIndex;
+    uint80 lockedSwap = _lockedSwaps[swapId];
+    require(lockedSwap != 0, "swap does not exist");
+    require(uint80(block.timestamp << 40) > lockedSwap, "The swap is still in lock");
 
-    require(providerIndex != 0, "swap does not exist");
-    require(uint40(block.timestamp) > lockedSwap.until, "The swap is still in lock");
-
+    uint40 providerIndex = uint40(lockedSwap);
     uint128 amount = uint128(encodedSwap >> 128);
     uint8 tokenIndex = uint8(encodedSwap >> 8);
 
     _tokenBalanceOf[tokenIndex][providerIndex] = LowGasSafeMath.add(
       _tokenBalanceOf[tokenIndex][providerIndex], amount
     );
-    delete _lockedSwaps[swapId];
+    _lockedSwaps[swapId] = 0;
   }
 
   /// @inheritdoc IMesonPools
@@ -124,17 +120,15 @@ contract MesonPools is IMesonPools, MesonStates {
   ) external override {
     bytes32 swapId = _getSwapId(encodedSwap, domainHash);
 
-    LockedSwap memory lockedSwap = _lockedSwaps[swapId];
-    require(lockedSwap.providerIndex != 0, "swap does not exist");
+    uint80 lockedSwap = _lockedSwaps[swapId];
+    require(lockedSwap != 0, "swap does not exist");
 
     _checkReleaseSignature(swapId, keccak256(abi.encodePacked(recipient)), domainHash, initiator, r, s, v);
 
     uint128 amount = uint128(encodedSwap >> 128);
-    uint8 tokenIndex = uint8(encodedSwap >> 8);
-    
-    address token = _tokenList[tokenIndex];
+    address token = _tokenList[uint8(encodedSwap >> 8)];
 
-    delete _lockedSwaps[swapId];
+    _lockedSwaps[swapId] = 0;
 
     _safeTransfer(token, recipient, amount);
 
@@ -144,9 +138,8 @@ contract MesonPools is IMesonPools, MesonStates {
   function getLockedSwap(bytes32 swapId) external view
     returns (address provider, uint40 until)
   {
-    LockedSwap memory lockedSwap = _lockedSwaps[swapId];
-    uint40 providerIndex = lockedSwap.providerIndex;
-    provider = addressOfIndex[providerIndex];
-    until = lockedSwap.until;
+    uint80 lockedSwap = _lockedSwaps[swapId];
+    provider = addressOfIndex[uint40(lockedSwap)];
+    until = uint40(lockedSwap >> 40);
   }
 }

@@ -3,11 +3,6 @@ pragma solidity 0.8.6;
 
 /// @title MesonPools Interface
 interface IMesonPools {
-  struct LockedSwap {
-    uint40 providerIndex;
-    uint40 until;
-  }
-
   /// @notice Deposit tokens into the liquidity pool. This is the
   /// prerequisite for LPs if they want to participate in swap
   /// trades.

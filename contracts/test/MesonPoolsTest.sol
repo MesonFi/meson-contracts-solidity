@@ -9,6 +9,6 @@ contract MesonPoolsTest is MesonPools {
   }
 
   function hasLockedSwap(bytes32 swapId) external view returns (bool) {
-    return _lockedSwaps[swapId].providerIndex != 0;
+    return _lockedSwaps[swapId] != 0;
   }
 }

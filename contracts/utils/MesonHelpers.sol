@@ -42,9 +42,20 @@ contract MesonHelpers is MesonConfig {
     IERC20Minimal(token).transferFrom(sender, address(this), uint256(amount));
   }
 
-  function _getSwapId(uint256 encodedSwap, bytes32 domainHash) internal pure returns (bytes32) {
-    bytes32 swapHash = keccak256(abi.encode(SWAP_REQUEST_TYPEHASH, encodedSwap));
-    return keccak256(abi.encodePacked("\x19\x01", domainHash, swapHash));
+  function _getSwapId(uint256 encodedSwap, bytes32 domainHash) internal pure returns (bytes32 swapId) {
+    bytes32 typeHash = SWAP_REQUEST_TYPEHASH;
+    assembly {
+      let ptr := mload(0x40)
+      mstore(0, typeHash)
+      mstore(0x20, encodedSwap)
+      mstore(0x22, keccak256(0, 0x40))
+
+      mstore8(0, 0x19)
+      mstore8(1, 0x01)
+      mstore(2, domainHash)
+      swapId := keccak256(0, 0x42)
+      mstore(0x40, ptr)
+    }
   }
 
   function _checkReleaseSignature(
@@ -56,9 +67,23 @@ contract MesonHelpers is MesonConfig {
     bytes32 s,
     uint8 v
   ) internal pure {
+    bytes32 typeHash = SWAP_RELEASE_TYPEHASH;
     require(signer != address(0), "signer cannot be empty address");
-    bytes32 releaseHash = keccak256(abi.encode(SWAP_RELEASE_TYPEHASH, swapId, recipientHash));
-    bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainHash, releaseHash));
+    bytes32 digest;
+    assembly {
+      let ptr := mload(0x40)
+      mstore(0, typeHash)
+      mstore(0x20, swapId)
+      mstore(0x40, recipientHash)
+      mstore(0x22, keccak256(0, 0x60))
+      
+      mstore8(0, 0x19)
+      mstore8(1, 0x01)
+      mstore(2, domainHash)
+      digest := keccak256(0, 0x42)
+      
+      mstore(0x40, ptr)
+    }
     require(signer == ecrecover(digest, v, r, s), "invalid signature");
   }
 
