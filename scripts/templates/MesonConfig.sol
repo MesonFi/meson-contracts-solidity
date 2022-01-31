@@ -11,5 +11,5 @@ contract MesonConfig {
 
   uint40 constant MIN_BOND_TIME_PERIOD = 1 hours;
   uint40 constant MAX_BOND_TIME_PERIOD = 2 hours;
-  uint40 constant LOCK_TIME_PERIOD = 20 minutes;
+  uint256 constant LOCK_TIME_PERIOD = 20 minutes;
 }
