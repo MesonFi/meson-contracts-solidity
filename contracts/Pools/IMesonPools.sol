@@ -50,7 +50,6 @@ interface IMesonPools {
   function release(
     uint256 encodedSwap,
     bytes32 domainHash,
-    address initiator,
     address recipient,
     bytes32 r,
     bytes32 s,

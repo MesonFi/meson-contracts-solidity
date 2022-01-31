@@ -19,14 +19,11 @@ interface IMesonSwap {
   /// be able to bond again, or the user can cancel the swap.
   /// @dev Designed to be used by liquidity providers
   /// @param encodedSwap The abi encoded swap
-  /// @param initiator The address for the initiator of the swap
   function postSwap(
     uint256 encodedSwap,
     bytes32 r,
     bytes32 s,
-    uint8 v,
-    address initiator,
-    uint40 providerIndex
+    uint208 packedData
   ) external;
 
   /// @notice Cancel a swap

@@ -17,8 +17,8 @@ contract Meson is MesonSwap, MesonPools {
         )
       );
       
-    for (uint i = 0; i < supportedTokens.length; i++) {
-      _addSupportToken(supportedTokens[i]);
+    for (uint8 i = 0; i < supportedTokens.length; i++) {
+      _addSupportToken(supportedTokens[i], i);
     }
   }
 }

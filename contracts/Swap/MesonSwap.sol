@@ -41,15 +41,15 @@ contract MesonSwap is IMesonSwap, MesonStates {
     uint256 encodedSwap,
     bytes32 r,
     bytes32 s,
-    uint8 v,
-    address initiator,
-    uint40 providerIndex // TODO register providerIndex on the initial chain
+    uint208 packedData
   ) external override {
     bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
     require(_swapRequests[swapId] == 0, "swap conflict");
-    require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
 
-    _swapRequests[swapId] = (uint200(uint160(initiator)) << 40) | providerIndex;
+    address initiator = address(uint160(packedData >> 40));
+    require(initiator == ecrecover(swapId, uint8(packedData >> 200), r, s), "invalid signature");
+
+    _swapRequests[swapId] = uint200(packedData);
     (uint128 amountWithFee, address inToken) = _checkSwapRequest(encodedSwap);
 
     _unsafeDepositToken(inToken, initiator, amountWithFee);
@@ -57,22 +57,17 @@ contract MesonSwap is IMesonSwap, MesonStates {
   }
 
   function _checkSwapRequest(uint256 encodedSwap) internal view
-    returns (uint128, address)
+    returns (uint128 amountWithFee, address inToken)
   {
-    // TODO: user may make more requests
-    uint128 amountWithFee = uint128(encodedSwap >> 128);
+    amountWithFee = uint128(encodedSwap >> 128);
+    inToken = _tokenList[uint8(encodedSwap)];
     uint40 expireTs = uint40(encodedSwap >> 48);
-    uint8 inTokenIndex = uint8(encodedSwap);
 
-    require(inTokenIndex < _tokenList.length, "unsupported token");
-    address inToken = _tokenList[inTokenIndex];
     require(amountWithFee > 0, "swap amount must be greater than zero");
 
     uint40 ts = uint40(block.timestamp);
     require(expireTs > ts + MIN_BOND_TIME_PERIOD, "expire ts too early");
     require(expireTs < ts + MAX_BOND_TIME_PERIOD, "expire ts too late");
-
-    return (amountWithFee, inToken);
   }
 
   /// @inheritdoc IMesonSwap
@@ -114,7 +109,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
     require(providerIndex != 0, "swap not found or not bonded");
 
     address initiator = address(uint160(req >> 40));
-    _checkReleaseSignature(swapId, recipientHash, domainSeparator, initiator, r, s, v);
+    _checkReleaseSignatureForHash(swapId, recipientHash, domainSeparator, r, s, v, initiator);
 
     uint128 amountWithFee = uint128(encodedSwap >> 128);
     uint8 inTokenIndex = uint8(encodedSwap);

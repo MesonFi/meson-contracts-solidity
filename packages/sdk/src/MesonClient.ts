@@ -1,6 +1,7 @@
 import type { Wallet } from '@ethersproject/wallet'
 import type { Meson } from '@mesonfi/contract-types'
 
+import { pack } from '@ethersproject/solidity'
 import { keccak256 } from '@ethersproject/keccak256'
 import { SwapSigner } from './SwapSigner'
 import { SwapRequestWithSigner } from './SwapRequestWithSigner'
@@ -59,9 +60,13 @@ export class MesonClient {
     }
     return this.mesonInstance.postSwap(
       signedRequest.encode(),
-      ...signedRequest.signature,
-      signedRequest.initiator,
-      providerIndex
+      signedRequest.signature[0],
+      signedRequest.signature[1],
+      pack(['uint8', 'address', 'uint40'], [
+        signedRequest.signature[2],
+        signedRequest.initiator,
+        providerIndex
+      ])
     )
   }
 
@@ -80,7 +85,6 @@ export class MesonClient {
     return this.mesonInstance.release(
       signedRelease.encode(),
       signedRelease.domainHash,
-      signedRelease.initiator,
       signedRelease.recipient,
       ...signedRelease.signature
     )

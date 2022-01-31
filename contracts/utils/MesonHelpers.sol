@@ -60,12 +60,43 @@ contract MesonHelpers is MesonConfig {
 
   function _checkReleaseSignature(
     bytes32 swapId,
-    bytes32 recipientHash,
+    address recipient,
     bytes32 domainHash,
-    address signer,
     bytes32 r,
     bytes32 s,
-    uint8 v
+    uint8 v,
+    address signer
+  ) internal pure {
+    bytes32 typeHash = SWAP_RELEASE_TYPEHASH;
+    require(signer != address(0), "signer cannot be empty address");
+    bytes32 digest;
+    assembly {
+      let ptr := mload(0x40)
+      mstore(0, recipient)
+      mstore(0x40, keccak256(12, 20))
+
+      mstore(0, typeHash)
+      mstore(0x20, swapId)
+      mstore(0x22, keccak256(0, 0x60))
+      
+      mstore8(0, 0x19)
+      mstore8(1, 0x01)
+      mstore(2, domainHash)
+      digest := keccak256(0, 0x42)
+      
+      mstore(0x40, ptr)
+    }
+    require(signer == ecrecover(digest, v, r, s), "invalid signature");
+  }
+
+  function _checkReleaseSignatureForHash(
+    bytes32 swapId,
+    bytes32 recipientHash,
+    bytes32 domainHash,
+    bytes32 r,
+    bytes32 s,
+    uint8 v,
+    address signer
   ) internal pure {
     bytes32 typeHash = SWAP_RELEASE_TYPEHASH;
     require(signer != address(0), "signer cannot be empty address");

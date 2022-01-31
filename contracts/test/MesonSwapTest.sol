@@ -4,7 +4,7 @@ pragma solidity =0.8.6;
 import "../Swap/MesonSwap.sol";
 
 contract MesonSwapTest is MesonSwap {
-  constructor() {
+  constructor(address token) {
     DOMAIN_SEPARATOR =
       keccak256(
         abi.encode(
@@ -15,10 +15,7 @@ contract MesonSwapTest is MesonSwap {
           address(this)
         )
       );
-  }
-
-  function addSupportToken(address token) external {
-    _addSupportToken(token);
+    _addSupportToken(token, 0);
   }
 
   function register(uint40 providerIndex) external {

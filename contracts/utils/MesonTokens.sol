@@ -4,9 +4,8 @@ pragma solidity 0.8.6;
 /// @title MesonTokens
 contract MesonTokens {
   mapping(address => bool) internal _supportedTokens;
-  address[] internal _tokenList;
-  bytes32[] internal _tokenHashList;
 
+  mapping(uint8 => address) internal _tokenList;
   mapping(address => uint8) internal _indexOfToken;
 
   mapping(bytes32 => address) internal _tokenAddressByHash;
@@ -20,13 +19,11 @@ contract MesonTokens {
     return _indexOfToken[token];
   }
 
-  function _addSupportToken(address token) internal {
-    // TODO: make sure only 16 tokens can be added
+  function _addSupportToken(address token, uint8 index) internal {
     _supportedTokens[token] = true;
     bytes32 tokenHash = keccak256(abi.encodePacked(token));
-    _indexOfToken[token] = uint8(_tokenList.length);
-    _tokenList.push(token);
-    _tokenHashList.push(tokenHash);
+    _indexOfToken[token] = index;
+    _tokenList[index] = token;
 
     _tokenAddressByHash[tokenHash] = token;
     _tokenHashByAddress[token] = tokenHash;

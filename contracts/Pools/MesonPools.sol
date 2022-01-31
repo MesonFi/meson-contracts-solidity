@@ -11,7 +11,7 @@ import "../utils/MesonStates.sol";
 /// Methods in this class will be executed by LPs when users want to
 /// swap into the current chain.
 contract MesonPools is IMesonPools, MesonStates {
-  mapping(bytes32 => uint80) internal _lockedSwaps;
+  mapping(bytes32 => uint240) internal _lockedSwaps;
 
   /// @inheritdoc IMesonPools
   function deposit(address token, uint128 amount) external override tokenSupported(token) {
@@ -82,7 +82,9 @@ contract MesonPools is IMesonPools, MesonStates {
     require(_tokenBalanceOf[tokenIndex][providerIndex] >= amount, "insufficient balance");
     _tokenBalanceOf[tokenIndex][providerIndex] = _tokenBalanceOf[tokenIndex][providerIndex] - amount;
     
-    _lockedSwaps[swapId] = ((uint80(block.timestamp) + LOCK_TIME_PERIOD) << 40) | providerIndex;
+    _lockedSwaps[swapId] = (uint240(uint40(block.timestamp) + LOCK_TIME_PERIOD) << 200)
+      | (uint240(providerIndex) << 160)
+      | uint160(initiator);
 
     emit SwapLocked(swapId);
   }
@@ -94,11 +96,11 @@ contract MesonPools is IMesonPools, MesonStates {
   ) external override {
     bytes32 swapId = _getSwapId(encodedSwap, domainHash);
 
-    uint80 lockedSwap = _lockedSwaps[swapId];
+    uint240 lockedSwap = _lockedSwaps[swapId];
     require(lockedSwap != 0, "swap does not exist");
-    require(uint80(block.timestamp << 40) > lockedSwap, "The swap is still in lock");
+    require(uint240(block.timestamp << 200) > lockedSwap, "The swap is still in lock");
 
-    uint40 providerIndex = uint40(lockedSwap);
+    uint40 providerIndex = uint40(lockedSwap >> 160);
     uint128 amount = uint128(encodedSwap >> 128);
     uint8 tokenIndex = uint8(encodedSwap >> 8);
 
@@ -112,7 +114,6 @@ contract MesonPools is IMesonPools, MesonStates {
   function release(
     uint256 encodedSwap,
     bytes32 domainHash,
-    address initiator,
     address recipient,
     bytes32 r,
     bytes32 s,
@@ -120,26 +121,27 @@ contract MesonPools is IMesonPools, MesonStates {
   ) external override {
     bytes32 swapId = _getSwapId(encodedSwap, domainHash);
 
-    uint80 lockedSwap = _lockedSwaps[swapId];
+    uint240 lockedSwap = _lockedSwaps[swapId];
     require(lockedSwap != 0, "swap does not exist");
 
-    _checkReleaseSignature(swapId, keccak256(abi.encodePacked(recipient)), domainHash, initiator, r, s, v);
+    address initiator = address(uint160(lockedSwap));
+    _checkReleaseSignature(swapId, recipient, domainHash, r, s, v, initiator);
 
-    uint128 amount = uint128(encodedSwap >> 128);
     address token = _tokenList[uint8(encodedSwap >> 8)];
 
     _lockedSwaps[swapId] = 0;
 
-    _safeTransfer(token, recipient, amount);
+    _safeTransfer(token, recipient, uint128(encodedSwap >> 128));
 
     emit SwapReleased(swapId);
   }
 
   function getLockedSwap(bytes32 swapId) external view
-    returns (address provider, uint40 until)
+    returns (address initiator, address provider, uint40 until)
   {
-    uint80 lockedSwap = _lockedSwaps[swapId];
-    provider = addressOfIndex[uint40(lockedSwap)];
-    until = uint40(lockedSwap >> 40);
+    uint240 lockedSwap = _lockedSwaps[swapId];
+    initiator = address(uint160(lockedSwap));
+    provider = addressOfIndex[uint40(lockedSwap >> 160)];
+    until = uint40(lockedSwap >> 200);
   }
 }

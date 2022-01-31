@@ -6,6 +6,6 @@ import "../utils/MesonStates.sol";
 
 contract MesonStatesTest is MesonStates {
   constructor(address token) {
-    _addSupportToken(token);
+    _addSupportToken(token, 0);
   }
 }

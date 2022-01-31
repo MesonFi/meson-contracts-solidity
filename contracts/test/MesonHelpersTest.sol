@@ -67,6 +67,6 @@ contract MesonHelpersTest is MesonHelpers {
     bytes32 s,
     uint8 v
   ) public view {
-    _checkReleaseSignature(swapId, keccak256(abi.encodePacked(recipient)), DOMAIN_SEPARATOR, signer, r, s, v);
+    _checkReleaseSignature(swapId, recipient, DOMAIN_SEPARATOR, r, s, v, signer);
   }
 }

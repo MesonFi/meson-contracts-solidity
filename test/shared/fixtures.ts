@@ -25,12 +25,10 @@ export async function fixtures (accounts: string[] | undefined) {
   }
 
   const poolsFactory = await ethers.getContractFactory('MesonPoolsTest')
-  const pools: MesonPoolsTest = await poolsFactory.deploy()
-  await pools.addSupportToken(token1.address)
+  const pools: MesonPoolsTest = await poolsFactory.deploy(token1.address)
 
   const swapFactory = await ethers.getContractFactory('MesonSwapTest')
-  const swap: MesonSwapTest = await swapFactory.deploy()
-  await swap.addSupportToken(token1.address)
+  const swap: MesonSwapTest = await swapFactory.deploy(token1.address)
 
   return { pools, swap, token1, token2 }
 }
