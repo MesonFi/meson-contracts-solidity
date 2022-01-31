@@ -9,7 +9,7 @@
     "evmVersion": "istanbul",
     "optimizer": {
       "enabled": true,
-      "runs": 100000
+      "runs": 10000
     }
   },
   "linter": "solhint",
