@@ -65,10 +65,10 @@ contract MesonPools is IMesonPools, MesonStates {
   function lock(
     uint256 encodedSwap,
     bytes32 domainHash,
-    address initiator,
     bytes32 r,
     bytes32 s,
-    uint8 v
+    uint8 v,
+    address initiator
   ) external override {
     bytes32 swapId = _getSwapId(encodedSwap, domainHash);
     require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
@@ -114,10 +114,10 @@ contract MesonPools is IMesonPools, MesonStates {
   function release(
     uint256 encodedSwap,
     bytes32 domainHash,
-    address recipient,
     bytes32 r,
     bytes32 s,
-    uint8 v
+    uint8 v,
+    address recipient
   ) external override {
     bytes32 swapId = _getSwapId(encodedSwap, domainHash);
 

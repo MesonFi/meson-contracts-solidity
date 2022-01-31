@@ -75,8 +75,8 @@ export class MesonClient {
     return this.mesonInstance.lock(
       signedRequest.encode(),
       signedRequest.domainHash,
-      signedRequest.initiator,
-      ...signedRequest.signature
+      ...signedRequest.signature,
+      signedRequest.initiator
     )
   }
 
@@ -85,8 +85,8 @@ export class MesonClient {
     return this.mesonInstance.release(
       signedRelease.encode(),
       signedRelease.domainHash,
-      signedRelease.recipient,
-      ...signedRelease.signature
+      ...signedRelease.signature,
+      signedRelease.recipient
     )
   }
 

@@ -28,10 +28,10 @@ interface IMesonPools {
   function lock(
     uint256 encodedSwap,
     bytes32 domainHash,
-    address initiator,
     bytes32 r,
     bytes32 s,
-    uint8 v
+    uint8 v,
+    address initiator
   ) external;
 
   /// @notice Unlock tokens
@@ -50,10 +50,10 @@ interface IMesonPools {
   function release(
     uint256 encodedSwap,
     bytes32 domainHash,
-    address recipient,
     bytes32 r,
     bytes32 s,
-    uint8 v
+    uint8 v,
+    address recipient
   ) external;
 
   /// @notice Event when a swap request has been locked.
