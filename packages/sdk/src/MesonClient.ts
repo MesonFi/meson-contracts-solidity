@@ -7,10 +7,10 @@ import { SwapRequestWithSigner } from './SwapRequestWithSigner'
 import { SignedSwapRequest, SignedSwapRelease } from './SignedSwap'
 
 export interface PartialSwapRequest {
-  inToken: string,
+  inToken: number,
   amount: string,
   fee: string,
-  outToken: string,
+  outToken: number,
   recipient: string,
 }
 
@@ -55,12 +55,12 @@ export class MesonClient {
     const providerAddress = await this.mesonInstance.signer.getAddress()
     const providerIndex = await this.mesonInstance.indexOfAddress(providerAddress)
     if (!providerIndex) {
-      throw new Error(`Address ${providerAddress} not registered. Please call registerAddress first.`)
+      throw new Error(`Address ${providerAddress} not registered. Please call depositAndRegister first.`)
     }
     return this.mesonInstance.postSwap(
       signedRequest.encode(),
-      signedRequest.initiator,
       ...signedRequest.signature,
+      signedRequest.initiator,
       providerIndex
     )
   }

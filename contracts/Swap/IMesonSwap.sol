@@ -10,7 +10,7 @@ interface IMesonSwap {
     uint40 providerIndex;
   }
 
-  function requestSwap(bytes calldata encodedSwap) external;
+  function requestSwap(uint256 encodedSwap) external;
 
   function bondSwap(bytes32 swapId, uint40 providerIndex) external;
 
@@ -26,18 +26,18 @@ interface IMesonSwap {
   /// @param encodedSwap The abi encoded swap
   /// @param initiator The address for the initiator of the swap
   function postSwap(
-    bytes calldata encodedSwap,
-    address initiator,
+    uint256 encodedSwap,
     bytes32 r,
     bytes32 s,
     uint8 v,
+    address initiator,
     uint40 providerIndex
   ) external;
 
   /// @notice Cancel a swap
   /// @dev Designed to be used by users
   /// @param encodedSwap The abi encoded swap
-  function cancelSwap(bytes calldata encodedSwap) external;
+  function cancelSwap(uint256 encodedSwap) external;
 
   /// @notice Execute the swap by providing a signature.
   /// This is step 4️⃣  in a swap.
@@ -50,7 +50,7 @@ interface IMesonSwap {
   /// @dev Designed to be used by the current bonding LP
   /// @param encodedSwap The abi encoded swap
   function executeSwap(
-    bytes calldata encodedSwap,
+    uint256 encodedSwap,
     bytes32 recipientHash,
     bytes32 r,
     bytes32 s,

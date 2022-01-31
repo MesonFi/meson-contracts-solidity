@@ -2,8 +2,21 @@ import type { Wallet } from '@ethersproject/wallet'
 import type { TypedDataDomain } from '@ethersproject/abstract-signer'
 import { _TypedDataEncoder } from '@ethersproject/hash'
 
-import { SwapRequestData, SWAP_REQUEST_TYPE, SWAP_RELEASE_TYPE } from './SwapRequest'
+import { SwapRequest } from './SwapRequest'
 import { SignedSwapReleaseData } from './SignedSwap'
+
+const SWAP_REQUEST_TYPE = {
+  SwapRequest: [
+    { name: 'encoded', type: 'uint256' },
+  ]
+}
+
+const SWAP_RELEASE_TYPE = {
+  SwapRelease: [
+    { name: 'swapId', type: 'bytes32' },
+    { name: 'recipient', type: 'bytes' },
+  ]
+}
 
 interface MesonTypedDataDomain extends TypedDataDomain {
   chainId: number;
@@ -36,8 +49,8 @@ export class SwapSigner {
     return _TypedDataEncoder.hashDomain(this.domain)
   }
 
-  async signSwapRequest(swap: SwapRequestData, wallet: Wallet): Promise<Signature> {
-    const signature = await wallet._signTypedData(this.domain, SWAP_REQUEST_TYPE, swap)
+  async signSwapRequest(swap: SwapRequest, wallet: Wallet): Promise<Signature> {
+    const signature = await wallet._signTypedData(this.domain, SWAP_REQUEST_TYPE, { encoded: swap.encode() })
     return this._separateSignature(signature)
   }
 
@@ -53,8 +66,8 @@ export class SwapSigner {
     return [r, s, v]
   }
 
-  hashRequest(swapRequest: SwapRequestData): string {
-    return _TypedDataEncoder.hash(this.domain, SWAP_REQUEST_TYPE, swapRequest)
+  hashRequest(encoded: string): string {
+    return _TypedDataEncoder.hash(this.domain, SWAP_REQUEST_TYPE, { encoded })
   }
 
   hashRelease(swapRelease: SignedSwapReleaseData): string {

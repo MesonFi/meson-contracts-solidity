@@ -34,21 +34,14 @@ async function main() {
   await depositTx2.wait(1)
 
   // requestSwap (no gas)
-  const swapData = getDefaultSwap({
-    inToken: tokenContract.address,
-    outToken: tokenContract.address
-  })
+  const swapData = getDefaultSwap({ inToken: 0, outToken: 0 })
   const outChain = await mesonContract.getCoinType()
   const swap = mesonClient.requestSwap(outChain, swapData)
   const exported = await swap.exportRequest(signer)
   const signedRequest = new SignedSwapRequest(exported)
   signedRequest.checkSignature()
 
-  const swapData2 = getDefaultSwap({
-    amount: '200',
-    inToken: tokenContract.address,
-    outToken: tokenContract.address
-  })
+  const swapData2 = getDefaultSwap({ amount: '200', inToken: 0, outToken: 0 })
   const swap2 = mesonClient.requestSwap(outChain, swapData2)
   const exported2 = await swap2.exportRequest(signer)
   const signedRequest2 = new SignedSwapRequest(exported2)

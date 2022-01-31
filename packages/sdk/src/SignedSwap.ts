@@ -59,7 +59,7 @@ export class SignedSwapRequest extends SwapRequest implements SignedSwapRequestD
     this.signer = new SwapSigner(this.mesonAddress, Number(this.chainId))
     this.domainHash = this.signer.getDomainHash()
     
-    if (data.swapId !== this.signer.hashRequest(data)) {
+    if (data.swapId !== this.signer.hashRequest(this.encode())) {
       throw new Error('Invalid swap id')
     }
   }

@@ -1,84 +1,77 @@
+import { pack } from '@ethersproject/solidity'
 import { _TypedDataEncoder } from '@ethersproject/hash'
 
-export const SWAP_REQUEST_TYPE = {
-  SwapRequest: [
-    { name: 'inToken', type: 'bytes' },
-    { name: 'amount', type: 'uint128' },
-    { name: 'fee', type: 'uint48' },
-    { name: 'expireTs', type: 'uint48' },
-    { name: 'outChain', type: 'bytes4' },
-    { name: 'outToken', type: 'bytes' },
-  ]
-}
-
-export const SWAP_RELEASE_TYPE = {
-  SwapRelease: [
-    { name: 'swapId', type: 'bytes32' },
-    { name: 'recipient', type: 'bytes' },
-  ]
-}
-
+const swapStruct = [
+  { name: 'amount', type: 'uint128' },
+  { name: 'fee', type: 'uint40' },
+  { name: 'expireTs', type: 'uint40' },
+  { name: 'outChain', type: 'bytes4' },
+  { name: 'outToken', type: 'uint8' },
+  { name: 'inToken', type: 'uint8' },
+]
 export interface SwapRequestData {
-  inChain: string,
-  inToken: string,
   amount: string,
   fee: string,
   expireTs: number,
+  inChain: string,
+  inToken: number,
   outChain: string,
-  outToken: string,
+  outToken: number,
 }
 
 export class SwapRequest implements SwapRequestData {
-  readonly inChain: string
-  readonly inToken: string
   readonly amount: string
   readonly fee: string
   readonly expireTs: number
+  readonly inChain: string
+  readonly inToken: number
   readonly outChain: string
-  readonly outToken: string
+  readonly outToken: number
 
   private _encoded: string = ''
 
   constructor(data: SwapRequestData) {
-    if (!data.expireTs) {
-      throw new Error('Missing expireTs')
-    } else if (!data.inChain) {
-      throw new Error('Missing inChain')
-    } else if (!data.inToken) {
-      throw new Error('Missing inToken')
-    } else if (!data.amount) {
+    if (!data.amount) {
       throw new Error('Missing amount')
     } else if (!data.fee) {
       throw new Error('Missing fee')
+    } else if (!data.expireTs) {
+      throw new Error('Missing expireTs')
+    } else if (!data.inChain) {
+      throw new Error('Missing inChain')
+    } else if (typeof data.inToken !== 'number') {
+      throw new Error('Invalid inToken')
     } else if (!data.outChain) {
       throw new Error('Missing outChain')
-    } else if (!data.outToken) {
-      throw new Error('Missing outToken')
+    } else if (typeof data.outToken !== 'number') {
+      throw new Error('Invalid outToken')
     }
 
-    this.inChain = data.inChain
-    this.inToken = data.inToken
     this.amount = data.amount
     this.fee = data.fee
     this.expireTs = data.expireTs
+    this.inChain = data.inChain
+    this.inToken = data.inToken
     this.outChain = data.outChain
     this.outToken = data.outToken
   }
 
   encode(): string {
     if (!this._encoded) {
-      this._encoded = _TypedDataEncoder.from(SWAP_REQUEST_TYPE).encode(this)
+      const types = swapStruct.map(i => i.type)
+      const values = swapStruct.map(i => (this as any)[i.name])
+      this._encoded = pack(types, values)
     }
     return this._encoded
   }
 
   toObject(): SwapRequestData {
     return {
-      inChain: this.inChain,
-      inToken: this.inToken,
       amount: this.amount,
       fee: this.fee,
       expireTs: this.expireTs,
+      inChain: this.inChain,
+      inToken: this.inToken,
       outChain: this.outChain,
       outToken: this.outToken,
     }

@@ -22,19 +22,19 @@ describe('MesonHelpers', () => {
     mesonInstance = await waffle.loadFixture(fixture)
     const outChain = await mesonInstance.getCoinType()
     mesonClient = await MesonClient.Create(mesonInstance as any)
-    swapData = getDefaultSwap()
+    swapData = getDefaultSwap({ inToken: 2, outToken: 3 })
     swap = mesonClient.requestSwap(outChain, swapData)
   })
 
   describe('#encodeSwap', () => {
     it('returns same result as js function', async () => {
       const encodedSwapFromContract = await mesonInstance.encodeSwap(
-        swap.inToken,
         swap.amount,
         swap.fee,
         swap.expireTs,
         swap.outChain,
-        swap.outToken
+        swap.outToken,
+        swap.inToken
       )
 
       expect(encodedSwapFromContract).to.equal(swap.encode())
@@ -43,13 +43,10 @@ describe('MesonHelpers', () => {
 
   describe('#decodeSwap (from mesonPresets)', () => {
     it('decodes a swap', async () => {
-      mesonPresets._addTokenToHashTable(swap.inToken)
-      mesonPresets._addTokenToHashTable(swap.outToken)
-
       const decoded = mesonPresets.decodeSwap(swap.encode() as string)
 
       expect(decoded.amount).to.equal(swap.amount)
-      expect(decoded.fee.toString()).to.equal(swap.fee)
+      expect(decoded.fee).to.equal(swap.fee)
       expect(decoded.expireTs).to.equal(swap.expireTs)
       expect(decoded.inToken).to.equal(swap.inToken)
       expect(decoded.outToken).to.equal(swap.outToken)
@@ -64,20 +61,13 @@ describe('MesonHelpers', () => {
     })
   })
 
-  describe('#decodeSwapInput', () => {
+  describe('#decodeSwap', () => {
     it('returns decoded swap data', async () => {
-      const decoded = await mesonInstance.decodeSwapInput(swap.encode())
-      expect(decoded[0].toLowerCase()).to.equal(ethers.utils.keccak256(swap.inToken))
-      expect(decoded[1]).to.equal(swap.amount)
-      expect(decoded[2]).to.equal(swap.expireTs)
-    })
-  })
-
-  describe('#decodeSwapOutput', () => {
-    it('returns decoded swap data', async () => {
-      const decoded = await mesonInstance.decodeSwapOutput(swap.encode())
+      const decoded = await mesonInstance.decodeSwap(swap.encode())
       expect(decoded[0]).to.equal(swap.amount)
-      expect(decoded[1].toLowerCase()).to.equal(ethers.utils.keccak256(swap.outToken))
+      expect(decoded[1]).to.equal(swap.expireTs)
+      expect(decoded[2]).to.equal(swap.inToken)
+      expect(decoded[3]).to.equal(swap.outToken)
     })
   })
 

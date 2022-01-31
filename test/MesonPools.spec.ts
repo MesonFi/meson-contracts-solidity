@@ -26,7 +26,7 @@ describe('MesonPools', () => {
     outChain = await mesonInstance.getCoinType()
     userClient = await MesonClient.Create(result.pools) // user is default account
     lpClient = await MesonClient.Create(mesonInstance)
-    await lpClient.registerAddress(1)
+    await token.approve(mesonInstance.address, 1000)
   })
 
   describe('#token total supply', () => {
@@ -48,10 +48,9 @@ describe('MesonPools', () => {
     })
   })
 
-  describe('#deposit', () => {
+  describe('#depositAndRegister', () => {
     it('accepts 1000 deposit', async () => {
-      await token.approve(mesonInstance.address, 1000)
-      await mesonInstance.deposit(token.address, 1000)
+      await mesonInstance.depositAndRegister(token.address, 1000, 1)
       expect(await mesonInstance.balanceOf(token.address, provider.address)).to.equal(1000)
       expect(await token.balanceOf(mesonInstance.address)).to.equal(1000)
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.sub(1000))
@@ -61,16 +60,14 @@ describe('MesonPools', () => {
 
     it('refuses unsupported token', async () => {
       await unsupportedToken.approve(mesonInstance.address, 1000)
-      await expect(mesonInstance.deposit(unsupportedToken.address, 1000)).to.be.revertedWith('unsupported token')
-
-      await expect(mesonInstance.deposit(token.address, 1)).to.be.reverted
+      await expect(mesonInstance.depositAndRegister(unsupportedToken.address, 1000, 1))
+        .to.be.revertedWith('unsupported token')
     })
   })
 
   describe('#withdraw', () => {
     it('accepts 1000 deposit and 1000 withdrawal', async () => {
-      await token.approve(mesonInstance.address, 1000)
-      await mesonInstance.deposit(token.address, 1000)
+      await mesonInstance.depositAndRegister(token.address, 1000, 1)
       await mesonInstance.withdraw(token.address, 1000)
       expect(await token.balanceOf(mesonInstance.address)).to.equal(0)
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE)
@@ -85,13 +82,13 @@ describe('MesonPools', () => {
 
   describe('#lock', async () => {
     it('lockes a swap', async () => {
-      const swap = userClient.requestSwap(outChain, getDefaultSwap({ outToken: token.address }))
+      await mesonInstance.depositAndRegister(token.address, 1000, 1)
+
+      const swap = userClient.requestSwap(outChain, getDefaultSwap({ outToken: 0 }))
       const exported = await swap.exportRequest(initiator)
 
       const signedRequest = new SignedSwapRequest(exported)
       signedRequest.checkSignature()
-      await token.approve(mesonInstance.address, signedRequest.amount)
-      await mesonInstance.deposit(signedRequest.outToken, signedRequest.amount)
       await lpClient.lock(signedRequest)
 
       expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
@@ -101,14 +98,14 @@ describe('MesonPools', () => {
 
   describe('#release', async () => {
     it('accepts a release', async () => {
-      const swapData = getDefaultSwap({ outToken: token.address })
+      await mesonInstance.depositAndRegister(token.address, 1000, 1)
+
+      const swapData = getDefaultSwap({ outToken: 0 })
       const swap = userClient.requestSwap(outChain, swapData)
       const exported = await swap.exportRequest(initiator)
       
       const signedRequest = new SignedSwapRequest(exported)
       signedRequest.checkSignature()
-      await token.approve(mesonInstance.address, signedRequest.amount)
-      await mesonInstance.deposit(signedRequest.outToken, signedRequest.amount)
       await lpClient.lock(signedRequest)
 
       const exportedRelease = await swap.exportRelease(initiator, swapData.recipient)

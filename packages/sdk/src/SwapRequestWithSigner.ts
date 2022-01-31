@@ -12,7 +12,7 @@ export class SwapRequestWithSigner extends SwapRequest {
   constructor(req: SwapRequestData, signer: SwapSigner) {
     super(req)
     this.signer = signer
-    this.swapId = signer.hashRequest(req)
+    this.swapId = signer.hashRequest(this.encode())
   }
 
   async signRequest(wallet: Wallet): Promise<Signature> {

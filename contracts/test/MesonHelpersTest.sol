@@ -17,40 +17,36 @@ contract MesonHelpersTest is MesonHelpers {
       );
   }
 
-  function getSwapId(bytes calldata encodedSwap) external view returns (bytes32) {
+  function getSwapId(uint256 encodedSwap) external view returns (bytes32) {
     return _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
   }
 
   function encodeSwap(
-    bytes memory inToken,
     uint128 amount,
-    uint48 fee,
-    uint48 expireTs,
+    uint40 fee,
+    uint40 expireTs,
     bytes4 outChain,
-    bytes memory outToken
+    uint8 outToken,
+    uint8 inToken
   ) external pure returns (bytes memory) {
     return
-      abi.encode(
-        SWAP_REQUEST_TYPEHASH,
-        keccak256(inToken),
+      abi.encodePacked(
         amount,
         fee,
         expireTs,
         outChain,
-        keccak256(outToken)
+        outToken,
+        inToken
       );
   }
 
-  function decodeSwapInput(bytes calldata encodedSwap) external pure
-    returns (bytes32, uint128, uint48)
+  function decodeSwap(uint256 encodedSwap) external pure
+    returns (uint128 amount, uint40 expireTs, uint8 inTokenIndex, uint8 outTokenIndex)
   {
-    return _decodeSwapInput(encodedSwap);
-  }
-
-  function decodeSwapOutput(bytes calldata encodedSwap) external pure
-    returns (uint128, bytes32)
-  {
-    return _decodeSwapOutput(encodedSwap);
+    amount = uint128(encodedSwap >> 128);
+    expireTs = uint40(encodedSwap >> 48);
+    inTokenIndex = uint8(encodedSwap);
+    outTokenIndex = uint8(encodedSwap >> 8);
   }
 
   function checkRequestSignature(

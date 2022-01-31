@@ -5,7 +5,7 @@ pragma solidity 0.8.6;
 interface IMesonPools {
   struct LockedSwap {
     uint40 providerIndex;
-    uint48 until;
+    uint40 until;
   }
 
   /// @notice Deposit tokens into the liquidity pool. This is the
@@ -31,7 +31,7 @@ interface IMesonPools {
 
   /// @notice Lock tokens
   function lock(
-    bytes calldata encodedSwap,
+    uint256 encodedSwap,
     bytes32 domainHash,
     address initiator,
     bytes32 r,
@@ -41,7 +41,7 @@ interface IMesonPools {
 
   /// @notice Unlock tokens
   function unlock(
-    bytes calldata encodedSwap,
+    uint256 encodedSwap,
     bytes32 domainHash
   ) external;
 
@@ -53,7 +53,7 @@ interface IMesonPools {
   /// in `executeSwap`.
   /// @dev Designed to be used by liquidity providers
   function release(
-    bytes calldata encodedSwap,
+    uint256 encodedSwap,
     bytes32 domainHash,
     address initiator,
     address recipient,

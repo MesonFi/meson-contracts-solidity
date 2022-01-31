@@ -11,8 +11,9 @@ contract MesonHelpers is MesonConfig {
 
   bytes32 internal DOMAIN_SEPARATOR;
 
-  bytes32 internal constant SWAP_REQUEST_TYPEHASH =
-    keccak256(bytes("SwapRequest(bytes inToken,uint128 amount,uint48 fee,uint48 expireTs,bytes4 outChain,bytes outToken)"));
+  bytes32 internal constant SWAP_REQUEST_TYPEHASH = keccak256(bytes("SwapRequest(uint256 encoded)"));
+
+  //uint128 amount,uint40 fee,uint40 expireTs,uint8 inToken,bytes4 outChain,uint8 outToken
 
   bytes32 internal constant SWAP_RELEASE_TYPEHASH = keccak256(bytes("SwapRelease(bytes32 swapId,bytes recipient)"));
 
@@ -41,22 +42,8 @@ contract MesonHelpers is MesonConfig {
     IERC20Minimal(token).transferFrom(sender, address(this), uint256(amount));
   }
 
-  function _decodeSwapInput(bytes calldata encodedSwap) internal pure returns (bytes32, uint128, uint48) {
-    (bytes32 typehash, bytes32 inTokenHash, uint128 amount,, uint48 expireTs, ,) =
-      abi.decode(encodedSwap, (bytes32, bytes32, uint128, uint48, uint48, bytes4, bytes32));
-    require(typehash == SWAP_REQUEST_TYPEHASH, "Invalid swap request typehash");
-    return (inTokenHash, amount, expireTs);
-  }
-
-  function _decodeSwapOutput(bytes calldata encodedSwap) internal pure returns (uint128, bytes32) {
-    (bytes32 typehash, , uint128 amount, , , , bytes32 outTokenHash) =
-      abi.decode(encodedSwap, (bytes32, bytes32, uint128, uint48, uint48, bytes4, bytes32));
-    require(typehash == SWAP_REQUEST_TYPEHASH, "Invalid swap request typehash");
-    return (amount, outTokenHash);
-  }
-
-  function _getSwapId(bytes calldata encodedSwap, bytes32 domainHash) internal pure returns (bytes32) {
-    bytes32 swapHash = keccak256(encodedSwap);
+  function _getSwapId(uint256 encodedSwap, bytes32 domainHash) internal pure returns (bytes32) {
+    bytes32 swapHash = keccak256(abi.encode(SWAP_REQUEST_TYPEHASH, encodedSwap));
     return keccak256(abi.encodePacked("\x19\x01", domainHash, swapHash));
   }
 

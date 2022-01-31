@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/utils/Strings.sol";
-
 import "../libraries/LowGasSafeMath.sol";
 import "../interfaces/IERC20Minimal.sol";
 
@@ -18,11 +16,11 @@ contract MesonSwap is IMesonSwap, MesonStates {
   mapping(bytes32 => SwapRequest) internal _swapRequests;
 
   /// @inheritdoc IMesonSwap
-  function requestSwap(bytes calldata encodedSwap) external override {
+  function requestSwap(uint256 encodedSwap) external override {
     bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
     require(_swapRequests[swapId].initiator == address(0), "swap conflict");
 
-    (address inToken, uint128 amountWithFee) = _checkSwapRequest(encodedSwap);
+    (uint128 amountWithFee, address inToken) = _checkSwapRequest(encodedSwap);
     address initiator = _msgSender();
 
     _swapRequests[swapId] = SwapRequest(initiator, 0);
@@ -40,49 +38,55 @@ contract MesonSwap is IMesonSwap, MesonStates {
 
   /// @inheritdoc IMesonSwap
   function postSwap(
-    bytes calldata encodedSwap,
-    address initiator,
+    uint256 encodedSwap,
     bytes32 r,
     bytes32 s,
     uint8 v,
-    uint40 providerIndex
+    address initiator,
+    uint40 providerIndex // TODO register providerIndex on the initial chain
   ) external override {
     bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
     require(_swapRequests[swapId].initiator == address(0), "swap conflict");
     require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
 
-    (address inToken, uint128 amountWithFee) = _checkSwapRequest(encodedSwap);
+    (uint128 amountWithFee, address inToken) = _checkSwapRequest(encodedSwap);
 
     _swapRequests[swapId] = SwapRequest(initiator, providerIndex);
     _unsafeDepositToken(inToken, initiator, amountWithFee);
     emit SwapPosted(swapId);
   }
 
-  function _checkSwapRequest(bytes calldata encodedSwap) internal view
-    returns (address, uint128)
+  function _checkSwapRequest(uint256 encodedSwap) internal view
+    returns (uint128, address)
   {
-     // TODO: user may make more requests
-    (bytes32 inTokenHash, uint128 amountWithFee, uint48 expireTs) = _decodeSwapInput(encodedSwap);
-    address inToken = _tokenAddressByHash[inTokenHash];
-    require(inToken != address(0), "unsupported token");
+    // TODO: user may make more requests
+    uint128 amountWithFee = uint128(encodedSwap >> 128);
+    uint40 expireTs = uint40(encodedSwap >> 48);
+    uint8 inTokenIndex = uint8(encodedSwap);
+
+    require(inTokenIndex < _tokenList.length, "unsupported token");
+    address inToken = _tokenList[inTokenIndex];
     require(amountWithFee > 0, "swap amount must be greater than zero");
 
-    uint48 ts = uint48(block.timestamp);
+    uint40 ts = uint40(block.timestamp);
     require(expireTs > ts + MIN_BOND_TIME_PERIOD, "expire ts too early");
     require(expireTs < ts + MAX_BOND_TIME_PERIOD, "expire ts too late");
 
-    return (inToken, amountWithFee);
+    return (amountWithFee, inToken);
   }
 
   /// @inheritdoc IMesonSwap
-  function cancelSwap(bytes calldata encodedSwap) external override {
+  function cancelSwap(uint256 encodedSwap) external override {
     bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
     address initiator = _swapRequests[swapId].initiator;
     require(initiator != address(0), "no swap");
 
-    (bytes32 inTokenHash, uint128 amountWithFee, uint48 expireTs) = _decodeSwapInput(encodedSwap);
-    require(expireTs < uint48(block.timestamp), "swap is locked");
-    address inToken = _tokenAddressByHash[inTokenHash];
+    uint128 amountWithFee = uint128(encodedSwap >> 128);
+    uint40 expireTs = uint40(encodedSwap >> 48);
+    uint8 inTokenIndex = uint8(encodedSwap);
+
+    require(expireTs < uint40(block.timestamp), "swap is locked");
+    address inToken = _tokenList[inTokenIndex];
 
     delete _swapRequests[swapId];
 
@@ -93,7 +97,7 @@ contract MesonSwap is IMesonSwap, MesonStates {
 
   /// @inheritdoc IMesonSwap
   function executeSwap(
-    bytes calldata encodedSwap,
+    uint256 encodedSwap,
     bytes32 recipientHash,
     bytes32 r,
     bytes32 s,
@@ -107,18 +111,19 @@ contract MesonSwap is IMesonSwap, MesonStates {
 
     _checkReleaseSignature(swapId, recipientHash, DOMAIN_SEPARATOR, initiator, r, s, v);
 
-    (bytes32 inTokenHash, uint128 amountWithFee,) = _decodeSwapInput(encodedSwap);
+    uint128 amountWithFee = uint128(encodedSwap >> 128);
+    uint8 inTokenIndex = uint8(encodedSwap);
 
     delete _swapRequests[swapId];
 
     // TODO: fee to meson protocol
 
     if (depositToPool) {
-      _tokenBalanceOf[inTokenHash][providerIndex]
-        = LowGasSafeMath.add(_tokenBalanceOf[inTokenHash][providerIndex], amountWithFee);
+      _tokenBalanceOf[inTokenIndex][providerIndex]
+        = LowGasSafeMath.add(_tokenBalanceOf[inTokenIndex][providerIndex], amountWithFee);
     } else {
       address provider = addressOfIndex[providerIndex];
-      address inToken = _tokenAddressByHash[inTokenHash];
+      address inToken = _tokenList[inTokenIndex];
       _safeTransfer(inToken, provider, amountWithFee);
     }
 
