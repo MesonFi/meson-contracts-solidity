@@ -51,7 +51,7 @@ describe('MesonSwap', () => {
       const signedRequest = new SignedSwapRequest(exported)
       signedRequest.checkSignature()
       await unsupportedToken.approve(mesonInstance.address, swap.amount)
-      await expect(lpClient.postSwap(signedRequest)).to.be.revertedWith('unsupported token')
+      await expect(lpClient.postSwap(signedRequest)).to.be.reverted
     })
   })
 
