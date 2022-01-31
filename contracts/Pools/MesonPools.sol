@@ -124,15 +124,12 @@ contract MesonPools is IMesonPools, MesonStates {
     uint240 lockedSwap = _lockedSwaps[swapId];
     require(lockedSwap != 0, "swap does not exist");
 
-    address initiator = address(uint160(lockedSwap));
-    _checkReleaseSignature(swapId, recipient, domainHash, r, s, v, initiator);
+    _checkReleaseSignature(swapId, recipient, domainHash, r, s, v, address(uint160(lockedSwap)));
 
     address token = _tokenList[uint8(encodedSwap >> 8)];
-
-    _lockedSwaps[swapId] = 0;
-
     _safeTransfer(token, recipient, uint128(encodedSwap >> 128));
 
+    _lockedSwaps[swapId] = 0;
     emit SwapReleased(swapId);
   }
 
