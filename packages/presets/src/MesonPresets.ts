@@ -125,7 +125,7 @@ export class MesonPresets {
     }
     if (!this._cache.get(id)) {
       const instance = new Contract(network.mesonAddress, Meson.abi, provider)
-      const client = new MesonClient(instance, Number(network.chainId), network.slip44)
+      const client = new MesonClient(instance, Number(network.chainId), network.shortSlip44)
       this._cache.set(id, client)
     }
     return this._cache.get(id)
