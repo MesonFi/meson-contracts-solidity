@@ -67,14 +67,14 @@ describe('MesonHelpers', () => {
   describe('#checkRequestSignature', () => {
     it('validates a request signature', async () => {
       const sigs = await swap.signRequest(wallet)
-      await mesonInstance.checkRequestSignature(swap.encoded, wallet.address, ...sigs)
+      await mesonInstance.checkRequestSignature(swap.encoded, ...sigs, wallet.address)
     })
   })
 
   describe('#checkReleaseSignature', () => {
     it('validates a release signature', async () => {
       const sigs = await swap.signRelease(wallet, swapData.recipient)
-      await mesonInstance.checkReleaseSignature(swap.encoded, swapData.recipient, wallet.address, ...sigs)
+      await mesonInstance.checkReleaseSignature(swap.encoded, swapData.recipient, ...sigs, wallet.address)
     })
   })
 })

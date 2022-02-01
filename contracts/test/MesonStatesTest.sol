@@ -46,23 +46,22 @@ contract MesonStatesTest is MesonStates {
   }
 
   function checkRequestSignature(
-    bytes32 encodedSwap,
-    address signer,
+    uint256 encodedSwap,
     bytes32 r,
     bytes32 s,
-    uint8 v
+    uint8 v,
+    address signer
   ) public pure {
-    bytes32 digest = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", encodedSwap));
-    require(signer == ecrecover(digest, v, r, s), "Invalid signature");
+    _checkRequestSignature(encodedSwap, r, s, v, signer);
   }
 
   function checkReleaseSignature(
     uint256 encodedSwap,
     address recipient,
-    address signer,
     bytes32 r,
     bytes32 s,
-    uint8 v
+    uint8 v,
+    address signer
   ) public view {
     _checkReleaseSignature(encodedSwap, recipient, DOMAIN_SEPARATOR, r, s, v, signer);
   }

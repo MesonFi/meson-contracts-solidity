@@ -38,6 +38,17 @@ contract MesonHelpers is MesonConfig {
     IERC20Minimal(token).transferFrom(sender, address(this), amount);
   }
 
+  function _checkRequestSignature(
+    uint256 encodedSwap,
+    bytes32 r,
+    bytes32 s,
+    uint8 v,
+    address signer
+  ) internal pure {
+    bytes32 digest = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", encodedSwap));
+    require(signer == ecrecover(digest, v, r, s), "Invalid signature");
+  }
+
   function _checkReleaseSignature(
     uint256 encodedSwap,
     address recipient,

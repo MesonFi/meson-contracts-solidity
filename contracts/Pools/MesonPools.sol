@@ -70,8 +70,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     address initiator
   ) external {
     require(_lockedSwaps[encodedSwap] == 0, "Swap already exists");
-    bytes32 digest = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", encodedSwap));
-    require(initiator == ecrecover(bytes32(digest), v, r, s), "Invalid signature");
+    _checkRequestSignature(encodedSwap, r, s, v, initiator);
 
     uint40 providerIndex = indexOfAddress[_msgSender()];
     require(providerIndex != 0, "Caller not registered. Call depositAndRegister.");

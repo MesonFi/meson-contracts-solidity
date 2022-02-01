@@ -67,9 +67,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
       req := mload(32) // load [39:64) which is initiator|providerIndex
     }
 
-    bytes32 digest = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", encodedSwap));
-    require(initiator == ecrecover(digest, v, r, s), "Invalid signature");
-
+    _checkRequestSignature(encodedSwap, r, s, v, initiator);
     _swapRequests[encodedSwap] = req;
     (uint256 amountWithFee, address inToken) = _checkSwapRequest(encodedSwap);
     _unsafeDepositToken(inToken, initiator, amountWithFee);
