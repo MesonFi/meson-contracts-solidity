@@ -5,6 +5,7 @@
     "alias": "Ropsten",
     "chainId": "0x3",
     "slip44": "0x8000003c",
+    "shortSlip44": "0x003c",
     "extensions": [
       "metamask"
     ],
@@ -33,6 +34,7 @@
     "alias": "BSC",
     "chainId": "0x61",
     "slip44": "0x800002ca",
+    "shortSlip44": "0x02ca",
     "extensions": [
       "metamask"
     ],
@@ -66,6 +68,7 @@
     "alias": "FTM",
     "chainId": "0xfa2",
     "slip44": "0x800003ef",
+    "shortSlip44": "0x03ef",
     "extensions": [
       "metamask"
     ],
@@ -99,6 +102,7 @@
     "alias": "Ava",
     "chainId": "0xa869",
     "slip44": "0x80002328",
+    "shortSlip44": "0x2328",
     "extensions": [
       "metamask"
     ],
@@ -132,6 +136,7 @@
     "alias": "Matic",
     "chainId": "0x13881",
     "slip44": "0x800003c6",
+    "shortSlip44": "0x03c6",
     "extensions": [
       "metamask"
     ],
@@ -165,6 +170,7 @@
     "alias": "One",
     "chainId": "0x6357d2e0",
     "slip44": "0x800003ff",
+    "shortSlip44": "0x03ff",
     "extensions": [
       "metamask"
     ],

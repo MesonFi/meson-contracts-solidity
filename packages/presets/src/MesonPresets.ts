@@ -22,6 +22,7 @@ export interface PresetNetwork {
   name: string
   chainId?: string
   slip44: string
+  shortSlip44: string
   extensions?: string[]
   addressFormat: string
   url?: string
@@ -81,9 +82,9 @@ export class MesonPresets {
     return networks.find(item => item.chainId === hexChainId)
   }
 
-  getNetworkFromCoinType(coinType: string): PresetNetwork {
+  getNetworkFromShortCoinType(shortCoinType: string): PresetNetwork {
     const networks = this.getAllNetworks()
-    return networks.find(item => item.slip44 === coinType)
+    return networks.find(item => item.shortSlip44 === shortCoinType)
   }
 
   getTokensForNetwork(id: string): PresetToken[] {

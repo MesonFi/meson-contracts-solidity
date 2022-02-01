@@ -35,7 +35,7 @@ async function main() {
 
   // requestSwap (no gas)
   const swapData = getDefaultSwap({ inToken: 1, outToken: 1 })
-  const outChain = await mesonContract.getCoinType()
+  const outChain = await mesonContract.getShortCoinType()
   const swap = mesonClient.requestSwap(outChain, swapData)
   const exported = await swap.exportRequest(signer)
   const signedRequest = new SignedSwapRequest(exported)

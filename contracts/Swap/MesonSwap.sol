@@ -12,14 +12,14 @@ import "../utils/MesonStates.sol";
 /// users initiate swaps on the initial chain.
 contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @notice Posted swap requests
-  /// Key: encodedSwap in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:bytes4|outToken:uint8|inToken:uint8`
-  /// Value: in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:bytes4|outToken:uint8|inToken:uint8`
+  /// Key: encodedSwap in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
+  /// Value: in format of initiator:uint160|providerIndex:uint40
   mapping(uint256 => uint200) internal _swapRequests;
 
   /// @notice xxxx
   /// @dev Designed to be used by users
-  /// @param encodedSwap Packed in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:bytes4|outToken:uint8|inToken:uint8`
-  function requestSwap(uint256 encodedSwap) external {
+  /// @param encodedSwap Packed in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
+  function requestSwap(uint256 encodedSwap) external forInitialChain(encodedSwap) {
     require(_swapRequests[encodedSwap] == 0, "Swap already exists");
 
     address initiator = _msgSender();
@@ -55,7 +55,9 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @param r Part of the signature
   /// @param s Part of the signature
   /// @param packedData Packed in format of `v:uint8|initiator:address|providerIndex:uint40` to save gas
-  function postSwap(uint256 encodedSwap, bytes32 r, bytes32 s, uint208 packedData) external {
+  function postSwap(uint256 encodedSwap, bytes32 r, bytes32 s, uint208 packedData)
+    external forInitialChain(encodedSwap)
+  {
     require(_swapRequests[encodedSwap] == 0, "Swap already exists");
 
     uint8 v;
@@ -170,5 +172,10 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   function swapProvider(uint256 encodedSwap) external view returns (address) {
     uint200 req = _swapRequests[encodedSwap];
     return addressOfIndex[uint40(req)];
+  }
+
+  modifier forInitialChain(uint256 encodedSwap) {
+    require(uint16(encodedSwap >> 8) == SHORT_COIN_TYPE, "Swap not for this chain");
+    _;
   }
 }

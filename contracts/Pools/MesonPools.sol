@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
+import "@openzeppelin/contracts/utils/Strings.sol";
+
 import "../libraries/LowGasSafeMath.sol";
 
 import "./IMesonPoolsEvents.sol";
@@ -68,7 +70,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     bytes32 s,
     uint8 v,
     address initiator
-  ) external {
+  ) external forTargetChain(encodedSwap) {
     require(_lockedSwaps[encodedSwap] == 0, "Swap already exists");
     _checkRequestSignature(encodedSwap, r, s, v, initiator);
 
@@ -81,8 +83,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     assembly {
       mstore(32, initiator) // store initiator@[44-64)
       mstore(12, providerIndex) // store providerIndex@[39-44)
-      mstore(7, shr(8, encodedSwap)) // store encodedSwap@[8-39) where amount@[8-24) & outToken@38
-      amount := shr(64, mload(0)) // load amount@[8-24) (read 0-32 and right shift 8 bytes)
+      mstore(7, shr(24, encodedSwap)) // store encodedSwap@[10-39) where amount@[10-26) & outToken@38
+      amount := shr(48, mload(0)) // load amount@[10-26) (read 0-32 and right shift 6 bytes)
       balanceIndex := mload(12) // load [38-44) which is outToken|providerIndex
       mstore(7, until) // store until@[34-39)
       lockedSwap := mload(32) // load [34-64) which is until|providerIndex|initiator
@@ -101,7 +103,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(uint240(block.timestamp << 200) > lockedSwap, "Swap still in lock");
 
     uint128 amount = uint128(encodedSwap >> 128);
-    uint8 tokenIndex = uint8(encodedSwap >> 8);
+    uint8 tokenIndex = uint8(encodedSwap >> 24);
 
     uint48 balanceIndex = (uint48(tokenIndex) << 40) | uint40(lockedSwap >> 160);
     _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amount);
@@ -128,7 +130,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     _checkReleaseSignature(encodedSwap, recipient, domainHash, r, s, v, address(uint160(lockedSwap)));
 
-    address token = _tokenList[uint8(encodedSwap >> 8)];
+    address token = _tokenList[uint8(encodedSwap >> 24)];
     _safeTransfer(token, recipient, encodedSwap >> 128);
 
     _lockedSwaps[encodedSwap] = 0;
@@ -142,5 +144,10 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     initiator = address(uint160(lockedSwap));
     provider = addressOfIndex[uint40(lockedSwap >> 160)];
     until = uint40(lockedSwap >> 200);
+  }
+
+  modifier forTargetChain(uint256 encodedSwap) {
+    require(uint16(encodedSwap >> 32) == SHORT_COIN_TYPE, "Swap not for this chain");
+    _;
   }
 }

@@ -116,8 +116,8 @@ contract MesonHelpers is MesonConfig {
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }
 
-  function getCoinType() external pure returns (bytes4) {
-    return COIN_TYPE;
+  function getShortCoinType() external pure returns (bytes2) {
+    return bytes2(SHORT_COIN_TYPE);
   }
 
   function _msgSender() internal view returns (address) {

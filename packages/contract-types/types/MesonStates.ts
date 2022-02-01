@@ -19,7 +19,7 @@ export interface MesonStatesInterface extends utils.Interface {
   functions: {
     "addressOfIndex(uint40)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
-    "getCoinType()": FunctionFragment;
+    "getShortCoinType()": FunctionFragment;
     "indexOfAddress(address)": FunctionFragment;
     "indexOfToken(address)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
@@ -35,7 +35,7 @@ export interface MesonStatesInterface extends utils.Interface {
     values: [string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "getCoinType",
+    functionFragment: "getShortCoinType",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -61,7 +61,7 @@ export interface MesonStatesInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getCoinType",
+    functionFragment: "getShortCoinType",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -122,7 +122,7 @@ export interface MesonStates extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    getCoinType(overrides?: CallOverrides): Promise<[string]>;
+    getShortCoinType(overrides?: CallOverrides): Promise<[string]>;
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<[number]>;
 
@@ -149,7 +149,7 @@ export interface MesonStates extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  getCoinType(overrides?: CallOverrides): Promise<string>;
+  getShortCoinType(overrides?: CallOverrides): Promise<string>;
 
   indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
 
@@ -174,7 +174,7 @@ export interface MesonStates extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getCoinType(overrides?: CallOverrides): Promise<string>;
+    getShortCoinType(overrides?: CallOverrides): Promise<string>;
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
 
@@ -202,7 +202,7 @@ export interface MesonStates extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getCoinType(overrides?: CallOverrides): Promise<BigNumber>;
+    getShortCoinType(overrides?: CallOverrides): Promise<BigNumber>;
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -228,7 +228,7 @@ export interface MesonStates extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    getShortCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     indexOfAddress(
       arg0: string,

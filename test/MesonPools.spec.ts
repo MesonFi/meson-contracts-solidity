@@ -23,7 +23,7 @@ describe('MesonPools', () => {
 
     userClient = await MesonClient.Create(result.pools) // user is default account
     lpClient = await MesonClient.Create(mesonInstance)
-    outChain = lpClient.coinType
+    outChain = lpClient.shortCoinType
     await token.approve(mesonInstance.address, 1000)
   })
 

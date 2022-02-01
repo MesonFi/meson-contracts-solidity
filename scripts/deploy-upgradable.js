@@ -64,7 +64,7 @@ async function main() {
 
   const mesonClient = await MesonClient.Create(meson)
 
-  if (mesonClient.coinType !== testnet.slip44) {
+  if (mesonClient.shortCoinType !== testnet.shortSlip44) {
     throw new Error('Coin type does not match')
   }
 

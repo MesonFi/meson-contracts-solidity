@@ -18,23 +18,23 @@ export interface PartialSwapRequest {
 export class MesonClient {
   readonly mesonInstance: Meson
   readonly chainId: number
-  readonly coinType: string
+  readonly shortCoinType: string
   readonly signer: SwapSigner
   
   #tokens: string[] = []
 
   static async Create(mesonInstance: Meson) {
     const network = await mesonInstance.provider.getNetwork()
-    const coinType = await mesonInstance.getCoinType()
-    const client = new MesonClient(mesonInstance, Number(network.chainId), coinType)
+    const shortCoinType = await mesonInstance.getShortCoinType()
+    const client = new MesonClient(mesonInstance, Number(network.chainId), shortCoinType)
     await client._getSupportedTokens()
     return client
   }
 
-  constructor(mesonInstance: any, chainId: number, coinType: string) {
+  constructor(mesonInstance: any, chainId: number, shortCoinType: string) {
     this.mesonInstance = mesonInstance as Meson
     this.chainId = chainId
-    this.coinType = coinType
+    this.shortCoinType = shortCoinType
     this.signer = new SwapSigner(mesonInstance.address, chainId)
   }
 
@@ -53,7 +53,7 @@ export class MesonClient {
   requestSwap(outChain: string, swap: PartialSwapRequest, lockPeriod: number = 5400) {
     return new SwapRequestWithSigner({
       ...swap,
-      inChain: this.coinType,
+      inChain: this.shortCoinType,
       outChain,
       expireTs: Math.floor(Date.now() / 1000) + lockPeriod,
     }, this.signer)
@@ -157,7 +157,7 @@ export class MesonClient {
     // return await this.mesonInstance.requests(swapId)
   }
 
-  async getLockedSwap(swapId: string) {
-    // return await this.mesonInstance.lockedSwaps(swapId)
+  async getLockedSwap(encoded: string) {
+    return await this.mesonInstance.getLockedSwap(encoded)
   }
 }

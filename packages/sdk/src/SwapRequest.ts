@@ -5,8 +5,9 @@ const swapStruct = [
   { name: 'amount', type: 'uint128' },
   { name: 'fee', type: 'uint40' },
   { name: 'expireTs', type: 'uint40' },
-  { name: 'outChain', type: 'bytes4' },
+  { name: 'outChain', type: 'bytes2' },
   { name: 'outToken', type: 'uint8' },
+  { name: 'inChain', type: 'bytes2' },
   { name: 'inToken', type: 'uint8' },
 ]
 export interface SwapRequestData {
