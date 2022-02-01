@@ -20,11 +20,15 @@ export class MesonClient {
   readonly chainId: number
   readonly coinType: string
   readonly signer: SwapSigner
+  
+  #tokens: string[] = []
 
   static async Create(mesonInstance: Meson) {
     const network = await mesonInstance.provider.getNetwork()
     const coinType = await mesonInstance.getCoinType()
-    return new MesonClient(mesonInstance, Number(network.chainId), coinType)
+    const client = new MesonClient(mesonInstance, Number(network.chainId), coinType)
+    await client._getSupportedTokens()
+    return client
   }
 
   constructor(mesonInstance: any, chainId: number, coinType: string) {
@@ -32,6 +36,18 @@ export class MesonClient {
     this.chainId = chainId
     this.coinType = coinType
     this.signer = new SwapSigner(mesonInstance.address, chainId)
+  }
+
+  async _getSupportedTokens () {
+    const tokens = await this.mesonInstance.supportedTokens()
+    this.#tokens = tokens.map(addr => addr.toLowerCase())
+  }
+
+  token (index: number) {
+    if (!index) {
+      throw new Error(`Token index cannot be zero`)
+    }
+    return this.#tokens[index - 1] || ''
   }
 
   requestSwap(outChain: string, swap: PartialSwapRequest, lockPeriod: number = 5400) {
@@ -43,25 +59,35 @@ export class MesonClient {
     }, this.signer)
   }
 
-  private _check (swap: SignedSwapRequest) {
-    if (this.chainId !== swap.chainId) {
-      throw new Error('Mismatch chain id')
-    } else if (this.mesonInstance.address !== swap.mesonAddress) {
-      throw new Error('Mismatch messon address')
+  async depositAndRegister(token: string, amount: string, providerIndex: string) {
+    console.log(this.#tokens)
+    console.log(token)
+    const tokenIndex = 1 + this.#tokens.indexOf(token.toLowerCase())
+    if (!tokenIndex) {
+      throw new Error(`Token not supported`)
     }
+    return this._depositAndRegister(amount, tokenIndex, providerIndex)
   }
 
-  async depositAndRegister(amount: string, tokenIndex: number, providerIndex: string) {
+  async _depositAndRegister(amount: string, tokenIndex: number, providerIndex: string) {
     const balanceIndex = pack(['uint8', 'uint40'], [tokenIndex, providerIndex])
     return this.mesonInstance.depositAndRegister(amount, balanceIndex)
   }
 
-  async deposit(amount: string, tokenIndex: number) {
+  async deposit(token: string, amount: string) {
+    const tokenIndex = 1 + this.#tokens.indexOf(token.toLowerCase())
+    if (!tokenIndex) {
+      throw new Error(`Token not supported`)
+    }
     const providerAddress = await this.mesonInstance.signer.getAddress()
     const providerIndex = await this.mesonInstance.indexOfAddress(providerAddress)
     if (!providerIndex) {
       throw new Error(`Address ${providerAddress} not registered. Please call depositAndRegister first.`)
     }
+    return this._deposit(amount, tokenIndex, providerIndex)
+  }
+
+  async _deposit(amount: string, tokenIndex: number, providerIndex: number) {
     const balanceIndex = pack(['uint8', 'uint40'], [tokenIndex, providerIndex])
     return this.mesonInstance.deposit(amount, balanceIndex)
   }
@@ -113,6 +139,14 @@ export class MesonClient {
       ...signedRelease.signature,
       depositToPool
     )
+  }
+
+  private _check (swap: SignedSwapRequest) {
+    if (this.chainId !== swap.chainId) {
+      throw new Error('Mismatch chain id')
+    } else if (this.mesonInstance.address !== swap.mesonAddress) {
+      throw new Error('Mismatch messon address')
+    }
   }
 
   async cancelSwap(swapId: string, signer?: Wallet) {

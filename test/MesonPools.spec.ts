@@ -48,22 +48,22 @@ describe('MesonPools', () => {
 
   describe('#depositAndRegister', () => {
     it('accepts 1000 deposit', async () => {
-      await lpClient.depositAndRegister('1000', 1, '1')
-      expect(await mesonInstance.balanceOf(token.address, provider.address)).to.equal(1000)
+      await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
+      expect(await mesonInstance.balanceOf(lpClient.token(1), provider.address)).to.equal(1000)
       expect(await token.balanceOf(mesonInstance.address)).to.equal(1000)
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.sub(1000))
 
-      await expect(mesonInstance.deposit(token.address, 1)).to.be.reverted
+      await expect(mesonInstance.deposit(lpClient.token(1), 1)).to.be.reverted
     })
 
     it('refuses unsupported token', async () => {
-      await expect(lpClient.depositAndRegister('1000', 2, '1')).to.be.reverted
+      await expect(lpClient._depositAndRegister('1000', 2, '1')).to.be.reverted
     })
   })
 
   describe('#withdraw', () => {
     it('accepts 1000 deposit and 1000 withdrawal', async () => {
-      await lpClient.depositAndRegister('1000', 1, '1')
+      await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
       await mesonInstance.withdraw('1000', 1)
       expect(await token.balanceOf(mesonInstance.address)).to.equal(0)
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE)
@@ -78,7 +78,7 @@ describe('MesonPools', () => {
 
   describe('#lock', async () => {
     it('lockes a swap', async () => {
-      await lpClient.depositAndRegister('1000', 1, '1')
+      await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
 
       const swap = userClient.requestSwap(outChain, getDefaultSwap())
       const exported = await swap.exportRequest(initiator)
@@ -87,14 +87,14 @@ describe('MesonPools', () => {
       signedRequest.checkSignature()
       await lpClient.lock(signedRequest)
 
-      expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
+      expect(await mesonInstance.balanceOf(lpClient.token(1), initiator.address)).to.equal(0)
       expect(await mesonInstance.hasLockedSwap(swap.swapId)).to.equal(true)
     })
   })
 
   describe('#release', async () => {
     it('accepts a release', async () => {
-      await lpClient.depositAndRegister('1000', 1, '1')
+      await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
 
       const swapData = getDefaultSwap()
       const swap = userClient.requestSwap(outChain, swapData)
@@ -109,7 +109,7 @@ describe('MesonPools', () => {
       signedRelease.checkSignature()
       await lpClient.release(signedRelease)
 
-      expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
+      expect(await mesonInstance.balanceOf(lpClient.token(1), initiator.address)).to.equal(0)
       expect(await token.balanceOf(swapData.recipient)).to.equal(swap.amount)
     })
   })
