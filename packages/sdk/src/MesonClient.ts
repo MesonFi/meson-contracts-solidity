@@ -60,8 +60,6 @@ export class MesonClient {
   }
 
   async depositAndRegister(token: string, amount: string, providerIndex: string) {
-    console.log(this.#tokens)
-    console.log(token)
     const tokenIndex = 1 + this.#tokens.indexOf(token.toLowerCase())
     if (!tokenIndex) {
       throw new Error(`Token not supported`)
