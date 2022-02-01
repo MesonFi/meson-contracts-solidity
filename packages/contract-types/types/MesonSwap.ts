@@ -19,16 +19,18 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface MesonSwapInterface extends utils.Interface {
   functions: {
-    "addressOfIndex(uint32)": FunctionFragment;
+    "addressOfIndex(uint40)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
-    "bondSwap(bytes32,uint32)": FunctionFragment;
-    "cancelSwap(bytes)": FunctionFragment;
-    "executeSwap(bytes,bytes32,bytes32,bytes32,uint8,bool)": FunctionFragment;
+    "bondSwap(bytes32,uint40)": FunctionFragment;
+    "cancelSwap(uint256)": FunctionFragment;
+    "executeSwap(uint256,bytes32,bytes32,bytes32,uint8,bool)": FunctionFragment;
     "getCoinType()": FunctionFragment;
+    "getSwap(bytes32)": FunctionFragment;
     "indexOfAddress(address)": FunctionFragment;
-    "postSwap(bytes,address,bytes32,bytes32,uint8,uint32)": FunctionFragment;
-    "registerAddress(uint32)": FunctionFragment;
-    "requestSwap(bytes)": FunctionFragment;
+    "indexOfToken(address)": FunctionFragment;
+    "postSwap(uint256,bytes32,bytes32,uint208)": FunctionFragment;
+    "requestSwap(uint256)": FunctionFragment;
+    "tokenForIndex(uint8)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -45,38 +47,43 @@ export interface MesonSwapInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "cancelSwap",
-    values: [BytesLike]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "executeSwap",
-    values: [BytesLike, BytesLike, BytesLike, BytesLike, BigNumberish, boolean]
+    values: [
+      BigNumberish,
+      BytesLike,
+      BytesLike,
+      BytesLike,
+      BigNumberish,
+      boolean
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "getCoinType",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "getSwap", values: [BytesLike]): string;
   encodeFunctionData(
     functionFragment: "indexOfAddress",
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "postSwap",
-    values: [
-      BytesLike,
-      string,
-      BytesLike,
-      BytesLike,
-      BigNumberish,
-      BigNumberish
-    ]
+    functionFragment: "indexOfToken",
+    values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "registerAddress",
-    values: [BigNumberish]
+    functionFragment: "postSwap",
+    values: [BigNumberish, BytesLike, BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "requestSwap",
-    values: [BytesLike]
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenForIndex",
+    values: [BigNumberish]
   ): string;
 
   decodeFunctionResult(
@@ -94,17 +101,22 @@ export interface MesonSwapInterface extends utils.Interface {
     functionFragment: "getCoinType",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getSwap", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "indexOfAddress",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "indexOfToken",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "postSwap", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "registerAddress",
+    functionFragment: "requestSwap",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "requestSwap",
+    functionFragment: "tokenForIndex",
     data: BytesLike
   ): Result;
 
@@ -188,12 +200,12 @@ export interface MesonSwap extends BaseContract {
     ): Promise<ContractTransaction>;
 
     cancelSwap(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     executeSwap(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
@@ -204,27 +216,32 @@ export interface MesonSwap extends BaseContract {
 
     getCoinType(overrides?: CallOverrides): Promise<[string]>;
 
+    getSwap(
+      swapId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[string, string] & { initiator: string; provider: string }>;
+
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<[number]>;
 
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<[number]>;
+
     postSwap(
-      encodedSwap: BytesLike,
-      initiator: string,
+      encodedSwap: BigNumberish,
       r: BytesLike,
       s: BytesLike,
-      v: BigNumberish,
-      providerIndex: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    registerAddress(
-      index: BigNumberish,
+      packedData: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     requestSwap(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
   };
 
   addressOfIndex(
@@ -245,12 +262,12 @@ export interface MesonSwap extends BaseContract {
   ): Promise<ContractTransaction>;
 
   cancelSwap(
-    encodedSwap: BytesLike,
+    encodedSwap: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   executeSwap(
-    encodedSwap: BytesLike,
+    encodedSwap: BigNumberish,
     recipientHash: BytesLike,
     r: BytesLike,
     s: BytesLike,
@@ -261,27 +278,32 @@ export interface MesonSwap extends BaseContract {
 
   getCoinType(overrides?: CallOverrides): Promise<string>;
 
+  getSwap(
+    swapId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<[string, string] & { initiator: string; provider: string }>;
+
   indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
 
+  indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
+
   postSwap(
-    encodedSwap: BytesLike,
-    initiator: string,
+    encodedSwap: BigNumberish,
     r: BytesLike,
     s: BytesLike,
-    v: BigNumberish,
-    providerIndex: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  registerAddress(
-    index: BigNumberish,
+    packedData: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   requestSwap(
-    encodedSwap: BytesLike,
+    encodedSwap: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  tokenForIndex(
+    tokenIndex: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   callStatic: {
     addressOfIndex(
@@ -302,12 +324,12 @@ export interface MesonSwap extends BaseContract {
     ): Promise<void>;
 
     cancelSwap(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     executeSwap(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
@@ -318,27 +340,32 @@ export interface MesonSwap extends BaseContract {
 
     getCoinType(overrides?: CallOverrides): Promise<string>;
 
+    getSwap(
+      swapId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[string, string] & { initiator: string; provider: string }>;
+
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
 
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
+
     postSwap(
-      encodedSwap: BytesLike,
-      initiator: string,
+      encodedSwap: BigNumberish,
       r: BytesLike,
       s: BytesLike,
-      v: BigNumberish,
-      providerIndex: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registerAddress(
-      index: BigNumberish,
+      packedData: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     requestSwap(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
   };
 
   filters: {
@@ -377,12 +404,12 @@ export interface MesonSwap extends BaseContract {
     ): Promise<BigNumber>;
 
     cancelSwap(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     executeSwap(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
@@ -393,26 +420,28 @@ export interface MesonSwap extends BaseContract {
 
     getCoinType(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getSwap(swapId: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<BigNumber>;
+
     postSwap(
-      encodedSwap: BytesLike,
-      initiator: string,
+      encodedSwap: BigNumberish,
       r: BytesLike,
       s: BytesLike,
-      v: BigNumberish,
-      providerIndex: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    registerAddress(
-      index: BigNumberish,
+      packedData: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     requestSwap(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
@@ -435,12 +464,12 @@ export interface MesonSwap extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     cancelSwap(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     executeSwap(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
@@ -451,29 +480,37 @@ export interface MesonSwap extends BaseContract {
 
     getCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    getSwap(
+      swapId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     indexOfAddress(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    postSwap(
-      encodedSwap: BytesLike,
-      initiator: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
-      providerIndex: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    indexOfToken(
+      token: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    registerAddress(
-      index: BigNumberish,
+    postSwap(
+      encodedSwap: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      packedData: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     requestSwap(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
 }

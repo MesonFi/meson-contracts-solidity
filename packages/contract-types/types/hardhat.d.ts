@@ -45,17 +45,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Meson__factory>;
     getContractFactory(
-      name: "IMesonPools",
+      name: "IMesonPoolsEvents",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IMesonPools__factory>;
+    ): Promise<Contracts.IMesonPoolsEvents__factory>;
     getContractFactory(
       name: "MesonPools",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MesonPools__factory>;
     getContractFactory(
-      name: "IMesonSwap",
+      name: "IMesonSwapEvents",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IMesonSwap__factory>;
+    ): Promise<Contracts.IMesonSwapEvents__factory>;
     getContractFactory(
       name: "MesonSwap",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -92,6 +92,10 @@ declare module "hardhat/types/runtime" {
       name: "MesonStates",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MesonStates__factory>;
+    getContractFactory(
+      name: "MesonTokens",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MesonTokens__factory>;
 
     getContractAt(
       name: "IBeaconUpgradeable",
@@ -134,20 +138,20 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.Meson>;
     getContractAt(
-      name: "IMesonPools",
+      name: "IMesonPoolsEvents",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IMesonPools>;
+    ): Promise<Contracts.IMesonPoolsEvents>;
     getContractAt(
       name: "MesonPools",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.MesonPools>;
     getContractAt(
-      name: "IMesonSwap",
+      name: "IMesonSwapEvents",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IMesonSwap>;
+    ): Promise<Contracts.IMesonSwapEvents>;
     getContractAt(
       name: "MesonSwap",
       address: string,
@@ -193,6 +197,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.MesonStates>;
+    getContractAt(
+      name: "MesonTokens",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MesonTokens>;
 
     // default types
     getContractFactory(

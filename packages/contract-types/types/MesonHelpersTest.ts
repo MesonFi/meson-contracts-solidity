@@ -19,11 +19,10 @@ export interface MesonHelpersTestInterface extends utils.Interface {
   functions: {
     "checkReleaseSignature(bytes32,address,address,bytes32,bytes32,uint8)": FunctionFragment;
     "checkRequestSignature(bytes32,address,bytes32,bytes32,uint8)": FunctionFragment;
-    "decodeSwapInput(bytes)": FunctionFragment;
-    "decodeSwapOutput(bytes)": FunctionFragment;
-    "encodeSwap(bytes,uint128,uint48,uint48,bytes4,bytes)": FunctionFragment;
+    "decodeSwap(uint256)": FunctionFragment;
+    "encodeSwap(uint128,uint40,uint40,bytes4,uint8,uint8)": FunctionFragment;
     "getCoinType()": FunctionFragment;
-    "getSwapId(bytes)": FunctionFragment;
+    "getSwapId(uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -35,22 +34,18 @@ export interface MesonHelpersTestInterface extends utils.Interface {
     values: [BytesLike, string, BytesLike, BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "decodeSwapInput",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "decodeSwapOutput",
-    values: [BytesLike]
+    functionFragment: "decodeSwap",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "encodeSwap",
     values: [
-      BytesLike,
       BigNumberish,
       BigNumberish,
       BigNumberish,
       BytesLike,
-      BytesLike
+      BigNumberish,
+      BigNumberish
     ]
   ): string;
   encodeFunctionData(
@@ -59,7 +54,7 @@ export interface MesonHelpersTestInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getSwapId",
-    values: [BytesLike]
+    values: [BigNumberish]
   ): string;
 
   decodeFunctionResult(
@@ -70,14 +65,7 @@ export interface MesonHelpersTestInterface extends utils.Interface {
     functionFragment: "checkRequestSignature",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "decodeSwapInput",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "decodeSwapOutput",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "decodeSwap", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "encodeSwap", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getCoinType",
@@ -134,30 +122,32 @@ export interface MesonHelpersTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[void]>;
 
-    decodeSwapInput(
-      encodedSwap: BytesLike,
+    decodeSwap(
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, BigNumber, number]>;
-
-    decodeSwapOutput(
-      encodedSwap: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber, string]>;
+    ): Promise<
+      [BigNumber, number, number, number] & {
+        amount: BigNumber;
+        expireTs: number;
+        inTokenIndex: number;
+        outTokenIndex: number;
+      }
+    >;
 
     encodeSwap(
-      inToken: BytesLike,
       amount: BigNumberish,
       fee: BigNumberish,
       expireTs: BigNumberish,
       outChain: BytesLike,
-      outToken: BytesLike,
+      outToken: BigNumberish,
+      inToken: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
     getCoinType(overrides?: CallOverrides): Promise<[string]>;
 
     getSwapId(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
   };
@@ -181,29 +171,34 @@ export interface MesonHelpersTest extends BaseContract {
     overrides?: CallOverrides
   ): Promise<void>;
 
-  decodeSwapInput(
-    encodedSwap: BytesLike,
+  decodeSwap(
+    encodedSwap: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<[string, BigNumber, number]>;
-
-  decodeSwapOutput(
-    encodedSwap: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<[BigNumber, string]>;
+  ): Promise<
+    [BigNumber, number, number, number] & {
+      amount: BigNumber;
+      expireTs: number;
+      inTokenIndex: number;
+      outTokenIndex: number;
+    }
+  >;
 
   encodeSwap(
-    inToken: BytesLike,
     amount: BigNumberish,
     fee: BigNumberish,
     expireTs: BigNumberish,
     outChain: BytesLike,
-    outToken: BytesLike,
+    outToken: BigNumberish,
+    inToken: BigNumberish,
     overrides?: CallOverrides
   ): Promise<string>;
 
   getCoinType(overrides?: CallOverrides): Promise<string>;
 
-  getSwapId(encodedSwap: BytesLike, overrides?: CallOverrides): Promise<string>;
+  getSwapId(
+    encodedSwap: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   callStatic: {
     checkReleaseSignature(
@@ -225,30 +220,32 @@ export interface MesonHelpersTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    decodeSwapInput(
-      encodedSwap: BytesLike,
+    decodeSwap(
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, BigNumber, number]>;
-
-    decodeSwapOutput(
-      encodedSwap: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber, string]>;
+    ): Promise<
+      [BigNumber, number, number, number] & {
+        amount: BigNumber;
+        expireTs: number;
+        inTokenIndex: number;
+        outTokenIndex: number;
+      }
+    >;
 
     encodeSwap(
-      inToken: BytesLike,
       amount: BigNumberish,
       fee: BigNumberish,
       expireTs: BigNumberish,
       outChain: BytesLike,
-      outToken: BytesLike,
+      outToken: BigNumberish,
+      inToken: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
 
     getCoinType(overrides?: CallOverrides): Promise<string>;
 
     getSwapId(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
   };
@@ -275,30 +272,25 @@ export interface MesonHelpersTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    decodeSwapInput(
-      encodedSwap: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    decodeSwapOutput(
-      encodedSwap: BytesLike,
+    decodeSwap(
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     encodeSwap(
-      inToken: BytesLike,
       amount: BigNumberish,
       fee: BigNumberish,
       expireTs: BigNumberish,
       outChain: BytesLike,
-      outToken: BytesLike,
+      outToken: BigNumberish,
+      inToken: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     getCoinType(overrides?: CallOverrides): Promise<BigNumber>;
 
     getSwapId(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
@@ -323,30 +315,25 @@ export interface MesonHelpersTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    decodeSwapInput(
-      encodedSwap: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    decodeSwapOutput(
-      encodedSwap: BytesLike,
+    decodeSwap(
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     encodeSwap(
-      inToken: BytesLike,
       amount: BigNumberish,
       fee: BigNumberish,
       expireTs: BigNumberish,
       outChain: BytesLike,
-      outToken: BytesLike,
+      outToken: BigNumberish,
+      inToken: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     getCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getSwapId(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

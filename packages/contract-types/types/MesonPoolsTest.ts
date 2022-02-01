@@ -19,24 +19,22 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface MesonPoolsTestInterface extends utils.Interface {
   functions: {
-    "addTokenToSwapList(address)": FunctionFragment;
-    "addressOfIndex(uint32)": FunctionFragment;
+    "addressOfIndex(uint40)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
-    "deposit(address,uint128)": FunctionFragment;
+    "deposit(uint128,uint48)": FunctionFragment;
+    "depositAndRegister(uint128,uint48)": FunctionFragment;
     "getCoinType()": FunctionFragment;
+    "getLockedSwap(bytes32)": FunctionFragment;
     "hasLockedSwap(bytes32)": FunctionFragment;
     "indexOfAddress(address)": FunctionFragment;
-    "lock(bytes,bytes32,address,bytes32,bytes32,uint8)": FunctionFragment;
-    "registerAddress(uint32)": FunctionFragment;
-    "release(bytes,bytes32,address,address,bytes32,bytes32,uint8)": FunctionFragment;
-    "unlock(bytes,bytes32)": FunctionFragment;
-    "withdraw(address,uint128)": FunctionFragment;
+    "indexOfToken(address)": FunctionFragment;
+    "lock(uint256,bytes32,bytes32,bytes32,uint8,address)": FunctionFragment;
+    "release(uint256,bytes32,bytes32,bytes32,uint8,address)": FunctionFragment;
+    "tokenForIndex(uint8)": FunctionFragment;
+    "unlock(uint256,bytes32)": FunctionFragment;
+    "withdraw(uint128,uint8)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "addTokenToSwapList",
-    values: [string]
-  ): string;
   encodeFunctionData(
     functionFragment: "addressOfIndex",
     values: [BigNumberish]
@@ -47,11 +45,19 @@ export interface MesonPoolsTestInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "deposit",
-    values: [string, BigNumberish]
+    values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "depositAndRegister",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getCoinType",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getLockedSwap",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "hasLockedSwap",
@@ -62,38 +68,44 @@ export interface MesonPoolsTestInterface extends utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "lock",
-    values: [BytesLike, BytesLike, string, BytesLike, BytesLike, BigNumberish]
+    functionFragment: "indexOfToken",
+    values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "registerAddress",
-    values: [BigNumberish]
+    functionFragment: "lock",
+    values: [
+      BigNumberish,
+      BytesLike,
+      BytesLike,
+      BytesLike,
+      BigNumberish,
+      string
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "release",
     values: [
+      BigNumberish,
       BytesLike,
       BytesLike,
-      string,
-      string,
       BytesLike,
-      BytesLike,
-      BigNumberish
+      BigNumberish,
+      string
     ]
   ): string;
   encodeFunctionData(
+    functionFragment: "tokenForIndex",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "unlock",
-    values: [BytesLike, BytesLike]
+    values: [BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "withdraw",
-    values: [string, BigNumberish]
+    values: [BigNumberish, BigNumberish]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "addTokenToSwapList",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "addressOfIndex",
     data: BytesLike
@@ -101,7 +113,15 @@ export interface MesonPoolsTestInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "depositAndRegister",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getCoinType",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getLockedSwap",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -112,12 +132,16 @@ export interface MesonPoolsTestInterface extends utils.Interface {
     functionFragment: "indexOfAddress",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "lock", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "registerAddress",
+    functionFragment: "indexOfToken",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "lock", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenForIndex",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "unlock", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
@@ -165,11 +189,6 @@ export interface MesonPoolsTest extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    addTokenToSwapList(
-      token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     addressOfIndex(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -182,12 +201,29 @@ export interface MesonPoolsTest extends BaseContract {
     ): Promise<[BigNumber]>;
 
     deposit(
-      token: string,
       amount: BigNumberish,
+      balanceIndex: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    depositAndRegister(
+      amount: BigNumberish,
+      balanceIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     getCoinType(overrides?: CallOverrides): Promise<[string]>;
+
+    getLockedSwap(
+      swapId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, number] & {
+        initiator: string;
+        provider: string;
+        until: number;
+      }
+    >;
 
     hasLockedSwap(
       swapId: BytesLike,
@@ -196,49 +232,45 @@ export interface MesonPoolsTest extends BaseContract {
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<[number]>;
 
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<[number]>;
+
     lock(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       domainHash: BytesLike,
-      initiator: string,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    registerAddress(
-      index: BigNumberish,
+      initiator: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     release(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       domainHash: BytesLike,
-      initiator: string,
-      recipient: string,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     unlock(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       domainHash: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     withdraw(
-      token: string,
       amount: BigNumberish,
+      tokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
-
-  addTokenToSwapList(
-    token: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   addressOfIndex(
     arg0: BigNumberish,
@@ -252,58 +284,74 @@ export interface MesonPoolsTest extends BaseContract {
   ): Promise<BigNumber>;
 
   deposit(
-    token: string,
     amount: BigNumberish,
+    balanceIndex: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  depositAndRegister(
+    amount: BigNumberish,
+    balanceIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   getCoinType(overrides?: CallOverrides): Promise<string>;
 
+  getLockedSwap(
+    swapId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<
+    [string, string, number] & {
+      initiator: string;
+      provider: string;
+      until: number;
+    }
+  >;
+
   hasLockedSwap(swapId: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
   indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
 
+  indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
+
   lock(
-    encodedSwap: BytesLike,
+    encodedSwap: BigNumberish,
     domainHash: BytesLike,
-    initiator: string,
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  registerAddress(
-    index: BigNumberish,
+    initiator: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   release(
-    encodedSwap: BytesLike,
+    encodedSwap: BigNumberish,
     domainHash: BytesLike,
-    initiator: string,
-    recipient: string,
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
+    recipient: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  tokenForIndex(
+    tokenIndex: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   unlock(
-    encodedSwap: BytesLike,
+    encodedSwap: BigNumberish,
     domainHash: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   withdraw(
-    token: string,
     amount: BigNumberish,
+    tokenIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    addTokenToSwapList(token: string, overrides?: CallOverrides): Promise<void>;
-
     addressOfIndex(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -316,12 +364,29 @@ export interface MesonPoolsTest extends BaseContract {
     ): Promise<BigNumber>;
 
     deposit(
-      token: string,
       amount: BigNumberish,
+      balanceIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    depositAndRegister(
+      amount: BigNumberish,
+      balanceIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     getCoinType(overrides?: CallOverrides): Promise<string>;
+
+    getLockedSwap(
+      swapId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, number] & {
+        initiator: string;
+        provider: string;
+        until: number;
+      }
+    >;
 
     hasLockedSwap(
       swapId: BytesLike,
@@ -330,41 +395,42 @@ export interface MesonPoolsTest extends BaseContract {
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
 
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
+
     lock(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       domainHash: BytesLike,
-      initiator: string,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registerAddress(
-      index: BigNumberish,
+      initiator: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     release(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       domainHash: BytesLike,
-      initiator: string,
-      recipient: string,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      recipient: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     unlock(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       domainHash: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
     withdraw(
-      token: string,
       amount: BigNumberish,
+      tokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -378,11 +444,6 @@ export interface MesonPoolsTest extends BaseContract {
   };
 
   estimateGas: {
-    addTokenToSwapList(
-      token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     addressOfIndex(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -395,12 +456,23 @@ export interface MesonPoolsTest extends BaseContract {
     ): Promise<BigNumber>;
 
     deposit(
-      token: string,
       amount: BigNumberish,
+      balanceIndex: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    depositAndRegister(
+      amount: BigNumberish,
+      balanceIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     getCoinType(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getLockedSwap(
+      swapId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     hasLockedSwap(
       swapId: BytesLike,
@@ -409,51 +481,47 @@ export interface MesonPoolsTest extends BaseContract {
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<BigNumber>;
+
     lock(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       domainHash: BytesLike,
-      initiator: string,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    registerAddress(
-      index: BigNumberish,
+      initiator: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     release(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       domainHash: BytesLike,
-      initiator: string,
-      recipient: string,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     unlock(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       domainHash: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     withdraw(
-      token: string,
       amount: BigNumberish,
+      tokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    addTokenToSwapList(
-      token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     addressOfIndex(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -466,12 +534,23 @@ export interface MesonPoolsTest extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     deposit(
-      token: string,
       amount: BigNumberish,
+      balanceIndex: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    depositAndRegister(
+      amount: BigNumberish,
+      balanceIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     getCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getLockedSwap(
+      swapId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     hasLockedSwap(
       swapId: BytesLike,
@@ -483,41 +562,45 @@ export interface MesonPoolsTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    indexOfToken(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     lock(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       domainHash: BytesLike,
-      initiator: string,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registerAddress(
-      index: BigNumberish,
+      initiator: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     release(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       domainHash: BytesLike,
-      initiator: string,
-      recipient: string,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     unlock(
-      encodedSwap: BytesLike,
+      encodedSwap: BigNumberish,
       domainHash: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     withdraw(
-      token: string,
       amount: BigNumberish,
+      tokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

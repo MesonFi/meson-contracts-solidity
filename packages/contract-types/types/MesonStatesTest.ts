@@ -7,8 +7,6 @@ import {
   BigNumberish,
   BytesLike,
   CallOverrides,
-  ContractTransaction,
-  Overrides,
   PopulatedTransaction,
   Signer,
   utils,
@@ -19,11 +17,12 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface MesonStatesTestInterface extends utils.Interface {
   functions: {
-    "addressOfIndex(uint32)": FunctionFragment;
+    "addressOfIndex(uint40)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "getCoinType()": FunctionFragment;
     "indexOfAddress(address)": FunctionFragment;
-    "registerAddress(uint32)": FunctionFragment;
+    "indexOfToken(address)": FunctionFragment;
+    "tokenForIndex(uint8)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -43,7 +42,11 @@ export interface MesonStatesTestInterface extends utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "registerAddress",
+    functionFragment: "indexOfToken",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenForIndex",
     values: [BigNumberish]
   ): string;
 
@@ -61,7 +64,11 @@ export interface MesonStatesTestInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "registerAddress",
+    functionFragment: "indexOfToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenForIndex",
     data: BytesLike
   ): Result;
 
@@ -110,10 +117,12 @@ export interface MesonStatesTest extends BaseContract {
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<[number]>;
 
-    registerAddress(
-      index: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<[number]>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
   };
 
   addressOfIndex(
@@ -131,10 +140,12 @@ export interface MesonStatesTest extends BaseContract {
 
   indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
 
-  registerAddress(
-    index: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
+
+  tokenForIndex(
+    tokenIndex: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   callStatic: {
     addressOfIndex(
@@ -152,10 +163,12 @@ export interface MesonStatesTest extends BaseContract {
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
 
-    registerAddress(
-      index: BigNumberish,
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<string>;
   };
 
   filters: {};
@@ -176,9 +189,11 @@ export interface MesonStatesTest extends BaseContract {
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    registerAddress(
-      index: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
@@ -201,9 +216,14 @@ export interface MesonStatesTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    registerAddress(
-      index: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    indexOfToken(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
 }
