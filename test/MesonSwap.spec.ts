@@ -1,4 +1,4 @@
-import { waffle } from 'hardhat'
+import { ethers, waffle } from 'hardhat'
 import { MesonClient, SignedSwapRequest, SignedSwapRelease } from '@mesonfi/sdk'
 import { MockToken, MesonSwapTest } from '@mesonfi/contract-typs'
 
@@ -40,7 +40,8 @@ describe('MesonSwap', () => {
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
-      expect(await mesonInstance.hasSwap(swap.encoded)).to.equal(true)
+      expect(await mesonInstance.swapInitiator(swap.encoded)).to.equal(initiator.address)
+      expect(await mesonInstance.swapProvider(swap.encoded)).to.equal(provider.address)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
     })
 
@@ -71,7 +72,8 @@ describe('MesonSwap', () => {
       signedRelease.checkSignature()
       await lpClient.executeSwap(signedRelease, false)
 
-      expect(await mesonInstance.hasSwap(swap.encoded)).to.equal(false)
+      expect(await mesonInstance.swapInitiator(swap.encoded)).to.equal(ethers.constants.AddressZero)
+      expect(await mesonInstance.swapProvider(swap.encoded)).to.equal(ethers.constants.AddressZero)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.add(swap.amount))
     })

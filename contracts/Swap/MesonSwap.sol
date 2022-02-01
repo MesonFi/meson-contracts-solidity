@@ -11,12 +11,14 @@ import "../utils/MesonStates.sol";
 /// Methods in this class will be executed by users or LPs when
 /// users initiate swaps on the initial chain.
 contract MesonSwap is IMesonSwapEvents, MesonStates {
-  /// @notice swap requests by encodedSwaps, in format of `initiator:uint160|providerIndex:uint40`
+  /// @notice Posted swap requests
+  /// Key: encodedSwap in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:bytes4|outToken:uint8|inToken:uint8`
+  /// Value: in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:bytes4|outToken:uint8|inToken:uint8`
   mapping(uint256 => uint200) internal _swapRequests;
 
   /// @notice xxxx
   /// @dev Designed to be used by users
-  /// @param encodedSwap Packed in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:bytes4|outToken:uint8|inToken:uint8` to save gas
+  /// @param encodedSwap Packed in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:bytes4|outToken:uint8|inToken:uint8`
   function requestSwap(uint256 encodedSwap) external {
     require(_swapRequests[encodedSwap] == 0, "Swap already exists");
 
@@ -31,7 +33,6 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
   /// @notice xxxx
   /// @dev Designed to be used by LPs
-
   function bondSwap(uint256 encodedSwap, uint40 providerIndex) external {
     uint200 req = _swapRequests[encodedSwap];
     require(req != 0, "Swap does not exist");
@@ -50,7 +51,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// After the bonding period expires, other LPs can bond again (wip),
   /// or the user can cancel the swap.
   /// @dev Designed to be used by LPs
-  /// @param encodedSwap The packed swap
+  /// @param encodedSwap Encoded swap
   /// @param r Part of the signature
   /// @param s Part of the signature
   /// @param packedData Packed in format of `v:uint8|initiator:address|providerIndex:uint40` to save gas
@@ -77,7 +78,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
   /// @notice xxxx
   /// @dev Designed to be used by users
-  /// @param encodedSwap The abi encoded swap
+  /// @param encodedSwap Encoded swap
   function _checkSwapRequest(uint256 encodedSwap) internal view
     returns (uint256 amountWithFee, address inToken)
   {
@@ -94,7 +95,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
   /// @notice Cancel a swap
   /// @dev Designed to be used by users
-  /// @param encodedSwap The abi encoded swap
+  /// @param encodedSwap Encoded swap
   function cancelSwap(uint256 encodedSwap) external {
     uint200 req = _swapRequests[encodedSwap];
 
@@ -120,7 +121,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// in `release`.
   /// Otherwise, other people can use the signature to `challenge` the LP.
   /// @dev Designed to be used by the current bonding LP
-  /// @param encodedSwap The abi encoded swap
+  /// @param encodedSwap Encoded swap
   function executeSwap(
     uint256 encodedSwap,
     bytes32 recipientHash,

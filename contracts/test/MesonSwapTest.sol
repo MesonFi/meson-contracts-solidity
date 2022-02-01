@@ -26,8 +26,4 @@ contract MesonSwapTest is MesonSwap {
     addressOfIndex[providerIndex] = provider;
     indexOfAddress[provider] = providerIndex;
   }
-
-  function hasSwap(uint256 encodedSwap) external view returns (bool) {
-    return _swapRequests[encodedSwap] != 0;
-  }
 }
