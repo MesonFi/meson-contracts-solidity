@@ -20,7 +20,7 @@ describe('MesonHelpers', () => {
 
   beforeEach('deploy MesonStatesTest', async () => {
     mesonInstance = await waffle.loadFixture(fixture)
-    const outChain = await mesonInstance.getCoinType()
+    const outChain = await mesonInstance.getShortCoinType()
     mesonClient = await MesonClient.Create(mesonInstance as any)
     swapData = getDefaultSwap({ inToken: 2, outToken: 3 })
     swap = mesonClient.requestSwap(outChain, swapData)
@@ -34,6 +34,7 @@ describe('MesonHelpers', () => {
         swap.expireTs,
         swap.outChain,
         swap.outToken,
+        swap.inChain,
         swap.inToken
       )
 
@@ -44,13 +45,13 @@ describe('MesonHelpers', () => {
   describe('#decodeSwap (from mesonPresets)', () => {
     it('decodes a swap', async () => {
       const decoded = mesonPresets.decodeSwap(swap.encoded)
-
       expect(decoded.amount).to.equal(swap.amount)
       expect(decoded.fee).to.equal(swap.fee)
       expect(decoded.expireTs).to.equal(swap.expireTs)
-      expect(decoded.inToken).to.equal(swap.inToken)
-      expect(decoded.outToken).to.equal(swap.outToken)
       expect(decoded.outChain).to.equal(swap.outChain)
+      expect(decoded.outToken).to.equal(swap.outToken)
+      expect(decoded.inChain).to.equal(swap.inChain)
+      expect(decoded.inToken).to.equal(swap.inToken)
     })
   })
 
@@ -59,8 +60,10 @@ describe('MesonHelpers', () => {
       const decoded = await mesonInstance.decodeSwap(swap.encoded)
       expect(decoded[0]).to.equal(swap.amount)
       expect(decoded[1]).to.equal(swap.expireTs)
-      expect(decoded[2]).to.equal(swap.inToken)
+      expect(decoded[2]).to.equal(swap.outChain)
       expect(decoded[3]).to.equal(swap.outToken)
+      expect(decoded[4]).to.equal(swap.inChain)
+      expect(decoded[5]).to.equal(swap.inToken)
     })
   })
 

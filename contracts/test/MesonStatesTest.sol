@@ -21,8 +21,9 @@ contract MesonStatesTest is MesonStates {
     uint128 amount,
     uint40 fee,
     uint40 expireTs,
-    bytes4 outChain,
+    bytes2 outChain,
     uint8 outToken,
+    bytes2 inChain,
     uint8 inToken
   ) external pure returns (bytes memory) {
     return
@@ -32,17 +33,25 @@ contract MesonStatesTest is MesonStates {
         expireTs,
         outChain,
         outToken,
+        inChain,
         inToken
       );
   }
 
-  function decodeSwap(uint256 encodedSwap) external pure
-    returns (uint128 amount, uint40 expireTs, uint8 inTokenIndex, uint8 outTokenIndex)
-  {
+  function decodeSwap(uint256 encodedSwap) external pure returns (
+    uint128 amount,
+    uint40 expireTs,
+    bytes2 outChain,
+    uint8 outTokenIndex,
+    bytes2 inChain,
+    uint8 inTokenIndex
+  ) {
     amount = uint128(encodedSwap >> 128);
     expireTs = uint40(encodedSwap >> 48);
+    outChain = bytes2(uint16(encodedSwap >> 32));
+    outTokenIndex = uint8(encodedSwap >> 24);
+    inChain = bytes2(uint16(encodedSwap >> 8));
     inTokenIndex = uint8(encodedSwap);
-    outTokenIndex = uint8(encodedSwap >> 8);
   }
 
   function checkRequestSignature(
