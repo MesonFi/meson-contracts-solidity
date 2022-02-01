@@ -5,7 +5,7 @@ import "../Pools/MesonPools.sol";
 
 contract MesonPoolsTest is MesonPools {
   constructor(address token) {
-    _addSupportToken(token, 0);
+    _addSupportToken(token, 1);
   }
 
   function hasLockedSwap(bytes32 swapId) external view returns (bool) {

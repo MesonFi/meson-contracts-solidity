@@ -15,7 +15,7 @@ contract MesonSwapTest is MesonSwap {
           address(this)
         )
       );
-    _addSupportToken(token, 0);
+    _addSupportToken(token, 1);
   }
 
   function register(uint40 providerIndex) external {

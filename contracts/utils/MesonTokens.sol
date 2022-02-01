@@ -17,6 +17,7 @@ contract MesonTokens {
   }
 
   function _addSupportToken(address token, uint8 index) internal {
+    require(index != 0, "Cannot use 0 as token index");
     _supportedTokens[token] = true;
     _indexOfToken[token] = index;
     _tokenList[index] = token;

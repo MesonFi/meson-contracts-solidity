@@ -8,8 +8,8 @@ type OptionalSwapRequestData = {
 }
 
 export function getDefaultSwap({
-  inToken = 0,
-  outToken = 0,
+  inToken = 1,
+  outToken = 1,
   amount = '100',
   fee = '1'
 }: OptionalSwapRequestData = {}): PartialSwapRequest {

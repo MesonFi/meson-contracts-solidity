@@ -23,16 +23,16 @@ describe('MesonSwap', () => {
     unsupportedToken = result.token2.connect(initiator)
     mesonInstance = result.swap // default account is signer
 
-    outChain = await mesonInstance.getCoinType()
     userClient = await MesonClient.Create(mesonInstance) // user is default account
     lpClient = await MesonClient.Create(mesonInstance.connect(provider))
     await lpClient.mesonInstance.register(1)
+    outChain = lpClient.coinType
   })
 
 
   describe('#postSwap', () => {
     it('posts a swap', async () => {
-      const swap = userClient.requestSwap(outChain, getDefaultSwap({ inToken: 0, fee: '0' }))
+      const swap = userClient.requestSwap(outChain, getDefaultSwap({ fee: '0' }))
       const exported = await swap.exportRequest(initiator)
 
       const signedRequest = new SignedSwapRequest(exported)
@@ -45,7 +45,7 @@ describe('MesonSwap', () => {
     })
 
     it('refuses unsupported token', async () => {
-      const swap = userClient.requestSwap(outChain, getDefaultSwap({ inToken: 1, fee: '0' }))
+      const swap = userClient.requestSwap(outChain, getDefaultSwap({ inToken: 2, fee: '0' }))
       const exported = await swap.exportRequest(initiator)
 
       const signedRequest = new SignedSwapRequest(exported)
@@ -57,7 +57,7 @@ describe('MesonSwap', () => {
 
   describe('#executeSwap', () => {
     it('can execute a swap', async () => {
-      const swapData = getDefaultSwap({ inToken: 0, fee: '0' })
+      const swapData = getDefaultSwap({ fee: '0' })
       const swap = userClient.requestSwap(outChain, swapData)
       const exported = await swap.exportRequest(initiator)
       
