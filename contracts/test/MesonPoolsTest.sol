@@ -8,7 +8,7 @@ contract MesonPoolsTest is MesonPools {
     _addSupportToken(token, 1);
   }
 
-  function hasLockedSwap(bytes32 swapId) external view returns (bool) {
-    return _lockedSwaps[swapId] != 0;
+  function hasLockedSwap(uint256 encodedSwap) external view returns (bool) {
+    return _lockedSwaps[encodedSwap] != 0;
   }
 }

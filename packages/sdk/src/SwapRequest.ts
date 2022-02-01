@@ -10,6 +10,7 @@ const swapStruct = [
   { name: 'inToken', type: 'uint8' },
 ]
 export interface SwapRequestData {
+  encoded?: string,
   amount: string,
   fee: string,
   expireTs: number,
@@ -56,7 +57,7 @@ export class SwapRequest implements SwapRequestData {
     this.outToken = data.outToken
   }
 
-  encode(): string {
+  get encoded(): string {
     if (!this._encoded) {
       const types = swapStruct.map(i => i.type)
       const values = swapStruct.map(i => (this as any)[i.name])
@@ -67,6 +68,7 @@ export class SwapRequest implements SwapRequestData {
 
   toObject(): SwapRequestData {
     return {
+      encoded: this.encoded,
       amount: this.amount,
       fee: this.fee,
       expireTs: this.expireTs,

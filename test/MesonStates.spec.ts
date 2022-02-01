@@ -37,13 +37,13 @@ describe('MesonHelpers', () => {
         swap.inToken
       )
 
-      expect(encodedSwapFromContract).to.equal(swap.encode())
+      expect(encodedSwapFromContract).to.equal(swap.encoded)
     })
   })
 
   describe('#decodeSwap (from mesonPresets)', () => {
     it('decodes a swap', async () => {
-      const decoded = mesonPresets.decodeSwap(swap.encode() as string)
+      const decoded = mesonPresets.decodeSwap(swap.encoded)
 
       expect(decoded.amount).to.equal(swap.amount)
       expect(decoded.fee).to.equal(swap.fee)
@@ -54,16 +54,9 @@ describe('MesonHelpers', () => {
     })
   })
 
-  describe('#getSwapId', () => {
-    it('returns same result as js function', async () => {
-      const swapIdFromContract = await mesonInstance.getSwapId(swap.encode())
-      expect(swapIdFromContract).to.equal(swap.swapId)
-    })
-  })
-
   describe('#decodeSwap', () => {
     it('returns decoded swap data', async () => {
-      const decoded = await mesonInstance.decodeSwap(swap.encode())
+      const decoded = await mesonInstance.decodeSwap(swap.encoded)
       expect(decoded[0]).to.equal(swap.amount)
       expect(decoded[1]).to.equal(swap.expireTs)
       expect(decoded[2]).to.equal(swap.inToken)
@@ -74,14 +67,14 @@ describe('MesonHelpers', () => {
   describe('#checkRequestSignature', () => {
     it('validates a request signature', async () => {
       const sigs = await swap.signRequest(wallet)
-      await mesonInstance.checkRequestSignature(swap.swapId, wallet.address, ...sigs)
+      await mesonInstance.checkRequestSignature(swap.encoded, wallet.address, ...sigs)
     })
   })
 
   describe('#checkReleaseSignature', () => {
     it('validates a release signature', async () => {
       const sigs = await swap.signRelease(wallet, swapData.recipient)
-      await mesonInstance.checkReleaseSignature(swap.swapId, swapData.recipient, wallet.address, ...sigs)
+      await mesonInstance.checkReleaseSignature(swap.encoded, swapData.recipient, wallet.address, ...sigs)
     })
   })
 })

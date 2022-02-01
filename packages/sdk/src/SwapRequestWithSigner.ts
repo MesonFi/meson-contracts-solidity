@@ -7,26 +7,23 @@ import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwap'
 
 export class SwapRequestWithSigner extends SwapRequest {
   readonly signer: SwapSigner
-  readonly swapId: string
 
   constructor(req: SwapRequestData, signer: SwapSigner) {
     super(req)
     this.signer = signer
-    this.swapId = signer.hashRequest(this.encode())
   }
 
   async signRequest(wallet: Wallet): Promise<Signature> {
-    return await this.signer.signSwapRequest(this, wallet)
+    return await this.signer.signSwapRequest(this.encoded, wallet)
   }
 
   async signRelease(wallet: Wallet, recipient: string): Promise<Signature> {
-    return await this.signer.signSwapRelease(this.swapId, recipient, wallet)
+    return await this.signer.signSwapRelease(this.encoded, recipient, wallet)
   }
 
   _exportBasics(initiator: string): SignedSwapRequestData {
     return {
       ...super.toObject(),
-      swapId: this.swapId,
       initiator: initiator.toLowerCase(),
       chainId: this.signer.chainId,
       mesonAddress: this.signer.mesonAddress,

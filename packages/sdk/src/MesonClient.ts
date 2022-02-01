@@ -98,7 +98,7 @@ export class MesonClient {
       throw new Error(`Address ${providerAddress} not registered. Please call depositAndRegister first.`)
     }
     return this.mesonInstance.postSwap(
-      signedRequest.encode(),
+      signedRequest.encoded,
       signedRequest.signature[0],
       signedRequest.signature[1],
       pack(['uint8', 'address', 'uint40'], [
@@ -112,8 +112,7 @@ export class MesonClient {
   async lock(signedRequest: SignedSwapRequest) {
     this._check(signedRequest)
     return this.mesonInstance.lock(
-      signedRequest.encode(),
-      signedRequest.domainHash,
+      signedRequest.encoded,
       ...signedRequest.signature,
       signedRequest.initiator
     )
@@ -122,7 +121,7 @@ export class MesonClient {
   async release(signedRelease: SignedSwapRelease) {
     this._check(signedRelease)
     return this.mesonInstance.release(
-      signedRelease.encode(),
+      signedRelease.encoded,
       signedRelease.domainHash,
       ...signedRelease.signature,
       signedRelease.recipient
@@ -132,7 +131,7 @@ export class MesonClient {
   async executeSwap(signedRelease: SignedSwapRelease, depositToPool: boolean = false) {
     this._check(signedRelease)
     return this.mesonInstance.executeSwap(
-      signedRelease.encode(),
+      signedRelease.encoded,
       keccak256(signedRelease.recipient),
       ...signedRelease.signature,
       depositToPool

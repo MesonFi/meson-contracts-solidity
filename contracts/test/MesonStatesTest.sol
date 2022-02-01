@@ -17,10 +17,6 @@ contract MesonStatesTest is MesonStates {
       );
   }
 
-  function getSwapId(uint256 encodedSwap) external view returns (bytes32) {
-    return _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
-  }
-
   function encodeSwap(
     uint128 amount,
     uint40 fee,
@@ -50,23 +46,24 @@ contract MesonStatesTest is MesonStates {
   }
 
   function checkRequestSignature(
-    bytes32 swapId,
+    bytes32 encodedSwap,
     address signer,
     bytes32 r,
     bytes32 s,
     uint8 v
   ) public pure {
-    require(signer == ecrecover(swapId, v, r, s), "invalid signature");
+    bytes32 digest = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", encodedSwap));
+    require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }
 
   function checkReleaseSignature(
-    bytes32 swapId,
+    uint256 encodedSwap,
     address recipient,
     address signer,
     bytes32 r,
     bytes32 s,
     uint8 v
   ) public view {
-    _checkReleaseSignature(swapId, recipient, DOMAIN_SEPARATOR, r, s, v, signer);
+    _checkReleaseSignature(encodedSwap, recipient, DOMAIN_SEPARATOR, r, s, v, signer);
   }
 }

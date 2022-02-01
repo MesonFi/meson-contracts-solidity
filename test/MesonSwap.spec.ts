@@ -40,7 +40,7 @@ describe('MesonSwap', () => {
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
-      expect(await mesonInstance.hasSwap(swap.swapId)).to.equal(true)
+      expect(await mesonInstance.hasSwap(swap.encoded)).to.equal(true)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
     })
 
@@ -71,7 +71,7 @@ describe('MesonSwap', () => {
       signedRelease.checkSignature()
       await lpClient.executeSwap(signedRelease, false)
 
-      expect(await mesonInstance.hasSwap(swap.swapId)).to.equal(false)
+      expect(await mesonInstance.hasSwap(swap.encoded)).to.equal(false)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.add(swap.amount))
     })

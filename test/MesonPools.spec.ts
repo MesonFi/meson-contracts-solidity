@@ -88,7 +88,7 @@ describe('MesonPools', () => {
       await lpClient.lock(signedRequest)
 
       expect(await mesonInstance.balanceOf(lpClient.token(1), initiator.address)).to.equal(0)
-      expect(await mesonInstance.hasLockedSwap(swap.swapId)).to.equal(true)
+      expect(await mesonInstance.hasLockedSwap(swap.encoded)).to.equal(true)
     })
   })
 

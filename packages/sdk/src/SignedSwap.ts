@@ -1,12 +1,13 @@
 import type { Signature } from './SwapSigner'
 
 import { recoverAddress } from '@ethersproject/transactions'
+import { hashMessage } from "@ethersproject/hash";
+import { arrayify } from '@ethersproject/bytes'
 
 import { SwapRequest, SwapRequestData } from './SwapRequest'
 import { SwapSigner } from './SwapSigner'
 
 export interface SignedSwapRequestData extends SwapRequestData {
-  swapId: string,
   initiator: string,
   chainId: number,
   mesonAddress: string,
@@ -18,8 +19,6 @@ export interface SignedSwapReleaseData extends SignedSwapRequestData {
 }
 
 export class SignedSwapRequest extends SwapRequest implements SignedSwapRequestData {
-  readonly swapId: string
-  readonly domainHash: string
   readonly chainId: number
   readonly mesonAddress: string
   readonly initiator: string
@@ -39,8 +38,8 @@ export class SignedSwapRequest extends SwapRequest implements SignedSwapRequestD
   constructor (data: SignedSwapRequestData) {
     super(data)
 
-    if (!data.swapId) {
-      throw new Error('Missing swapId')
+    if (data.encoded !== this.encoded) {
+      throw new Error('Invalid encoded value')
     } else if (!data.chainId) {
       throw new Error('Missing chainId')
     } else if (!data.mesonAddress) {
@@ -50,21 +49,17 @@ export class SignedSwapRequest extends SwapRequest implements SignedSwapRequestD
     } else if (!data.signature) {
       throw new Error('Missing signature')
     }
-    this.swapId = data.swapId
     this.chainId = data.chainId
     this.mesonAddress = data.mesonAddress
     this.initiator = data.initiator
     this.signature = data.signature
 
     this.signer = new SwapSigner(this.mesonAddress, Number(this.chainId))
-    this.domainHash = this.signer.getDomainHash()
-    
-    if (data.swapId !== this.signer.hashRequest(this.encode())) {
-      throw new Error('Invalid swap id')
-    }
   }
 
-  get digest () { return this.swapId }
+  get digest () {
+    return hashMessage(arrayify(this.encoded))
+  }
 
   checkSignature () {
     const [r, s, v] = this.signature
@@ -77,10 +72,9 @@ export class SignedSwapRequest extends SwapRequest implements SignedSwapRequestD
   toObject (): SignedSwapRequestData {
     return {
       ...super.toObject(),
-      swapId: this.swapId,
-      initiator: this.initiator,
       chainId: this.chainId,
       mesonAddress: this.mesonAddress,
+      initiator: this.initiator,
       signature: this.signature,
     }
   }
@@ -88,6 +82,7 @@ export class SignedSwapRequest extends SwapRequest implements SignedSwapRequestD
 
 export class SignedSwapRelease extends SignedSwapRequest implements SignedSwapReleaseData {
   readonly recipient: string;
+  readonly domainHash: string
 
   constructor (data: SignedSwapReleaseData) {
     super(data)
@@ -96,6 +91,7 @@ export class SignedSwapRelease extends SignedSwapRequest implements SignedSwapRe
       throw new Error('Missing recipient')
     }
     this.recipient = data.recipient
+    this.domainHash = this.signer.getDomainHash()
   }
 
   get digest () { return this.signer.hashRelease(this) }

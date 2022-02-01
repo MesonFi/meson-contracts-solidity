@@ -11,35 +11,34 @@ import "../utils/MesonStates.sol";
 /// Methods in this class will be executed by users or LPs when
 /// users initiate swaps on the initial chain.
 contract MesonSwap is IMesonSwapEvents, MesonStates {
-  /// @notice swap requests by swapIds, in format of `initiator:uint160|providerIndex:uint40`
-  mapping(bytes32 => uint200) internal _swapRequests;
+  /// @notice swap requests by encodedSwaps, in format of `initiator:uint160|providerIndex:uint40`
+  mapping(uint256 => uint200) internal _swapRequests;
 
   /// @notice xxxx
   /// @dev Designed to be used by users
   /// @param encodedSwap Packed in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:bytes4|outToken:uint8|inToken:uint8` to save gas
   function requestSwap(uint256 encodedSwap) external {
-    bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
-    require(_swapRequests[swapId] == 0, "Swap already exists");
+    require(_swapRequests[encodedSwap] == 0, "Swap already exists");
 
     address initiator = _msgSender();
-    _swapRequests[swapId] = uint200(uint160(initiator)) << 40;
+    _swapRequests[encodedSwap] = uint200(uint160(initiator)) << 40;
 
     (uint256 amountWithFee, address inToken) = _checkSwapRequest(encodedSwap);
     _unsafeDepositToken(inToken, initiator, amountWithFee);
     
-    emit SwapRequested(swapId);
+    emit SwapRequested(encodedSwap);
   }
 
   /// @notice xxxx
   /// @dev Designed to be used by LPs
 
-  function bondSwap(bytes32 swapId, uint40 providerIndex) external {
-    uint200 req = _swapRequests[swapId];
+  function bondSwap(uint256 encodedSwap, uint40 providerIndex) external {
+    uint200 req = _swapRequests[encodedSwap];
     require(req != 0, "Swap does not exist");
     require(uint40(req) == 0, "Swap bonded to another provider");
 
-    _swapRequests[swapId] = req | providerIndex;
-    emit SwapBonded(swapId);
+    _swapRequests[encodedSwap] = req | providerIndex;
+    emit SwapBonded(encodedSwap);
   }
 
   /// @notice A liquidity provider can call this method to post the swap and bond it
@@ -56,8 +55,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @param s Part of the signature
   /// @param packedData Packed in format of `v:uint8|initiator:address|providerIndex:uint40` to save gas
   function postSwap(uint256 encodedSwap, bytes32 r, bytes32 s, uint208 packedData) external {
-    bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
-    require(_swapRequests[swapId] == 0, "Swap already exists");
+    require(_swapRequests[encodedSwap] == 0, "Swap already exists");
 
     uint8 v;
     address initiator;
@@ -69,13 +67,14 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
       req := mload(32) // load [39:64) which is initiator|providerIndex
     }
 
-    require(initiator == ecrecover(swapId, v, r, s), "Invalid signature");
+    bytes32 digest = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", encodedSwap));
+    require(initiator == ecrecover(digest, v, r, s), "Invalid signature");
 
-    _swapRequests[swapId] = req;
+    _swapRequests[encodedSwap] = req;
     (uint256 amountWithFee, address inToken) = _checkSwapRequest(encodedSwap);
     _unsafeDepositToken(inToken, initiator, amountWithFee);
 
-    emit SwapPosted(swapId);
+    emit SwapPosted(encodedSwap);
   }
 
   /// @notice xxxx
@@ -84,7 +83,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   function _checkSwapRequest(uint256 encodedSwap) internal view
     returns (uint256 amountWithFee, address inToken)
   {
-    amountWithFee = encodedSwap >> 128;
+    amountWithFee = uint256(encodedSwap) >> 128;
     require(amountWithFee > 0, "Swap amount must be greater than zero");
     
     inToken = _tokenList[uint8(encodedSwap)];
@@ -99,8 +98,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @dev Designed to be used by users
   /// @param encodedSwap The abi encoded swap
   function cancelSwap(uint256 encodedSwap) external {
-    bytes32 swapId = _getSwapId(encodedSwap, DOMAIN_SEPARATOR);
-    uint200 req = _swapRequests[swapId];
+    uint200 req = _swapRequests[encodedSwap];
 
     require(req != 0, "Swap does not exist");
     require(uint40(encodedSwap >> 48) < uint40(block.timestamp), "Swap is still locked");
@@ -108,11 +106,11 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     address initiator = address(uint160(req >> 40));
     address inToken = _tokenList[uint8(encodedSwap)];
 
-    _swapRequests[swapId] = 0;
+    _swapRequests[encodedSwap] = 0;
 
     _safeTransfer(inToken, initiator, encodedSwap >> 128);
 
-    emit SwapCancelled(swapId);
+    emit SwapCancelled(encodedSwap);
   }
 
   /// @notice Execute the swap by providing a signature.
@@ -133,13 +131,10 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     uint8 v,
     bool depositToPool
   ) external {
-    bytes32 domainSeparator = DOMAIN_SEPARATOR;
-    bytes32 swapId = _getSwapId(encodedSwap, domainSeparator);
-    uint200 req = _swapRequests[swapId]; // No check here. User should check it before sign for release
+    uint200 req = _swapRequests[encodedSwap]; // No check here. User should check it before sign for release
+    _swapRequests[encodedSwap] = 0;
 
     // TODO: fee to meson protocol
-
-    _swapRequests[swapId] = 0;
 
     if (depositToPool) {
       address initiator;
@@ -152,10 +147,10 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
         amountWithFee := mload(0) // load amount@[16-32)
         balanceIndex := mload(21) // load [47-53) which is inToken|providerIndex
       }
-      _checkReleaseSignatureForHash(swapId, recipientHash, domainSeparator, r, s, v, initiator);
+      _checkReleaseSignatureForHash(encodedSwap, recipientHash, DOMAIN_SEPARATOR, r, s, v, initiator);
       _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amountWithFee);
     } else {
-      _checkReleaseSignatureForHash(swapId, recipientHash, domainSeparator, r, s, v,
+      _checkReleaseSignatureForHash(encodedSwap, recipientHash, DOMAIN_SEPARATOR, r, s, v,
         address(uint160(req >> 40)) // initiator
       );
       _safeTransfer(
@@ -165,12 +160,16 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
       );
     }
 
-    emit SwapExecuted(swapId);
+    emit SwapExecuted(encodedSwap);
   }
 
-  function getSwap(bytes32 swapId) external view returns (address initiator, address provider) {
-    uint200 req = _swapRequests[swapId];
-    provider = addressOfIndex[uint40(req)];
-    initiator = address(uint160(req >> 40));
+  function swapInitiator(uint256 encodedSwap) external view returns (address) {
+    uint200 req = _swapRequests[encodedSwap];
+    return address(uint160(req >> 40));
+  }
+
+  function swapProvider(uint256 encodedSwap) external view returns (address) {
+    uint200 req = _swapRequests[encodedSwap];
+    return addressOfIndex[uint40(req)];
   }
 }
