@@ -25,11 +25,11 @@ async function main() {
 
   // deposits
   const swapAmount = '1000000000'
-  const depositTx1 = await mesonContract.depositAndRegister(tokenContract.address, swapAmount, 1)
+  const depositTx1 = await mesonClient.depositAndRegister(swapAmount, 0, '1')
   getUsedGas('first deposit', depositTx1.hash)
   await depositTx1.wait(1)
 
-  const depositTx2 = await mesonContract.deposit(tokenContract.address, swapAmount)
+  const depositTx2 = await mesonClient.deposit(swapAmount, 0)
   getUsedGas('another deposit', depositTx2.hash)
   await depositTx2.wait(1)
 
