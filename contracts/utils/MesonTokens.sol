@@ -18,7 +18,6 @@ contract MesonTokens {
 
   function _addSupportToken(address token, uint8 index) internal {
     _supportedTokens[token] = true;
-    bytes32 tokenHash = keccak256(abi.encodePacked(token));
     _indexOfToken[token] = index;
     _tokenList[index] = token;
   }

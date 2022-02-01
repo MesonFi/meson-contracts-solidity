@@ -13,21 +13,6 @@ import "../utils/MesonStates.sol";
 contract MesonPools is IMesonPoolsEvents, MesonStates {
   mapping(bytes32 => uint240) internal _lockedSwaps;
 
-  /// @notice Deposit tokens into the liquidity pool. This is the
-  /// prerequisite for LPs if they want to participate in swap
-  /// trades.
-  /// The LP should be careful to make sure the `balanceIndex` is correct.
-  /// Make sure to call `depositAndRegister` first and register a provider index.
-  /// Otherwise, token may be deposited to others.
-  /// @dev Designed to be used by liquidity providers
-  /// @param amount The amount to be added to the pool
-  /// @param balanceIndex `[tokenIndex:uint8][providerIndex:40]
-  function deposit(uint128 amount, uint48 balanceIndex) external {
-    require(amount > 0, 'Amount must be positive');
-    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amount);
-    _unsafeDepositToken(_tokenList[uint8(balanceIndex >> 40)], _msgSender(), uint256(amount));
-  }
-
   function depositAndRegister(uint128 amount, uint48 balanceIndex) external {
     require(amount > 0, 'Amount must be positive');
 
@@ -41,6 +26,21 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amount);
     _unsafeDepositToken(_tokenList[uint8(balanceIndex >> 40)], provider, uint256(amount));
+  }
+
+  /// @notice Deposit tokens into the liquidity pool. This is the
+  /// prerequisite for LPs if they want to participate in swap
+  /// trades.
+  /// The LP should be careful to make sure the `balanceIndex` is correct.
+  /// Make sure to call `depositAndRegister` first and register a provider index.
+  /// Otherwise, token may be deposited to others.
+  /// @dev Designed to be used by liquidity providers
+  /// @param amount The amount to be added to the pool
+  /// @param balanceIndex `[tokenIndex:uint8][providerIndex:uint40]
+  function deposit(uint128 amount, uint48 balanceIndex) external {
+    require(amount > 0, 'Amount must be positive');
+    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amount);
+    _unsafeDepositToken(_tokenList[uint8(balanceIndex >> 40)], _msgSender(), uint256(amount));
   }
 
   /// @notice Withdraw tokens from the liquidity pool. In order to make sure
@@ -69,7 +69,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     bytes32 s,
     uint8 v,
     address initiator
-  ) external override {
+  ) external {
     bytes32 swapId = _getSwapId(encodedSwap, domainHash);
     require(_lockedSwaps[swapId] == 0, "Swap already exists");
     require(initiator == ecrecover(swapId, v, r, s), "Invalid signature");
@@ -96,7 +96,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     emit SwapLocked(swapId);
   }
 
-  function unlock(uint256 encodedSwap, bytes32 domainHash) external override {
+  function unlock(uint256 encodedSwap, bytes32 domainHash) external {
     bytes32 swapId = _getSwapId(encodedSwap, domainHash);
     uint240 lockedSwap = _lockedSwaps[swapId];
     require(lockedSwap != 0, "Swap does not exist");
@@ -125,7 +125,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     bytes32 s,
     uint8 v,
     address recipient
-  ) external override {
+  ) external {
     bytes32 swapId = _getSwapId(encodedSwap, domainHash);
     uint240 lockedSwap = _lockedSwaps[swapId];
     require(lockedSwap != 0, "Swap does not exist");
