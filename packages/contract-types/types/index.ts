@@ -13,7 +13,6 @@ export type { IMesonPoolsEvents } from "./IMesonPoolsEvents";
 export type { MesonPools } from "./MesonPools";
 export type { IMesonSwapEvents } from "./IMesonSwapEvents";
 export type { MesonSwap } from "./MesonSwap";
-export type { MesonHelpersTest } from "./MesonHelpersTest";
 export type { MesonPoolsTest } from "./MesonPoolsTest";
 export type { MesonStatesTest } from "./MesonStatesTest";
 export type { MesonSwapTest } from "./MesonSwapTest";
@@ -35,7 +34,6 @@ export { IMesonPoolsEvents__factory } from "./factories/IMesonPoolsEvents__facto
 export { MesonPools__factory } from "./factories/MesonPools__factory";
 export { IMesonSwapEvents__factory } from "./factories/IMesonSwapEvents__factory";
 export { MesonSwap__factory } from "./factories/MesonSwap__factory";
-export { MesonHelpersTest__factory } from "./factories/MesonHelpersTest__factory";
 export { MesonPoolsTest__factory } from "./factories/MesonPoolsTest__factory";
 export { MesonStatesTest__factory } from "./factories/MesonStatesTest__factory";
 export { MesonSwapTest__factory } from "./factories/MesonSwapTest__factory";

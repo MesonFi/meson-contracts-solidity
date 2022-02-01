@@ -22,6 +22,7 @@ export interface MesonStatesInterface extends utils.Interface {
     "getCoinType()": FunctionFragment;
     "indexOfAddress(address)": FunctionFragment;
     "indexOfToken(address)": FunctionFragment;
+    "supportedTokens()": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
   };
 
@@ -46,6 +47,10 @@ export interface MesonStatesInterface extends utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "supportedTokens",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "tokenForIndex",
     values: [BigNumberish]
   ): string;
@@ -65,6 +70,10 @@ export interface MesonStatesInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "indexOfToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "supportedTokens",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -119,6 +128,10 @@ export interface MesonStates extends BaseContract {
 
     indexOfToken(token: string, overrides?: CallOverrides): Promise<[number]>;
 
+    supportedTokens(
+      overrides?: CallOverrides
+    ): Promise<[string[]] & { tokens: string[] }>;
+
     tokenForIndex(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
@@ -142,6 +155,8 @@ export interface MesonStates extends BaseContract {
 
   indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
 
+  supportedTokens(overrides?: CallOverrides): Promise<string[]>;
+
   tokenForIndex(
     tokenIndex: BigNumberish,
     overrides?: CallOverrides
@@ -164,6 +179,8 @@ export interface MesonStates extends BaseContract {
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
 
     indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
+
+    supportedTokens(overrides?: CallOverrides): Promise<string[]>;
 
     tokenForIndex(
       tokenIndex: BigNumberish,
@@ -190,6 +207,8 @@ export interface MesonStates extends BaseContract {
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     indexOfToken(token: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    supportedTokens(overrides?: CallOverrides): Promise<BigNumber>;
 
     tokenForIndex(
       tokenIndex: BigNumberish,
@@ -220,6 +239,8 @@ export interface MesonStates extends BaseContract {
       token: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    supportedTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     tokenForIndex(
       tokenIndex: BigNumberish,

@@ -30,6 +30,7 @@ export interface MesonPoolsTestInterface extends utils.Interface {
     "indexOfToken(address)": FunctionFragment;
     "lock(uint256,bytes32,bytes32,bytes32,uint8,address)": FunctionFragment;
     "release(uint256,bytes32,bytes32,bytes32,uint8,address)": FunctionFragment;
+    "supportedTokens()": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
     "unlock(uint256,bytes32)": FunctionFragment;
     "withdraw(uint128,uint8)": FunctionFragment;
@@ -94,6 +95,10 @@ export interface MesonPoolsTestInterface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(
+    functionFragment: "supportedTokens",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "tokenForIndex",
     values: [BigNumberish]
   ): string;
@@ -138,6 +143,10 @@ export interface MesonPoolsTestInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "lock", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "supportedTokens",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "tokenForIndex",
     data: BytesLike
@@ -254,6 +263,10 @@ export interface MesonPoolsTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    supportedTokens(
+      overrides?: CallOverrides
+    ): Promise<[string[]] & { tokens: string[] }>;
+
     tokenForIndex(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
@@ -333,6 +346,8 @@ export interface MesonPoolsTest extends BaseContract {
     recipient: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  supportedTokens(overrides?: CallOverrides): Promise<string[]>;
 
   tokenForIndex(
     tokenIndex: BigNumberish,
@@ -416,6 +431,8 @@ export interface MesonPoolsTest extends BaseContract {
       recipient: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    supportedTokens(overrides?: CallOverrides): Promise<string[]>;
 
     tokenForIndex(
       tokenIndex: BigNumberish,
@@ -503,6 +520,8 @@ export interface MesonPoolsTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    supportedTokens(overrides?: CallOverrides): Promise<BigNumber>;
+
     tokenForIndex(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
@@ -586,6 +605,8 @@ export interface MesonPoolsTest extends BaseContract {
       recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    supportedTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     tokenForIndex(
       tokenIndex: BigNumberish,

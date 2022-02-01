@@ -30,6 +30,7 @@ export interface MesonSwapInterface extends utils.Interface {
     "indexOfToken(address)": FunctionFragment;
     "postSwap(uint256,bytes32,bytes32,uint208)": FunctionFragment;
     "requestSwap(uint256)": FunctionFragment;
+    "supportedTokens()": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
   };
 
@@ -82,6 +83,10 @@ export interface MesonSwapInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "supportedTokens",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "tokenForIndex",
     values: [BigNumberish]
   ): string;
@@ -113,6 +118,10 @@ export interface MesonSwapInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "postSwap", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "requestSwap",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "supportedTokens",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -238,6 +247,10 @@ export interface MesonSwap extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    supportedTokens(
+      overrides?: CallOverrides
+    ): Promise<[string[]] & { tokens: string[] }>;
+
     tokenForIndex(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
@@ -300,6 +313,8 @@ export interface MesonSwap extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  supportedTokens(overrides?: CallOverrides): Promise<string[]>;
+
   tokenForIndex(
     tokenIndex: BigNumberish,
     overrides?: CallOverrides
@@ -361,6 +376,8 @@ export interface MesonSwap extends BaseContract {
       encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    supportedTokens(overrides?: CallOverrides): Promise<string[]>;
 
     tokenForIndex(
       tokenIndex: BigNumberish,
@@ -439,6 +456,8 @@ export interface MesonSwap extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    supportedTokens(overrides?: CallOverrides): Promise<BigNumber>;
+
     tokenForIndex(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
@@ -507,6 +526,8 @@ export interface MesonSwap extends BaseContract {
       encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    supportedTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     tokenForIndex(
       tokenIndex: BigNumberish,
