@@ -109,11 +109,12 @@ export class MesonPresets {
     const amount = BigNumber.from(`0x${encoded.substring(2, 34)}`).toString()
     const fee = BigNumber.from(`0x${encoded.substring(34, 44)}`).toString()
     const expireTs = parseInt(`0x${encoded.substring(44, 54)}`, 16)
-    const outChain = `0x${encoded.substring(54, 62)}`
-    const outToken = parseInt(`0x${encoded.substring(62, 64)}`, 16)
+    const outChain = `0x${encoded.substring(54, 58)}`
+    const outToken = parseInt(`0x${encoded.substring(58, 60)}`, 16)
+    const inChain = `0x${encoded.substring(60, 64)}`
     const inToken = parseInt(`0x${encoded.substring(64, 66)}`, 16)
 
-    return { inChain: '', inToken, amount, fee, expireTs, outChain, outToken }
+    return { inChain, inToken, amount, fee, expireTs, outChain, outToken }
   }
 
   getClient(id: string, provider: Provider, Contract = EthersContract): MesonClient {
