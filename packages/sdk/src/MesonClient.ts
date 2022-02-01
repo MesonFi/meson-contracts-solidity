@@ -51,6 +51,21 @@ export class MesonClient {
     }
   }
 
+  async depositAndRegister(amount: string, tokenIndex: number, providerIndex: string) {
+    const balanceIndex = pack(['uint8', 'uint40'], [tokenIndex, providerIndex])
+    return this.mesonInstance.depositAndRegister(amount, balanceIndex)
+  }
+
+  async deposit(amount: string, tokenIndex: number) {
+    const providerAddress = await this.mesonInstance.signer.getAddress()
+    const providerIndex = await this.mesonInstance.indexOfAddress(providerAddress)
+    if (!providerIndex) {
+      throw new Error(`Address ${providerAddress} not registered. Please call depositAndRegister first.`)
+    }
+    const balanceIndex = pack(['uint8', 'uint40'], [tokenIndex, providerIndex])
+    return this.mesonInstance.deposit(amount, balanceIndex)
+  }
+
   async postSwap(signedRequest: SignedSwapRequest) {
     this._check(signedRequest)
     const providerAddress = await this.mesonInstance.signer.getAddress()
