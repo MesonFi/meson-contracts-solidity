@@ -22,7 +22,7 @@ export interface MesonStatesTestInterface extends utils.Interface {
     "checkReleaseSignature(uint256,address,bytes32,bytes32,uint8,address)": FunctionFragment;
     "checkRequestSignature(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
     "decodeSwap(uint256)": FunctionFragment;
-    "encodeSwap(uint128,uint40,uint40,bytes2,uint8,bytes2,uint8)": FunctionFragment;
+    "encodeSwap(uint96,uint32,uint40,uint40,bytes2,uint8,bytes2,uint8)": FunctionFragment;
     "getShortCoinType()": FunctionFragment;
     "indexOfAddress(address)": FunctionFragment;
     "indexOfToken(address)": FunctionFragment;
@@ -53,6 +53,7 @@ export interface MesonStatesTestInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "encodeSwap",
     values: [
+      BigNumberish,
       BigNumberish,
       BigNumberish,
       BigNumberish,
@@ -183,8 +184,9 @@ export interface MesonStatesTest extends BaseContract {
       encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, number, string, number, string, number] & {
+      [BigNumber, number, number, string, number, string, number] & {
         amount: BigNumber;
+        salt: number;
         expireTs: number;
         outChain: string;
         outTokenIndex: number;
@@ -195,6 +197,7 @@ export interface MesonStatesTest extends BaseContract {
 
     encodeSwap(
       amount: BigNumberish,
+      salt: BigNumberish,
       fee: BigNumberish,
       expireTs: BigNumberish,
       outChain: BytesLike,
@@ -254,8 +257,9 @@ export interface MesonStatesTest extends BaseContract {
     encodedSwap: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, number, string, number, string, number] & {
+    [BigNumber, number, number, string, number, string, number] & {
       amount: BigNumber;
+      salt: number;
       expireTs: number;
       outChain: string;
       outTokenIndex: number;
@@ -266,6 +270,7 @@ export interface MesonStatesTest extends BaseContract {
 
   encodeSwap(
     amount: BigNumberish,
+    salt: BigNumberish,
     fee: BigNumberish,
     expireTs: BigNumberish,
     outChain: BytesLike,
@@ -323,8 +328,9 @@ export interface MesonStatesTest extends BaseContract {
       encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, number, string, number, string, number] & {
+      [BigNumber, number, number, string, number, string, number] & {
         amount: BigNumber;
+        salt: number;
         expireTs: number;
         outChain: string;
         outTokenIndex: number;
@@ -335,6 +341,7 @@ export interface MesonStatesTest extends BaseContract {
 
     encodeSwap(
       amount: BigNumberish,
+      salt: BigNumberish,
       fee: BigNumberish,
       expireTs: BigNumberish,
       outChain: BytesLike,
@@ -398,6 +405,7 @@ export interface MesonStatesTest extends BaseContract {
 
     encodeSwap(
       amount: BigNumberish,
+      salt: BigNumberish,
       fee: BigNumberish,
       expireTs: BigNumberish,
       outChain: BytesLike,
@@ -459,6 +467,7 @@ export interface MesonStatesTest extends BaseContract {
 
     encodeSwap(
       amount: BigNumberish,
+      salt: BigNumberish,
       fee: BigNumberish,
       expireTs: BigNumberish,
       outChain: BytesLike,
