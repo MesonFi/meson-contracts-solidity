@@ -15,9 +15,9 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-        internalType: "bytes32",
-        name: "swapId",
-        type: "bytes32",
+        internalType: "uint256",
+        name: "encodedSwap",
+        type: "uint256",
       },
     ],
     name: "SwapBonded",
@@ -28,9 +28,9 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-        internalType: "bytes32",
-        name: "swapId",
-        type: "bytes32",
+        internalType: "uint256",
+        name: "encodedSwap",
+        type: "uint256",
       },
     ],
     name: "SwapCancelled",
@@ -41,22 +41,9 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-        internalType: "bytes32",
-        name: "swapId",
-        type: "bytes32",
-      },
-    ],
-    name: "SwapExecuted",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "bytes32",
-        name: "swapId",
-        type: "bytes32",
+        internalType: "uint256",
+        name: "encodedSwap",
+        type: "uint256",
       },
     ],
     name: "SwapPosted",
@@ -67,9 +54,9 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-        internalType: "bytes32",
-        name: "swapId",
-        type: "bytes32",
+        internalType: "uint256",
+        name: "encodedSwap",
+        type: "uint256",
       },
     ],
     name: "SwapRequested",

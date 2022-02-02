@@ -15,9 +15,9 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-        internalType: "bytes32",
-        name: "swapId",
-        type: "bytes32",
+        internalType: "uint256",
+        name: "encodedSwap",
+        type: "uint256",
       },
     ],
     name: "SwapLocked",
@@ -28,9 +28,9 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-        internalType: "bytes32",
-        name: "swapId",
-        type: "bytes32",
+        internalType: "uint256",
+        name: "encodedSwap",
+        type: "uint256",
       },
     ],
     name: "SwapReleased",

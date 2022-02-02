@@ -21,23 +21,24 @@ export interface MesonInterface extends utils.Interface {
   functions: {
     "addressOfIndex(uint40)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
-    "bondSwap(bytes32,uint40)": FunctionFragment;
+    "bondSwap(uint256,uint40)": FunctionFragment;
     "cancelSwap(uint256)": FunctionFragment;
     "deposit(uint128,uint48)": FunctionFragment;
     "depositAndRegister(uint128,uint48)": FunctionFragment;
     "executeSwap(uint256,bytes32,bytes32,bytes32,uint8,bool)": FunctionFragment;
-    "getCoinType()": FunctionFragment;
-    "getLockedSwap(bytes32)": FunctionFragment;
-    "getSwap(bytes32)": FunctionFragment;
+    "getLockedSwap(uint256)": FunctionFragment;
+    "getShortCoinType()": FunctionFragment;
     "indexOfAddress(address)": FunctionFragment;
     "indexOfToken(address)": FunctionFragment;
-    "lock(uint256,bytes32,bytes32,bytes32,uint8,address)": FunctionFragment;
+    "lock(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
     "postSwap(uint256,bytes32,bytes32,uint208)": FunctionFragment;
-    "release(uint256,bytes32,bytes32,bytes32,uint8,address)": FunctionFragment;
+    "release(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
     "requestSwap(uint256)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
+    "swapInitiator(uint256)": FunctionFragment;
+    "swapProvider(uint256)": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
-    "unlock(uint256,bytes32)": FunctionFragment;
+    "unlock(uint256)": FunctionFragment;
     "withdraw(uint128,uint8)": FunctionFragment;
   };
 
@@ -51,7 +52,7 @@ export interface MesonInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "bondSwap",
-    values: [BytesLike, BigNumberish]
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "cancelSwap",
@@ -77,14 +78,13 @@ export interface MesonInterface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "getCoinType",
-    values?: undefined
+    functionFragment: "getLockedSwap",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getLockedSwap",
-    values: [BytesLike]
+    functionFragment: "getShortCoinType",
+    values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "getSwap", values: [BytesLike]): string;
   encodeFunctionData(
     functionFragment: "indexOfAddress",
     values: [string]
@@ -95,14 +95,7 @@ export interface MesonInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "lock",
-    values: [
-      BigNumberish,
-      BytesLike,
-      BytesLike,
-      BytesLike,
-      BigNumberish,
-      string
-    ]
+    values: [BigNumberish, BytesLike, BytesLike, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "postSwap",
@@ -110,14 +103,7 @@ export interface MesonInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "release",
-    values: [
-      BigNumberish,
-      BytesLike,
-      BytesLike,
-      BytesLike,
-      BigNumberish,
-      string
-    ]
+    values: [BigNumberish, BytesLike, BytesLike, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "requestSwap",
@@ -128,12 +114,20 @@ export interface MesonInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "swapInitiator",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "swapProvider",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "tokenForIndex",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "unlock",
-    values: [BigNumberish, BytesLike]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "withdraw",
@@ -157,14 +151,13 @@ export interface MesonInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getCoinType",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "getLockedSwap",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getSwap", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getShortCoinType",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "indexOfAddress",
     data: BytesLike
@@ -185,6 +178,14 @@ export interface MesonInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "swapInitiator",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "swapProvider",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "tokenForIndex",
     data: BytesLike
   ): Result;
@@ -192,49 +193,61 @@ export interface MesonInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
-    "SwapBonded(bytes32)": EventFragment;
-    "SwapCancelled(bytes32)": EventFragment;
-    "SwapExecuted(bytes32)": EventFragment;
-    "SwapLocked(bytes32)": EventFragment;
-    "SwapPosted(bytes32)": EventFragment;
-    "SwapReleased(bytes32)": EventFragment;
-    "SwapRequested(bytes32)": EventFragment;
+    "SwapBonded(uint256)": EventFragment;
+    "SwapCancelled(uint256)": EventFragment;
+    "SwapLocked(uint256)": EventFragment;
+    "SwapPosted(uint256)": EventFragment;
+    "SwapReleased(uint256)": EventFragment;
+    "SwapRequested(uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "SwapBonded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SwapCancelled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SwapExecuted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SwapLocked"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SwapPosted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SwapReleased"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SwapRequested"): EventFragment;
 }
 
-export type SwapBondedEvent = TypedEvent<[string], { swapId: string }>;
+export type SwapBondedEvent = TypedEvent<
+  [BigNumber],
+  { encodedSwap: BigNumber }
+>;
 
 export type SwapBondedEventFilter = TypedEventFilter<SwapBondedEvent>;
 
-export type SwapCancelledEvent = TypedEvent<[string], { swapId: string }>;
+export type SwapCancelledEvent = TypedEvent<
+  [BigNumber],
+  { encodedSwap: BigNumber }
+>;
 
 export type SwapCancelledEventFilter = TypedEventFilter<SwapCancelledEvent>;
 
-export type SwapExecutedEvent = TypedEvent<[string], { swapId: string }>;
-
-export type SwapExecutedEventFilter = TypedEventFilter<SwapExecutedEvent>;
-
-export type SwapLockedEvent = TypedEvent<[string], { swapId: string }>;
+export type SwapLockedEvent = TypedEvent<
+  [BigNumber],
+  { encodedSwap: BigNumber }
+>;
 
 export type SwapLockedEventFilter = TypedEventFilter<SwapLockedEvent>;
 
-export type SwapPostedEvent = TypedEvent<[string], { swapId: string }>;
+export type SwapPostedEvent = TypedEvent<
+  [BigNumber],
+  { encodedSwap: BigNumber }
+>;
 
 export type SwapPostedEventFilter = TypedEventFilter<SwapPostedEvent>;
 
-export type SwapReleasedEvent = TypedEvent<[string], { swapId: string }>;
+export type SwapReleasedEvent = TypedEvent<
+  [BigNumber],
+  { encodedSwap: BigNumber }
+>;
 
 export type SwapReleasedEventFilter = TypedEventFilter<SwapReleasedEvent>;
 
-export type SwapRequestedEvent = TypedEvent<[string], { swapId: string }>;
+export type SwapRequestedEvent = TypedEvent<
+  [BigNumber],
+  { encodedSwap: BigNumber }
+>;
 
 export type SwapRequestedEventFilter = TypedEventFilter<SwapRequestedEvent>;
 
@@ -277,7 +290,7 @@ export interface Meson extends BaseContract {
     ): Promise<[BigNumber]>;
 
     bondSwap(
-      swapId: BytesLike,
+      encodedSwap: BigNumberish,
       providerIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -309,10 +322,8 @@ export interface Meson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getCoinType(overrides?: CallOverrides): Promise<[string]>;
-
     getLockedSwap(
-      swapId: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
       [string, string, number] & {
@@ -322,10 +333,7 @@ export interface Meson extends BaseContract {
       }
     >;
 
-    getSwap(
-      swapId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[string, string] & { initiator: string; provider: string }>;
+    getShortCoinType(overrides?: CallOverrides): Promise<[string]>;
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<[number]>;
 
@@ -333,7 +341,6 @@ export interface Meson extends BaseContract {
 
     lock(
       encodedSwap: BigNumberish,
-      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -351,7 +358,6 @@ export interface Meson extends BaseContract {
 
     release(
       encodedSwap: BigNumberish,
-      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -368,6 +374,16 @@ export interface Meson extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string[]] & { tokens: string[] }>;
 
+    swapInitiator(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    swapProvider(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     tokenForIndex(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
@@ -375,7 +391,6 @@ export interface Meson extends BaseContract {
 
     unlock(
       encodedSwap: BigNumberish,
-      domainHash: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -398,7 +413,7 @@ export interface Meson extends BaseContract {
   ): Promise<BigNumber>;
 
   bondSwap(
-    swapId: BytesLike,
+    encodedSwap: BigNumberish,
     providerIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -430,10 +445,8 @@ export interface Meson extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getCoinType(overrides?: CallOverrides): Promise<string>;
-
   getLockedSwap(
-    swapId: BytesLike,
+    encodedSwap: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
     [string, string, number] & {
@@ -443,10 +456,7 @@ export interface Meson extends BaseContract {
     }
   >;
 
-  getSwap(
-    swapId: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<[string, string] & { initiator: string; provider: string }>;
+  getShortCoinType(overrides?: CallOverrides): Promise<string>;
 
   indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
 
@@ -454,7 +464,6 @@ export interface Meson extends BaseContract {
 
   lock(
     encodedSwap: BigNumberish,
-    domainHash: BytesLike,
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
@@ -472,7 +481,6 @@ export interface Meson extends BaseContract {
 
   release(
     encodedSwap: BigNumberish,
-    domainHash: BytesLike,
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
@@ -487,6 +495,16 @@ export interface Meson extends BaseContract {
 
   supportedTokens(overrides?: CallOverrides): Promise<string[]>;
 
+  swapInitiator(
+    encodedSwap: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  swapProvider(
+    encodedSwap: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   tokenForIndex(
     tokenIndex: BigNumberish,
     overrides?: CallOverrides
@@ -494,7 +512,6 @@ export interface Meson extends BaseContract {
 
   unlock(
     encodedSwap: BigNumberish,
-    domainHash: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -517,7 +534,7 @@ export interface Meson extends BaseContract {
     ): Promise<BigNumber>;
 
     bondSwap(
-      swapId: BytesLike,
+      encodedSwap: BigNumberish,
       providerIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -549,10 +566,8 @@ export interface Meson extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    getCoinType(overrides?: CallOverrides): Promise<string>;
-
     getLockedSwap(
-      swapId: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
       [string, string, number] & {
@@ -562,10 +577,7 @@ export interface Meson extends BaseContract {
       }
     >;
 
-    getSwap(
-      swapId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[string, string] & { initiator: string; provider: string }>;
+    getShortCoinType(overrides?: CallOverrides): Promise<string>;
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
 
@@ -573,7 +585,6 @@ export interface Meson extends BaseContract {
 
     lock(
       encodedSwap: BigNumberish,
-      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -591,7 +602,6 @@ export interface Meson extends BaseContract {
 
     release(
       encodedSwap: BigNumberish,
-      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -606,16 +616,22 @@ export interface Meson extends BaseContract {
 
     supportedTokens(overrides?: CallOverrides): Promise<string[]>;
 
+    swapInitiator(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    swapProvider(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     tokenForIndex(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    unlock(
-      encodedSwap: BigNumberish,
-      domainHash: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    unlock(encodedSwap: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
     withdraw(
       amount: BigNumberish,
@@ -625,26 +641,23 @@ export interface Meson extends BaseContract {
   };
 
   filters: {
-    "SwapBonded(bytes32)"(swapId?: null): SwapBondedEventFilter;
-    SwapBonded(swapId?: null): SwapBondedEventFilter;
+    "SwapBonded(uint256)"(encodedSwap?: null): SwapBondedEventFilter;
+    SwapBonded(encodedSwap?: null): SwapBondedEventFilter;
 
-    "SwapCancelled(bytes32)"(swapId?: null): SwapCancelledEventFilter;
-    SwapCancelled(swapId?: null): SwapCancelledEventFilter;
+    "SwapCancelled(uint256)"(encodedSwap?: null): SwapCancelledEventFilter;
+    SwapCancelled(encodedSwap?: null): SwapCancelledEventFilter;
 
-    "SwapExecuted(bytes32)"(swapId?: null): SwapExecutedEventFilter;
-    SwapExecuted(swapId?: null): SwapExecutedEventFilter;
+    "SwapLocked(uint256)"(encodedSwap?: null): SwapLockedEventFilter;
+    SwapLocked(encodedSwap?: null): SwapLockedEventFilter;
 
-    "SwapLocked(bytes32)"(swapId?: null): SwapLockedEventFilter;
-    SwapLocked(swapId?: null): SwapLockedEventFilter;
+    "SwapPosted(uint256)"(encodedSwap?: null): SwapPostedEventFilter;
+    SwapPosted(encodedSwap?: null): SwapPostedEventFilter;
 
-    "SwapPosted(bytes32)"(swapId?: null): SwapPostedEventFilter;
-    SwapPosted(swapId?: null): SwapPostedEventFilter;
+    "SwapReleased(uint256)"(encodedSwap?: null): SwapReleasedEventFilter;
+    SwapReleased(encodedSwap?: null): SwapReleasedEventFilter;
 
-    "SwapReleased(bytes32)"(swapId?: null): SwapReleasedEventFilter;
-    SwapReleased(swapId?: null): SwapReleasedEventFilter;
-
-    "SwapRequested(bytes32)"(swapId?: null): SwapRequestedEventFilter;
-    SwapRequested(swapId?: null): SwapRequestedEventFilter;
+    "SwapRequested(uint256)"(encodedSwap?: null): SwapRequestedEventFilter;
+    SwapRequested(encodedSwap?: null): SwapRequestedEventFilter;
   };
 
   estimateGas: {
@@ -660,7 +673,7 @@ export interface Meson extends BaseContract {
     ): Promise<BigNumber>;
 
     bondSwap(
-      swapId: BytesLike,
+      encodedSwap: BigNumberish,
       providerIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -692,14 +705,12 @@ export interface Meson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getCoinType(overrides?: CallOverrides): Promise<BigNumber>;
-
     getLockedSwap(
-      swapId: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getSwap(swapId: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+    getShortCoinType(overrides?: CallOverrides): Promise<BigNumber>;
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -707,7 +718,6 @@ export interface Meson extends BaseContract {
 
     lock(
       encodedSwap: BigNumberish,
-      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -725,7 +735,6 @@ export interface Meson extends BaseContract {
 
     release(
       encodedSwap: BigNumberish,
-      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -740,6 +749,16 @@ export interface Meson extends BaseContract {
 
     supportedTokens(overrides?: CallOverrides): Promise<BigNumber>;
 
+    swapInitiator(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    swapProvider(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     tokenForIndex(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
@@ -747,7 +766,6 @@ export interface Meson extends BaseContract {
 
     unlock(
       encodedSwap: BigNumberish,
-      domainHash: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -771,7 +789,7 @@ export interface Meson extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     bondSwap(
-      swapId: BytesLike,
+      encodedSwap: BigNumberish,
       providerIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -803,17 +821,12 @@ export interface Meson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    getCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     getLockedSwap(
-      swapId: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getSwap(
-      swapId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    getShortCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     indexOfAddress(
       arg0: string,
@@ -827,7 +840,6 @@ export interface Meson extends BaseContract {
 
     lock(
       encodedSwap: BigNumberish,
-      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -845,7 +857,6 @@ export interface Meson extends BaseContract {
 
     release(
       encodedSwap: BigNumberish,
-      domainHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -860,6 +871,16 @@ export interface Meson extends BaseContract {
 
     supportedTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    swapInitiator(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    swapProvider(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     tokenForIndex(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
@@ -867,7 +888,6 @@ export interface Meson extends BaseContract {
 
     unlock(
       encodedSwap: BigNumberish,
-      domainHash: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
