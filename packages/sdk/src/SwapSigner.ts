@@ -12,7 +12,7 @@ export class SwapSigner {
 
   constructor() {}
 
-  async getAddress(): Promise<string> {
+  getAddress(): string {
     throw new Error('Not implemented')
   }
 
@@ -54,44 +54,6 @@ export class SwapSigner {
   }
 }
 
-export class JsonRpcSwapSigner extends SwapSigner {
-  readonly ethereum: any
-
-  constructor (ethereum: any) {
-    super()
-    this.ethereum = ethereum
-  }
-
-  async getAddress(): Promise<string> {
-    return ''
-  }
-
-  async signSwapRequest(encoded: string): Promise<Signature> {
-    const initiator = await this.getAddress()
-    const message = [
-      { type: 'bytes32', name: NOTICE_SIGN_REQUEST, value: encoded },
-    ]
-    const signature = await this.ethereum.request({
-      method: 'eth_signTypedData',
-      params: [message, initiator],
-    })
-    return this._separateSignature(signature)
-  }
-
-  async signSwapRelease(encoded: string, recipient: string): Promise<Signature> {
-    const initiator = await this.getAddress()
-    const message = [
-      { type: 'bytes32', name: NOTICE_SIGN_REQUEST, value: encoded },
-      { type: 'bytes32', name: 'Recipient hash', value: keccak256(recipient) },
-    ]
-    const signature = await this.ethereum.request({
-      method: 'eth_signTypedData',
-      params: [message, initiator],
-    })
-    return this._separateSignature(signature)
-  }
-}
-
 export class EthersWalletSwapSigner extends SwapSigner {
   readonly wallet: Wallet
 
@@ -100,7 +62,7 @@ export class EthersWalletSwapSigner extends SwapSigner {
     this.wallet = wallet
   }
 
-  async getAddress(): Promise<string> {
+  getAddress(): string {
     return this.wallet.address
   }
 
@@ -114,5 +76,39 @@ export class EthersWalletSwapSigner extends SwapSigner {
     const digest = SwapSigner.hashRelease(encoded, recipient)
     const signature = await this.wallet._signingKey().signDigest(digest)
     return [signature.r, signature.s, signature.v]
+  }
+}
+
+
+type RemoteSigner = {
+  getAddress: () => string
+  signTypedData: (data: any) => Promise<string>
+}
+
+export class RemoteSwapSigner extends SwapSigner {
+  readonly remoteSigner: RemoteSigner
+
+  constructor (remoteSigner: RemoteSigner) {
+    super()
+    this.remoteSigner = remoteSigner
+  }
+
+  getAddress(): string {
+    return this.remoteSigner.getAddress()
+  }
+
+  async signSwapRequest(encoded: string): Promise<Signature> {
+    const data = [{ type: 'bytes32', name: NOTICE_SIGN_REQUEST, value: encoded }]
+    const signature = await this.remoteSigner.signTypedData(data)
+    return this._separateSignature(signature)
+  }
+
+  async signSwapRelease(encoded: string, recipient: string): Promise<Signature> {
+    const data = [
+      { type: 'bytes32', name: NOTICE_SIGN_REQUEST, value: encoded },
+      { type: 'bytes32', name: 'Recipient hash', value: keccak256(recipient) },
+    ]
+    const signature = await this.remoteSigner.signTypedData(data)
+    return this._separateSignature(signature)
   }
 }

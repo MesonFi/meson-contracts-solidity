@@ -4,23 +4,23 @@ import { SwapSigner } from './SwapSigner'
 import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwap'
 
 export class SwapWithSigner extends Swap {
-  readonly signer: SwapSigner
+  readonly swapSigner: SwapSigner
 
-  constructor(req: SwapData, signer: SwapSigner) {
+  constructor(req: SwapData, swapSigner: SwapSigner) {
     super(req)
-    this.signer = signer
+    this.swapSigner = swapSigner
   }
 
   async signRequest(): Promise<Signature> {
-    return await this.signer.signSwapRequest(this.encoded)
+    return await this.swapSigner.signSwapRequest(this.encoded)
   }
 
   async signRelease(recipient: string): Promise<Signature> {
-    return await this.signer.signSwapRelease(this.encoded, recipient)
+    return await this.swapSigner.signSwapRelease(this.encoded, recipient)
   }
 
   async exportRequest(): Promise<SignedSwapRequestData> {
-    const initiator = await this.signer.getAddress()
+    const initiator = this.swapSigner.getAddress()
     const signature = await this.signRequest()
     return {
       ...this.toObject(),
@@ -30,7 +30,7 @@ export class SwapWithSigner extends Swap {
   }
 
   async exportRelease(recipient: string): Promise<SignedSwapReleaseData> {
-    const initiator = await this.signer.getAddress()
+    const initiator = this.swapSigner.getAddress()
     const signature = await this.signRelease(recipient)
     return {
       ...this.toObject(),
