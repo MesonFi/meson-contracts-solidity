@@ -32,32 +32,23 @@ export class SwapSigner {
   }
 
   static hashRequest(encoded: string): string {
-    const domainHash = keccak256(pack(
-      ['string', 'string'],
-      ['string Notice', 'bytes32 Encoded swap']
-    ))
+    const domainHash = keccak256(pack(['string'], [`bytes32 ${NOTICE_SIGN_REQUEST}`]))
     return keccak256(pack(
       ['bytes32', 'bytes32'],
-      [
-        domainHash,
-        keccak256(pack(['string', 'bytes32'], [NOTICE_SIGN_REQUEST, encoded])),
-      ],
+      [domainHash, keccak256(encoded)],
     ))
   }
 
   static hashRelease(encoded: string, recipient: string): string {
     const domainHash = keccak256(pack(
-      ['string', 'string', 'string'],
-      ['string Notice', 'bytes32 Encoded swap', 'bytes32 Recipient']
+      ['string', 'string'],
+      [`bytes32 ${NOTICE_SIGN_RELEASE}`, 'bytes32 Recipient hash']
     ))
     return keccak256(pack(
       ['bytes32', 'bytes32'],
       [
         domainHash,
-        keccak256(pack(
-          ['string', 'bytes32', 'bytes32'],
-          [NOTICE_SIGN_RELEASE, encoded, keccak256(recipient)]
-        )),
+        keccak256(pack(['bytes32', 'bytes32'], [encoded, keccak256(recipient)])),
       ],
     ))
   }
@@ -78,8 +69,7 @@ export class JsonRpcSwapSigner extends SwapSigner {
   async signSwapRequest(encoded: string): Promise<Signature> {
     const initiator = await this.getAddress()
     const message = [
-      { type: 'string', name: 'Notice', value: NOTICE_SIGN_REQUEST },
-      { type: 'bytes32', name: 'Encoded swap', value: encoded },
+      { type: 'bytes32', name: NOTICE_SIGN_REQUEST, value: encoded },
     ]
     const signature = await this.ethereum.request({
       method: 'eth_signTypedData',
@@ -91,9 +81,8 @@ export class JsonRpcSwapSigner extends SwapSigner {
   async signSwapRelease(encoded: string, recipient: string): Promise<Signature> {
     const initiator = await this.getAddress()
     const message = [
-      { type: 'string', name: 'Notice', value: NOTICE_SIGN_REQUEST },
-      { type: 'bytes32', name: 'Encoded swap', value: encoded },
-      { type: 'bytes32', name: 'Recipient', value: keccak256(recipient) },
+      { type: 'bytes32', name: NOTICE_SIGN_REQUEST, value: encoded },
+      { type: 'bytes32', name: 'Recipient hash', value: keccak256(recipient) },
     ]
     const signature = await this.ethereum.request({
       method: 'eth_signTypedData',

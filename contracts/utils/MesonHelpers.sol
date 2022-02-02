@@ -41,11 +41,15 @@ contract MesonHelpers is MesonConfig {
     address signer
   ) internal view {
     require(signer != address(0), "Signer cannot be empty address");
-    bytes32 digest = keccak256(abi.encodePacked(
-      // next hash = keccak256(abi.encodePacked("string Notice", "bytes32 Encoded swap"))
-      bytes32(0x1a76b359431334e60d4633af81b46702f12477315b8286fa908e623614d1d0bc),
-      keccak256(abi.encodePacked("Sign to request a swap on Meson", encodedSwap))
-    ));
+    bytes32 digest;
+    assembly {
+      mstore(0, encodedSwap)
+      mstore(0x20, keccak256(0, 0x20))
+
+      // The HEX string below is keccak256("bytes32 Sign to request a swap on Meson")
+      mstore(0, 0x9862d877599564bcd97c37305a7b0fdbe621d9c2a125026f2ad601f754a75abc)
+      digest := keccak256(0, 0x40)
+    }
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }
 
@@ -58,11 +62,16 @@ contract MesonHelpers is MesonConfig {
     address signer
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
-    bytes32 digest = keccak256(abi.encodePacked(
-      // next hash = keccak256(abi.encodePacked("string Notice", "bytes32 Encoded swap", "bytes32 Recipient hash"))
-      bytes32(0x7c9686b79d9ae79f496b739d7c6979a77cd378c673a58fd8c051d4f04427a9ab),
-      keccak256(abi.encodePacked("Sign to release a swap on Meson", encodedSwap, recipientHash))
-    ));
+    bytes32 digest;
+    assembly {
+      mstore(0, encodedSwap)
+      mstore(0x20, recipientHash)
+      mstore(0x20, keccak256(0, 0x40))
+
+      // The HEX string below is keccak256("bytes32 Sign to release a swap on Meson" + "bytes32 Recipient hash")
+      mstore(0, 0x5ef297f2881340f11ed62c7c08e0e0c235c333ad8f340d7285f529f16716968a)
+      digest := keccak256(0, 0x40)
+    }
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }
 
