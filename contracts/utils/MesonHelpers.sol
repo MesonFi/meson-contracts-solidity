@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/utils/Strings.sol";
-
 import "../MesonConfig.sol";
 import "../interfaces/IERC20Minimal.sol";
 
@@ -30,6 +28,7 @@ contract MesonHelpers is MesonConfig {
     address sender,
     uint256 amount
   ) internal {
+    require(amount > 0, "Amount must be greater than zero");
     IERC20Minimal(token).transferFrom(sender, address(this), amount);
   }
 

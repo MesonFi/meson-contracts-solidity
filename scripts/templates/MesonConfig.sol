@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-// import "@openzeppelin/contracts/access/Ownable.sol";
-
 /// @notice Parameters of the Meson contract
 /// for CONFIG_BLOCKCHAIN_NAME
 contract MesonConfig {

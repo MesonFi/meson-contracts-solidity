@@ -3,8 +3,6 @@ pragma solidity 0.8.6;
 
 /// @title MesonTokens
 contract MesonTokens {
-  mapping(address => bool) internal _supportedTokens;
-
   mapping(uint8 => address) internal _tokenList;
   mapping(address => uint8) internal _indexOfToken;
 
@@ -34,13 +32,7 @@ contract MesonTokens {
 
   function _addSupportToken(address token, uint8 index) internal {
     require(index != 0, "Cannot use 0 as token index");
-    _supportedTokens[token] = true;
     _indexOfToken[token] = index;
     _tokenList[index] = token;
-  }
-
-  modifier tokenSupported(address token) {
-    require(_supportedTokens[token], "unsupported token");
-    _;
   }
 }

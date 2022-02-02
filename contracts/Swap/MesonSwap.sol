@@ -22,11 +22,15 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   function requestSwap(uint256 encodedSwap) external forInitialChain(encodedSwap) {
     require(_swapRequests[encodedSwap] == 0, "Swap already exists");
 
+    uint256 delta = ((encodedSwap >> 48) & 0xFFFFFFFFFF) - block.timestamp;
+    // Underflow would trigger "Expire ts too late" error
+    require(delta > MIN_BOND_TIME_PERIOD, "Expire ts too early");
+    require(delta < MAX_BOND_TIME_PERIOD, "Expire ts too late");
+
     address initiator = _msgSender();
     _swapRequests[encodedSwap] = uint200(uint160(initiator)) << 40;
-
-    (uint256 amountWithFee, address inToken) = _checkSwapRequest(encodedSwap);
-    _unsafeDepositToken(inToken, initiator, amountWithFee);
+    
+    _unsafeDepositToken(_tokenList[uint8(encodedSwap)], initiator, encodedSwap >> 128);
     
     emit SwapRequested(encodedSwap);
   }
@@ -60,32 +64,18 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   {
     require(_swapRequests[encodedSwap] == 0, "Swap already exists");
 
-    uint8 v = uint8(packedData >> 200);
-    uint200 req = uint200(packedData);
-    address initiator = address(uint160(req >> 40));
+    uint256 delta = ((encodedSwap >> 48) & 0xFFFFFFFFFF) - block.timestamp;
+    // Underflow would trigger "Expire ts too late" error
+    require(delta > MIN_BOND_TIME_PERIOD, "Expire ts too early");
+    require(delta < MAX_BOND_TIME_PERIOD, "Expire ts too late");
 
-    _checkRequestSignature(encodedSwap, r, s, v, initiator);
-    _swapRequests[encodedSwap] = req;
-    (uint256 amountWithFee, address inToken) = _checkSwapRequest(encodedSwap);
-    _unsafeDepositToken(inToken, initiator, amountWithFee);
+    address initiator = address(uint160(packedData >> 40));
+    _checkRequestSignature(encodedSwap, r, s, uint8(packedData >> 200), initiator);
+    _swapRequests[encodedSwap] = uint200(packedData);
+
+    _unsafeDepositToken(_tokenList[uint8(encodedSwap)], initiator, encodedSwap >> 128);
 
     emit SwapPosted(encodedSwap);
-  }
-
-  /// @notice xxxx
-  /// @dev Designed to be used by users
-  /// @param encodedSwap Encoded swap
-  function _checkSwapRequest(uint256 encodedSwap) internal view
-    returns (uint256 amountWithFee, address inToken)
-  {
-    amountWithFee = encodedSwap >> 128;
-    require(amountWithFee > 0, "Swap amount must be greater than zero");
-    
-    inToken = _tokenList[uint8(encodedSwap)];
-
-    uint256 expireTs = (encodedSwap >> 48) & 0xFFFFFFFFFF;
-    require(expireTs > block.timestamp + MIN_BOND_TIME_PERIOD, "Expire ts too early");
-    require(expireTs < block.timestamp + MAX_BOND_TIME_PERIOD, "Expire ts too late");
   }
 
   /// @notice Cancel a swap
@@ -93,15 +83,18 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @param encodedSwap Encoded swap
   function cancelSwap(uint256 encodedSwap) external {
     uint200 req = _swapRequests[encodedSwap];
-    require(req != 0, "Swap does not exist");
-    require(uint40(encodedSwap >> 48) < uint40(block.timestamp), "Swap is still locked");
+    require(req > 1, "Swap does not exist");
+    require((encodedSwap >> 48 & 0xFFFFFFFFFF) < block.timestamp, "Swap is still locked");
     
-    address initiator = address(uint160(req >> 40));
     address inToken = _tokenList[uint8(encodedSwap)];
 
-    _swapRequests[encodedSwap] = 1;
+    _swapRequests[encodedSwap] = 0; // Swap expired so the same one cannot be posted again
 
-    _safeTransfer(inToken, initiator, encodedSwap >> 128);
+    _safeTransfer(
+      _tokenList[uint8(encodedSwap)], // tokenIndex -> token address
+      address(uint160(req >> 40)), // initiator
+      encodedSwap >> 128
+    );
 
     emit SwapCancelled(encodedSwap);
   }
@@ -128,8 +121,12 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     require(req != 0, "Swap does not exist");
 
     if (((encodedSwap >> 48) & 0xFFFFFFFFFF) < block.timestamp + MIN_BOND_TIME_PERIOD) {
+      // Swap expiredTs < current + MIN_BOND_TIME_PERIOD
+      // The swap cannot be posted again and therefore safe to remove it
+      // LPs who execute in this mode can save ~5000 gas
       _swapRequests[encodedSwap] = 0;
     } else {
+      // 1 will prevent the same swap to be posted again
       _swapRequests[encodedSwap] = 1;
     }
 

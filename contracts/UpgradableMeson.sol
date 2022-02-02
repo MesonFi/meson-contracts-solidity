@@ -21,11 +21,11 @@ contract UpgradableMeson is UUPSUpgradeable, MesonSwap, MesonPools {
   }
 
   function _authorizeUpgrade(address newImplementation) internal view override {
-    require(_msgSender() == _owner, "unauthorized");
+    require(_msgSender() == _owner, "Unauthorized");
   }
 
   modifier onlyOwner() {
-    require(_owner == _msgSender(), "Ownable: caller is not the owner");
+    require(_owner == _msgSender(), "Caller is not the owner");
     _;
   }
 }

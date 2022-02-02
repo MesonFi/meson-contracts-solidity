@@ -113,11 +113,11 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(lockedSwap != 0, "Swap does not exist");
 
     _checkReleaseSignature(encodedSwap, keccak256(abi.encodePacked(recipient)), r, s, v, address(uint160(lockedSwap)));
+    _lockedSwaps[encodedSwap] = 0;
 
     address token = _tokenList[uint8(encodedSwap >> 24)];
     _safeTransfer(token, recipient, encodedSwap >> 128);
 
-    _lockedSwaps[encodedSwap] = 0;
     emit SwapReleased(encodedSwap);
   }
 
