@@ -86,8 +86,6 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     require(req > 1, "Swap does not exist");
     require((encodedSwap >> 48 & 0xFFFFFFFFFF) < block.timestamp, "Swap is still locked");
     
-    address inToken = _tokenList[uint8(encodedSwap)];
-
     _swapRequests[encodedSwap] = 0; // Swap expired so the same one cannot be posted again
 
     _safeTransfer(
