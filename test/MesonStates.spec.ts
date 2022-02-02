@@ -74,14 +74,14 @@ describe('MesonStates', () => {
 
   describe('#checkRequestSignature', () => {
     it('validates a request signature', async () => {
-      const sigs = await swap.signRequest()
+      const sigs = (await swap.signForRequest()).signature
       await mesonInstance.checkRequestSignature(swap.encoded, ...sigs, wallet.address)
     })
   })
 
   describe('#checkReleaseSignature', () => {
     it('validates a release signature', async () => {
-      const sigs = await swap.signRelease(swapData.recipient)
+      const sigs = (await swap.signForRelease(swapData.recipient)).signature
       await mesonInstance.checkReleaseSignature(swap.encoded, swapData.recipient, ...sigs, wallet.address)
     })
   })

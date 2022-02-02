@@ -86,9 +86,9 @@ describe('MesonPools', () => {
       await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
 
       const swap = userClient.requestSwap(getDefaultSwap(), outChain)
-      const exported = await swap.exportRequest()
+      const request = await swap.signForRequest()
 
-      const signedRequest = new SignedSwapRequest(exported)
+      const signedRequest = new SignedSwapRequest(request)
       signedRequest.checkSignature()
       await lpClient.lock(signedRequest)
 
@@ -103,14 +103,14 @@ describe('MesonPools', () => {
 
       const swapData = getDefaultSwap()
       const swap = userClient.requestSwap(swapData, outChain)
-      const exported = await swap.exportRequest()
+      const request = await swap.signForRequest()
       
-      const signedRequest = new SignedSwapRequest(exported)
+      const signedRequest = new SignedSwapRequest(request)
       signedRequest.checkSignature()
       await lpClient.lock(signedRequest)
 
-      const exportedRelease = await swap.exportRelease(swapData.recipient)
-      const signedRelease = new SignedSwapRelease(exportedRelease)
+      const release = await swap.signForRelease(swapData.recipient)
+      const signedRelease = new SignedSwapRelease(release)
       signedRelease.checkSignature()
       await lpClient.release(signedRelease)
 

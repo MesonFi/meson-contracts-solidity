@@ -43,14 +43,14 @@ async function main() {
   const swapData = getDefaultSwap({ inToken: 1, outToken: 1 })
   const outChain = await mesonContract.getShortCoinType()
   const swap = mesonClient.requestSwap(swapData, outChain)
-  const exported = await swap.exportRequest()
-  const signedRequest = new SignedSwapRequest(exported)
+  const request = await swap.signForRequest()
+  const signedRequest = new SignedSwapRequest(request)
   signedRequest.checkSignature()
 
   const swapData2 = getDefaultSwap({ amount: '200', inToken: 1, outToken: 1 })
   const swap2 = mesonClient.requestSwap(swapData2, outChain)
-  const exported2 = await swap2.exportRequest()
-  const signedRequest2 = new SignedSwapRequest(exported2)
+  const request2 = await swap2.signForRequest()
+  const signedRequest2 = new SignedSwapRequest(request2)
   signedRequest2.checkSignature()
 
   // postSwap
@@ -68,8 +68,8 @@ async function main() {
   await lockTx.wait(1)
 
   // export release signature
-  const exportedRelease = await swap.exportRelease(swapData.recipient)
-  const signedRelease = new SignedSwapRelease(exportedRelease)
+  const release = await swap.signForRelease(swapData.recipient)
+  const signedRelease = new SignedSwapRelease(release)
   signedRelease.checkSignature()
 
   // release

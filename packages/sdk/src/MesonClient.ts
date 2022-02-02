@@ -24,7 +24,6 @@ export class MesonClient {
   #tokens: string[] = []
 
   static async Create(mesonInstance: Meson, swapSigner?: SwapSigner) {
-    const network = await mesonInstance.provider.getNetwork()
     const shortCoinType = await mesonInstance.getShortCoinType()
     const client = new MesonClient(mesonInstance, shortCoinType)
     if (swapSigner) {

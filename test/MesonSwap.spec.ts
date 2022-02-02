@@ -38,9 +38,9 @@ describe('MesonSwap', () => {
   describe('#postSwap', () => {
     it('posts a swap', async () => {
       const swap = userClient.requestSwap(getDefaultSwap({ fee: '0' }), outChain)
-      const exported = await swap.exportRequest()
+      const request = await swap.signForRequest()
 
-      const signedRequest = new SignedSwapRequest(exported)
+      const signedRequest = new SignedSwapRequest(request)
       signedRequest.checkSignature()
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
@@ -52,9 +52,9 @@ describe('MesonSwap', () => {
 
     it('refuses unsupported token', async () => {
       const swap = userClient.requestSwap(getDefaultSwap({ inToken: 2, fee: '0' }), outChain)
-      const exported = await swap.exportRequest()
+      const request = await swap.signForRequest()
 
-      const signedRequest = new SignedSwapRequest(exported)
+      const signedRequest = new SignedSwapRequest(request)
       signedRequest.checkSignature()
       await unsupportedToken.approve(mesonInstance.address, swap.amount)
       await expect(lpClient.postSwap(signedRequest)).to.be.reverted
@@ -65,15 +65,15 @@ describe('MesonSwap', () => {
     it('can execute a swap', async () => {
       const swapData = getDefaultSwap({ fee: '0' })
       const swap = userClient.requestSwap(swapData, outChain)
-      const exported = await swap.exportRequest()
+      const request = await swap.signForRequest()
       
-      const signedRequest = new SignedSwapRequest(exported)
+      const signedRequest = new SignedSwapRequest(request)
       signedRequest.checkSignature()
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
-      const exportedRelease = await swap.exportRelease(swapData.recipient)
-      const signedRelease = new SignedSwapRelease(exportedRelease)
+      const release = await swap.signForRelease(swapData.recipient)
+      const signedRelease = new SignedSwapRelease(release)
       signedRelease.checkSignature()
       await lpClient.executeSwap(signedRelease, false)
 
