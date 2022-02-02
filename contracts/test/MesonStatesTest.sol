@@ -47,7 +47,7 @@ contract MesonStatesTest is MesonStates {
     bytes32 s,
     uint8 v,
     address signer
-  ) public view {
+  ) public pure {
     _checkRequestSignature(encodedSwap, r, s, v, signer);
   }
 
@@ -58,7 +58,7 @@ contract MesonStatesTest is MesonStates {
     bytes32 s,
     uint8 v,
     address signer
-  ) public view {
+  ) public pure {
     _checkReleaseSignature(encodedSwap, keccak256(abi.encodePacked(recipient)), r, s, v, signer);
   }
 }

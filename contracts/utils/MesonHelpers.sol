@@ -39,7 +39,7 @@ contract MesonHelpers is MesonConfig {
     bytes32 s,
     uint8 v,
     address signer
-  ) internal view {
+  ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
     bytes32 digest;
     assembly {
