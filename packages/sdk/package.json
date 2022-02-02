@@ -18,9 +18,8 @@
     "prepare": "yarn build"
   },
   "dependencies": {
-    "@ethersproject/abstract-signer": "5.5.0",
+    "@ethersproject/bignumber": "5.5.0",
     "@ethersproject/bytes": "5.5.0",
-    "@ethersproject/hash": "5.5.0",
     "@ethersproject/keccak256": "5.5.0",
     "@ethersproject/solidity": "5.5.0",
     "@ethersproject/transactions": "5.5.0",

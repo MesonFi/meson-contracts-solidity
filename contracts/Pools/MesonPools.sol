@@ -76,7 +76,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(providerIndex != 0, "Caller not registered. Call depositAndRegister.");
 
     uint48 balanceIndex = uint48((encodedSwap & 0xFF000000) << 16) | providerIndex;
-    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.sub(_tokenBalanceOf[balanceIndex], encodedSwap >> 128);
+    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.sub(_tokenBalanceOf[balanceIndex], encodedSwap >> 160);
     
     _lockedSwaps[encodedSwap] = (uint240(block.timestamp + LOCK_TIME_PERIOD) << 200)
       | (providerIndex << 160)
@@ -91,7 +91,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(uint240(block.timestamp << 200) > lockedSwap, "Swap still in lock");
 
     uint48 balanceIndex = uint48((encodedSwap & 0xFF000000) << 16) | uint40(lockedSwap >> 160);
-    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], encodedSwap >> 128);
+    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], encodedSwap >> 160);
     _lockedSwaps[encodedSwap] = 0;
   }
 
@@ -116,7 +116,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _lockedSwaps[encodedSwap] = 0;
 
     address token = _tokenList[uint8(encodedSwap >> 24)];
-    _safeTransfer(token, recipient, encodedSwap >> 128);
+    _safeTransfer(token, recipient, encodedSwap >> 160);
 
     emit SwapReleased(encodedSwap);
   }

@@ -1,8 +1,6 @@
 import type { Provider } from '@ethersproject/providers'
-import type { SwapData } from '@mesonfi/sdk'
 
 import { Contract as EthersContract } from '@ethersproject/contracts'
-import { BigNumber } from '@ethersproject/bignumber'
 import { keccak256 } from '@ethersproject/keccak256'
 import { MesonClient } from '@mesonfi/sdk'
 import { Meson } from '@mesonfi/contract-abis'
@@ -93,21 +91,6 @@ export class MesonPresets {
 
   getTokenAddrFromHash(hash: string): string {
     return this._tokenHashes.get(hash)
-  }
-
-  decodeSwap(encoded: string): SwapData {
-    if (!encoded.startsWith('0x') || encoded.length !== 66) {
-      throw new Error('encoded swap should be a hex string of length 66')
-    }
-    const amount = BigNumber.from(`0x${encoded.substring(2, 34)}`).toString()
-    const fee = BigNumber.from(`0x${encoded.substring(34, 44)}`).toString()
-    const expireTs = parseInt(`0x${encoded.substring(44, 54)}`, 16)
-    const outChain = `0x${encoded.substring(54, 58)}`
-    const outToken = parseInt(`0x${encoded.substring(58, 60)}`, 16)
-    const inChain = `0x${encoded.substring(60, 64)}`
-    const inToken = parseInt(`0x${encoded.substring(64, 66)}`, 16)
-
-    return { inChain, inToken, amount, fee, expireTs, outChain, outToken }
   }
 
   getClient(id: string, provider: Provider, Contract = EthersContract): MesonClient {

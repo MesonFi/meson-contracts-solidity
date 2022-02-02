@@ -1,11 +1,11 @@
 import { ethers, waffle } from 'hardhat'
 import {
   MesonClient,
+  Swap,
   EthersWalletSwapSigner,
   PartialSwapData,
   SwapWithSigner,
 } from '@mesonfi/sdk'
-import mesonPresets from '@mesonfi/presets'
 import { MesonStatesTest } from '@mesonfi/contract-types'
 
 import { expect } from './shared/expect'
@@ -35,6 +35,7 @@ describe('MesonStates', () => {
     it('returns same result as js function', async () => {
       const encodedSwapFromContract = await mesonInstance.encodeSwap(
         swap.amount,
+        swap.salt,
         swap.fee,
         swap.expireTs,
         swap.outChain,
@@ -47,28 +48,32 @@ describe('MesonStates', () => {
     })
   })
 
-  describe('#decodeSwap (from mesonPresets)', () => {
-    it('decodes a swap', async () => {
-      const decoded = mesonPresets.decodeSwap(swap.encoded)
-      expect(decoded.amount).to.equal(swap.amount)
-      expect(decoded.fee).to.equal(swap.fee)
-      expect(decoded.expireTs).to.equal(swap.expireTs)
-      expect(decoded.outChain).to.equal(swap.outChain)
-      expect(decoded.outToken).to.equal(swap.outToken)
-      expect(decoded.inChain).to.equal(swap.inChain)
-      expect(decoded.inToken).to.equal(swap.inToken)
-    })
-  })
-
   describe('#decodeSwap', () => {
     it('returns decoded swap data', async () => {
       const decoded = await mesonInstance.decodeSwap(swap.encoded)
       expect(decoded[0]).to.equal(swap.amount)
-      expect(decoded[1]).to.equal(swap.expireTs)
-      expect(decoded[2]).to.equal(swap.outChain)
-      expect(decoded[3]).to.equal(swap.outToken)
-      expect(decoded[4]).to.equal(swap.inChain)
-      expect(decoded[5]).to.equal(swap.inToken)
+      expect(decoded[1]).to.equal(swap.salt)
+      expect(decoded[2]).to.equal(swap.expireTs)
+      expect(decoded[3]).to.equal(swap.outChain)
+      expect(decoded[4]).to.equal(swap.outToken)
+      expect(decoded[5]).to.equal(swap.inChain)
+      expect(decoded[6]).to.equal(swap.inToken)
+    })
+  })
+
+  describe('#Swap.decode', () => {
+    it('decodes a swap', async () => {
+
+      
+      const swap2 = Swap.decode(swap.encoded)
+      expect(swap2.amount).to.equal(swap.amount)
+      expect(swap2.salt).to.equal(swap.salt)
+      expect(swap2.fee).to.equal(swap.fee)
+      expect(swap2.expireTs).to.equal(swap.expireTs)
+      expect(swap2.outChain).to.equal(swap.outChain)
+      expect(swap2.outToken).to.equal(swap.outToken)
+      expect(swap2.inChain).to.equal(swap.inChain)
+      expect(swap2.inToken).to.equal(swap.inToken)
     })
   })
 

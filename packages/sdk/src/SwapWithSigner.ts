@@ -1,4 +1,3 @@
-import type { Signature } from './SwapSigner'
 import { Swap, SwapData } from './Swap'
 import { SwapSigner } from './SwapSigner'
 import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwap'

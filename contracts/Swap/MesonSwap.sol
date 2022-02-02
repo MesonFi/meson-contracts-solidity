@@ -12,7 +12,7 @@ import "../utils/MesonStates.sol";
 /// users initiate swaps on the initial chain.
 contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @notice Posted swap requests
-  /// key: encodedSwap in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
+  /// key: encodedSwap in format of `amount:uint96|salt:uint32|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
   /// value: in format of initiator:uint160|providerIndex:uint40; =1 maybe means executed (to prevent replay attack)
   mapping(uint256 => uint200) internal _swapRequests;
 
@@ -30,7 +30,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     address initiator = _msgSender();
     _swapRequests[encodedSwap] = uint200(uint160(initiator)) << 40;
     
-    _unsafeDepositToken(_tokenList[uint8(encodedSwap)], initiator, encodedSwap >> 128);
+    _unsafeDepositToken(_tokenList[uint8(encodedSwap)], initiator, encodedSwap >> 160);
     
     emit SwapRequested(encodedSwap);
   }
@@ -73,7 +73,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _checkRequestSignature(encodedSwap, r, s, uint8(packedData >> 200), initiator);
     _swapRequests[encodedSwap] = uint200(packedData);
 
-    _unsafeDepositToken(_tokenList[uint8(encodedSwap)], initiator, encodedSwap >> 128);
+    _unsafeDepositToken(_tokenList[uint8(encodedSwap)], initiator, encodedSwap >> 160);
 
     emit SwapPosted(encodedSwap);
   }
@@ -91,7 +91,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _safeTransfer(
       _tokenList[uint8(encodedSwap)], // tokenIndex -> token address
       address(uint160(req >> 40)), // initiator
-      encodedSwap >> 128
+      encodedSwap >> 160
     );
 
     emit SwapCancelled(encodedSwap);
@@ -134,12 +134,12 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
     if (depositToPool) {
       uint48 balanceIndex = uint48(encodedSwap << 40) | uint40(req); // TODO: check
-      _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], encodedSwap >> 128);
+      _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], encodedSwap >> 160);
     } else {
       _safeTransfer(
         _tokenList[uint8(encodedSwap)], // tokenIndex -> token address
         addressOfIndex[uint40(req)], // providerIndex -> provider address
-        encodedSwap >> 128
+        encodedSwap >> 160
       );
     }
   }

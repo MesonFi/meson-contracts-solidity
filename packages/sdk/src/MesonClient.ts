@@ -8,10 +8,10 @@ import { SwapSigner } from './SwapSigner'
 import { SignedSwapRequest, SignedSwapRelease } from './SignedSwap'
 
 export interface PartialSwapData {
-  initiator: string,
-  inToken: number,
   amount: string,
+  salt?: number,
   fee: string,
+  inToken: number,
   outToken: number,
   recipient: string,
 }

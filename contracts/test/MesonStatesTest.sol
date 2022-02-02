@@ -5,7 +5,8 @@ import "../utils/MesonStates.sol";
 
 contract MesonStatesTest is MesonStates {
   function encodeSwap(
-    uint128 amount,
+    uint96 amount,
+    uint32 salt,
     uint40 fee,
     uint40 expireTs,
     bytes2 outChain,
@@ -16,6 +17,7 @@ contract MesonStatesTest is MesonStates {
     return
       abi.encodePacked(
         amount,
+        salt,
         fee,
         expireTs,
         outChain,
@@ -26,14 +28,16 @@ contract MesonStatesTest is MesonStates {
   }
 
   function decodeSwap(uint256 encodedSwap) external pure returns (
-    uint128 amount,
+    uint96 amount,
+    uint32 salt,
     uint40 expireTs,
     bytes2 outChain,
     uint8 outTokenIndex,
     bytes2 inChain,
     uint8 inTokenIndex
   ) {
-    amount = uint128(encodedSwap >> 128);
+    amount = uint96(encodedSwap >> 160);
+    salt = uint32(encodedSwap >> 128);
     expireTs = uint40(encodedSwap >> 48);
     outChain = bytes2(uint16(encodedSwap >> 32));
     outTokenIndex = uint8(encodedSwap >> 24);
