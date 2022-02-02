@@ -21,8 +21,8 @@ export interface MesonPoolsTestInterface extends utils.Interface {
   functions: {
     "addressOfIndex(uint40)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
-    "deposit(uint128,uint48)": FunctionFragment;
-    "depositAndRegister(uint128,uint48)": FunctionFragment;
+    "deposit(uint256,uint48)": FunctionFragment;
+    "depositAndRegister(uint256,uint48)": FunctionFragment;
     "getLockedSwap(uint256)": FunctionFragment;
     "getShortCoinType()": FunctionFragment;
     "indexOfAddress(address)": FunctionFragment;
@@ -32,7 +32,7 @@ export interface MesonPoolsTestInterface extends utils.Interface {
     "supportedTokens()": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
     "unlock(uint256)": FunctionFragment;
-    "withdraw(uint128,uint8)": FunctionFragment;
+    "withdraw(uint256,uint8)": FunctionFragment;
   };
 
   encodeFunctionData(

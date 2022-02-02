@@ -23,8 +23,8 @@ export interface MesonInterface extends utils.Interface {
     "balanceOf(address,address)": FunctionFragment;
     "bondSwap(uint256,uint40)": FunctionFragment;
     "cancelSwap(uint256)": FunctionFragment;
-    "deposit(uint128,uint48)": FunctionFragment;
-    "depositAndRegister(uint128,uint48)": FunctionFragment;
+    "deposit(uint256,uint48)": FunctionFragment;
+    "depositAndRegister(uint256,uint48)": FunctionFragment;
     "executeSwap(uint256,bytes32,bytes32,bytes32,uint8,bool)": FunctionFragment;
     "getLockedSwap(uint256)": FunctionFragment;
     "getShortCoinType()": FunctionFragment;
@@ -39,7 +39,7 @@ export interface MesonInterface extends utils.Interface {
     "swapProvider(uint256)": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
     "unlock(uint256)": FunctionFragment;
-    "withdraw(uint128,uint8)": FunctionFragment;
+    "withdraw(uint256,uint8)": FunctionFragment;
   };
 
   encodeFunctionData(
