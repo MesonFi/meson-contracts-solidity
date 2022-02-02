@@ -18,6 +18,7 @@ export interface PresetToken {
 export interface PresetNetwork {
   id: string
   name: string
+  chainId: string,
   slip44: string
   shortSlip44: string
   extensions?: string[]
@@ -36,32 +37,14 @@ export interface PresetNetwork {
 export class MesonPresets {
   private _networks: PresetNetwork[] | undefined
   private _cache: Map<string, MesonClient>
-  private _tokenHashes: Map<string, string>
 
   constructor(networks?: PresetNetwork[]) {
     this._networks = networks
     this._cache = new Map()
-    this._tokenHashes = new Map()
   }
 
   useTestnet(testnet) {
     this._networks = testnet ? testnets : mainnets
-  }
-
-  calcAllTokenHashes(): void {
-    const networks = this.getAllNetworks()
-    networks.forEach(n => {
-      if (n.addressFormat !== 'hex') {
-        return
-      }
-      n.tokens.forEach(t => {
-        this._addTokenToHashTable(t.addr)
-      })
-    })
-  }
-
-  private _addTokenToHashTable(address: string): void {
-    this._tokenHashes.set(keccak256(address), address)
   }
 
   getAllNetworks(): PresetNetwork[] {
@@ -78,19 +61,20 @@ export class MesonPresets {
     return networks.find(item => item.shortSlip44 === shortCoinType)
   }
 
+  getNetworkFromChainId(chainId: string): PresetNetwork {
+    const networks = this.getAllNetworks()
+    return networks.find(item => item.chainId === chainId)
+  }
+
   getTokensForNetwork(id: string): PresetToken[] {
     const networks = this.getAllNetworks()
     const match = networks.find(item => item.id === id)
     return match?.tokens || []
   }
 
-  getToken(networkId: string, addr: string): PresetToken {
+  getToken(networkId: string, tokenIndex: number): PresetToken {
     const tokens = this.getTokensForNetwork(networkId)
-    return tokens.find(token => token.addr.toLowerCase() === addr.toLowerCase())
-  }
-
-  getTokenAddrFromHash(hash: string): string {
-    return this._tokenHashes.get(hash)
+    return tokens[tokenIndex - 1]
   }
 
   getClient(id: string, provider: Provider, Contract = EthersContract): MesonClient {
