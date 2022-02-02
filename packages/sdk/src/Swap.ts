@@ -1,5 +1,4 @@
 import { pack } from '@ethersproject/solidity'
-import { _TypedDataEncoder } from '@ethersproject/hash'
 
 const swapStruct = [
   { name: 'amount', type: 'uint128' },
@@ -10,7 +9,8 @@ const swapStruct = [
   { name: 'inChain', type: 'bytes2' },
   { name: 'inToken', type: 'uint8' },
 ]
-export interface SwapRequestData {
+
+export interface SwapData {
   encoded?: string,
   amount: string,
   fee: string,
@@ -21,7 +21,7 @@ export interface SwapRequestData {
   outToken: number,
 }
 
-export class SwapRequest implements SwapRequestData {
+export class Swap implements SwapData {
   readonly amount: string
   readonly fee: string
   readonly expireTs: number
@@ -32,7 +32,7 @@ export class SwapRequest implements SwapRequestData {
 
   private _encoded: string = ''
 
-  constructor(data: SwapRequestData) {
+  constructor(data: SwapData) {
     if (!data.amount) {
       throw new Error('Missing amount')
     } else if (!data.fee) {
@@ -67,7 +67,7 @@ export class SwapRequest implements SwapRequestData {
     return this._encoded
   }
 
-  toObject(): SwapRequestData {
+  toObject(): SwapData {
     return {
       encoded: this.encoded,
       amount: this.amount,
@@ -78,9 +78,5 @@ export class SwapRequest implements SwapRequestData {
       outChain: this.outChain,
       outToken: this.outToken,
     }
-  }
-
-  serialize(): string {
-    return JSON.stringify(this.toObject())
   }
 }

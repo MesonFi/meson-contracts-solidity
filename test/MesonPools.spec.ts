@@ -1,5 +1,10 @@
 import { waffle } from 'hardhat'
-import { MesonClient, SignedSwapRequest, SignedSwapRelease } from '@mesonfi/sdk'
+import {
+  MesonClient,
+  EthersWalletSwapSigner,
+  SignedSwapRequest,
+  SignedSwapRelease,
+} from '@mesonfi/sdk'
 import { MockToken, MesonPoolsTest } from '@mesonfi/contract-typs'
 
 import { expect } from './shared/expect'
@@ -21,7 +26,7 @@ describe('MesonPools', () => {
     token = result.token1.connect(provider)
     mesonInstance = result.pools.connect(provider) // provider is signer
 
-    userClient = await MesonClient.Create(result.pools) // user is default account
+    userClient = await MesonClient.Create(result.pools, new EthersWalletSwapSigner(initiator))
     lpClient = await MesonClient.Create(mesonInstance)
     outChain = lpClient.shortCoinType
     await token.approve(mesonInstance.address, 1000)
@@ -80,8 +85,8 @@ describe('MesonPools', () => {
     it('lockes a swap', async () => {
       await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
 
-      const swap = userClient.requestSwap(outChain, getDefaultSwap())
-      const exported = await swap.exportRequest(initiator)
+      const swap = userClient.requestSwap(getDefaultSwap(), outChain)
+      const exported = await swap.exportRequest()
 
       const signedRequest = new SignedSwapRequest(exported)
       signedRequest.checkSignature()
@@ -97,14 +102,14 @@ describe('MesonPools', () => {
       await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
 
       const swapData = getDefaultSwap()
-      const swap = userClient.requestSwap(outChain, swapData)
-      const exported = await swap.exportRequest(initiator)
+      const swap = userClient.requestSwap(swapData, outChain)
+      const exported = await swap.exportRequest()
       
       const signedRequest = new SignedSwapRequest(exported)
       signedRequest.checkSignature()
       await lpClient.lock(signedRequest)
 
-      const exportedRelease = await swap.exportRelease(initiator, swapData.recipient)
+      const exportedRelease = await swap.exportRelease(swapData.recipient)
       const signedRelease = new SignedSwapRelease(exportedRelease)
       signedRelease.checkSignature()
       await lpClient.release(signedRelease)

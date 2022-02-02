@@ -1,13 +1,14 @@
 import type { Wallet } from '@ethersproject/wallet'
 import type { Meson } from '@mesonfi/contract-types'
-
 import { pack } from '@ethersproject/solidity'
 import { keccak256 } from '@ethersproject/keccak256'
+
+import { SwapWithSigner } from './SwapWithSigner'
 import { SwapSigner } from './SwapSigner'
-import { SwapRequestWithSigner } from './SwapRequestWithSigner'
 import { SignedSwapRequest, SignedSwapRelease } from './SignedSwap'
 
-export interface PartialSwapRequest {
+export interface PartialSwapData {
+  initiator: string,
   inToken: number,
   amount: string,
   fee: string,
@@ -17,25 +18,29 @@ export interface PartialSwapRequest {
 
 export class MesonClient {
   readonly mesonInstance: Meson
-  readonly chainId: number
   readonly shortCoinType: string
-  readonly signer: SwapSigner
   
+  #signer: SwapSigner | null = null
   #tokens: string[] = []
 
-  static async Create(mesonInstance: Meson) {
+  static async Create(mesonInstance: Meson, swapSigner?: SwapSigner) {
     const network = await mesonInstance.provider.getNetwork()
     const shortCoinType = await mesonInstance.getShortCoinType()
-    const client = new MesonClient(mesonInstance, Number(network.chainId), shortCoinType)
+    const client = new MesonClient(mesonInstance, shortCoinType)
+    if (swapSigner) {
+      client.setSwapSigner(swapSigner)
+    }
     await client._getSupportedTokens()
     return client
   }
 
-  constructor(mesonInstance: any, chainId: number, shortCoinType: string) {
+  constructor(mesonInstance: any, shortCoinType: string) {
     this.mesonInstance = mesonInstance as Meson
-    this.chainId = chainId
     this.shortCoinType = shortCoinType
-    this.signer = new SwapSigner(mesonInstance.address, chainId)
+  }
+
+  setSwapSigner (swapSigner: SwapSigner) {
+    this.#signer = swapSigner
   }
 
   async _getSupportedTokens () {
@@ -50,13 +55,16 @@ export class MesonClient {
     return this.#tokens[index - 1] || ''
   }
 
-  requestSwap(outChain: string, swap: PartialSwapRequest, lockPeriod: number = 5400) {
-    return new SwapRequestWithSigner({
+  requestSwap(swap: PartialSwapData, outChain: string, lockPeriod: number = 5400) {
+    if (!this.#signer) {
+      throw new Error('No swap signer assigned')
+    }
+    return new SwapWithSigner({
       ...swap,
       inChain: this.shortCoinType,
       outChain,
       expireTs: Math.floor(Date.now() / 1000) + lockPeriod,
-    }, this.signer)
+    }, this.#signer)
   }
 
   async depositAndRegister(token: string, amount: string, providerIndex: string) {
@@ -91,7 +99,6 @@ export class MesonClient {
   }
 
   async postSwap(signedRequest: SignedSwapRequest) {
-    this._check(signedRequest)
     const providerAddress = await this.mesonInstance.signer.getAddress()
     const providerIndex = await this.mesonInstance.indexOfAddress(providerAddress)
     if (!providerIndex) {
@@ -110,7 +117,6 @@ export class MesonClient {
   }
 
   async lock(signedRequest: SignedSwapRequest) {
-    this._check(signedRequest)
     return this.mesonInstance.lock(
       signedRequest.encoded,
       ...signedRequest.signature,
@@ -119,17 +125,14 @@ export class MesonClient {
   }
 
   async release(signedRelease: SignedSwapRelease) {
-    this._check(signedRelease)
     return this.mesonInstance.release(
       signedRelease.encoded,
-      signedRelease.domainHash,
       ...signedRelease.signature,
       signedRelease.recipient
     )
   }
 
   async executeSwap(signedRelease: SignedSwapRelease, depositToPool: boolean = false) {
-    this._check(signedRelease)
     return this.mesonInstance.executeSwap(
       signedRelease.encoded,
       keccak256(signedRelease.recipient),
@@ -138,23 +141,11 @@ export class MesonClient {
     )
   }
 
-  private _check (swap: SignedSwapRequest) {
-    if (this.chainId !== swap.chainId) {
-      throw new Error('Mismatch chain id')
-    } else if (this.mesonInstance.address !== swap.mesonAddress) {
-      throw new Error('Mismatch messon address')
-    }
-  }
-
   async cancelSwap(swapId: string, signer?: Wallet) {
     if (signer) {
       return await this.mesonInstance.connect(signer).cancelSwap(swapId)
     }
     return await this.mesonInstance.cancelSwap(swapId)
-  }
-
-  async getSwap(swapId: string) {
-    // return await this.mesonInstance.requests(swapId)
   }
 
   async getLockedSwap(encoded: string) {

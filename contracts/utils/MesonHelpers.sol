@@ -1,18 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
+import "@openzeppelin/contracts/utils/Strings.sol";
+
 import "../MesonConfig.sol";
 import "../interfaces/IERC20Minimal.sol";
 
 /// @title MesonHelpers
 contract MesonHelpers is MesonConfig {
-  bytes32 internal constant EIP712_DOMAIN_TYPEHASH =
-    keccak256(bytes("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"));
-
-  bytes32 internal DOMAIN_SEPARATOR;
-
-  bytes32 internal constant SWAP_RELEASE_TYPEHASH = keccak256(bytes("SwapRelease(bytes32 encoded,bytes recipient)"));
-
   bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
 
   /// @notice Safe transfers tokens from msg.sender to a recipient
@@ -44,75 +39,30 @@ contract MesonHelpers is MesonConfig {
     bytes32 s,
     uint8 v,
     address signer
-  ) internal pure {
-    bytes32 digest = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", encodedSwap));
+  ) internal view {
+    require(signer != address(0), "Signer cannot be empty address");
+    bytes32 digest = keccak256(abi.encodePacked(
+      // next hash = keccak256(abi.encodePacked("string Notice", "bytes32 Encoded swap"))
+      bytes32(0x1a76b359431334e60d4633af81b46702f12477315b8286fa908e623614d1d0bc),
+      keccak256(abi.encodePacked("Sign to request a swap on Meson", encodedSwap))
+    ));
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }
 
   function _checkReleaseSignature(
     uint256 encodedSwap,
-    address recipient,
-    bytes32 domainHash,
-    bytes32 r,
-    bytes32 s,
-    uint8 v,
-    address signer
-  ) internal pure {
-    bytes32 typeHash = SWAP_RELEASE_TYPEHASH;
-    require(signer != address(0), "Signer cannot be empty address");
-    bytes32 digest;
-    assembly {
-      let ptr := mload(0x40)
-
-      // same as recipientHash = keccak256(recipient)
-      mstore(0, recipient)
-      mstore(0x40, keccak256(12, 20))
-
-      // same as hash = keccak256(abi.encodePacked(typeHash, encodedSwap, recipientHash))
-      mstore(0, typeHash)
-      mstore(0x20, encodedSwap)
-      mstore(0x22, keccak256(0, 0x60))
-      
-      // same as digest = keccak256(abi.encodePacked(0x1901, domainHash, hash))
-      mstore8(0, 0x19)
-      mstore8(1, 0x01)
-      mstore(2, domainHash)
-      digest := keccak256(0, 0x42)
-      
-      mstore(0x40, ptr)
-    }
-    require(signer == ecrecover(digest, v, r, s), "Invalid signature");
-  }
-
-  function _checkReleaseSignatureForHash(
-    uint256 encodedSwap,
     bytes32 recipientHash,
-    bytes32 domainHash,
     bytes32 r,
     bytes32 s,
     uint8 v,
     address signer
   ) internal pure {
-    bytes32 typeHash = SWAP_RELEASE_TYPEHASH;
     require(signer != address(0), "Signer cannot be empty address");
-    bytes32 digest;
-    assembly {
-      let ptr := mload(0x40)
-
-      // same as hash = keccak256(abi.encodePacked(typeHash, encodedSwap, recipientHash))
-      mstore(0, typeHash)
-      mstore(0x20, encodedSwap)
-      mstore(0x40, recipientHash)
-      mstore(0x22, keccak256(0, 0x60))
-      
-      // same as digest = keccak256(abi.encodePacked(0x1901, domainHash, hash))
-      mstore8(0, 0x19)
-      mstore8(1, 0x01)
-      mstore(2, domainHash)
-      digest := keccak256(0, 0x42)
-      
-      mstore(0x40, ptr)
-    }
+    bytes32 digest = keccak256(abi.encodePacked(
+      // next hash = keccak256(abi.encodePacked("string Notice", "bytes32 Encoded swap", "bytes32 Recipient hash"))
+      bytes32(0x7c9686b79d9ae79f496b739d7c6979a77cd378c673a58fd8c051d4f04427a9ab),
+      keccak256(abi.encodePacked("Sign to release a swap on Meson", encodedSwap, recipientHash))
+    ));
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }
 

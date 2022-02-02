@@ -148,10 +148,10 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
         amountWithFee := mload(0) // load amount@[16-32)
         balanceIndex := mload(21) // load [47-53) which is inToken|providerIndex
       }
-      _checkReleaseSignatureForHash(encodedSwap, recipientHash, DOMAIN_SEPARATOR, r, s, v, initiator);
+      _checkReleaseSignature(encodedSwap, recipientHash, r, s, v, initiator);
       _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amountWithFee);
     } else {
-      _checkReleaseSignatureForHash(encodedSwap, recipientHash, DOMAIN_SEPARATOR, r, s, v,
+      _checkReleaseSignature(encodedSwap, recipientHash, r, s, v,
         address(uint160(req >> 40)) // initiator
       );
       _safeTransfer(

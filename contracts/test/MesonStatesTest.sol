@@ -4,19 +4,6 @@ pragma solidity =0.8.6;
 import "../utils/MesonStates.sol";
 
 contract MesonStatesTest is MesonStates {
-  constructor() {
-    DOMAIN_SEPARATOR =
-      keccak256(
-        abi.encode(
-          EIP712_DOMAIN_TYPEHASH,
-          keccak256(bytes("Meson Fi")),
-          keccak256(bytes("1")),
-          block.chainid,
-          address(this)
-        )
-      );
-  }
-
   function encodeSwap(
     uint128 amount,
     uint40 fee,
@@ -60,7 +47,7 @@ contract MesonStatesTest is MesonStates {
     bytes32 s,
     uint8 v,
     address signer
-  ) public pure {
+  ) public view {
     _checkRequestSignature(encodedSwap, r, s, v, signer);
   }
 
@@ -72,6 +59,6 @@ contract MesonStatesTest is MesonStates {
     uint8 v,
     address signer
   ) public view {
-    _checkReleaseSignature(encodedSwap, recipient, DOMAIN_SEPARATOR, r, s, v, signer);
+    _checkReleaseSignature(encodedSwap, keccak256(abi.encodePacked(recipient)), r, s, v, signer);
   }
 }

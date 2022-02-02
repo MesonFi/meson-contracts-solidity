@@ -1,66 +1,129 @@
 import type { Wallet } from '@ethersproject/wallet'
-import type { TypedDataDomain } from '@ethersproject/abstract-signer'
-import { _TypedDataEncoder } from '@ethersproject/hash'
-import { arrayify } from '@ethersproject/bytes'
+import { pack } from '@ethersproject/solidity'
+import { keccak256 } from '@ethersproject/keccak256'
 
-import { SignedSwapReleaseData } from './SignedSwap'
-
-const SWAP_RELEASE_TYPE = {
-  SwapRelease: [
-    { name: 'encoded', type: 'bytes32' },
-    { name: 'recipient', type: 'bytes' },
-  ]
-}
-
-interface MesonTypedDataDomain extends TypedDataDomain {
-  chainId: number;
-  verifyingContract: string;
-}
+const NOTICE_SIGN_REQUEST = 'Sign to request a swap on Meson'
+const NOTICE_SIGN_RELEASE = 'Sign to release a swap on Meson'
 
 export type Signature = [string, string, number]
 
 export class SwapSigner {
-  readonly domain: MesonTypedDataDomain
+  readonly signer: any
 
-  constructor(mesonAddress: string, chainId: number) {
-    this.domain = {
-      name: 'Meson Fi',
-      version: '1',
-      chainId,
-      verifyingContract: mesonAddress
-    }
+  constructor() {}
+
+  async getAddress(): Promise<string> {
+    throw new Error('Not implemented')
   }
 
-  get chainId(): number {
-    return Number(this.domain.chainId)
+  async signSwapRequest(encoded: string): Promise<Signature> {
+    throw new Error('Not implemented')
   }
 
-  get mesonAddress(): string {
-    return this.domain.verifyingContract
+  async signSwapRelease(encoded: string, recipient: string): Promise<Signature> {
+    throw new Error('Not implemented')
   }
 
-  getDomainHash(): string {
-    return _TypedDataEncoder.hashDomain(this.domain)
-  }
-
-  async signSwapRequest(encoded: string, wallet: Wallet): Promise<Signature> {
-    const signature = await wallet.signMessage(arrayify(encoded))
-    return this._separateSignature(signature)
-  }
-
-  async signSwapRelease(encoded: string, recipient: string, wallet: Wallet): Promise<Signature> {
-    const signature = await wallet._signTypedData(this.domain, SWAP_RELEASE_TYPE, { encoded, recipient })
-    return this._separateSignature(signature)
-  }
-
-  private _separateSignature(signature: string): Signature {
+  protected _separateSignature(signature: string): Signature {
     const r = '0x' + signature.substring(2, 66)
     const s = '0x' + signature.substring(66, 130)
     const v = parseInt(signature.substring(130, 132), 16)
     return [r, s, v]
   }
 
-  hashRelease(swapRelease: SignedSwapReleaseData): string {
-    return _TypedDataEncoder.hash(this.domain, SWAP_RELEASE_TYPE, swapRelease)
+  static hashRequest(encoded: string): string {
+    const domainHash = keccak256(pack(
+      ['string', 'string'],
+      ['string Notice', 'bytes32 Encoded swap']
+    ))
+    return keccak256(pack(
+      ['bytes32', 'bytes32'],
+      [
+        domainHash,
+        keccak256(pack(['string', 'bytes32'], [NOTICE_SIGN_REQUEST, encoded])),
+      ],
+    ))
+  }
+
+  static hashRelease(encoded: string, recipient: string): string {
+    const domainHash = keccak256(pack(
+      ['string', 'string', 'string'],
+      ['string Notice', 'bytes32 Encoded swap', 'bytes32 Recipient']
+    ))
+    return keccak256(pack(
+      ['bytes32', 'bytes32'],
+      [
+        domainHash,
+        keccak256(pack(
+          ['string', 'bytes32', 'bytes32'],
+          [NOTICE_SIGN_RELEASE, encoded, keccak256(recipient)]
+        )),
+      ],
+    ))
+  }
+}
+
+export class JsonRpcSwapSigner extends SwapSigner {
+  readonly ethereum: any
+
+  constructor (ethereum: any) {
+    super()
+    this.ethereum = ethereum
+  }
+
+  async getAddress(): Promise<string> {
+    return ''
+  }
+
+  async signSwapRequest(encoded: string): Promise<Signature> {
+    const initiator = await this.getAddress()
+    const message = [
+      { type: 'string', name: 'Notice', value: NOTICE_SIGN_REQUEST },
+      { type: 'bytes32', name: 'Encoded swap', value: encoded },
+    ]
+    const signature = await this.ethereum.request({
+      method: 'eth_signTypedData',
+      params: [message, initiator],
+    })
+    return this._separateSignature(signature)
+  }
+
+  async signSwapRelease(encoded: string, recipient: string): Promise<Signature> {
+    const initiator = await this.getAddress()
+    const message = [
+      { type: 'string', name: 'Notice', value: NOTICE_SIGN_REQUEST },
+      { type: 'bytes32', name: 'Encoded swap', value: encoded },
+      { type: 'bytes32', name: 'Recipient', value: keccak256(recipient) },
+    ]
+    const signature = await this.ethereum.request({
+      method: 'eth_signTypedData',
+      params: [message, initiator],
+    })
+    return this._separateSignature(signature)
+  }
+}
+
+export class EthersWalletSwapSigner extends SwapSigner {
+  readonly wallet: Wallet
+
+  constructor(wallet: Wallet) {
+    super()
+    this.wallet = wallet
+  }
+
+  async getAddress(): Promise<string> {
+    return this.wallet.address
+  }
+
+  async signSwapRequest(encoded: string): Promise<Signature> {
+    const digest = SwapSigner.hashRequest(encoded)
+    const signature = await this.wallet._signingKey().signDigest(digest)
+    return [signature.r, signature.s, signature.v]
+  }
+
+  async signSwapRelease(encoded: string, recipient: string): Promise<Signature> {
+    const digest = SwapSigner.hashRelease(encoded, recipient)
+    const signature = await this.wallet._signingKey().signDigest(digest)
+    return [signature.r, signature.s, signature.v]
   }
 }

@@ -1,16 +1,11 @@
-import type { Signature } from './SwapSigner'
-
 import { recoverAddress } from '@ethersproject/transactions'
-import { hashMessage } from "@ethersproject/hash";
-import { arrayify } from '@ethersproject/bytes'
 
-import { SwapRequest, SwapRequestData } from './SwapRequest'
+import type { Signature } from './SwapSigner'
+import { Swap, SwapData } from './Swap'
 import { SwapSigner } from './SwapSigner'
 
-export interface SignedSwapRequestData extends SwapRequestData {
+export interface SignedSwapRequestData extends SwapData {
   initiator: string,
-  chainId: number,
-  mesonAddress: string,
   signature: Signature,
 }
 
@@ -18,12 +13,9 @@ export interface SignedSwapReleaseData extends SignedSwapRequestData {
   recipient: string,
 }
 
-export class SignedSwapRequest extends SwapRequest implements SignedSwapRequestData {
-  readonly chainId: number
-  readonly mesonAddress: string
+export class SignedSwapRequest extends Swap implements SignedSwapRequestData {
   readonly initiator: string
   readonly signature: Signature
-  readonly signer: SwapSigner
 
   static FromSerialized (json: string) {
     let parsed: SignedSwapRequestData
@@ -40,26 +32,17 @@ export class SignedSwapRequest extends SwapRequest implements SignedSwapRequestD
 
     if (data.encoded !== this.encoded) {
       throw new Error('Invalid encoded value')
-    } else if (!data.chainId) {
-      throw new Error('Missing chainId')
-    } else if (!data.mesonAddress) {
-      throw new Error('Missing meson contract address')
     } else if (!data.initiator) {
       throw new Error('Missing initiator')
     } else if (!data.signature) {
       throw new Error('Missing signature')
     }
-    this.chainId = data.chainId
-    this.mesonAddress = data.mesonAddress
-    this.initiator = data.initiator
+
+    this.initiator = data.initiator.toLowerCase()
     this.signature = data.signature
-
-    this.signer = new SwapSigner(this.mesonAddress, Number(this.chainId))
   }
 
-  get digest () {
-    return hashMessage(arrayify(this.encoded))
-  }
+  get digest () { return SwapSigner.hashRequest(this.encoded) }
 
   checkSignature () {
     const [r, s, v] = this.signature
@@ -72,8 +55,6 @@ export class SignedSwapRequest extends SwapRequest implements SignedSwapRequestD
   toObject (): SignedSwapRequestData {
     return {
       ...super.toObject(),
-      chainId: this.chainId,
-      mesonAddress: this.mesonAddress,
       initiator: this.initiator,
       signature: this.signature,
     }
@@ -82,7 +63,6 @@ export class SignedSwapRequest extends SwapRequest implements SignedSwapRequestD
 
 export class SignedSwapRelease extends SignedSwapRequest implements SignedSwapReleaseData {
   readonly recipient: string;
-  readonly domainHash: string
 
   constructor (data: SignedSwapReleaseData) {
     super(data)
@@ -91,10 +71,9 @@ export class SignedSwapRelease extends SignedSwapRequest implements SignedSwapRe
       throw new Error('Missing recipient')
     }
     this.recipient = data.recipient
-    this.domainHash = this.signer.getDomainHash()
   }
 
-  get digest () { return this.signer.hashRelease(this) }
+  get digest () { return SwapSigner.hashRelease(this.encoded, this.recipient) }
 
   toObject (): SignedSwapReleaseData {
     return {

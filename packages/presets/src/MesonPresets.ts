@@ -1,5 +1,5 @@
 import type { Provider } from '@ethersproject/providers'
-import type { SwapRequestData } from '@mesonfi/sdk'
+import type { SwapData } from '@mesonfi/sdk'
 
 import { Contract as EthersContract } from '@ethersproject/contracts'
 import { BigNumber } from '@ethersproject/bignumber'
@@ -20,7 +20,6 @@ export interface PresetToken {
 export interface PresetNetwork {
   id: string
   name: string
-  chainId?: string
   slip44: string
   shortSlip44: string
   extensions?: string[]
@@ -76,12 +75,6 @@ export class MesonPresets {
     return networks.find(item => item.id === id)
   }
 
-  getNetworkFromChainId(chainId: string): PresetNetwork {
-    const hexChainId = `0x${Number(chainId).toString(16)}`
-    const networks = this.getAllNetworks()
-    return networks.find(item => item.chainId === hexChainId)
-  }
-
   getNetworkFromShortCoinType(shortCoinType: string): PresetNetwork {
     const networks = this.getAllNetworks()
     return networks.find(item => item.shortSlip44 === shortCoinType)
@@ -102,7 +95,7 @@ export class MesonPresets {
     return this._tokenHashes.get(hash)
   }
 
-  decodeSwap(encoded: string): SwapRequestData {
+  decodeSwap(encoded: string): SwapData {
     if (!encoded.startsWith('0x') || encoded.length !== 66) {
       throw new Error('encoded swap should be a hex string of length 66')
     }
@@ -125,7 +118,7 @@ export class MesonPresets {
     }
     if (!this._cache.get(id)) {
       const instance = new Contract(network.mesonAddress, Meson.abi, provider)
-      const client = new MesonClient(instance, Number(network.chainId), network.shortSlip44)
+      const client = new MesonClient(instance, network.shortSlip44)
       this._cache.set(id, client)
     }
     return this._cache.get(id)

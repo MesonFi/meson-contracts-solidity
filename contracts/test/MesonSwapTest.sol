@@ -5,16 +5,6 @@ import "../Swap/MesonSwap.sol";
 
 contract MesonSwapTest is MesonSwap {
   constructor(address token) {
-    DOMAIN_SEPARATOR =
-      keccak256(
-        abi.encode(
-          EIP712_DOMAIN_TYPEHASH,
-          keccak256(bytes("Meson Fi")),
-          keccak256(bytes("1")),
-          block.chainid,
-          address(this)
-        )
-      );
     _addSupportToken(token, 1);
   }
 

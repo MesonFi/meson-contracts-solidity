@@ -117,7 +117,6 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @dev Designed to be used by liquidity providers
   function release(
     uint256 encodedSwap,
-    bytes32 domainHash,
     bytes32 r,
     bytes32 s,
     uint8 v,
@@ -126,7 +125,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint240 lockedSwap = _lockedSwaps[encodedSwap];
     require(lockedSwap != 0, "Swap does not exist");
 
-    _checkReleaseSignature(encodedSwap, recipient, domainHash, r, s, v, address(uint160(lockedSwap)));
+    _checkReleaseSignature(encodedSwap, keccak256(abi.encodePacked(recipient)), r, s, v, address(uint160(lockedSwap)));
 
     address token = _tokenList[uint8(encodedSwap >> 24)];
     _safeTransfer(token, recipient, encodedSwap >> 128);

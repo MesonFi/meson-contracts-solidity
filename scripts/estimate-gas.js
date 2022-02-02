@@ -1,10 +1,16 @@
 const { ethers } = require('hardhat')
-const { MesonClient, SignedSwapRequest, SignedSwapRelease } = require('@mesonfi/sdk/src')
+const {
+  MesonClient,
+  EthersWalletSwapSigner,
+  SignedSwapRequest,
+  SignedSwapRelease,
+} = require('@mesonfi/sdk/src')
+const { wallet } = require('../test/shared/wallet')
 const { getDefaultSwap } = require('../test/shared/meson')
 
 async function main() {
-  // use hardhat default wallet (see test/shared/wallet.ts)
-  const signer = await hre.ethers.getSigner()
+  // const signer = await hre.ethers.getSigner()
+  const swapSigner = new EthersWalletSwapSigner(wallet)
 
   //#####################---deploy contract ---#############################
   const MockToken = await ethers.getContractFactory('MockToken')
@@ -16,7 +22,7 @@ async function main() {
   console.log('Deploying Meson...')
   const mesonContract = await mesonFactory.deploy([tokenContract.address])
   console.log('Meson deployed to:', mesonContract.address)
-  const mesonClient = await MesonClient.Create(mesonContract)
+  const mesonClient = await MesonClient.Create(mesonContract, swapSigner)
 
   // approve
   const approveTx = await tokenContract.approve(mesonContract.address, totalSupply)
@@ -36,14 +42,14 @@ async function main() {
   // requestSwap (no gas)
   const swapData = getDefaultSwap({ inToken: 1, outToken: 1 })
   const outChain = await mesonContract.getShortCoinType()
-  const swap = mesonClient.requestSwap(outChain, swapData)
-  const exported = await swap.exportRequest(signer)
+  const swap = mesonClient.requestSwap(swapData, outChain)
+  const exported = await swap.exportRequest()
   const signedRequest = new SignedSwapRequest(exported)
   signedRequest.checkSignature()
 
   const swapData2 = getDefaultSwap({ amount: '200', inToken: 1, outToken: 1 })
-  const swap2 = mesonClient.requestSwap(outChain, swapData2)
-  const exported2 = await swap2.exportRequest(signer)
+  const swap2 = mesonClient.requestSwap(swapData2, outChain)
+  const exported2 = await swap2.exportRequest()
   const signedRequest2 = new SignedSwapRequest(exported2)
   signedRequest2.checkSignature()
 
@@ -62,7 +68,7 @@ async function main() {
   await lockTx.wait(1)
 
   // export release signature
-  const exportedRelease = await swap.exportRelease(signer, swapData.recipient)
+  const exportedRelease = await swap.exportRelease(swapData.recipient)
   const signedRelease = new SignedSwapRelease(exportedRelease)
   signedRelease.checkSignature()
 

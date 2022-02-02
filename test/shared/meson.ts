@@ -1,6 +1,6 @@
-import { PartialSwapRequest } from '@mesonfi/sdk'
+import { PartialSwapData } from '@mesonfi/sdk'
 
-type OptionalSwapRequestData = {
+type OptionalSwapData = {
   inToken?: number,
   outToken?: number,
   amount?: string,
@@ -12,7 +12,7 @@ export function getDefaultSwap({
   outToken = 1,
   amount = '100',
   fee = '1'
-}: OptionalSwapRequestData = {}): PartialSwapRequest {
+}: OptionalSwapData = {}): PartialSwapData {
   return {
     inToken,
     amount,

@@ -1,5 +1,10 @@
 import { ethers, waffle } from 'hardhat'
-import { MesonClient, PartialSwapRequest, SwapRequestWithSigner } from '@mesonfi/sdk'
+import {
+  MesonClient,
+  EthersWalletSwapSigner,
+  PartialSwapData,
+  SwapWithSigner,
+} from '@mesonfi/sdk'
 import mesonPresets from '@mesonfi/presets'
 import { MesonStatesTest } from '@mesonfi/contract-types'
 
@@ -7,11 +12,11 @@ import { expect } from './shared/expect'
 import { wallet } from './shared/wallet'
 import { getDefaultSwap } from './shared/meson'
 
-describe('MesonHelpers', () => {
+describe('MesonStates', () => {
   let mesonInstance: MesonStatesTest
   let mesonClient: MesonClient
-  let swapData: PartialSwapRequest
-  let swap: SwapRequestWithSigner
+  let swapData: PartialSwapData
+  let swap: SwapWithSigner
 
   const fixture = async () => {
     const factory = await ethers.getContractFactory('MesonStatesTest')
@@ -21,9 +26,9 @@ describe('MesonHelpers', () => {
   beforeEach('deploy MesonStatesTest', async () => {
     mesonInstance = await waffle.loadFixture(fixture)
     const outChain = await mesonInstance.getShortCoinType()
-    mesonClient = await MesonClient.Create(mesonInstance as any)
+    mesonClient = await MesonClient.Create(mesonInstance as any, new EthersWalletSwapSigner(wallet))
     swapData = getDefaultSwap({ inToken: 2, outToken: 3 })
-    swap = mesonClient.requestSwap(outChain, swapData)
+    swap = mesonClient.requestSwap(swapData, outChain)
   })
 
   describe('#encodeSwap', () => {
@@ -69,14 +74,14 @@ describe('MesonHelpers', () => {
 
   describe('#checkRequestSignature', () => {
     it('validates a request signature', async () => {
-      const sigs = await swap.signRequest(wallet)
+      const sigs = await swap.signRequest()
       await mesonInstance.checkRequestSignature(swap.encoded, ...sigs, wallet.address)
     })
   })
 
   describe('#checkReleaseSignature', () => {
     it('validates a release signature', async () => {
-      const sigs = await swap.signRelease(wallet, swapData.recipient)
+      const sigs = await swap.signRelease(swapData.recipient)
       await mesonInstance.checkReleaseSignature(swap.encoded, swapData.recipient, ...sigs, wallet.address)
     })
   })

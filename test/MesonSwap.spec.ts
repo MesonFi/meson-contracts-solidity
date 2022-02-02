@@ -1,5 +1,10 @@
 import { ethers, waffle } from 'hardhat'
-import { MesonClient, SignedSwapRequest, SignedSwapRelease } from '@mesonfi/sdk'
+import {
+  MesonClient,
+  EthersWalletSwapSigner,
+  SignedSwapRequest,
+  SignedSwapRelease,
+} from '@mesonfi/sdk'
 import { MockToken, MesonSwapTest } from '@mesonfi/contract-typs'
 
 import { expect } from './shared/expect'
@@ -23,7 +28,7 @@ describe('MesonSwap', () => {
     unsupportedToken = result.token2.connect(initiator)
     mesonInstance = result.swap // default account is signer
 
-    userClient = await MesonClient.Create(mesonInstance) // user is default account
+    userClient = await MesonClient.Create(mesonInstance, new EthersWalletSwapSigner(initiator)) // user is default account
     lpClient = await MesonClient.Create(mesonInstance.connect(provider))
     await lpClient.mesonInstance.register(1)
     outChain = lpClient.shortCoinType
@@ -32,8 +37,8 @@ describe('MesonSwap', () => {
 
   describe('#postSwap', () => {
     it('posts a swap', async () => {
-      const swap = userClient.requestSwap(outChain, getDefaultSwap({ fee: '0' }))
-      const exported = await swap.exportRequest(initiator)
+      const swap = userClient.requestSwap(getDefaultSwap({ fee: '0' }), outChain)
+      const exported = await swap.exportRequest()
 
       const signedRequest = new SignedSwapRequest(exported)
       signedRequest.checkSignature()
@@ -46,8 +51,8 @@ describe('MesonSwap', () => {
     })
 
     it('refuses unsupported token', async () => {
-      const swap = userClient.requestSwap(outChain, getDefaultSwap({ inToken: 2, fee: '0' }))
-      const exported = await swap.exportRequest(initiator)
+      const swap = userClient.requestSwap(getDefaultSwap({ inToken: 2, fee: '0' }), outChain)
+      const exported = await swap.exportRequest()
 
       const signedRequest = new SignedSwapRequest(exported)
       signedRequest.checkSignature()
@@ -59,15 +64,15 @@ describe('MesonSwap', () => {
   describe('#executeSwap', () => {
     it('can execute a swap', async () => {
       const swapData = getDefaultSwap({ fee: '0' })
-      const swap = userClient.requestSwap(outChain, swapData)
-      const exported = await swap.exportRequest(initiator)
+      const swap = userClient.requestSwap(swapData, outChain)
+      const exported = await swap.exportRequest()
       
       const signedRequest = new SignedSwapRequest(exported)
       signedRequest.checkSignature()
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
-      const exportedRelease = await swap.exportRelease(initiator, swapData.recipient)
+      const exportedRelease = await swap.exportRelease(swapData.recipient)
       const signedRelease = new SignedSwapRelease(exportedRelease)
       signedRelease.checkSignature()
       await lpClient.executeSwap(signedRelease, false)
