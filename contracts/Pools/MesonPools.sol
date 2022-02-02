@@ -13,7 +13,7 @@ import "../utils/MesonStates.sol";
 contract MesonPools is IMesonPoolsEvents, MesonStates {
   mapping(uint256 => uint240) internal _lockedSwaps;
 
-  function depositAndRegister(uint128 amount, uint48 balanceIndex) external {
+  function depositAndRegister(uint256 amount, uint48 balanceIndex) external {
     require(amount > 0, 'Amount must be positive');
 
     address provider = _msgSender();
@@ -25,7 +25,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     indexOfAddress[provider] = providerIndex;
 
     _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amount);
-    _unsafeDepositToken(_tokenList[uint8(balanceIndex >> 40)], provider, uint256(amount));
+    _unsafeDepositToken(_tokenList[uint8(balanceIndex >> 40)], provider, amount);
   }
 
   /// @notice Deposit tokens into the liquidity pool. This is the
@@ -37,10 +37,10 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @dev Designed to be used by liquidity providers
   /// @param amount The amount to be added to the pool
   /// @param balanceIndex `[tokenIndex:uint8][providerIndex:uint40]
-  function deposit(uint128 amount, uint48 balanceIndex) external {
+  function deposit(uint256 amount, uint48 balanceIndex) external {
     require(amount > 0, 'Amount must be positive');
     _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amount);
-    _unsafeDepositToken(_tokenList[uint8(balanceIndex >> 40)], _msgSender(), uint256(amount));
+    _unsafeDepositToken(_tokenList[uint8(balanceIndex >> 40)], _msgSender(), amount);
   }
 
   /// @notice Withdraw tokens from the liquidity pool. In order to make sure
@@ -52,14 +52,14 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @dev Designed to be used by liquidity providers
   /// @param amount The amount to be removed from the pool
   /// @param tokenIndex The contract address of the withdrawing token
-  function withdraw(uint128 amount, uint8 tokenIndex) external {
+  function withdraw(uint256 amount, uint8 tokenIndex) external {
     address provider = _msgSender();
     uint40 providerIndex = indexOfAddress[provider];
     require(providerIndex != 0, 'Caller not registered. Call depositAndRegister');
 
-    uint48 index = (uint48(tokenIndex) << 40) | providerIndex;
-    _tokenBalanceOf[index] = LowGasSafeMath.sub(_tokenBalanceOf[index], amount);
-    _safeTransfer(_tokenList[tokenIndex], provider, uint256(amount));
+    uint48 balanceIndex = (uint48(tokenIndex) << 40) | providerIndex;
+    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.sub(_tokenBalanceOf[balanceIndex], amount);
+    _safeTransfer(_tokenList[tokenIndex], provider, amount);
   }
 
   function lock(
@@ -74,22 +74,13 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     uint40 providerIndex = indexOfAddress[_msgSender()];
     require(providerIndex != 0, "Caller not registered. Call depositAndRegister.");
-    uint128 amount;
-    uint48 balanceIndex;
-    uint256 until = block.timestamp + LOCK_TIME_PERIOD;
-    uint240 lockedSwap;
-    assembly {
-      mstore(32, initiator) // store initiator@[44-64)
-      mstore(12, providerIndex) // store providerIndex@[39-44)
-      mstore(7, shr(24, encodedSwap)) // store encodedSwap@[10-39) where amount@[10-26) & outToken@38
-      amount := shr(48, mload(0)) // load amount@[10-26) (read 0-32 and right shift 6 bytes)
-      balanceIndex := mload(12) // load [38-44) which is outToken|providerIndex
-      mstore(7, until) // store until@[34-39)
-      lockedSwap := mload(32) // load [34-64) which is until|providerIndex|initiator
-    }
 
-    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.sub(_tokenBalanceOf[balanceIndex], amount);
-    _lockedSwaps[encodedSwap] = lockedSwap;
+    uint48 balanceIndex = uint48((encodedSwap & 0xFF000000) << 16) | providerIndex;
+    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.sub(_tokenBalanceOf[balanceIndex], encodedSwap >> 128);
+    
+    _lockedSwaps[encodedSwap] = (uint240(block.timestamp + LOCK_TIME_PERIOD) << 200)
+      | (providerIndex << 160)
+      | uint160(initiator);
 
     emit SwapLocked(encodedSwap);
   }
@@ -97,14 +88,10 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   function unlock(uint256 encodedSwap) external {
     uint240 lockedSwap = _lockedSwaps[encodedSwap];
     require(lockedSwap != 0, "Swap does not exist");
-
     require(uint240(block.timestamp << 200) > lockedSwap, "Swap still in lock");
 
-    uint128 amount = uint128(encodedSwap >> 128);
-    uint8 tokenIndex = uint8(encodedSwap >> 24);
-
-    uint48 balanceIndex = (uint48(tokenIndex) << 40) | uint40(lockedSwap >> 160);
-    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amount);
+    uint48 balanceIndex = uint48((encodedSwap & 0xFF000000) << 16) | uint40(lockedSwap >> 160);
+    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], encodedSwap >> 128);
     _lockedSwaps[encodedSwap] = 0;
   }
 

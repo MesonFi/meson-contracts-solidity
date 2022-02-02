@@ -12,8 +12,8 @@ import "../utils/MesonStates.sol";
 /// users initiate swaps on the initial chain.
 contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @notice Posted swap requests
-  /// Key: encodedSwap in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
-  /// Value: in format of initiator:uint160|providerIndex:uint40
+  /// key: encodedSwap in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
+  /// value: in format of initiator:uint160|providerIndex:uint40; =1 maybe means executed (to prevent replay attack)
   mapping(uint256 => uint200) internal _swapRequests;
 
   /// @notice xxxx
@@ -60,15 +60,9 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   {
     require(_swapRequests[encodedSwap] == 0, "Swap already exists");
 
-    uint8 v;
-    address initiator;
-    uint200 req;
-    assembly {
-      mstore(32, packedData) // store packedData@[38:64] where v@38, initiator@[39:59) & providerIndex@[59:64)
-      v := mload(7) // load v@38
-      initiator := mload(27) // load initiator@[39:59)
-      req := mload(32) // load [39:64) which is initiator|providerIndex
-    }
+    uint8 v = uint8(packedData >> 200);
+    uint200 req = uint200(packedData);
+    address initiator = address(uint160(req >> 40));
 
     _checkRequestSignature(encodedSwap, r, s, v, initiator);
     _swapRequests[encodedSwap] = req;
@@ -89,10 +83,9 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     
     inToken = _tokenList[uint8(encodedSwap)];
 
-    uint40 expireTs = uint40(encodedSwap >> 48);
-    uint40 ts = uint40(block.timestamp);
-    require(expireTs > ts + MIN_BOND_TIME_PERIOD, "Expire ts too early");
-    require(expireTs < ts + MAX_BOND_TIME_PERIOD, "Expire ts too late");
+    uint256 expireTs = (encodedSwap >> 48) & 0xFFFFFFFFFF;
+    require(expireTs > block.timestamp + MIN_BOND_TIME_PERIOD, "Expire ts too early");
+    require(expireTs < block.timestamp + MAX_BOND_TIME_PERIOD, "Expire ts too late");
   }
 
   /// @notice Cancel a swap
@@ -100,14 +93,13 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @param encodedSwap Encoded swap
   function cancelSwap(uint256 encodedSwap) external {
     uint200 req = _swapRequests[encodedSwap];
-
     require(req != 0, "Swap does not exist");
     require(uint40(encodedSwap >> 48) < uint40(block.timestamp), "Swap is still locked");
     
     address initiator = address(uint160(req >> 40));
     address inToken = _tokenList[uint8(encodedSwap)];
 
-    _swapRequests[encodedSwap] = 0;
+    _swapRequests[encodedSwap] = 1;
 
     _safeTransfer(inToken, initiator, encodedSwap >> 128);
 
@@ -132,28 +124,23 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     uint8 v,
     bool depositToPool
   ) external {
-    uint200 req = _swapRequests[encodedSwap]; // No check here. User should check it before sign for release
-    _swapRequests[encodedSwap] = 0;
+    uint200 req = _swapRequests[encodedSwap];
+    require(req != 0, "Swap does not exist");
+
+    if (((encodedSwap >> 48) & 0xFFFFFFFFFF) < block.timestamp + MIN_BOND_TIME_PERIOD) {
+      _swapRequests[encodedSwap] = 0;
+    } else {
+      _swapRequests[encodedSwap] = 1;
+    }
 
     // TODO: fee to meson protocol
 
+    _checkReleaseSignature(encodedSwap, recipientHash, r, s, v, address(uint160(req >> 40)));
+
     if (depositToPool) {
-      address initiator;
-      uint128 amountWithFee;
-      uint48 balanceIndex;
-      assembly {
-        mstore(21, req) // store req@[28-53) where initiator@[28-48) & providerIndex@[48-53)
-        initiator := mload(16) // load initiator@[28-48)
-        mstore(16, encodedSwap) // store encodedSwap@[16-48) where amount@[16-32) & inToken@47
-        amountWithFee := mload(0) // load amount@[16-32)
-        balanceIndex := mload(21) // load [47-53) which is inToken|providerIndex
-      }
-      _checkReleaseSignature(encodedSwap, recipientHash, r, s, v, initiator);
-      _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amountWithFee);
+      uint48 balanceIndex = uint48(encodedSwap << 40) | uint40(req); // TODO: check
+      _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], encodedSwap >> 128);
     } else {
-      _checkReleaseSignature(encodedSwap, recipientHash, r, s, v,
-        address(uint160(req >> 40)) // initiator
-      );
       _safeTransfer(
         _tokenList[uint8(encodedSwap)], // tokenIndex -> token address
         addressOfIndex[uint40(req)], // providerIndex -> provider address
@@ -169,6 +156,9 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
   function swapProvider(uint256 encodedSwap) external view returns (address) {
     uint200 req = _swapRequests[encodedSwap];
+    if (req >> 40 == 0) {
+      return address(0);
+    }
     return addressOfIndex[uint40(req)];
   }
 

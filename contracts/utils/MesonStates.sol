@@ -10,9 +10,9 @@ contract MesonStates is MesonTokens, MesonHelpers {
   mapping(address => uint40) public indexOfAddress;
   mapping(uint40 => address) public addressOfIndex;
 
-  mapping(uint48 => uint128) internal _tokenBalanceOf;
+  mapping(uint48 => uint256) internal _tokenBalanceOf;
 
-  function balanceOf(address token, address addr) external view returns (uint128) {
+  function balanceOf(address token, address addr) external view returns (uint256) {
     uint8 tokenIndex = _indexOfToken[token];
     uint40 providerIndex = indexOfAddress[addr];
     return _tokenBalanceOf[(uint48(tokenIndex) << 40) | providerIndex];
