@@ -84,7 +84,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   function _checkSwapRequest(uint256 encodedSwap) internal view
     returns (uint256 amountWithFee, address inToken)
   {
-    amountWithFee = uint256(encodedSwap) >> 128;
+    amountWithFee = encodedSwap >> 128;
     require(amountWithFee > 0, "Swap amount must be greater than zero");
     
     inToken = _tokenList[uint8(encodedSwap)];
@@ -160,8 +160,6 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
         encodedSwap >> 128
       );
     }
-
-    emit SwapExecuted(encodedSwap);
   }
 
   function swapInitiator(uint256 encodedSwap) external view returns (address) {

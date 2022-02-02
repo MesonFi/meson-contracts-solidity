@@ -16,9 +16,4 @@ interface IMesonSwapEvents {
   event SwapPosted(uint256 encodedSwap);
 
   event SwapCancelled(uint256 encodedSwap);
-
-  /// @notice Event when a swap request is fully executed.
-  /// Emit at the end of `executeSwap()` calls.
-  /// @param encodedSwap Encoded swap
-  event SwapExecuted(uint256 encodedSwap);
 }
