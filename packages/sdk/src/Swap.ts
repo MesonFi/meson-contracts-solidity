@@ -1,4 +1,5 @@
 import { pack } from '@ethersproject/solidity'
+import { hexZeroPad } from '@ethersproject/bytes'
 import { BigNumber } from '@ethersproject/bignumber'
 
 const swapStruct = [
@@ -36,7 +37,10 @@ export class Swap implements SwapData {
 
   private _encoded: string = ''
 
-  static decode (encoded: string): Swap {
+  static decode (encoded: string | BigNumber): Swap {
+    if (typeof encoded !== 'string') {
+      encoded = hexZeroPad(encoded.toHexString(), 32)
+    }
     if (!encoded.startsWith('0x') || encoded.length !== 66) {
       throw new Error('encoded swap should be a hex string of length 66')
     }
