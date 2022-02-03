@@ -1,7 +1,5 @@
 import type { Provider } from '@ethersproject/providers'
-
 import { Contract as EthersContract } from '@ethersproject/contracts'
-import { keccak256 } from '@ethersproject/keccak256'
 import { MesonClient } from '@mesonfi/sdk'
 import { Meson } from '@mesonfi/contract-abis'
 
