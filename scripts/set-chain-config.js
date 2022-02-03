@@ -16,7 +16,7 @@ async function setChainConfig(networkId) {
 
   let network
   if (networkId === 'local') {
-    network = { name: 'Local', slip44: '0x0001' }
+    network = { name: 'Local', shortSlip44: '0x0001' }
   } else {
     network = presets.find(item => item.id === networkId)
   }
