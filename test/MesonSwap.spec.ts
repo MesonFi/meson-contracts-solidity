@@ -1,5 +1,10 @@
-import { waffle } from 'hardhat'
-import { MesonClient, SignedSwapRequest, SignedSwapRelease } from '@mesonfi/sdk'
+import { ethers, waffle } from 'hardhat'
+import {
+  MesonClient,
+  EthersWalletSwapSigner,
+  SignedSwapRequest,
+  SignedSwapRelease,
+} from '@mesonfi/sdk'
 import { MockToken, MesonSwapTest } from '@mesonfi/contract-typs'
 
 import { expect } from './shared/expect'
@@ -23,54 +28,59 @@ describe('MesonSwap', () => {
     unsupportedToken = result.token2.connect(initiator)
     mesonInstance = result.swap // default account is signer
 
-    outChain = await mesonInstance.getCoinType()
-    userClient = await MesonClient.Create(mesonInstance) // user is default account
+    userClient = await MesonClient.Create(mesonInstance, new EthersWalletSwapSigner(initiator)) // user is default account
     lpClient = await MesonClient.Create(mesonInstance.connect(provider))
+    await lpClient.mesonInstance.register(1)
+    outChain = lpClient.shortCoinType
   })
 
 
   describe('#postSwap', () => {
     it('posts a swap', async () => {
-      const swap = userClient.requestSwap(outChain, getDefaultSwap({ inToken: token.address, fee: '0' }))
-      const exported = await swap.exportRequest(initiator)
+      const swap = userClient.requestSwap(getDefaultSwap({ fee: '0' }), outChain)
+      const request = await swap.signForRequest()
 
-      const signedRequest = new SignedSwapRequest(exported)
+      const signedRequest = new SignedSwapRequest(request)
       signedRequest.checkSignature()
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
-      expect(await mesonInstance.hasSwap(swap.swapId)).to.equal(true)
+      const posted = await mesonInstance.getPostedSwap(swap.encoded)
+      expect(posted.initiator).to.equal(initiator.address)
+      expect(posted.provider).to.equal(provider.address)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
     })
 
     it('refuses unsupported token', async () => {
-      const swap = userClient.requestSwap(outChain, getDefaultSwap({ inToken: unsupportedToken.address, fee: '0' }))
-      const exported = await swap.exportRequest(initiator)
+      const swap = userClient.requestSwap(getDefaultSwap({ inToken: 2, fee: '0' }), outChain)
+      const request = await swap.signForRequest()
 
-      const signedRequest = new SignedSwapRequest(exported)
+      const signedRequest = new SignedSwapRequest(request)
       signedRequest.checkSignature()
       await unsupportedToken.approve(mesonInstance.address, swap.amount)
-      await expect(lpClient.postSwap(signedRequest)).to.be.revertedWith('unsupported token')
+      await expect(lpClient.postSwap(signedRequest)).to.be.reverted
     })
   })
 
   describe('#executeSwap', () => {
     it('can execute a swap', async () => {
-      const swapData = getDefaultSwap({ inToken: token.address, fee: '0' })
-      const swap = userClient.requestSwap(outChain, swapData)
-      const exported = await swap.exportRequest(initiator)
+      const swapData = getDefaultSwap({ fee: '0' })
+      const swap = userClient.requestSwap(swapData, outChain)
+      const request = await swap.signForRequest()
       
-      const signedRequest = new SignedSwapRequest(exported)
+      const signedRequest = new SignedSwapRequest(request)
       signedRequest.checkSignature()
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
-      const exportedRelease = await swap.exportRelease(initiator, swapData.recipient)
-      const signedRelease = new SignedSwapRelease(exportedRelease)
+      const release = await swap.signForRelease(swapData.recipient)
+      const signedRelease = new SignedSwapRelease(release)
       signedRelease.checkSignature()
       await lpClient.executeSwap(signedRelease, false)
 
-      expect(await mesonInstance.hasSwap(swap.swapId)).to.equal(false)
+      const posted = await mesonInstance.getPostedSwap(swap.encoded)
+      expect(posted.initiator).to.equal(ethers.constants.AddressZero)
+      expect(posted.provider).to.equal(ethers.constants.AddressZero)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.add(swap.amount))
     })

@@ -1,19 +1,24 @@
-import { BytesLike } from 'ethers'
-import { PartialSwapRequest } from '@mesonfi/sdk'
+import { PartialSwapData } from '@mesonfi/sdk'
 
-type OptionalSwapRequestData = {
-  inToken?: BytesLike,
-  outToken?: BytesLike,
+type OptionalSwapData = {
+  inToken?: number,
+  outToken?: number,
   amount?: string,
   fee?: string,
 }
 
-export function getDefaultSwap({ inToken, outToken, amount, fee }: OptionalSwapRequestData = {}): PartialSwapRequest {
+export function getDefaultSwap({
+  inToken = 1,
+  outToken = 1,
+  amount = '100',
+  fee = '1'
+}: OptionalSwapData = {}): PartialSwapData {
   return {
-    inToken: inToken || '0x943f0cabc0675f3642927e25abfa9a7ae15e8672',
-    amount: amount || '100',
-    fee: fee || '1',
-    outToken: outToken || '0x2151166224670b37ec76c8ee2011bbbf4bbf2a52',
+    amount,
+    salt: Math.floor(Math.random() * 10000),
+    fee,
+    inToken,
+    outToken,
     recipient: '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211',
   }
 }

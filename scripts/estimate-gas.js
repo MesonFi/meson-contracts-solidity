@@ -1,10 +1,16 @@
 const { ethers } = require('hardhat')
-const { MesonClient, SignedSwapRequest, SignedSwapRelease } = require('@mesonfi/sdk/src')
+const {
+  MesonClient,
+  EthersWalletSwapSigner,
+  SignedSwapRequest,
+  SignedSwapRelease,
+} = require('@mesonfi/sdk/src')
+const { wallet } = require('../test/shared/wallet')
 const { getDefaultSwap } = require('../test/shared/meson')
 
 async function main() {
-  // use hardhat default wallet (see test/shared/wallet.ts)
-  const signer = await hre.ethers.getSigner()
+  // const signer = await hre.ethers.getSigner()
+  const swapSigner = new EthersWalletSwapSigner(wallet)
 
   //#####################---deploy contract ---#############################
   const MockToken = await ethers.getContractFactory('MockToken')
@@ -16,8 +22,7 @@ async function main() {
   console.log('Deploying Meson...')
   const mesonContract = await mesonFactory.deploy([tokenContract.address])
   console.log('Meson deployed to:', mesonContract.address)
-  const mesonClient = await MesonClient.Create(mesonContract)
-
+  const mesonClient = await MesonClient.Create(mesonContract, swapSigner)
 
   // approve
   const approveTx = await tokenContract.approve(mesonContract.address, totalSupply)
@@ -26,32 +31,27 @@ async function main() {
 
   // deposits
   const swapAmount = '1000000000'
-  const depositTx1 = await mesonContract.deposit(tokenContract.address, swapAmount)
+  const depositTx1 = await mesonClient.depositAndRegister(mesonClient.token(1), swapAmount, '1')
   getUsedGas('first deposit', depositTx1.hash)
   await depositTx1.wait(1)
 
-  const depositTx2 = await mesonContract.deposit(tokenContract.address, swapAmount)
+  const depositTx2 = await mesonClient.deposit(mesonClient.token(1), swapAmount)
   getUsedGas('another deposit', depositTx2.hash)
   await depositTx2.wait(1)
 
   // requestSwap (no gas)
-  const swapData = getDefaultSwap({
-    inToken: tokenContract.address,
-    outToken: tokenContract.address
-  })
-  const outChain = await mesonContract.getCoinType()
-  const swap = mesonClient.requestSwap(outChain, swapData)
-  const exported = await swap.exportRequest(signer)
-  const signedRequest = new SignedSwapRequest(exported)
+  const swapData = getDefaultSwap({ inToken: 1, outToken: 1 })
+  const outChain = await mesonContract.getShortCoinType()
+  const swap = mesonClient.requestSwap(swapData, outChain)
+  const request = await swap.signForRequest()
+  const signedRequest = new SignedSwapRequest(request)
+  signedRequest.checkSignature()
 
-  const swapData2 = getDefaultSwap({
-    amount: '200',
-    inToken: tokenContract.address,
-    outToken: tokenContract.address
-  })
-  const swap2 = mesonClient.requestSwap(outChain, swapData2)
-  const exported2 = await swap2.exportRequest(signer)
-  const signedRequest2 = new SignedSwapRequest(exported2)
+  const swapData2 = getDefaultSwap({ amount: '200', inToken: 1, outToken: 1 })
+  const swap2 = mesonClient.requestSwap(swapData2, outChain)
+  const request2 = await swap2.signForRequest()
+  const signedRequest2 = new SignedSwapRequest(request2)
+  signedRequest2.checkSignature()
 
   // postSwap
   const postSwapTx1 = await mesonClient.postSwap(signedRequest)
@@ -67,13 +67,18 @@ async function main() {
   getUsedGas('lock', lockTx.hash)
   await lockTx.wait(1)
 
-  // release signature (no gas)
-  const exportedRelease = await swap.exportRelease(signer, swapData.recipient)
+  // export release signature
+  const release = await swap.signForRelease(swapData.recipient)
+  const signedRelease = new SignedSwapRelease(release)
+  signedRelease.checkSignature()
 
-  // Release
-  const signedRelease = new SignedSwapRelease(exportedRelease)
-  const releaseTx = await mesonClient.release(signedRelease, swap.amount)
+  // release
+  const releaseTx = await mesonClient.release(signedRelease)
   getUsedGas('release', releaseTx.hash)
+
+  // executeSwap
+  const executeTx = await mesonClient.executeSwap(signedRelease, true)
+  getUsedGas('execute', executeTx.hash)
 }
 
 

@@ -1,5 +1,10 @@
 import { waffle } from 'hardhat'
-import { MesonClient, SignedSwapRequest, SignedSwapRelease } from '@mesonfi/sdk'
+import {
+  MesonClient,
+  EthersWalletSwapSigner,
+  SignedSwapRequest,
+  SignedSwapRelease,
+} from '@mesonfi/sdk'
 import { MockToken, MesonPoolsTest } from '@mesonfi/contract-typs'
 
 import { expect } from './shared/expect'
@@ -9,7 +14,6 @@ import { getDefaultSwap } from './shared/meson'
 
 describe('MesonPools', () => {
   let token: MockToken
-  let unsupportedToken: MockToken
   let mesonInstance: MesonPoolsTest
   let outChain: string
   let userClient: MesonClient
@@ -20,12 +24,12 @@ describe('MesonPools', () => {
       initiator.address, provider.address
     ]))
     token = result.token1.connect(provider)
-    unsupportedToken = result.token2.connect(provider)
     mesonInstance = result.pools.connect(provider) // provider is signer
 
-    outChain = await mesonInstance.getCoinType()
-    userClient = await MesonClient.Create(result.pools) // user is default account
+    userClient = await MesonClient.Create(result.pools, new EthersWalletSwapSigner(initiator))
     lpClient = await MesonClient.Create(mesonInstance)
+    outChain = lpClient.shortCoinType
+    await token.approve(mesonInstance.address, 1000)
   })
 
   describe('#token total supply', () => {
@@ -47,75 +51,70 @@ describe('MesonPools', () => {
     })
   })
 
-  describe('#deposit', () => {
+  describe('#depositAndRegister', () => {
     it('accepts 1000 deposit', async () => {
-      await token.approve(mesonInstance.address, 1000)
-      await mesonInstance.deposit(token.address, 1000)
-      expect(await mesonInstance.balanceOf(token.address, provider.address)).to.equal(1000)
+      await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
+      expect(await mesonInstance.balanceOf(lpClient.token(1), provider.address)).to.equal(1000)
       expect(await token.balanceOf(mesonInstance.address)).to.equal(1000)
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.sub(1000))
 
-      await expect(mesonInstance.deposit(token.address, 1)).to.be.reverted
+      await expect(mesonInstance.deposit(lpClient.token(1), 1)).to.be.reverted
     })
 
     it('refuses unsupported token', async () => {
-      await unsupportedToken.approve(mesonInstance.address, 1000)
-      await expect(mesonInstance.deposit(unsupportedToken.address, 1000)).to.be.revertedWith('unsupported token')
-
-      await expect(mesonInstance.deposit(token.address, 1)).to.be.reverted
+      await expect(lpClient._depositAndRegister('1000', 2, '1')).to.be.reverted
     })
   })
 
   describe('#withdraw', () => {
     it('accepts 1000 deposit and 1000 withdrawal', async () => {
-      await token.approve(mesonInstance.address, 1000)
-      await mesonInstance.deposit(token.address, 1000)
-      await mesonInstance.withdraw(token.address, 1000)
+      await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
+      await mesonInstance.withdraw('1000', 1)
       expect(await token.balanceOf(mesonInstance.address)).to.equal(0)
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE)
 
-      await expect(mesonInstance.withdraw(token.address, 1)).to.be.revertedWith('overdrawn')
+      await expect(mesonInstance.withdraw('1', 1)).to.be.revertedWith('underflow')
     })
 
     it('refuses unsupported token', async () => {
-      await expect(mesonInstance.withdraw(unsupportedToken.address, 1000)).to.be.revertedWith('unsupported token')
+      await expect(mesonInstance.withdraw('1000', 2)).to.be.reverted
     })
   })
 
   describe('#lock', async () => {
     it('lockes a swap', async () => {
-      const swap = userClient.requestSwap(outChain, getDefaultSwap({ outToken: token.address }))
-      const exported = await swap.exportRequest(initiator)
+      await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
 
-      const signedRequest = new SignedSwapRequest(exported)
+      const swap = userClient.requestSwap(getDefaultSwap(), outChain)
+      const request = await swap.signForRequest()
+
+      const signedRequest = new SignedSwapRequest(request)
       signedRequest.checkSignature()
-      await token.approve(mesonInstance.address, signedRequest.amount)
-      await mesonInstance.deposit(signedRequest.outToken, signedRequest.amount)
       await lpClient.lock(signedRequest)
 
-      expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
-      expect(await mesonInstance.hasLockingSwap(swap.swapId)).to.equal(true)
+      expect(await mesonInstance.balanceOf(lpClient.token(1), initiator.address)).to.equal(0)
+      // expect(await mesonInstance.getLockedSwap(swap.encoded)).to.equal(true)
     })
   })
 
   describe('#release', async () => {
     it('accepts a release', async () => {
-      const swapData = getDefaultSwap({ outToken: token.address })
-      const swap = userClient.requestSwap(outChain, swapData)
-      const exported = await swap.exportRequest(initiator)
+      await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
+
+      const swapData = getDefaultSwap()
+      const swap = userClient.requestSwap(swapData, outChain)
+      const request = await swap.signForRequest()
       
-      const signedRequest = new SignedSwapRequest(exported)
+      const signedRequest = new SignedSwapRequest(request)
       signedRequest.checkSignature()
-      await token.approve(mesonInstance.address, signedRequest.amount)
-      await mesonInstance.deposit(signedRequest.outToken, signedRequest.amount)
       await lpClient.lock(signedRequest)
 
-      const exportedRelease = await swap.exportRelease(initiator, swapData.recipient)
-      const signedRelease = new SignedSwapRelease(exportedRelease)
+      const release = await swap.signForRelease(swapData.recipient)
+      const signedRelease = new SignedSwapRelease(release)
       signedRelease.checkSignature()
-      await lpClient.release(signedRelease, swap.amount)
+      await lpClient.release(signedRelease)
 
-      expect(await mesonInstance.balanceOf(token.address, initiator.address)).to.equal(0)
+      expect(await mesonInstance.balanceOf(lpClient.token(1), initiator.address)).to.equal(0)
       expect(await token.balanceOf(swapData.recipient)).to.equal(swap.amount)
     })
   })

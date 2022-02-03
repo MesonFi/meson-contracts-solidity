@@ -1,9 +1,5 @@
 import type { Provider } from '@ethersproject/providers'
-import type { SwapRequestData } from '@mesonfi/sdk'
-
 import { Contract as EthersContract } from '@ethersproject/contracts'
-import { defaultAbiCoder } from '@ethersproject/abi'
-import { keccak256 } from '@ethersproject/keccak256'
 import { MesonClient } from '@mesonfi/sdk'
 import { Meson } from '@mesonfi/contract-abis'
 
@@ -20,8 +16,9 @@ export interface PresetToken {
 export interface PresetNetwork {
   id: string
   name: string
-  chainId?: string
+  chainId: string,
   slip44: string
+  shortSlip44: string
   extensions?: string[]
   addressFormat: string
   url?: string
@@ -38,32 +35,14 @@ export interface PresetNetwork {
 export class MesonPresets {
   private _networks: PresetNetwork[] | undefined
   private _cache: Map<string, MesonClient>
-  private _tokenHashes: Map<string, string>
 
   constructor(networks?: PresetNetwork[]) {
     this._networks = networks
     this._cache = new Map()
-    this._tokenHashes = new Map()
   }
 
   useTestnet(testnet) {
     this._networks = testnet ? testnets : mainnets
-  }
-
-  calcAllTokenHashes(): void {
-    const networks = this.getAllNetworks()
-    networks.forEach(n => {
-      if (n.addressFormat !== 'hex') {
-        return
-      }
-      n.tokens.forEach(t => {
-        this._addTokenToHashTable(t.addr)
-      })
-    })
-  }
-
-  private _addTokenToHashTable(address: string): void {
-    this._tokenHashes.set(keccak256(address), address)
   }
 
   getAllNetworks(): PresetNetwork[] {
@@ -75,15 +54,14 @@ export class MesonPresets {
     return networks.find(item => item.id === id)
   }
 
-  getNetworkFromChainId(chainId: string): PresetNetwork {
-    const hexChainId = `0x${Number(chainId).toString(16)}`
+  getNetworkFromShortCoinType(shortCoinType: string): PresetNetwork {
     const networks = this.getAllNetworks()
-    return networks.find(item => item.chainId === hexChainId)
+    return networks.find(item => item.shortSlip44 === shortCoinType)
   }
 
-  getNetworkFromCoinType(coinType: string): PresetNetwork {
+  getNetworkFromChainId(chainId: string): PresetNetwork {
     const networks = this.getAllNetworks()
-    return networks.find(item => item.slip44 === coinType)
+    return networks.find(item => item.chainId === chainId)
   }
 
   getTokensForNetwork(id: string): PresetToken[] {
@@ -92,26 +70,9 @@ export class MesonPresets {
     return match?.tokens || []
   }
 
-  getToken(networkId: string, addr: string): PresetToken {
+  getToken(networkId: string, tokenIndex: number): PresetToken {
     const tokens = this.getTokensForNetwork(networkId)
-    return tokens.find(token => token.addr.toLowerCase() === addr.toLowerCase())
-  }
-
-  getTokenAddrFromHash(hash: string): string {
-    return this._tokenHashes.get(hash)
-  }
-
-  decodeSwap(encoded: string): SwapRequestData {
-    const [inChain, inTokenHash, amount, fee, expireTs, outChain, outTokenHash] =
-      defaultAbiCoder.decode(
-        ['bytes32', 'bytes32', 'uint128', 'uint48', 'uint48', 'bytes4', 'bytes32'],
-        encoded
-      )
-
-    const inToken = this.getTokenAddrFromHash(inTokenHash)
-    const outToken = this.getTokenAddrFromHash(outTokenHash)
-
-    return { inChain, inToken, amount, fee, expireTs, outChain, outToken }
+    return tokens[tokenIndex - 1]
   }
 
   getClient(id: string, provider: Provider, Contract = EthersContract): MesonClient {
@@ -122,7 +83,7 @@ export class MesonPresets {
     }
     if (!this._cache.get(id)) {
       const instance = new Contract(network.mesonAddress, Meson.abi, provider)
-      const client = new MesonClient(instance, Number(network.chainId), network.slip44)
+      const client = new MesonClient(instance, network.shortSlip44)
       this._cache.set(id, client)
     }
     return this._cache.get(id)

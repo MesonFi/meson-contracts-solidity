@@ -19,164 +19,226 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface MesonInterface extends utils.Interface {
   functions: {
+    "addressOfIndex(uint40)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
-    "bondSwap(bytes32)": FunctionFragment;
-    "cancelSwap(bytes32)": FunctionFragment;
-    "challenge()": FunctionFragment;
-    "deposit(address,uint128)": FunctionFragment;
-    "executeSwap(bytes32,bytes,bytes32,bytes32,uint8,bool)": FunctionFragment;
-    "getCoinType()": FunctionFragment;
-    "lock(bytes32,address,uint128,address)": FunctionFragment;
-    "lockingSwaps(bytes32)": FunctionFragment;
-    "postSwap(bytes,address,address,bytes32,bytes32,uint8)": FunctionFragment;
-    "release(bytes32,address,uint128,bytes32,bytes32,bytes32,uint8)": FunctionFragment;
-    "requestSwap(bytes,address)": FunctionFragment;
-    "requests(bytes32)": FunctionFragment;
-    "supportedTokens(address)": FunctionFragment;
-    "unlock(bytes32)": FunctionFragment;
-    "withdraw(address,uint128)": FunctionFragment;
+    "bondSwap(uint256,uint40)": FunctionFragment;
+    "cancelSwap(uint256)": FunctionFragment;
+    "deposit(uint256,uint48)": FunctionFragment;
+    "depositAndRegister(uint256,uint48)": FunctionFragment;
+    "executeSwap(uint256,bytes32,bytes32,bytes32,uint8,bool)": FunctionFragment;
+    "getLockedSwap(uint256)": FunctionFragment;
+    "getPostedSwap(uint256)": FunctionFragment;
+    "getShortCoinType()": FunctionFragment;
+    "indexOfAddress(address)": FunctionFragment;
+    "indexOfToken(address)": FunctionFragment;
+    "lock(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
+    "postSwap(uint256,bytes32,bytes32,uint208)": FunctionFragment;
+    "release(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
+    "requestSwap(uint256)": FunctionFragment;
+    "supportedTokens()": FunctionFragment;
+    "tokenForIndex(uint8)": FunctionFragment;
+    "unlock(uint256)": FunctionFragment;
+    "withdraw(uint256,uint8)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "addressOfIndex",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [string, string]
   ): string;
-  encodeFunctionData(functionFragment: "bondSwap", values: [BytesLike]): string;
+  encodeFunctionData(
+    functionFragment: "bondSwap",
+    values: [BigNumberish, BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "cancelSwap",
-    values: [BytesLike]
+    values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "challenge", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "deposit",
-    values: [string, BigNumberish]
+    values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "depositAndRegister",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "executeSwap",
-    values: [BytesLike, BytesLike, BytesLike, BytesLike, BigNumberish, boolean]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getCoinType",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "lock",
-    values: [BytesLike, string, BigNumberish, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "lockingSwaps",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "postSwap",
-    values: [BytesLike, string, string, BytesLike, BytesLike, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "release",
     values: [
-      BytesLike,
-      string,
       BigNumberish,
       BytesLike,
       BytesLike,
       BytesLike,
-      BigNumberish
+      BigNumberish,
+      boolean
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "requestSwap",
-    values: [BytesLike, string]
+    functionFragment: "getLockedSwap",
+    values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "requests", values: [BytesLike]): string;
   encodeFunctionData(
-    functionFragment: "supportedTokens",
+    functionFragment: "getPostedSwap",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getShortCoinType",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "indexOfAddress",
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "unlock", values: [BytesLike]): string;
+  encodeFunctionData(
+    functionFragment: "indexOfToken",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "lock",
+    values: [BigNumberish, BytesLike, BytesLike, BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "postSwap",
+    values: [BigNumberish, BytesLike, BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "release",
+    values: [BigNumberish, BytesLike, BytesLike, BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "requestSwap",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "supportedTokens",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenForIndex",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "unlock",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "withdraw",
-    values: [string, BigNumberish]
+    values: [BigNumberish, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "addressOfIndex",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bondSwap", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "cancelSwap", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "challenge", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "depositAndRegister",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "executeSwap",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getCoinType",
+    functionFragment: "getLockedSwap",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getPostedSwap",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getShortCoinType",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "indexOfAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "indexOfToken",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "lock", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "lockingSwaps",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "postSwap", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "requestSwap",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "requests", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportedTokens",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenForIndex",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unlock", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
-    "SwapBonded(bytes32)": EventFragment;
-    "SwapCancelled(bytes32)": EventFragment;
-    "SwapExecuted(bytes32)": EventFragment;
-    "SwapLocked(bytes32,address)": EventFragment;
-    "SwapPosted(bytes32)": EventFragment;
-    "SwapReleased(bytes32)": EventFragment;
-    "SwapRequested(bytes32)": EventFragment;
+    "SwapBonded(uint256)": EventFragment;
+    "SwapCancelled(uint256)": EventFragment;
+    "SwapLocked(uint256)": EventFragment;
+    "SwapPosted(uint256)": EventFragment;
+    "SwapReleased(uint256)": EventFragment;
+    "SwapRequested(uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "SwapBonded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SwapCancelled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SwapExecuted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SwapLocked"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SwapPosted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SwapReleased"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SwapRequested"): EventFragment;
 }
 
-export type SwapBondedEvent = TypedEvent<[string], { swapId: string }>;
+export type SwapBondedEvent = TypedEvent<
+  [BigNumber],
+  { encodedSwap: BigNumber }
+>;
 
 export type SwapBondedEventFilter = TypedEventFilter<SwapBondedEvent>;
 
-export type SwapCancelledEvent = TypedEvent<[string], { swapId: string }>;
+export type SwapCancelledEvent = TypedEvent<
+  [BigNumber],
+  { encodedSwap: BigNumber }
+>;
 
 export type SwapCancelledEventFilter = TypedEventFilter<SwapCancelledEvent>;
 
-export type SwapExecutedEvent = TypedEvent<[string], { swapId: string }>;
-
-export type SwapExecutedEventFilter = TypedEventFilter<SwapExecutedEvent>;
-
 export type SwapLockedEvent = TypedEvent<
-  [string, string],
-  { swapId: string; provider: string }
+  [BigNumber],
+  { encodedSwap: BigNumber }
 >;
 
 export type SwapLockedEventFilter = TypedEventFilter<SwapLockedEvent>;
 
-export type SwapPostedEvent = TypedEvent<[string], { swapId: string }>;
+export type SwapPostedEvent = TypedEvent<
+  [BigNumber],
+  { encodedSwap: BigNumber }
+>;
 
 export type SwapPostedEventFilter = TypedEventFilter<SwapPostedEvent>;
 
-export type SwapReleasedEvent = TypedEvent<[string], { swapId: string }>;
+export type SwapReleasedEvent = TypedEvent<
+  [BigNumber],
+  { encodedSwap: BigNumber }
+>;
 
 export type SwapReleasedEventFilter = TypedEventFilter<SwapReleasedEvent>;
 
-export type SwapRequestedEvent = TypedEvent<[string], { swapId: string }>;
+export type SwapRequestedEvent = TypedEvent<
+  [BigNumber],
+  { encodedSwap: BigNumber }
+>;
 
 export type SwapRequestedEventFilter = TypedEventFilter<SwapRequestedEvent>;
 
@@ -207,35 +269,43 @@ export interface Meson extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    addressOfIndex(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     balanceOf(
-      arg0: string,
-      arg1: string,
+      token: string,
+      addr: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     bondSwap(
-      swapId: BytesLike,
+      encodedSwap: BigNumberish,
+      providerIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     cancelSwap(
-      swapId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    challenge(
+      encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     deposit(
-      token: string,
       amount: BigNumberish,
+      balanceIndex: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    depositAndRegister(
+      amount: BigNumberish,
+      balanceIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     executeSwap(
-      swapId: BytesLike,
-      recipient: BytesLike,
+      encodedSwap: BigNumberish,
+      recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -243,115 +313,117 @@ export interface Meson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getCoinType(overrides?: CallOverrides): Promise<[string]>;
-
-    lock(
-      swapId: BytesLike,
-      initiator: string,
-      amount: BigNumberish,
-      token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    lockingSwaps(
-      arg0: BytesLike,
+    getLockedSwap(
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, BigNumber, BigNumber] & {
+      [string, string, number] & {
         initiator: string;
         provider: string;
-        token: string;
-        amount: BigNumber;
-        until: BigNumber;
+        until: number;
       }
     >;
 
-    postSwap(
-      encodedSwap: BytesLike,
-      inToken: string,
-      initiator: string,
+    getPostedSwap(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, string] & { initiator: string; provider: string }>;
+
+    getShortCoinType(overrides?: CallOverrides): Promise<[string]>;
+
+    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<[number]>;
+
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<[number]>;
+
+    lock(
+      encodedSwap: BigNumberish,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      initiator: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    postSwap(
+      encodedSwap: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      packedData: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     release(
-      swapId: BytesLike,
-      recipient: string,
-      metaAmount: BigNumberish,
-      domainHash: BytesLike,
+      encodedSwap: BigNumberish,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     requestSwap(
-      encodedSwap: BytesLike,
-      inToken: string,
+      encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    requests(
-      arg0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<
-      [string, string, string, BigNumber, number] & {
-        initiator: string;
-        provider: string;
-        inToken: string;
-        total: BigNumber;
-        expireTs: number;
-      }
-    >;
-
     supportedTokens(
-      arg0: string,
       overrides?: CallOverrides
-    ): Promise<[boolean]>;
+    ): Promise<[string[]] & { tokens: string[] }>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
     unlock(
-      swapId: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     withdraw(
-      token: string,
       amount: BigNumberish,
+      tokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
+  addressOfIndex(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   balanceOf(
-    arg0: string,
-    arg1: string,
+    token: string,
+    addr: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   bondSwap(
-    swapId: BytesLike,
+    encodedSwap: BigNumberish,
+    providerIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   cancelSwap(
-    swapId: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  challenge(
+    encodedSwap: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   deposit(
-    token: string,
     amount: BigNumberish,
+    balanceIndex: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  depositAndRegister(
+    amount: BigNumberish,
+    balanceIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   executeSwap(
-    swapId: BytesLike,
-    recipient: BytesLike,
+    encodedSwap: BigNumberish,
+    recipientHash: BytesLike,
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
@@ -359,104 +431,115 @@ export interface Meson extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getCoinType(overrides?: CallOverrides): Promise<string>;
-
-  lock(
-    swapId: BytesLike,
-    initiator: string,
-    amount: BigNumberish,
-    token: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  lockingSwaps(
-    arg0: BytesLike,
+  getLockedSwap(
+    encodedSwap: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [string, string, string, BigNumber, BigNumber] & {
+    [string, string, number] & {
       initiator: string;
       provider: string;
-      token: string;
-      amount: BigNumber;
-      until: BigNumber;
+      until: number;
     }
   >;
 
-  postSwap(
-    encodedSwap: BytesLike,
-    inToken: string,
-    initiator: string,
+  getPostedSwap(
+    encodedSwap: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<[string, string] & { initiator: string; provider: string }>;
+
+  getShortCoinType(overrides?: CallOverrides): Promise<string>;
+
+  indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
+
+  indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
+
+  lock(
+    encodedSwap: BigNumberish,
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
+    initiator: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  postSwap(
+    encodedSwap: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
+    packedData: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   release(
-    swapId: BytesLike,
-    recipient: string,
-    metaAmount: BigNumberish,
-    domainHash: BytesLike,
+    encodedSwap: BigNumberish,
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
+    recipient: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   requestSwap(
-    encodedSwap: BytesLike,
-    inToken: string,
+    encodedSwap: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  requests(
-    arg0: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<
-    [string, string, string, BigNumber, number] & {
-      initiator: string;
-      provider: string;
-      inToken: string;
-      total: BigNumber;
-      expireTs: number;
-    }
-  >;
+  supportedTokens(overrides?: CallOverrides): Promise<string[]>;
 
-  supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+  tokenForIndex(
+    tokenIndex: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   unlock(
-    swapId: BytesLike,
+    encodedSwap: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   withdraw(
-    token: string,
     amount: BigNumberish,
+    tokenIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    addressOfIndex(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     balanceOf(
-      arg0: string,
-      arg1: string,
+      token: string,
+      addr: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    bondSwap(swapId: BytesLike, overrides?: CallOverrides): Promise<void>;
+    bondSwap(
+      encodedSwap: BigNumberish,
+      providerIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    cancelSwap(swapId: BytesLike, overrides?: CallOverrides): Promise<void>;
-
-    challenge(overrides?: CallOverrides): Promise<void>;
+    cancelSwap(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     deposit(
-      token: string,
       amount: BigNumberish,
+      balanceIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    depositAndRegister(
+      amount: BigNumberish,
+      balanceIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     executeSwap(
-      swapId: BytesLike,
-      recipient: BytesLike,
+      encodedSwap: BigNumberish,
+      recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -464,136 +547,133 @@ export interface Meson extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    getCoinType(overrides?: CallOverrides): Promise<string>;
-
-    lock(
-      swapId: BytesLike,
-      initiator: string,
-      amount: BigNumberish,
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    lockingSwaps(
-      arg0: BytesLike,
+    getLockedSwap(
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, BigNumber, BigNumber] & {
+      [string, string, number] & {
         initiator: string;
         provider: string;
-        token: string;
-        amount: BigNumber;
-        until: BigNumber;
+        until: number;
       }
     >;
 
-    postSwap(
-      encodedSwap: BytesLike,
-      inToken: string,
-      initiator: string,
+    getPostedSwap(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, string] & { initiator: string; provider: string }>;
+
+    getShortCoinType(overrides?: CallOverrides): Promise<string>;
+
+    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
+
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
+
+    lock(
+      encodedSwap: BigNumberish,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      initiator: string,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<void>;
+
+    postSwap(
+      encodedSwap: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      packedData: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     release(
-      swapId: BytesLike,
-      recipient: string,
-      metaAmount: BigNumberish,
-      domainHash: BytesLike,
+      encodedSwap: BigNumberish,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      recipient: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     requestSwap(
-      encodedSwap: BytesLike,
-      inToken: string,
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    supportedTokens(overrides?: CallOverrides): Promise<string[]>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    requests(
-      arg0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<
-      [string, string, string, BigNumber, number] & {
-        initiator: string;
-        provider: string;
-        inToken: string;
-        total: BigNumber;
-        expireTs: number;
-      }
-    >;
-
-    supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
-
-    unlock(swapId: BytesLike, overrides?: CallOverrides): Promise<void>;
+    unlock(encodedSwap: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
     withdraw(
-      token: string,
       amount: BigNumberish,
+      tokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
   };
 
   filters: {
-    "SwapBonded(bytes32)"(swapId?: null): SwapBondedEventFilter;
-    SwapBonded(swapId?: null): SwapBondedEventFilter;
+    "SwapBonded(uint256)"(encodedSwap?: null): SwapBondedEventFilter;
+    SwapBonded(encodedSwap?: null): SwapBondedEventFilter;
 
-    "SwapCancelled(bytes32)"(swapId?: null): SwapCancelledEventFilter;
-    SwapCancelled(swapId?: null): SwapCancelledEventFilter;
+    "SwapCancelled(uint256)"(encodedSwap?: null): SwapCancelledEventFilter;
+    SwapCancelled(encodedSwap?: null): SwapCancelledEventFilter;
 
-    "SwapExecuted(bytes32)"(swapId?: null): SwapExecutedEventFilter;
-    SwapExecuted(swapId?: null): SwapExecutedEventFilter;
+    "SwapLocked(uint256)"(encodedSwap?: null): SwapLockedEventFilter;
+    SwapLocked(encodedSwap?: null): SwapLockedEventFilter;
 
-    "SwapLocked(bytes32,address)"(
-      swapId?: null,
-      provider?: null
-    ): SwapLockedEventFilter;
-    SwapLocked(swapId?: null, provider?: null): SwapLockedEventFilter;
+    "SwapPosted(uint256)"(encodedSwap?: null): SwapPostedEventFilter;
+    SwapPosted(encodedSwap?: null): SwapPostedEventFilter;
 
-    "SwapPosted(bytes32)"(swapId?: null): SwapPostedEventFilter;
-    SwapPosted(swapId?: null): SwapPostedEventFilter;
+    "SwapReleased(uint256)"(encodedSwap?: null): SwapReleasedEventFilter;
+    SwapReleased(encodedSwap?: null): SwapReleasedEventFilter;
 
-    "SwapReleased(bytes32)"(swapId?: null): SwapReleasedEventFilter;
-    SwapReleased(swapId?: null): SwapReleasedEventFilter;
-
-    "SwapRequested(bytes32)"(swapId?: null): SwapRequestedEventFilter;
-    SwapRequested(swapId?: null): SwapRequestedEventFilter;
+    "SwapRequested(uint256)"(encodedSwap?: null): SwapRequestedEventFilter;
+    SwapRequested(encodedSwap?: null): SwapRequestedEventFilter;
   };
 
   estimateGas: {
+    addressOfIndex(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     balanceOf(
-      arg0: string,
-      arg1: string,
+      token: string,
+      addr: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     bondSwap(
-      swapId: BytesLike,
+      encodedSwap: BigNumberish,
+      providerIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     cancelSwap(
-      swapId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    challenge(
+      encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     deposit(
-      token: string,
       amount: BigNumberish,
+      balanceIndex: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    depositAndRegister(
+      amount: BigNumberish,
+      balanceIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     executeSwap(
-      swapId: BytesLike,
-      recipient: BytesLike,
+      encodedSwap: BigNumberish,
+      recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -601,97 +681,110 @@ export interface Meson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getCoinType(overrides?: CallOverrides): Promise<BigNumber>;
-
-    lock(
-      swapId: BytesLike,
-      initiator: string,
-      amount: BigNumberish,
-      token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    lockingSwaps(
-      arg0: BytesLike,
+    getLockedSwap(
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    postSwap(
-      encodedSwap: BytesLike,
-      inToken: string,
-      initiator: string,
+    getPostedSwap(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getShortCoinType(overrides?: CallOverrides): Promise<BigNumber>;
+
+    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    lock(
+      encodedSwap: BigNumberish,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      initiator: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    postSwap(
+      encodedSwap: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      packedData: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     release(
-      swapId: BytesLike,
-      recipient: string,
-      metaAmount: BigNumberish,
-      domainHash: BytesLike,
+      encodedSwap: BigNumberish,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     requestSwap(
-      encodedSwap: BytesLike,
-      inToken: string,
+      encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    requests(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+    supportedTokens(overrides?: CallOverrides): Promise<BigNumber>;
 
-    supportedTokens(
-      arg0: string,
+    tokenForIndex(
+      tokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     unlock(
-      swapId: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     withdraw(
-      token: string,
       amount: BigNumberish,
+      tokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    addressOfIndex(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     balanceOf(
-      arg0: string,
-      arg1: string,
+      token: string,
+      addr: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     bondSwap(
-      swapId: BytesLike,
+      encodedSwap: BigNumberish,
+      providerIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     cancelSwap(
-      swapId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    challenge(
+      encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     deposit(
-      token: string,
       amount: BigNumberish,
+      balanceIndex: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    depositAndRegister(
+      amount: BigNumberish,
+      balanceIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     executeSwap(
-      swapId: BytesLike,
-      recipient: BytesLike,
+      encodedSwap: BigNumberish,
+      recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
@@ -699,66 +792,74 @@ export interface Meson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    getCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    lock(
-      swapId: BytesLike,
-      initiator: string,
-      amount: BigNumberish,
-      token: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    lockingSwaps(
-      arg0: BytesLike,
+    getLockedSwap(
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    postSwap(
-      encodedSwap: BytesLike,
-      inToken: string,
-      initiator: string,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    release(
-      swapId: BytesLike,
-      recipient: string,
-      metaAmount: BigNumberish,
-      domainHash: BytesLike,
-      r: BytesLike,
-      s: BytesLike,
-      v: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    requestSwap(
-      encodedSwap: BytesLike,
-      inToken: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    requests(
-      arg0: BytesLike,
+    getPostedSwap(
+      encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    supportedTokens(
+    getShortCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    indexOfAddress(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    indexOfToken(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    lock(
+      encodedSwap: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
+      initiator: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    postSwap(
+      encodedSwap: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      packedData: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    release(
+      encodedSwap: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
+      recipient: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    requestSwap(
+      encodedSwap: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    supportedTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     unlock(
-      swapId: BytesLike,
+      encodedSwap: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     withdraw(
-      token: string,
       amount: BigNumberish,
+      tokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

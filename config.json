@@ -6,7 +6,11 @@
   "compilers": {
     "solc": "0.8.6",
     "truffle": "",
-    "evmVersion": "istanbul"
+    "evmVersion": "istanbul",
+    "optimizer": {
+      "enabled": true,
+      "runs": 10000
+    }
   },
   "linter": "solhint",
   "editor": {

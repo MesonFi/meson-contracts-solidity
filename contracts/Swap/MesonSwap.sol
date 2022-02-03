@@ -2,146 +2,162 @@
 pragma solidity 0.8.6;
 
 import "../libraries/LowGasSafeMath.sol";
-import "../interfaces/IERC20Minimal.sol";
 
-import "./IMesonSwap.sol";
+import "./IMesonSwapEvents.sol";
 import "../utils/MesonStates.sol";
 
 /// @title MesonSwap
 /// @notice The class to receive and process swap requests.
 /// Methods in this class will be executed by users or LPs when
-/// users initiate swaps in the current chain.
-contract MesonSwap is IMesonSwap, MesonStates {
-  /// @notice swap requests by swapIds
-  mapping(bytes32 => SwapRequest) public requests;
+/// users initiate swaps on the initial chain.
+contract MesonSwap is IMesonSwapEvents, MesonStates {
+  /// @notice Posted swap requests
+  /// key: encodedSwap in format of `amount:uint96|salt:uint32|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
+  /// value: in format of initiator:uint160|providerIndex:uint40; =1 maybe means executed (to prevent replay attack)
+  mapping(uint256 => uint200) internal _swapRequests;
 
-  /// @inheritdoc IMesonSwap
-  function requestSwap(bytes memory encodedSwap, address inToken)
-    external
-    override
-    tokenSupported(inToken)
-    returns (bytes32)
-  {
-    (bytes32 swapId, uint128 amount, uint48 fee, uint48 expireTs) = _verifyEncodedSwap(encodedSwap, inToken);
+  /// @notice xxxx
+  /// @dev Designed to be used by users
+  /// @param encodedSwap Packed in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
+  function requestSwap(uint256 encodedSwap) external forInitialChain(encodedSwap) {
+    require(_swapRequests[encodedSwap] == 0, "Swap already exists");
+
+    uint256 delta = ((encodedSwap >> 48) & 0xFFFFFFFFFF) - block.timestamp;
+    // Underflow would trigger "Expire ts too late" error
+    require(delta > MIN_BOND_TIME_PERIOD, "Expire ts too early");
+    require(delta < MAX_BOND_TIME_PERIOD, "Expire ts too late");
 
     address initiator = _msgSender();
-
-    uint128 total = LowGasSafeMath.add(amount, fee); // TODO: fee to meson protocol
-    requests[swapId] = SwapRequest(initiator, address(0), inToken, total, expireTs);
-
-    _unsafeDepositToken(inToken, initiator, total);
-
-    emit SwapRequested(swapId);
-    return swapId;
+    _swapRequests[encodedSwap] = uint200(uint160(initiator)) << 40;
+    
+    _unsafeDepositToken(_tokenList[uint8(encodedSwap)], initiator, encodedSwap >> 160);
+    
+    emit SwapRequested(encodedSwap);
   }
 
-  function bondSwap(bytes32 swapId) public override swapExists(swapId) {
-    require(requests[swapId].provider == address(0), "swap bonded to another provider");
-    requests[swapId].provider = _msgSender();
+  /// @notice xxxx
+  /// @dev Designed to be used by LPs
+  function bondSwap(uint256 encodedSwap, uint40 providerIndex) external {
+    uint200 req = _swapRequests[encodedSwap];
+    require(req != 0, "Swap does not exist");
+    require(uint40(req) == 0, "Swap bonded to another provider");
 
-    emit SwapBonded(swapId);
+    _swapRequests[encodedSwap] = req | providerIndex;
+    emit SwapBonded(encodedSwap);
   }
 
-  /// @inheritdoc IMesonSwap
-  function postSwap(
-    bytes memory encodedSwap,
-    address inToken,
-    address initiator,
-    bytes32 r,
-    bytes32 s,
-    uint8 v
-  ) external override tokenSupported(inToken) returns (bytes32) {
-    (bytes32 swapId, uint128 amount, uint48 fee, uint48 expireTs) = _verifyEncodedSwap(encodedSwap, inToken);
-
-    require(initiator == ecrecover(swapId, v, r, s), "invalid signature");
-
-    address provider = _msgSender();
-    uint128 total = LowGasSafeMath.add(amount, fee); // TODO: fee to meson protocol
-    requests[swapId] = SwapRequest(initiator, provider, inToken, total, expireTs);
-
-    _unsafeDepositToken(inToken, initiator, total);
-
-    emit SwapPosted(swapId);
-    return swapId;
-  }
-
-  function _verifyEncodedSwap(bytes memory encodedSwap, address inToken)
-    private
-    view
-    returns (bytes32, uint128, uint48, uint48)
+  /// @notice A liquidity provider can call this method to post the swap and bond it
+  /// to himself.
+  /// This is step 1️⃣  in a swap.
+  /// The bonding state will last until `expireTs` and at most one LP can be bonded.
+  /// The bonding LP should call `release` and `executeSwap` later
+  /// to finish the swap within the bonding period.
+  /// After the bonding period expires, other LPs can bond again (wip),
+  /// or the user can cancel the swap.
+  /// @dev Designed to be used by LPs
+  /// @param encodedSwap Encoded swap
+  /// @param r Part of the signature
+  /// @param s Part of the signature
+  /// @param packedData Packed in format of `v:uint8|initiator:address|providerIndex:uint40` to save gas
+  function postSwap(uint256 encodedSwap, bytes32 r, bytes32 s, uint208 packedData)
+    external forInitialChain(encodedSwap)
   {
-    (bytes32 inTokenHash, uint128 amount, uint48 fee, uint48 expireTs) = _decodeSwapInput(encodedSwap);
+    require(_swapRequests[encodedSwap] == 0, "Swap already exists");
 
-    require(keccak256(abi.encodePacked(inToken)) == inTokenHash, "inToken does not match");
-    require(amount > 0, "swap amount must be greater than zero");
+    uint256 delta = ((encodedSwap >> 48) & 0xFFFFFFFFFF) - block.timestamp;
+    // Underflow would trigger "Expire ts too late" error
+    require(delta > MIN_BOND_TIME_PERIOD, "Expire ts too early");
+    require(delta < MAX_BOND_TIME_PERIOD, "Expire ts too late");
 
-    uint48 ts = uint48(block.timestamp);
-    require(expireTs > ts + MIN_BOND_TIME_PERIOD, "expires ts too early");
-    require(expireTs < ts + MAX_BOND_TIME_PERIOD, "expires ts too late");
+    address initiator = address(uint160(packedData >> 40));
+    _checkRequestSignature(encodedSwap, r, s, uint8(packedData >> 200), initiator);
+    _swapRequests[encodedSwap] = uint200(packedData);
 
-    bytes32 swapId = _getSwapId(encodedSwap);
-    require(!_hasSwap(swapId), "swap conflict"); // TODO: prevent duplication attack
+    _unsafeDepositToken(_tokenList[uint8(encodedSwap)], initiator, encodedSwap >> 160);
 
-    return (swapId, amount, fee, expireTs);
+    emit SwapPosted(encodedSwap);
   }
 
-  /// @inheritdoc IMesonSwap
-  function cancelSwap(bytes32 swapId) external override swapExists(swapId) swapExpired(swapId) {
-    SwapRequest memory req = requests[swapId];
-    address inToken = req.inToken;
-    address initiator = req.initiator;
-    uint128 total = req.total;
-    delete requests[swapId];
+  /// @notice Cancel a swap
+  /// @dev Designed to be used by users
+  /// @param encodedSwap Encoded swap
+  function cancelSwap(uint256 encodedSwap) external {
+    uint200 req = _swapRequests[encodedSwap];
+    require(req > 1, "Swap does not exist");
+    require((encodedSwap >> 48 & 0xFFFFFFFFFF) < block.timestamp, "Swap is still locked");
+    
+    _swapRequests[encodedSwap] = 0; // Swap expired so the same one cannot be posted again
 
-    _safeTransfer(inToken, initiator, total);
+    _safeTransfer(
+      _tokenList[uint8(encodedSwap)], // tokenIndex -> token address
+      address(uint160(req >> 40)), // initiator
+      encodedSwap >> 160
+    );
 
-    emit SwapCancelled(swapId);
+    emit SwapCancelled(encodedSwap);
   }
 
-  /// @inheritdoc IMesonSwap
+  /// @notice Execute the swap by providing a signature.
+  /// This is step 4️⃣  in a swap.
+  /// Once the signature is verified, the current bonding LP (provider)
+  /// will receive tokens initially deposited by the user.
+  /// The LP should call `release` first.
+  /// For a single swap, signature given here is identical to the one used
+  /// in `release`.
+  /// Otherwise, other people can use the signature to `challenge` the LP.
+  /// @dev Designed to be used by the current bonding LP
+  /// @param encodedSwap Encoded swap
   function executeSwap(
-    bytes32 swapId,
-    bytes memory recipient,
+    uint256 encodedSwap,
+    bytes32 recipientHash,
     bytes32 r,
     bytes32 s,
     uint8 v,
     bool depositToPool
-  ) external override swapExists(swapId) {
-    SwapRequest memory req = requests[swapId];
-    _checkReleaseSignature(swapId, keccak256(recipient), DOMAIN_SEPARATOR, req.initiator, r, s, v);
+  ) external {
+    uint200 req = _swapRequests[encodedSwap];
+    require(req != 0, "Swap does not exist");
 
-    address inToken = req.inToken;
-    address provider = req.provider;
-    uint128 total = req.total;
-
-    delete requests[swapId];
-
-    if (depositToPool) {
-      balanceOf[inToken][provider] = LowGasSafeMath.add(balanceOf[inToken][provider], total);
+    if (((encodedSwap >> 48) & 0xFFFFFFFFFF) < block.timestamp + MIN_BOND_TIME_PERIOD) {
+      // Swap expiredTs < current + MIN_BOND_TIME_PERIOD
+      // The swap cannot be posted again and therefore safe to remove it
+      // LPs who execute in this mode can save ~5000 gas
+      _swapRequests[encodedSwap] = 0;
     } else {
-      _safeTransfer(inToken, provider, total);
+      // 1 will prevent the same swap to be posted again
+      _swapRequests[encodedSwap] = 1;
     }
 
-    emit SwapExecuted(swapId);
+    // TODO: fee to meson protocol
+
+    _checkReleaseSignature(encodedSwap, recipientHash, r, s, v, address(uint160(req >> 40)));
+
+    if (depositToPool) {
+      uint48 balanceIndex = uint48(encodedSwap << 40) | uint40(req); // TODO: check
+      _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], encodedSwap >> 160);
+    } else {
+      _safeTransfer(
+        _tokenList[uint8(encodedSwap)], // tokenIndex -> token address
+        addressOfIndex[uint40(req)], // providerIndex -> provider address
+        encodedSwap >> 160
+      );
+    }
   }
 
-  function _deleteRequest(bytes32 swapId) internal {
-    delete requests[swapId];
+  function getPostedSwap(uint256 encodedSwap) external view
+    returns (address initiator, address provider)
+  {
+    uint200 req = _swapRequests[encodedSwap];
+    initiator = address(uint160(req >> 40));
+    if (req >> 40 == 0) {
+      provider = address(0);
+    } else {
+      provider = addressOfIndex[uint40(req)];
+    }
   }
 
-  /// @dev Check the swap for the given swapId exsits
-  modifier swapExists(bytes32 swapId) {
-    require(_hasSwap(swapId), "swap not found");
+  modifier forInitialChain(uint256 encodedSwap) {
+    require(uint16(encodedSwap >> 8) == SHORT_COIN_TYPE, "Swap not for this chain");
     _;
-  }
-
-  /// @dev Check the swap is bonded
-  modifier swapExpired(bytes32 swapId) {
-    require(requests[swapId].expireTs < uint64(block.timestamp), "swap not expired");
-    _;
-  }
-
-  function _hasSwap(bytes32 swapId) internal view returns (bool) {
-    return requests[swapId].total > 0;
   }
 }

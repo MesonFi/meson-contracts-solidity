@@ -4,6 +4,7 @@
 import {
   BaseContract,
   BigNumber,
+  BigNumberish,
   BytesLike,
   CallOverrides,
   PopulatedTransaction,
@@ -16,31 +17,106 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface MesonStatesTestInterface extends utils.Interface {
   functions: {
+    "addressOfIndex(uint40)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
-    "getCoinType()": FunctionFragment;
-    "supportedTokens(address)": FunctionFragment;
+    "checkReleaseSignature(uint256,address,bytes32,bytes32,uint8,address)": FunctionFragment;
+    "checkRequestSignature(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
+    "decodeSwap(uint256)": FunctionFragment;
+    "encodeSwap(uint96,uint32,uint40,uint40,bytes2,uint8,bytes2,uint8)": FunctionFragment;
+    "getShortCoinType()": FunctionFragment;
+    "indexOfAddress(address)": FunctionFragment;
+    "indexOfToken(address)": FunctionFragment;
+    "supportedTokens()": FunctionFragment;
+    "tokenForIndex(uint8)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "addressOfIndex",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "getCoinType",
+    functionFragment: "checkReleaseSignature",
+    values: [BigNumberish, string, BytesLike, BytesLike, BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "checkRequestSignature",
+    values: [BigNumberish, BytesLike, BytesLike, BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "decodeSwap",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "encodeSwap",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BytesLike,
+      BigNumberish,
+      BytesLike,
+      BigNumberish
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getShortCoinType",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "supportedTokens",
+    functionFragment: "indexOfAddress",
     values: [string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "indexOfToken",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "supportedTokens",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenForIndex",
+    values: [BigNumberish]
+  ): string;
 
+  decodeFunctionResult(
+    functionFragment: "addressOfIndex",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getCoinType",
+    functionFragment: "checkReleaseSignature",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "checkRequestSignature",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "decodeSwap", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "encodeSwap", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getShortCoinType",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "indexOfAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "indexOfToken",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "supportedTokens",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenForIndex",
     data: BytesLike
   ): Result;
 
@@ -74,70 +150,349 @@ export interface MesonStatesTest extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    addressOfIndex(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     balanceOf(
-      arg0: string,
-      arg1: string,
+      token: string,
+      addr: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    getCoinType(overrides?: CallOverrides): Promise<[string]>;
+    checkReleaseSignature(
+      encodedSwap: BigNumberish,
+      recipient: string,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
+      signer: string,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    checkRequestSignature(
+      encodedSwap: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
+      signer: string,
+      overrides?: CallOverrides
+    ): Promise<[void]>;
+
+    decodeSwap(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, number, number, string, number, string, number] & {
+        amount: BigNumber;
+        salt: number;
+        expireTs: number;
+        outChain: string;
+        outTokenIndex: number;
+        inChain: string;
+        inTokenIndex: number;
+      }
+    >;
+
+    encodeSwap(
+      amount: BigNumberish,
+      salt: BigNumberish,
+      fee: BigNumberish,
+      expireTs: BigNumberish,
+      outChain: BytesLike,
+      outToken: BigNumberish,
+      inChain: BytesLike,
+      inToken: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    getShortCoinType(overrides?: CallOverrides): Promise<[string]>;
+
+    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<[number]>;
+
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<[number]>;
 
     supportedTokens(
-      arg0: string,
       overrides?: CallOverrides
-    ): Promise<[boolean]>;
+    ): Promise<[string[]] & { tokens: string[] }>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
   };
 
+  addressOfIndex(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   balanceOf(
-    arg0: string,
-    arg1: string,
+    token: string,
+    addr: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  getCoinType(overrides?: CallOverrides): Promise<string>;
+  checkReleaseSignature(
+    encodedSwap: BigNumberish,
+    recipient: string,
+    r: BytesLike,
+    s: BytesLike,
+    v: BigNumberish,
+    signer: string,
+    overrides?: CallOverrides
+  ): Promise<void>;
 
-  supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+  checkRequestSignature(
+    encodedSwap: BigNumberish,
+    r: BytesLike,
+    s: BytesLike,
+    v: BigNumberish,
+    signer: string,
+    overrides?: CallOverrides
+  ): Promise<void>;
+
+  decodeSwap(
+    encodedSwap: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, number, number, string, number, string, number] & {
+      amount: BigNumber;
+      salt: number;
+      expireTs: number;
+      outChain: string;
+      outTokenIndex: number;
+      inChain: string;
+      inTokenIndex: number;
+    }
+  >;
+
+  encodeSwap(
+    amount: BigNumberish,
+    salt: BigNumberish,
+    fee: BigNumberish,
+    expireTs: BigNumberish,
+    outChain: BytesLike,
+    outToken: BigNumberish,
+    inChain: BytesLike,
+    inToken: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  getShortCoinType(overrides?: CallOverrides): Promise<string>;
+
+  indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
+
+  indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
+
+  supportedTokens(overrides?: CallOverrides): Promise<string[]>;
+
+  tokenForIndex(
+    tokenIndex: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   callStatic: {
+    addressOfIndex(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     balanceOf(
-      arg0: string,
-      arg1: string,
+      token: string,
+      addr: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getCoinType(overrides?: CallOverrides): Promise<string>;
+    checkReleaseSignature(
+      encodedSwap: BigNumberish,
+      recipient: string,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
+      signer: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    supportedTokens(arg0: string, overrides?: CallOverrides): Promise<boolean>;
+    checkRequestSignature(
+      encodedSwap: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
+      signer: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    decodeSwap(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, number, number, string, number, string, number] & {
+        amount: BigNumber;
+        salt: number;
+        expireTs: number;
+        outChain: string;
+        outTokenIndex: number;
+        inChain: string;
+        inTokenIndex: number;
+      }
+    >;
+
+    encodeSwap(
+      amount: BigNumberish,
+      salt: BigNumberish,
+      fee: BigNumberish,
+      expireTs: BigNumberish,
+      outChain: BytesLike,
+      outToken: BigNumberish,
+      inChain: BytesLike,
+      inToken: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    getShortCoinType(overrides?: CallOverrides): Promise<string>;
+
+    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
+
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
+
+    supportedTokens(overrides?: CallOverrides): Promise<string[]>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
   };
 
   filters: {};
 
   estimateGas: {
-    balanceOf(
-      arg0: string,
-      arg1: string,
+    addressOfIndex(
+      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getCoinType(overrides?: CallOverrides): Promise<BigNumber>;
+    balanceOf(
+      token: string,
+      addr: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    supportedTokens(
-      arg0: string,
+    checkReleaseSignature(
+      encodedSwap: BigNumberish,
+      recipient: string,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
+      signer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    checkRequestSignature(
+      encodedSwap: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
+      signer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    decodeSwap(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    encodeSwap(
+      amount: BigNumberish,
+      salt: BigNumberish,
+      fee: BigNumberish,
+      expireTs: BigNumberish,
+      outChain: BytesLike,
+      outToken: BigNumberish,
+      inChain: BytesLike,
+      inToken: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getShortCoinType(overrides?: CallOverrides): Promise<BigNumber>;
+
+    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    indexOfToken(token: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    supportedTokens(overrides?: CallOverrides): Promise<BigNumber>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    balanceOf(
-      arg0: string,
-      arg1: string,
+    addressOfIndex(
+      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    balanceOf(
+      token: string,
+      addr: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
-    supportedTokens(
+    checkReleaseSignature(
+      encodedSwap: BigNumberish,
+      recipient: string,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
+      signer: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    checkRequestSignature(
+      encodedSwap: BigNumberish,
+      r: BytesLike,
+      s: BytesLike,
+      v: BigNumberish,
+      signer: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    decodeSwap(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    encodeSwap(
+      amount: BigNumberish,
+      salt: BigNumberish,
+      fee: BigNumberish,
+      expireTs: BigNumberish,
+      outChain: BytesLike,
+      outToken: BigNumberish,
+      inChain: BytesLike,
+      inToken: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getShortCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    indexOfAddress(
       arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    indexOfToken(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    supportedTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    tokenForIndex(
+      tokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

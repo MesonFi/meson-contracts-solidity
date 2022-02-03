@@ -1,6 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 const { ethers } = require('hardhat')
+const { MesonClient } = require('@mesonfi/sdk/src')
 const mainnets = require('@mesonfi/presets/src/mainnets.json')
 const testnets = require('@mesonfi/presets/src/testnets.json')
 require('dotenv').config()
@@ -54,10 +55,12 @@ async function main() {
   const Meson = await ethers.getContractFactory('Meson', wallet)
   console.log('Deploying Meson...')
   const meson = await Meson.deploy([mockUSDT.address, mockUSDC.address], { nonce: nonce + 2 })
+  await meson.deployed()
   console.log('Meson deployed to:', meson.address)
 
-  const coinType = await meson.getCoinType()
-  if (coinType !== testnet.slip44) {
+  const mesonClient = await MesonClient.Create(mesonContract)
+
+  if (mesonClient.shortCoinType !== testnet.shortSlip44) {
     throw new Error('Coin type does not match')
   }
 
@@ -65,13 +68,13 @@ async function main() {
     const depositAmount = ethers.utils.parseUnits(DEPOSIT_ON_DEPLOY, 6)
 
     console.log(`Approving and depositing ${depositAmount} ${usdt.symbol} to Meson...`)
-    await (await mockUSDT.approve(meson.address, depositAmount, { nonce: nonce + 3 })).wait()
-    await meson.deposit(mockUSDT.address, depositAmount, { nonce: nonce + 4 })
+    await (await mockUSDT.approve(meson.address, depositAmount)).wait(1)
+    await (await mesonClient.depositAndRegister(mesonClient.token(1), depositAmount, 1)).wait(1)
     console.log(`${depositAmount} ${usdt.symbol} deposited`)
 
     console.log(`Approving and depositing ${depositAmount} ${usdc.symbol} to Meson...`)
-    await (await mockUSDC.approve(meson.address, depositAmount, { nonce: nonce + 5 })).wait()
-    await meson.deposit(mockUSDC.address, depositAmount, { nonce: nonce + 6 })
+    await (await mockUSDC.approve(meson.address, depositAmount)).wait(1)
+    await (await mesonClient.deposit(mesonClient.token(2), depositAmount)).wait(1)
     console.log(`${depositAmount} ${usdc.symbol} deposited`)
   }
 

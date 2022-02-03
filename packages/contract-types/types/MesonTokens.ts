@@ -15,33 +15,13 @@ import { FunctionFragment, Result } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface MesonStatesInterface extends utils.Interface {
+export interface MesonTokensInterface extends utils.Interface {
   functions: {
-    "addressOfIndex(uint40)": FunctionFragment;
-    "balanceOf(address,address)": FunctionFragment;
-    "getShortCoinType()": FunctionFragment;
-    "indexOfAddress(address)": FunctionFragment;
     "indexOfToken(address)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "addressOfIndex",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "balanceOf",
-    values: [string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getShortCoinType",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "indexOfAddress",
-    values: [string]
-  ): string;
   encodeFunctionData(
     functionFragment: "indexOfToken",
     values: [string]
@@ -55,19 +35,6 @@ export interface MesonStatesInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "addressOfIndex",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "getShortCoinType",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "indexOfAddress",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "indexOfToken",
     data: BytesLike
@@ -84,12 +51,12 @@ export interface MesonStatesInterface extends utils.Interface {
   events: {};
 }
 
-export interface MesonStates extends BaseContract {
+export interface MesonTokens extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: MesonStatesInterface;
+  interface: MesonTokensInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -111,21 +78,6 @@ export interface MesonStates extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    addressOfIndex(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    balanceOf(
-      token: string,
-      addr: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    getShortCoinType(overrides?: CallOverrides): Promise<[string]>;
-
-    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<[number]>;
-
     indexOfToken(token: string, overrides?: CallOverrides): Promise<[number]>;
 
     supportedTokens(
@@ -138,21 +90,6 @@ export interface MesonStates extends BaseContract {
     ): Promise<[string]>;
   };
 
-  addressOfIndex(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  balanceOf(
-    token: string,
-    addr: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  getShortCoinType(overrides?: CallOverrides): Promise<string>;
-
-  indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
-
   indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
 
   supportedTokens(overrides?: CallOverrides): Promise<string[]>;
@@ -163,21 +100,6 @@ export interface MesonStates extends BaseContract {
   ): Promise<string>;
 
   callStatic: {
-    addressOfIndex(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    balanceOf(
-      token: string,
-      addr: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getShortCoinType(overrides?: CallOverrides): Promise<string>;
-
-    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
-
     indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
 
     supportedTokens(overrides?: CallOverrides): Promise<string[]>;
@@ -191,21 +113,6 @@ export interface MesonStates extends BaseContract {
   filters: {};
 
   estimateGas: {
-    addressOfIndex(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    balanceOf(
-      token: string,
-      addr: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getShortCoinType(overrides?: CallOverrides): Promise<BigNumber>;
-
-    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
     indexOfToken(token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     supportedTokens(overrides?: CallOverrides): Promise<BigNumber>;
@@ -217,24 +124,6 @@ export interface MesonStates extends BaseContract {
   };
 
   populateTransaction: {
-    addressOfIndex(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    balanceOf(
-      token: string,
-      addr: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getShortCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    indexOfAddress(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     indexOfToken(
       token: string,
       overrides?: CallOverrides

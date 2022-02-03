@@ -16,7 +16,7 @@ async function setChainConfig(networkId) {
 
   let network
   if (networkId === 'local') {
-    network = { name: 'Local', slip44: '0x80000001' }
+    network = { name: 'Local', slip44: '0x0001' }
   } else {
     network = presets.find(item => item.id === networkId)
   }
@@ -26,7 +26,7 @@ async function setChainConfig(networkId) {
 
   const config = template
     .replace('CONFIG_BLOCKCHAIN_NAME', network.name)
-    .replace('CONFIG_COIN_TYPE', network.slip44)
+    .replace('CONFIG_COIN_TYPE', network.shortSlip44)
 
   await fs.promises.writeFile(
     path.join(__dirname, '../contracts/MesonConfig.sol'),

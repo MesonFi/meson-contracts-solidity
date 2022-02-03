@@ -8,12 +8,12 @@ import type { MesonHelpers, MesonHelpersInterface } from "../MesonHelpers";
 const _abi = [
   {
     inputs: [],
-    name: "getCoinType",
+    name: "getShortCoinType",
     outputs: [
       {
-        internalType: "bytes4",
+        internalType: "bytes2",
         name: "",
-        type: "bytes4",
+        type: "bytes2",
       },
     ],
     stateMutability: "pure",
@@ -22,7 +22,7 @@ const _abi = [
 ];
 
 const _bytecode =
-  "0x6080604052348015600f57600080fd5b50605480601d6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c806394149c1a14602d575b600080fd5b60408051632000000f60e21b815290519081900360200190f3fea164736f6c6343000806000a";
+  "0x6080604052348015600f57600080fd5b50606c80601d6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c8063eba7fb7714602d575b600080fd5b604080517e3c000000000000000000000000000000000000000000000000000000000000815290519081900360200190f3fea164736f6c6343000806000a";
 
 type MesonHelpersConstructorParams =
   | [signer?: Signer]

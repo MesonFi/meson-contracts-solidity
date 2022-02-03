@@ -5,6 +5,7 @@
     "alias": "Ethereum",
     "chainId": "0x1",
     "slip44": "0x8000003c",
+    "shortSlip44": "0x003c",
     "extensions": [
       "metamask"
     ],
@@ -25,6 +26,7 @@
     "alias": "BSC",
     "chainId": "0x38",
     "slip44": "0x800002ca",
+    "shortSlip44": "0x02ca",
     "extensions": [
       "metamask"
     ],
@@ -45,6 +47,7 @@
     "alias": "xDai",
     "chainId": "0x64",
     "slip44": "0x800002bc",
+    "shortSlip44": "0x02bc",
     "extensions": [
       "metamask"
     ],
@@ -65,6 +68,7 @@
     "alias": "Matic",
     "chainId": "0x89",
     "slip44": "0x800003c6",
+    "shortSlip44": "0x03c6",
     "extensions": [
       "metamask"
     ],
@@ -85,6 +89,7 @@
     "alias": "Fantom",
     "chainId": "0xfa",
     "slip44": "0x800003ef",
+    "shortSlip44": "0x03ef",
     "extensions": [
       "metamask"
     ],
@@ -105,6 +110,7 @@
     "alias": "Avalanche",
     "chainId": "0xa86a",
     "slip44": "0x80002328",
+    "shortSlip44": "0x2328",
     "extensions": [
       "metamask"
     ],
@@ -125,6 +131,7 @@
     "alias": "Harmony",
     "chainId": "0x63564c40",
     "slip44": "0x800003ff",
+    "shortSlip44": "0x03ff",
     "extensions": [
       "metamask"
     ],

@@ -6,16 +6,6 @@ import "../interfaces/IERC20Minimal.sol";
 
 /// @title MesonHelpers
 contract MesonHelpers is MesonConfig {
-  bytes32 internal constant EIP712_DOMAIN_TYPEHASH =
-    keccak256(bytes("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"));
-
-  bytes32 internal DOMAIN_SEPARATOR;
-
-  bytes32 internal constant SWAP_REQUEST_TYPEHASH =
-    keccak256(bytes("SwapRequest(bytes inToken,uint128 amount,uint48 fee,uint48 expireTs,bytes4 outChain,bytes outToken)"));
-
-  bytes32 internal constant SWAP_RELEASE_TYPEHASH = keccak256(bytes("SwapRelease(bytes32 swapId,bytes recipient)"));
-
   bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
 
   /// @notice Safe transfers tokens from msg.sender to a recipient
@@ -26,57 +16,66 @@ contract MesonHelpers is MesonConfig {
   function _safeTransfer(
     address token,
     address recipient,
-    uint128 amount
+    uint256 amount
   ) internal {
-    (bool success, bytes memory data) = token.call(abi.encodeWithSelector(ERC20_TRANSFER_SELECTOR, recipient, uint256(amount)));
-    require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
+    (bool success, bytes memory data) = token.call(abi.encodeWithSelector(ERC20_TRANSFER_SELECTOR, recipient, amount));
+    require(success && (data.length == 0 || abi.decode(data, (bool))), "Transfer failed");
   }
 
   /// @notice Execute the token transfer transaction
   function _unsafeDepositToken(
     address token,
     address sender,
-    uint128 amount
+    uint256 amount
   ) internal {
-    IERC20Minimal(token).transferFrom(sender, address(this), uint256(amount));
+    require(amount > 0, "Amount must be greater than zero");
+    IERC20Minimal(token).transferFrom(sender, address(this), amount);
   }
 
-  function _decodeSwapInput(bytes memory encodedSwap) internal pure returns (bytes32, uint128, uint48, uint48) {
-    (bytes32 typehash, bytes32 inTokenHash, uint128 amount, uint48 fee, uint48 expireTs, ,) =
-      abi.decode(encodedSwap, (bytes32, bytes32, uint128, uint48, uint48, bytes4, bytes32));
-    require(typehash == SWAP_REQUEST_TYPEHASH, "Invalid swap request typehash");
-    return (inTokenHash, amount, fee, expireTs);
-  }
+  function _checkRequestSignature(
+    uint256 encodedSwap,
+    bytes32 r,
+    bytes32 s,
+    uint8 v,
+    address signer
+  ) internal pure {
+    require(signer != address(0), "Signer cannot be empty address");
+    bytes32 digest;
+    assembly {
+      mstore(0, encodedSwap)
+      mstore(0x20, keccak256(0, 0x20))
 
-  function _decodeSwapOutput(bytes memory encodedSwap) internal pure returns (uint128, bytes32) {
-    (bytes32 typehash, , uint128 amount, , , , bytes32 outTokenHash) =
-      abi.decode(encodedSwap, (bytes32, bytes32, uint128, uint48, uint48, bytes4, bytes32));
-    require(typehash == SWAP_REQUEST_TYPEHASH, "Invalid swap request typehash");
-    return (amount, outTokenHash);
-  }
-
-  function _getSwapId(bytes memory encodedSwap) internal view returns (bytes32) {
-    bytes32 swapHash = keccak256(encodedSwap);
-    return keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, swapHash));
+      // The HEX string below is keccak256("bytes32 Sign to request a swap on Meson")
+      mstore(0, 0x9862d877599564bcd97c37305a7b0fdbe621d9c2a125026f2ad601f754a75abc)
+      digest := keccak256(0, 0x40)
+    }
+    require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }
 
   function _checkReleaseSignature(
-    bytes32 swapId,
+    uint256 encodedSwap,
     bytes32 recipientHash,
-    bytes32 domainHash,
-    address signer,
     bytes32 r,
     bytes32 s,
-    uint8 v
+    uint8 v,
+    address signer
   ) internal pure {
-    require(signer != address(0), "signer cannot be empty address");
-    bytes32 releaseHash = keccak256(abi.encode(SWAP_RELEASE_TYPEHASH, swapId, recipientHash));
-    bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainHash, releaseHash));
-    require(signer == ecrecover(digest, v, r, s), "invalid signature");
+    require(signer != address(0), "Signer cannot be empty address");
+    bytes32 digest;
+    assembly {
+      mstore(0, encodedSwap)
+      mstore(0x20, recipientHash)
+      mstore(0x20, keccak256(0, 0x40))
+
+      // The HEX string below is keccak256("bytes32 Sign to release a swap on Meson" + "bytes32 Recipient hash")
+      mstore(0, 0x5ef297f2881340f11ed62c7c08e0e0c235c333ad8f340d7285f529f16716968a)
+      digest := keccak256(0, 0x40)
+    }
+    require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }
 
-  function getCoinType() external pure returns (bytes4) {
-    return COIN_TYPE;
+  function getShortCoinType() external pure returns (bytes2) {
+    return bytes2(SHORT_COIN_TYPE);
   }
 
   function _msgSender() internal view returns (address) {
