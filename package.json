@@ -1,6 +1,6 @@
 {
   "name": "meson-contracts-solidity",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "main": "index.js",
   "private": true,
   "scripts": {
@@ -29,17 +29,17 @@
     "publish": "npm publish --workspaces"
   },
   "devDependencies": {
-    "@mesonfi/contract-abis": "^0.2.1",
-    "@mesonfi/contract-types": "^0.2.1",
-    "@mesonfi/presets": "^0.2.1",
-    "@mesonfi/sdk": "^0.2.1",
+    "@mesonfi/contract-abis": "^0.3.0",
+    "@mesonfi/contract-types": "^0.3.0",
+    "@mesonfi/presets": "^0.3.0",
+    "@mesonfi/sdk": "^0.3.0",
     "@nomiclabs/hardhat-ethers": "^2.0.3",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "^4.4.1",
     "@openzeppelin/contracts-upgradeable": "^4.4.1",
     "@openzeppelin/hardhat-upgrades": "^1.12.0",
     "@swc/core": "^1.2.111",
-    "@swc/helpers": "^0.2.14",
+    "@swc/helpers": "^0.3.2",
     "@typechain/ethers-v5": "^8.0.5",
     "@typechain/hardhat": "^3.1.0",
     "@types/chai": "^4.2.22",
