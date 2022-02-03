@@ -28,6 +28,7 @@ export interface UpgradableMesonInterface extends utils.Interface {
     "depositAndRegister(uint256,uint48)": FunctionFragment;
     "executeSwap(uint256,bytes32,bytes32,bytes32,uint8,bool)": FunctionFragment;
     "getLockedSwap(uint256)": FunctionFragment;
+    "getPostedSwap(uint256)": FunctionFragment;
     "getShortCoinType()": FunctionFragment;
     "indexOfAddress(address)": FunctionFragment;
     "indexOfToken(address)": FunctionFragment;
@@ -37,8 +38,6 @@ export interface UpgradableMesonInterface extends utils.Interface {
     "release(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
     "requestSwap(uint256)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
-    "swapInitiator(uint256)": FunctionFragment;
-    "swapProvider(uint256)": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
     "unlock(uint256)": FunctionFragment;
     "upgradeTo(address)": FunctionFragment;
@@ -86,6 +85,10 @@ export interface UpgradableMesonInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getPostedSwap",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getShortCoinType",
     values?: undefined
   ): string;
@@ -120,14 +123,6 @@ export interface UpgradableMesonInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "supportedTokens",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "swapInitiator",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "swapProvider",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "tokenForIndex",
@@ -168,6 +163,10 @@ export interface UpgradableMesonInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getPostedSwap",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getShortCoinType",
     data: BytesLike
   ): Result;
@@ -189,14 +188,6 @@ export interface UpgradableMesonInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "supportedTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapInitiator",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapProvider",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -373,6 +364,11 @@ export interface UpgradableMeson extends BaseContract {
       }
     >;
 
+    getPostedSwap(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, string] & { initiator: string; provider: string }>;
+
     getShortCoinType(overrides?: CallOverrides): Promise<[string]>;
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<[number]>;
@@ -418,16 +414,6 @@ export interface UpgradableMeson extends BaseContract {
     supportedTokens(
       overrides?: CallOverrides
     ): Promise<[string[]] & { tokens: string[] }>;
-
-    swapInitiator(
-      encodedSwap: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    swapProvider(
-      encodedSwap: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
 
     tokenForIndex(
       tokenIndex: BigNumberish,
@@ -512,6 +498,11 @@ export interface UpgradableMeson extends BaseContract {
     }
   >;
 
+  getPostedSwap(
+    encodedSwap: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<[string, string] & { initiator: string; provider: string }>;
+
   getShortCoinType(overrides?: CallOverrides): Promise<string>;
 
   indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
@@ -555,16 +546,6 @@ export interface UpgradableMeson extends BaseContract {
   ): Promise<ContractTransaction>;
 
   supportedTokens(overrides?: CallOverrides): Promise<string[]>;
-
-  swapInitiator(
-    encodedSwap: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  swapProvider(
-    encodedSwap: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
 
   tokenForIndex(
     tokenIndex: BigNumberish,
@@ -649,6 +630,11 @@ export interface UpgradableMeson extends BaseContract {
       }
     >;
 
+    getPostedSwap(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, string] & { initiator: string; provider: string }>;
+
     getShortCoinType(overrides?: CallOverrides): Promise<string>;
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
@@ -692,16 +678,6 @@ export interface UpgradableMeson extends BaseContract {
     ): Promise<void>;
 
     supportedTokens(overrides?: CallOverrides): Promise<string[]>;
-
-    swapInitiator(
-      encodedSwap: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    swapProvider(
-      encodedSwap: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
 
     tokenForIndex(
       tokenIndex: BigNumberish,
@@ -815,6 +791,11 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getPostedSwap(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getShortCoinType(overrides?: CallOverrides): Promise<BigNumber>;
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
@@ -858,16 +839,6 @@ export interface UpgradableMeson extends BaseContract {
     ): Promise<BigNumber>;
 
     supportedTokens(overrides?: CallOverrides): Promise<BigNumber>;
-
-    swapInitiator(
-      encodedSwap: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    swapProvider(
-      encodedSwap: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     tokenForIndex(
       tokenIndex: BigNumberish,
@@ -947,6 +918,11 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getPostedSwap(
+      encodedSwap: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getShortCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     indexOfAddress(
@@ -996,16 +972,6 @@ export interface UpgradableMeson extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     supportedTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    swapInitiator(
-      encodedSwap: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    swapProvider(
-      encodedSwap: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     tokenForIndex(
       tokenIndex: BigNumberish,
