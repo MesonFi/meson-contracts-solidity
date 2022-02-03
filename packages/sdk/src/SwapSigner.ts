@@ -105,7 +105,7 @@ export class RemoteSwapSigner extends SwapSigner {
 
   async signSwapRelease(encoded: string, recipient: string): Promise<Signature> {
     const data = [
-      { type: 'bytes32', name: NOTICE_SIGN_REQUEST, value: encoded },
+      { type: 'bytes32', name: NOTICE_SIGN_RELEASE, value: encoded },
       { type: 'bytes32', name: 'Recipient hash', value: keccak256(recipient) },
     ]
     const signature = await this.remoteSigner.signTypedData(data)
