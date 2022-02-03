@@ -1,10 +1,11 @@
 import { recoverAddress } from '@ethersproject/transactions'
 
 import type { Signature } from './SwapSigner'
-import { Swap, SwapData } from './Swap'
+import { Swap } from './Swap'
 import { SwapSigner } from './SwapSigner'
 
-export interface SignedSwapRequestData extends SwapData {
+export interface SignedSwapRequestData {
+  encoded: string,
   initiator: string,
   signature: Signature,
 }
@@ -13,31 +14,24 @@ export interface SignedSwapReleaseData extends SignedSwapRequestData {
   recipient: string,
 }
 
-export class SignedSwapRequest extends Swap implements SignedSwapRequestData {
+export class SignedSwapRequest implements SignedSwapRequestData {
+  readonly swap: Swap
+  readonly encoded: string
   readonly initiator: string
   readonly signature: Signature
 
-  static FromSerialized (json: string) {
-    let parsed: SignedSwapRequestData
-    try {
-      parsed = JSON.parse(json)
-    } catch {
-      throw new Error('Invalid json string')
-    }
-    return new SignedSwapRequest(parsed)
-  }
-
   constructor (data: SignedSwapRequestData) {
-    super(data)
-
-    if (data.encoded !== this.encoded) {
-      throw new Error('Invalid encoded value')
+    if (!data.encoded) {
+      throw new Error('Missing encoded')
     } else if (!data.initiator) {
       throw new Error('Missing initiator')
     } else if (!data.signature) {
       throw new Error('Missing signature')
     }
 
+    this.swap = Swap.decode(data.encoded)
+
+    this.encoded = data.encoded
     this.initiator = data.initiator.toLowerCase()
     this.signature = data.signature
   }
@@ -54,7 +48,7 @@ export class SignedSwapRequest extends Swap implements SignedSwapRequestData {
 
   toObject (): SignedSwapRequestData {
     return {
-      ...super.toObject(),
+      encoded: this.encoded,
       initiator: this.initiator,
       signature: this.signature,
     }

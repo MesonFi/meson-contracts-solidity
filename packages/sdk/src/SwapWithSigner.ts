@@ -14,7 +14,7 @@ export class SwapWithSigner extends Swap {
     const initiator = this.swapSigner.getAddress()
     const signature = await this.swapSigner.signSwapRequest(this.encoded)
     return {
-      ...this.toObject(),
+      encoded: this.encoded,
       initiator,
       signature,
     }
@@ -24,7 +24,7 @@ export class SwapWithSigner extends Swap {
     const initiator = this.swapSigner.getAddress()
     const signature = await this.swapSigner.signSwapRelease(this.encoded, recipient)
     return {
-      ...this.toObject(),
+      encoded: this.encoded,
       initiator,
       recipient,
       signature,
