@@ -45,8 +45,9 @@ describe('MesonSwap', () => {
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
-      expect(await mesonInstance.swapInitiator(swap.encoded)).to.equal(initiator.address)
-      expect(await mesonInstance.swapProvider(swap.encoded)).to.equal(provider.address)
+      const posted = await mesonInstance.getPostedSwap(swap.encoded)
+      expect(posted.initiator).to.equal(initiator.address)
+      expect(posted.provider).to.equal(provider.address)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
     })
 
@@ -77,8 +78,9 @@ describe('MesonSwap', () => {
       signedRelease.checkSignature()
       await lpClient.executeSwap(signedRelease, false)
 
-      expect(await mesonInstance.swapInitiator(swap.encoded)).to.equal(ethers.constants.AddressZero)
-      expect(await mesonInstance.swapProvider(swap.encoded)).to.equal(ethers.constants.AddressZero)
+      const posted = await mesonInstance.getPostedSwap(swap.encoded)
+      expect(posted.initiator).to.equal(ethers.constants.AddressZero)
+      expect(posted.provider).to.equal(ethers.constants.AddressZero)
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.add(swap.amount))
     })

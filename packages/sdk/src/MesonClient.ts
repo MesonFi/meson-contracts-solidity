@@ -2,6 +2,7 @@ import type { Wallet } from '@ethersproject/wallet'
 import type { Meson } from '@mesonfi/contract-types'
 import { pack } from '@ethersproject/solidity'
 import { keccak256 } from '@ethersproject/keccak256'
+import { AddressZero } from '@ethersproject/constants'
 
 import { SwapWithSigner } from './SwapWithSigner'
 import { SwapSigner } from './SwapSigner'
@@ -147,7 +148,16 @@ export class MesonClient {
     return await this.mesonInstance.cancelSwap(swapId)
   }
 
+  async getPostedSwap(encoded: string) {
+    const { initiator, provider } = await this.mesonInstance.getPostedSwap(encoded)
+    return {
+      provider: provider !== AddressZero && provider,
+      initiator: initiator !== AddressZero && initiator,
+    }
+  }
+
   async getLockedSwap(encoded: string) {
-    return await this.mesonInstance.getLockedSwap(encoded)
+    const { initiator, provider, until } = await this.mesonInstance.getLockedSwap(encoded)
+    return { initiator, provider, until }
   }
 }
