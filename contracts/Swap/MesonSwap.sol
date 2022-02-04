@@ -11,10 +11,10 @@ import "../utils/MesonStates.sol";
 /// Methods in this class will be executed by swap initiators or LPs
 /// on the initial chain of swaps.
 contract MesonSwap is IMesonSwapEvents, MesonStates {
-  /// @notice Swap requests
+  /// @notice Posted Swaps
   /// key: encodedSwap in format of `amount:uint96|salt:uint32|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
   /// value: in format of initiator:uint160|providerIndex:uint40; =1 maybe means executed (to prevent replay attack)
-  mapping(uint256 => uint200) internal _swapRequests;
+  mapping(uint256 => uint200) internal _postedSwaps;
 
   /// @notice Anyone can call this method to post a swap request. This is step 1️⃣  in a swap.
   /// The r,s,v signature must be signed by the swap initiator. The initiator can call 
@@ -30,14 +30,14 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// Once a swap is posted and bonded, the bonding LP should call `lock` on the target chain.
   ///
   /// @dev Designed to be used by both swap initiators and LPs
-  /// @param encodedSwap Encoded swap information; also used as the key of `_swapRequest`
+  /// @param encodedSwap Encoded swap information; also used as the key of `_postedSwaps`
   /// @param r Part of the signature
   /// @param s Part of the signature
   /// @param packedData Packed in format of `v:uint8|initiator:address|providerIndex:uint40` to save gas
   function postSwap(uint256 encodedSwap, bytes32 r, bytes32 s, uint208 packedData)
     external forInitialChain(encodedSwap)
   {
-    require(_swapRequests[encodedSwap] == 0, "Swap already exists");
+    require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
 
     uint256 delta = ((encodedSwap >> 48) & 0xFFFFFFFFFF) - block.timestamp;
     // Underflow would trigger "Expire ts too late" error
@@ -46,7 +46,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
     address initiator = address(uint160(packedData >> 40));
     _checkRequestSignature(encodedSwap, r, s, uint8(packedData >> 200), initiator);
-    _swapRequests[encodedSwap] = uint200(packedData);
+    _postedSwaps[encodedSwap] = uint200(packedData);
 
     _unsafeDepositToken(_tokenList[uint8(encodedSwap)], initiator, encodedSwap >> 160);
 
@@ -56,27 +56,27 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @notice If `postSwap` is called by the initiator of the swap and `providerIndex`
   /// is zero, an LP can call this to bond the swap to himself.
   /// @dev Designed to be used by LPs
-  /// @param encodedSwap Encoded swap information; also used as the key of `_swapRequest`
+  /// @param encodedSwap Encoded swap information; also used as the key of `_postedSwaps`
   /// @param providerIndex An index for the LP; call `depositAndRegister` to get an index
   function bondSwap(uint256 encodedSwap, uint40 providerIndex) external {
-    uint200 req = _swapRequests[encodedSwap];
+    uint200 req = _postedSwaps[encodedSwap];
     require(req != 0, "Swap does not exist");
     require(uint40(req) == 0, "Swap bonded to another provider");
 
-    _swapRequests[encodedSwap] = req | providerIndex;
+    _postedSwaps[encodedSwap] = req | providerIndex;
     emit SwapBonded(encodedSwap);
   }
 
   /// @notice Cancel a swap. The swap initiator can call this method to withdraw funds
   /// from an expired swap request.
   /// @dev Designed to be used by swap initiators
-  /// @param encodedSwap Encoded swap information; also used as the key of `_swapRequest`
+  /// @param encodedSwap Encoded swap information; also used as the key of `_postedSwaps`
   function cancelSwap(uint256 encodedSwap) external {
-    uint200 req = _swapRequests[encodedSwap];
+    uint200 req = _postedSwaps[encodedSwap];
     require(req > 1, "Swap does not exist");
     require((encodedSwap >> 48 & 0xFFFFFFFFFF) < block.timestamp, "Swap is still locked");
     
-    _swapRequests[encodedSwap] = 0; // Swap expired so the same one cannot be posted again
+    _postedSwaps[encodedSwap] = 0; // Swap expired so the same one cannot be posted again
 
     _safeTransfer(
       _tokenList[uint8(encodedSwap)], // tokenIndex -> token address
@@ -92,7 +92,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// Once the signature is verified, the current bonding LP (provider)
   /// will receive funds deposited by the swap initiator.
   /// @dev Designed to be used by the current bonding LP
-  /// @param encodedSwap Encoded swap information; also used as the key of `_swapRequest`
+  /// @param encodedSwap Encoded swap information; also used as the key of `_postedSwaps`
   /// @param recipientHash The keccak256 hash of the recipient address
   /// @param r Part of the release signature (same as in the `release` call)
   /// @param s Part of the release signature (same as in the `release` call)
@@ -106,17 +106,17 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     uint8 v,
     bool depositToPool
   ) external {
-    uint200 req = _swapRequests[encodedSwap];
+    uint200 req = _postedSwaps[encodedSwap];
     require(req != 0, "Swap does not exist");
 
     if (((encodedSwap >> 48) & 0xFFFFFFFFFF) < block.timestamp + MIN_BOND_TIME_PERIOD) {
       // Swap expiredTs < current + MIN_BOND_TIME_PERIOD
       // The swap cannot be posted again and therefore safe to remove it
       // LPs who execute in this mode can save ~5000 gas
-      _swapRequests[encodedSwap] = 0;
+      _postedSwaps[encodedSwap] = 0;
     } else {
       // 1 will prevent the same swap to be posted again
-      _swapRequests[encodedSwap] = 1;
+      _postedSwaps[encodedSwap] = 1;
     }
 
     // TODO: fee to meson protocol
@@ -135,11 +135,11 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     }
   }
 
-  /// @notice Read information for a swap request
-  function getSwapRequest(uint256 encodedSwap) external view
+  /// @notice Read information for a posted swap
+  function getPostedSwap(uint256 encodedSwap) external view
     returns (address initiator, address provider, bool executed)
   {
-    uint200 req = _swapRequests[encodedSwap];
+    uint200 req = _postedSwaps[encodedSwap];
     initiator = address(uint160(req >> 40));
     executed = req == 1;
     if (req >> 40 == 0) {

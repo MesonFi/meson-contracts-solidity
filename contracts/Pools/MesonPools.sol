@@ -11,6 +11,9 @@ import "../utils/MesonStates.sol";
 /// Methods in this class will be executed when a swap initiator wants to
 /// swap into this chain.
 contract MesonPools is IMesonPoolsEvents, MesonStates {
+    /// @notice Locked Swaps
+  /// key: encodedSwap in format of `amount:uint96|salt:uint32|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
+  /// value: in format of until:uint40|providerIndex:uint40|initiator:uint160
   mapping(uint256 => uint240) internal _lockedSwaps;
 
   /// @notice Deposit tokens into the liquidity pool and register an index 
