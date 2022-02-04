@@ -100,7 +100,7 @@ export class MesonPresets {
     return this._cache.get(network.id)
   }
 
-  async checkSwapStatus(encoded: string): Promise<[
+  async checkSwapStatus(encoded: string, initiator?: string): Promise<[
     { status: PostedSwapStatus, initiator?: string, provider?: string },
     { status: LockedSwapStatus, initiator?: string, provider?: string, until?: number }?
   ]> {
@@ -108,9 +108,9 @@ export class MesonPresets {
     const fromClient = this.getClientFromShortCoinType(swap.inChain)
     const toClient = this.getClientFromShortCoinType(swap.outChain)
 
-    const posted = await fromClient.getPostedSwap(encoded)
+    const posted = await fromClient.getPostedSwap(encoded, initiator)
     if (posted.status & PostedSwapStatus.Bonded) { // no need to getLockedSwap in other cases
-      const locked = await toClient.getLockedSwap(encoded)
+      const locked = await toClient.getLockedSwap(encoded, initiator)
       return [posted, locked]
     }
     return [posted]

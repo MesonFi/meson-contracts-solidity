@@ -19,7 +19,7 @@ export enum PostedSwapStatus {
   Error = 0b1000,
   ErrorExpired = 0b1001,
   ErrorExpiredButBonded = 0b1010,
-  ErrorMadeByOthers = 0b1100,
+  ErrorMadeByOtherInitiator = 0b1100,
 }
 
 export enum LockedSwapStatus {
@@ -29,7 +29,7 @@ export enum LockedSwapStatus {
   Unlocked = 0b0101,
   Error = 0b1000,
   ErrorExpired = 0b1001,
-  ErrorMadeForOthers = 0b1010,
+  ErrorMadeForOtherInitiator = 0b1010,
 }
 
 export interface PartialSwapData {
@@ -171,7 +171,7 @@ export class MesonClient {
     return await this.mesonInstance.cancelSwap(swapId)
   }
 
-  async getPostedSwap(encoded: string | BigNumber): Promise<{
+  async getPostedSwap(encoded: string | BigNumber, initiatorToCheck?: string): Promise<{
     status: PostedSwapStatus,
     initiator?: string,
     provider?: string,
@@ -193,6 +193,8 @@ export class MesonClient {
     } else if (initiator === AddressZero) {
       // could be executed or cancelled; need to check events
       return { status: PostedSwapStatus.None }
+    } else if (initiatorToCheck && initiatorToCheck.toLowerCase() !== initiator.toLowerCase()) {
+      return { status: PostedSwapStatus.ErrorMadeByOtherInitiator }
     } else if (provider === AddressZero) {
       if (expired) {
         return { status: PostedSwapStatus.ErrorExpired, initiator }
@@ -208,7 +210,7 @@ export class MesonClient {
     }
   }
 
-  async getLockedSwap(encoded: string | BigNumber): Promise<{
+  async getLockedSwap(encoded: string | BigNumber, initiatorToCheck?: string): Promise<{
     status: LockedSwapStatus,
     initiator?: string,
     provider?: string,
@@ -218,6 +220,8 @@ export class MesonClient {
     if (!until) {
       // could be released or cancelled; need to check events
       return { status: LockedSwapStatus.None }
+    } else if (initiatorToCheck && initiatorToCheck.toLowerCase() !== initiator.toLowerCase()) {
+      return { status: LockedSwapStatus.ErrorMadeForOtherInitiator }
     } else if (until * 1000 < Date.now()) {
       return { status: LockedSwapStatus.ErrorExpired, initiator, provider, until }
     } else {
