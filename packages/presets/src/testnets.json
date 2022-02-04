@@ -12,19 +12,19 @@
     "addressFormat": "hex",
     "url": "https://ropsten.infura.io/v3/${INFURA_API_KEY}",
     "explorer": "https://ropsten.etherscan.io",
-    "mesonAddress": "0xdA55929b3b5c715aB2700528f78693bE57F275e1",
+    "mesonAddress": "0x12d3250921753699f315F1DcD1aD01053bfe9D82",
     "tokens": [
       {
         "name": "Ropsten USDT",
         "symbol": "mUSDT",
         "decimals": 6,
-        "addr": "0x3b86d7B0186488955Eb7F3Fb8e4119FF4732082D"
+        "addr": "0x6Ef367E46d0Ca6C01a6954FE62251E4d72D600D2"
       },
       {
         "name": "Ropsten USDC",
         "symbol": "mUSDC",
         "decimals": 6,
-        "addr": "0xD88370bB2152e675548376BB301E59dfE4aa76fb"
+        "addr": "0xF2B34A9C724B3d690835249F2b645a82B15Fd073"
       }
     ]
   },
@@ -46,19 +46,19 @@
       "symbol": "tBNB",
       "decimals": 18
     },
-    "mesonAddress": "0x450fbe94873243D3f850C870144db7f18EAcba0B",
+    "mesonAddress": "0x42a42625dabB4e3e188ec75c2B20Ae57c4037faF",
     "tokens": [
       {
         "name": "BSC USDT",
         "symbol": "bUSDT",
         "decimals": 6,
-        "addr": "0x6995509a8C884BC9a0264A0ec1C0AE7Eb6d09Fc3"
+        "addr": "0x4b35FbCC248ea55B190C6759B191eB473013F13C"
       },
       {
         "name": "BSC USDC",
         "symbol": "bUSDC",
         "decimals": 6,
-        "addr": "0x58CB9175F530a59Df29a340C89b88fA9B01f6e9D"
+        "addr": "0x525121edE9A2a61369eA4ac2e3C7df208136AAd3"
       }
     ]
   },
@@ -80,19 +80,19 @@
       "symbol": "FTM",
       "decimals": 18
     },
-    "mesonAddress": "0xFAEd452F25e470Fd75F9f3A11187dD91C83b0fC0",
+    "mesonAddress": "0xC0Ff918124DdFfb39AaC4377469eE681Eff6A0C8",
     "tokens": [
       {
         "name": "FTM USDT",
         "symbol": "fUSDT",
         "decimals": 6,
-        "addr": "0xE2009467F3f0166b5EA4068c91b98C02A8Cb7878"
+        "addr": "0xF116464A4f2b684EB4e6550CF8e2956f3A0f63a9"
       },
       {
         "name": "FTM USDC",
         "symbol": "fUSDC",
         "decimals": 6,
-        "addr": "0xF4132a67F3c7e735C6d954dA2D1AE8Ef0f9bEaE8"
+        "addr": "0xe8cc63298c7CA99139b06645d24b0E5EA8B51202"
       }
     ]
   },
@@ -114,19 +114,19 @@
       "symbol": "AVAX",
       "decimals": 18
     },
-    "mesonAddress": "0x24d02fF98878f42e92B7fCa695cAc741f876aCF5",
+    "mesonAddress": "0x5cdad2c4d871D1732f5e3B12fe014E574b1a0246",
     "tokens": [
       {
         "name": "Ava USDT",
         "symbol": "aUSDT",
         "decimals": 6,
-        "addr": "0x35d13AE7eA881054c7571932e1cA4271b5434E76"
+        "addr": "0x60BAA74a71F57C2aAC0dAD61e440Eb4A3F5c0885"
       },
       {
         "name": "Ava USDC",
         "symbol": "aUSDC",
         "decimals": 6,
-        "addr": "0x22400F6C16B5d6f15C865450d97510428b6858CE"
+        "addr": "0x993f2523e127E9e487464DDaDdb47E7cEA321429"
       }
     ]
   },
@@ -148,19 +148,19 @@
       "symbol": "MATIC",
       "decimals": 18
     },
-    "mesonAddress": "0x26058C8fCF6Ee539738f651C2D555af4448FA91F",
+    "mesonAddress": "0x07557347c4304Ff95bEb069268C4A1d94A88814f",
     "tokens": [
       {
         "name": "Matic USDT",
         "symbol": "pUSDT",
         "decimals": 6,
-        "addr": "0x2E634B4988967467e33cb5f017f78Ffd4a4c8b82"
+        "addr": "0x8c5DAC7D1B3E24a02210643d0CB4D02A5a1AEdD7"
       },
       {
         "name": "Matic USDC",
         "symbol": "pUSDC",
         "decimals": 6,
-        "addr": "0x38446266b2632eA345c84eE2Cc8053C1a71fE34a"
+        "addr": "0xEE51E3f3fBb57D2496E17184a13dd9d6A181352a"
       }
     ]
   },
@@ -182,19 +182,19 @@
       "symbol": "ONE",
       "decimals": 18
     },
-    "mesonAddress": "0x857E525a09d6ee1a02dEa3A3FD008643750A49EC",
+    "mesonAddress": "0x5B5b14626273df85aaE7b4dA88e5d6E2F9381810",
     "tokens": [
       {
         "name": "One USDT",
         "symbol": "oUSDT",
         "decimals": 6,
-        "addr": "0xC171b33EAeFEB2541D71dc5099A781B05cdEd735"
+        "addr": "0x91daB4ab944d99b7606FCDBB766f9630843166d9"
       },
       {
         "name": "One USDC",
         "symbol": "oUSDC",
         "decimals": 6,
-        "addr": "0xDF9763629c308cE0f4D5A85314d901225d35F07a"
+        "addr": "0x9F414242d5E6d7612B5eBFe89ef1978525849b86"
       }
     ]
   }
