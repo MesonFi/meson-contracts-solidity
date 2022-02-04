@@ -24,8 +24,8 @@ export interface MesonSwapTestInterface extends utils.Interface {
     "bondSwap(uint256,uint40)": FunctionFragment;
     "cancelSwap(uint256)": FunctionFragment;
     "executeSwap(uint256,bytes32,bytes32,bytes32,uint8,bool)": FunctionFragment;
+    "getPostedSwap(uint256)": FunctionFragment;
     "getShortCoinType()": FunctionFragment;
-    "getSwapRequest(uint256)": FunctionFragment;
     "indexOfAddress(address)": FunctionFragment;
     "indexOfToken(address)": FunctionFragment;
     "postSwap(uint256,bytes32,bytes32,uint208)": FunctionFragment;
@@ -62,12 +62,12 @@ export interface MesonSwapTestInterface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "getShortCoinType",
-    values?: undefined
+    functionFragment: "getPostedSwap",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getSwapRequest",
-    values: [BigNumberish]
+    functionFragment: "getShortCoinType",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "indexOfAddress",
@@ -106,11 +106,11 @@ export interface MesonSwapTestInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getShortCoinType",
+    functionFragment: "getPostedSwap",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getSwapRequest",
+    functionFragment: "getShortCoinType",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -223,9 +223,7 @@ export interface MesonSwapTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getShortCoinType(overrides?: CallOverrides): Promise<[string]>;
-
-    getSwapRequest(
+    getPostedSwap(
       encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
@@ -235,6 +233,8 @@ export interface MesonSwapTest extends BaseContract {
         executed: boolean;
       }
     >;
+
+    getShortCoinType(overrides?: CallOverrides): Promise<[string]>;
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<[number]>;
 
@@ -295,9 +295,7 @@ export interface MesonSwapTest extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getShortCoinType(overrides?: CallOverrides): Promise<string>;
-
-  getSwapRequest(
+  getPostedSwap(
     encodedSwap: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
@@ -307,6 +305,8 @@ export interface MesonSwapTest extends BaseContract {
       executed: boolean;
     }
   >;
+
+  getShortCoinType(overrides?: CallOverrides): Promise<string>;
 
   indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
 
@@ -365,9 +365,7 @@ export interface MesonSwapTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    getShortCoinType(overrides?: CallOverrides): Promise<string>;
-
-    getSwapRequest(
+    getPostedSwap(
       encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
@@ -377,6 +375,8 @@ export interface MesonSwapTest extends BaseContract {
         executed: boolean;
       }
     >;
+
+    getShortCoinType(overrides?: CallOverrides): Promise<string>;
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
 
@@ -447,12 +447,12 @@ export interface MesonSwapTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getShortCoinType(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getSwapRequest(
+    getPostedSwap(
       encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getShortCoinType(overrides?: CallOverrides): Promise<BigNumber>;
 
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -512,12 +512,12 @@ export interface MesonSwapTest extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    getShortCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getSwapRequest(
+    getPostedSwap(
       encodedSwap: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    getShortCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     indexOfAddress(
       arg0: string,
