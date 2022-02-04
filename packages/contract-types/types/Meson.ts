@@ -32,7 +32,7 @@ export interface MesonInterface extends utils.Interface {
     "indexOfAddress(address)": FunctionFragment;
     "indexOfToken(address)": FunctionFragment;
     "lock(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
-    "postSwap(uint256,bytes32,bytes32,uint208)": FunctionFragment;
+    "postSwap(uint256,bytes32,bytes32,uint8,uint200)": FunctionFragment;
     "release(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
@@ -101,7 +101,7 @@ export interface MesonInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "postSwap",
-    values: [BigNumberish, BytesLike, BytesLike, BigNumberish]
+    values: [BigNumberish, BytesLike, BytesLike, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "release",
@@ -336,7 +336,8 @@ export interface Meson extends BaseContract {
       encodedSwap: BigNumberish,
       r: BytesLike,
       s: BytesLike,
-      packedData: BigNumberish,
+      v: BigNumberish,
+      postingValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -455,7 +456,8 @@ export interface Meson extends BaseContract {
     encodedSwap: BigNumberish,
     r: BytesLike,
     s: BytesLike,
-    packedData: BigNumberish,
+    v: BigNumberish,
+    postingValue: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -572,7 +574,8 @@ export interface Meson extends BaseContract {
       encodedSwap: BigNumberish,
       r: BytesLike,
       s: BytesLike,
-      packedData: BigNumberish,
+      v: BigNumberish,
+      postingValue: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -692,7 +695,8 @@ export interface Meson extends BaseContract {
       encodedSwap: BigNumberish,
       r: BytesLike,
       s: BytesLike,
-      packedData: BigNumberish,
+      v: BigNumberish,
+      postingValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -804,7 +808,8 @@ export interface Meson extends BaseContract {
       encodedSwap: BigNumberish,
       r: BytesLike,
       s: BytesLike,
-      packedData: BigNumberish,
+      v: BigNumberish,
+      postingValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
