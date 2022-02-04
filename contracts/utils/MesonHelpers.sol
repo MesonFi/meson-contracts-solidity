@@ -18,7 +18,11 @@ contract MesonHelpers is MesonConfig {
     address recipient,
     uint256 amount
   ) internal {
-    (bool success, bytes memory data) = token.call(abi.encodeWithSelector(ERC20_TRANSFER_SELECTOR, recipient, amount));
+    (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
+      bytes4(0xa9059cbb), // bytes4(keccak256(bytes("transfer(address,uint256)")))
+      recipient,
+      amount
+    ));
     require(success && (data.length == 0 || abi.decode(data, (bool))), "Transfer failed");
   }
 

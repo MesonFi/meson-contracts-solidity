@@ -8,54 +8,29 @@ import "../utils/MesonStates.sol";
 
 /// @title MesonSwap
 /// @notice The class to receive and process swap requests.
-/// Methods in this class will be executed by users or LPs when
-/// users initiate swaps on the initial chain.
+/// Methods in this class will be executed by swap initiators or LPs
+/// on the initial chain of swaps.
 contract MesonSwap is IMesonSwapEvents, MesonStates {
-  /// @notice Posted swap requests
+  /// @notice Swap requests
   /// key: encodedSwap in format of `amount:uint96|salt:uint32|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
   /// value: in format of initiator:uint160|providerIndex:uint40; =1 maybe means executed (to prevent replay attack)
   mapping(uint256 => uint200) internal _swapRequests;
 
-  /// @notice xxxx
-  /// @dev Designed to be used by users
-  /// @param encodedSwap Packed in format of `amount:uint128|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
-  function requestSwap(uint256 encodedSwap) external forInitialChain(encodedSwap) {
-    require(_swapRequests[encodedSwap] == 0, "Swap already exists");
-
-    uint256 delta = ((encodedSwap >> 48) & 0xFFFFFFFFFF) - block.timestamp;
-    // Underflow would trigger "Expire ts too late" error
-    require(delta > MIN_BOND_TIME_PERIOD, "Expire ts too early");
-    require(delta < MAX_BOND_TIME_PERIOD, "Expire ts too late");
-
-    address initiator = _msgSender();
-    _swapRequests[encodedSwap] = uint200(uint160(initiator)) << 40;
-    
-    _unsafeDepositToken(_tokenList[uint8(encodedSwap)], initiator, encodedSwap >> 160);
-    
-    emit SwapRequested(encodedSwap);
-  }
-
-  /// @notice xxxx
-  /// @dev Designed to be used by LPs
-  function bondSwap(uint256 encodedSwap, uint40 providerIndex) external {
-    uint200 req = _swapRequests[encodedSwap];
-    require(req != 0, "Swap does not exist");
-    require(uint40(req) == 0, "Swap bonded to another provider");
-
-    _swapRequests[encodedSwap] = req | providerIndex;
-    emit SwapBonded(encodedSwap);
-  }
-
-  /// @notice A liquidity provider can call this method to post the swap and bond it
-  /// to himself.
-  /// This is step 1️⃣  in a swap.
-  /// The bonding state will last until `expireTs` and at most one LP can be bonded.
-  /// The bonding LP should call `release` and `executeSwap` later
-  /// to finish the swap within the bonding period.
-  /// After the bonding period expires, other LPs can bond again (wip),
-  /// or the user can cancel the swap.
-  /// @dev Designed to be used by LPs
-  /// @param encodedSwap Encoded swap
+  /// @notice Anyone can call this method to post a swap request. This is step 1️⃣  in a swap.
+  /// The r,s,v signature must be signed by the swap initiator. The initiator can call 
+  /// this method directly, in which case `providerIndex` should be zero and wait for LPs 
+  /// to call `bondSwap`. Initiators can also send the swap requests offchain (through the 
+  /// meson relayer service). An liquidity provider who receives requests through the relayer
+  /// can call this method to post and bond the swap in a single contract execution,
+  /// in which case he should give his own `providerIndex`.
+  /// 
+  /// The swap will last until `expireTs` and at most one LP can bond to it.
+  /// After the swap expires, the initiator can cancel the swap ande withdraw funds.
+  ///
+  /// Once a swap is posted and bonded, the bonding LP should call `lock` on the target chain.
+  ///
+  /// @dev Designed to be used by both swap initiators and LPs
+  /// @param encodedSwap Encoded swap information; also used as the key of `_swapRequest`
   /// @param r Part of the signature
   /// @param s Part of the signature
   /// @param packedData Packed in format of `v:uint8|initiator:address|providerIndex:uint40` to save gas
@@ -78,9 +53,24 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     emit SwapPosted(encodedSwap);
   }
 
-  /// @notice Cancel a swap
-  /// @dev Designed to be used by users
-  /// @param encodedSwap Encoded swap
+  /// @notice If `postSwap` is called by the initiator of the swap and `providerIndex`
+  /// is zero, an LP can call this to bond the swap to himself.
+  /// @dev Designed to be used by LPs
+  /// @param encodedSwap Encoded swap information; also used as the key of `_swapRequest`
+  /// @param providerIndex An index for the LP; call `depositAndRegister` to get an index
+  function bondSwap(uint256 encodedSwap, uint40 providerIndex) external {
+    uint200 req = _swapRequests[encodedSwap];
+    require(req != 0, "Swap does not exist");
+    require(uint40(req) == 0, "Swap bonded to another provider");
+
+    _swapRequests[encodedSwap] = req | providerIndex;
+    emit SwapBonded(encodedSwap);
+  }
+
+  /// @notice Cancel a swap. The swap initiator can call this method to withdraw funds
+  /// from an expired swap request.
+  /// @dev Designed to be used by swap initiators
+  /// @param encodedSwap Encoded swap information; also used as the key of `_swapRequest`
   function cancelSwap(uint256 encodedSwap) external {
     uint200 req = _swapRequests[encodedSwap];
     require(req > 1, "Swap does not exist");
@@ -97,16 +87,17 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     emit SwapCancelled(encodedSwap);
   }
 
-  /// @notice Execute the swap by providing a signature.
+  /// @notice Execute the swap by providing a release signature.
   /// This is step 4️⃣  in a swap.
   /// Once the signature is verified, the current bonding LP (provider)
-  /// will receive tokens initially deposited by the user.
-  /// The LP should call `release` first.
-  /// For a single swap, signature given here is identical to the one used
-  /// in `release`.
-  /// Otherwise, other people can use the signature to `challenge` the LP.
+  /// will receive funds deposited by the swap initiator.
   /// @dev Designed to be used by the current bonding LP
-  /// @param encodedSwap Encoded swap
+  /// @param encodedSwap Encoded swap information; also used as the key of `_swapRequest`
+  /// @param recipientHash The keccak256 hash of the recipient address
+  /// @param r Part of the release signature (same as in the `release` call)
+  /// @param s Part of the release signature (same as in the `release` call)
+  /// @param v Part of the release signature (same as in the `release` call)
+  /// @param depositToPool Choose to deposit funds to the pool (will save gas)
   function executeSwap(
     uint256 encodedSwap,
     bytes32 recipientHash,
@@ -144,6 +135,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     }
   }
 
+  /// @notice Read information for a swap request
   function getSwapRequest(uint256 encodedSwap) external view
     returns (address initiator, address provider, bool executed)
   {

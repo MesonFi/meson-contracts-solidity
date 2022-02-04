@@ -8,11 +8,16 @@ import "../utils/MesonStates.sol";
 
 /// @title MesonPools
 /// @notice The class to manage liquidity pools for providers.
-/// Methods in this class will be executed by LPs when users want to
-/// swap into the current chain.
+/// Methods in this class will be executed when a swap initiator wants to
+/// swap into this chain.
 contract MesonPools is IMesonPoolsEvents, MesonStates {
   mapping(uint256 => uint240) internal _lockedSwaps;
 
+  /// @notice Deposit tokens into the liquidity pool and register an index 
+  /// for future use (will save gas).
+  /// This is the prerequisite for LPs if they want to participate in swap trades.
+  /// @param amount The amount to be added to the pool
+  /// @param balanceIndex In format of `tokenIndex:uint8|providerIndex:uint40` to save gas
   function depositAndRegister(uint256 amount, uint48 balanceIndex) external {
     require(amount > 0, 'Amount must be positive');
 
@@ -28,30 +33,23 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _unsafeDepositToken(_tokenList[uint8(balanceIndex >> 40)], provider, amount);
   }
 
-  /// @notice Deposit tokens into the liquidity pool. This is the
-  /// prerequisite for LPs if they want to participate in swap
-  /// trades.
+  /// @notice Deposit tokens into the liquidity pool.
   /// The LP should be careful to make sure the `balanceIndex` is correct.
   /// Make sure to call `depositAndRegister` first and register a provider index.
   /// Otherwise, token may be deposited to others.
   /// @dev Designed to be used by liquidity providers
   /// @param amount The amount to be added to the pool
-  /// @param balanceIndex `[tokenIndex:uint8][providerIndex:uint40]
+  /// @param balanceIndex In format of`[tokenIndex:uint8][providerIndex:uint40]
   function deposit(uint256 amount, uint48 balanceIndex) external {
     require(amount > 0, 'Amount must be positive');
     _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amount);
     _unsafeDepositToken(_tokenList[uint8(balanceIndex >> 40)], _msgSender(), amount);
   }
 
-  /// @notice Withdraw tokens from the liquidity pool. In order to make sure
-  /// pending swaps can be satisfied, withdraw have a rate limit that
-  /// in each epoch, total amounts to release (to users) and withdraw
-  /// (to LP himself) cannot exceed MAX_RELEASE_AMOUNT_BY_EPOCH.
-  /// This method will only run in the current epoch. Use `release`
-  /// if wish to increment epoch.
+  /// @notice Withdraw tokens from the liquidity pool.
   /// @dev Designed to be used by liquidity providers
   /// @param amount The amount to be removed from the pool
-  /// @param tokenIndex The contract address of the withdrawing token
+  /// @param tokenIndex The index of the withdrawing token
   function withdraw(uint256 amount, uint8 tokenIndex) external {
     address provider = _msgSender();
     uint40 providerIndex = indexOfAddress[provider];
@@ -62,6 +60,16 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _safeTransfer(_tokenList[tokenIndex], provider, amount);
   }
 
+  /// @notice Lock funds to match a swap request. This is step 2 in a swap.
+  /// The bonding LP should call this method with the same signature given
+  /// by `postSwap`. This method will lock swapping fund on the target chain
+  /// for `LOCK_TIME_PERIOD` and wait for fund release and execution.
+  /// @dev Designed to be used by liquidity providers
+  /// @param encodedSwap Encoded swap information; also used as the key of `_lockedSwaps`
+  /// @param r Part of the signature (the one given by `postSwap` call)
+  /// @param s Part of the signature (the one given by `postSwap` call)
+  /// @param v Part of the signature (the one given by `postSwap` call)
+  /// @param initiator Swap initiator
   function lock(
     uint256 encodedSwap,
     bytes32 r,
@@ -85,6 +93,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     emit SwapLocked(encodedSwap);
   }
 
+  /// @notice If the locked swap is not released after `LOCK_TIME_PERIOD`,
+  /// the LP can call this method to unlock the swapping fund.
   function unlock(uint256 encodedSwap) external {
     uint240 lockedSwap = _lockedSwaps[encodedSwap];
     require(lockedSwap != 0, "Swap does not exist");
@@ -95,13 +105,16 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _lockedSwaps[encodedSwap] = 0;
   }
 
-  /// @notice Release tokens to satisfy a user's swap request.
-  /// This is step 3️⃣  in a swap.
-  /// The LP should call this first before calling `executeSwap`.
-  /// Otherwise, other people can use the signature to challenge the LP.
-  /// For a single swap, signature given here is identical to the one used
-  /// in `executeSwap`.
-  /// @dev Designed to be used by liquidity providers
+  /// @notice Release tokens to satisfy a locked swap. This is step 3️⃣  in a swap.
+  /// This method requires a release signature from the swap initiator,
+  /// but anyone (initiator herself, the LP, and other people) with the signature 
+  /// can call it to make sure the swapping fund is guaranteed to be released.
+  /// @dev Designed to be used by anyone
+  /// @param encodedSwap Encoded swap information; also used as the key of `_lockedSwaps`
+  /// @param r Part of the release signature (same as in the `executeSwap` call)
+  /// @param s Part of the release signature (same as in the `executeSwap` call)
+  /// @param v Part of the release signature (same as in the `executeSwap` call)
+  /// @param recipient The recipient address of the swap
   function release(
     uint256 encodedSwap,
     bytes32 r,
@@ -121,6 +134,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     emit SwapReleased(encodedSwap);
   }
 
+  /// @notice Read information for a locked swap
   function getLockedSwap(uint256 encodedSwap) external view
     returns (address initiator, address provider, uint40 until)
   {

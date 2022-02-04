@@ -5,7 +5,7 @@ import "./MesonTokens.sol";
 import "./MesonHelpers.sol";
 
 /// @title MesonStates
-/// @notice The class that keeps track of token supplies and swap requests,
+/// @notice The class that keeps track of states
 contract MesonStates is MesonTokens, MesonHelpers {
   mapping(address => uint40) public indexOfAddress;
   mapping(uint40 => address) public addressOfIndex;
