@@ -1,4 +1,4 @@
-export { MesonClient, PartialSwapData } from './MesonClient'
+export { MesonClient, PartialSwapData, SwapStatus } from './MesonClient'
 export { Swap, SwapData } from './Swap'
 export { SwapSigner, EthersWalletSwapSigner, RemoteSwapSigner } from './SwapSigner'
 export { SwapWithSigner } from './SwapWithSigner'

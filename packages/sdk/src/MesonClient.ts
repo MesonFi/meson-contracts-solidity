@@ -1,13 +1,37 @@
-import { BigNumberish } from "@ethersproject/bignumber";
+import type { BigNumber } from "@ethersproject/bignumber";
 import type { Wallet } from '@ethersproject/wallet'
 import type { Meson } from '@mesonfi/contract-types'
 import { pack } from '@ethersproject/solidity'
 import { keccak256 } from '@ethersproject/keccak256'
 import { AddressZero } from '@ethersproject/constants'
 
+import { Swap } from './Swap'
 import { SwapWithSigner } from './SwapWithSigner'
 import { SwapSigner } from './SwapSigner'
 import { SignedSwapRequest, SignedSwapRelease } from './SignedSwap'
+
+export enum SwapStatus {
+  None = 0, // nothing found on chain
+
+  MaskForRequest = 0b1111,
+
+  Requested = 0b0001,
+  RequestBonded = 0b0010,
+  RequestExecuted = 0b0100,
+  RequestCancelled = 0b0101,
+  RequestError = 0b1000,
+  RequestErrorExpired = 0b1001,
+  RequestErrorMadeByOthers = 0b1010,
+
+  MaskForLock = 0b1111 << 4,
+
+  Locked = 0b0001 << 4,
+  LockReleased = 0b0100 << 4,
+  LockCancelled = 0b0101 << 4,
+  LockError = 0b1000 << 4,
+  LockErrorExpired = 0b1001 << 4,
+  LockErrorMadeForOthers = 0b1010 << 4,
+}
 
 export interface PartialSwapData {
   amount: string,
@@ -149,16 +173,62 @@ export class MesonClient {
     return await this.mesonInstance.cancelSwap(swapId)
   }
 
-  async getPostedSwap(encoded: BigNumberish) {
-    const { initiator, provider } = await this.mesonInstance.getPostedSwap(encoded)
-    return {
-      provider: provider !== AddressZero && provider,
-      initiator: initiator !== AddressZero && initiator,
+  async getSwapRequest(encoded: string | BigNumber, initiator: string): Promise<[SwapStatus, any?]> {
+    if (!initiator) {
+      throw new Error('Please provide the initiator address')
+    }
+    
+    let expired
+    try {
+      const swap = Swap.decode(encoded)
+      if (swap.expireTs * 1000 < Date.now()) {
+        expired = true
+      }
+    } catch (err: any) {
+      throw new Error('Invalid encoded swap. ' + err.message)
+    }
+    
+    try {
+      const req = await this.mesonInstance.getSwapRequest(encoded)
+      if (req.executed) {
+        // could be executed for others; need to check events
+        return [SwapStatus.RequestExecuted]
+      } else if (req.initiator === AddressZero) {
+        // could be executed or cancelled; need to check events
+        return [SwapStatus.None]
+      } else if (req.initiator.toLowerCase() !== initiator.toLowerCase()) {
+        return [SwapStatus.RequestErrorMadeByOthers]
+      } else if (expired) {
+        return [SwapStatus.RequestErrorExpired]
+      } else if (req.provider === AddressZero) {
+        return [SwapStatus.Requested, { initiator: req.initiator }]
+      } else {
+        return [SwapStatus.RequestBonded, req]
+      }
+    } catch (err: any) {
+      throw new Error('Fail to call getSwapRequest. ' + err.message)
     }
   }
 
-  async getLockedSwap(encoded: BigNumberish) {
-    const { initiator, provider, until } = await this.mesonInstance.getLockedSwap(encoded)
-    return { initiator, provider, until }
+  async getLockedSwap(encoded: string | BigNumber, initiator: string): Promise<[SwapStatus, any?]> {
+    if (!initiator) {
+      throw new Error('Please provide the initiator address')
+    }
+    
+    try {
+      const locked = await this.mesonInstance.getLockedSwap(encoded)
+      if (!locked.until) {
+        // could be released or cancelled; need to check events
+        return [SwapStatus.None]
+      } else if (locked.initiator.toLowerCase() !== initiator.toLowerCase()) {
+        return [SwapStatus.LockErrorMadeForOthers]
+      } else if (locked.until * 1000 < Date.now()) {
+        return [SwapStatus.LockErrorExpired]
+      } else {
+        return [SwapStatus.Locked, locked]
+      }
+    } catch (err: any) {
+      throw new Error('Fail to call getLockedSwap. ' + err.message)
+    }
   }
 }
