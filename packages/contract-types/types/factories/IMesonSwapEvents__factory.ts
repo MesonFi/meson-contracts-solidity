@@ -49,19 +49,6 @@ const _abi = [
     name: "SwapPosted",
     type: "event",
   },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "encodedSwap",
-        type: "uint256",
-      },
-    ],
-    name: "SwapRequested",
-    type: "event",
-  },
 ];
 
 export class IMesonSwapEvents__factory {

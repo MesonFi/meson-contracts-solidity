@@ -13,13 +13,11 @@ export interface IMesonSwapEventsInterface extends utils.Interface {
     "SwapBonded(uint256)": EventFragment;
     "SwapCancelled(uint256)": EventFragment;
     "SwapPosted(uint256)": EventFragment;
-    "SwapRequested(uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "SwapBonded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SwapCancelled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SwapPosted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SwapRequested"): EventFragment;
 }
 
 export type SwapBondedEvent = TypedEvent<
@@ -42,13 +40,6 @@ export type SwapPostedEvent = TypedEvent<
 >;
 
 export type SwapPostedEventFilter = TypedEventFilter<SwapPostedEvent>;
-
-export type SwapRequestedEvent = TypedEvent<
-  [BigNumber],
-  { encodedSwap: BigNumber }
->;
-
-export type SwapRequestedEventFilter = TypedEventFilter<SwapRequestedEvent>;
 
 export interface IMesonSwapEvents extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -89,9 +80,6 @@ export interface IMesonSwapEvents extends BaseContract {
 
     "SwapPosted(uint256)"(encodedSwap?: null): SwapPostedEventFilter;
     SwapPosted(encodedSwap?: null): SwapPostedEventFilter;
-
-    "SwapRequested(uint256)"(encodedSwap?: null): SwapRequestedEventFilter;
-    SwapRequested(encodedSwap?: null): SwapRequestedEventFilter;
   };
 
   estimateGas: {};
