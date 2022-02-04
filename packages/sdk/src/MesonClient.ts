@@ -130,8 +130,8 @@ export class MesonClient {
       signedRequest.encoded,
       signedRequest.signature[0],
       signedRequest.signature[1],
-      pack(['uint8', 'address', 'uint40'], [
-        signedRequest.signature[2],
+      signedRequest.signature[2],
+      pack(['address', 'uint40'], [
         signedRequest.initiator,
         providerIndex
       ])
