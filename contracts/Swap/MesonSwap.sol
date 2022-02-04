@@ -144,11 +144,12 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     }
   }
 
-  function getPostedSwap(uint256 encodedSwap) external view
-    returns (address initiator, address provider)
+  function getSwapRequest(uint256 encodedSwap) external view
+    returns (address initiator, address provider, bool executed)
   {
     uint200 req = _swapRequests[encodedSwap];
     initiator = address(uint160(req >> 40));
+    executed = req == 1;
     if (req >> 40 == 0) {
       provider = address(0);
     } else {
