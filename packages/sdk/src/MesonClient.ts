@@ -170,13 +170,11 @@ export class MesonClient {
     return await this.mesonInstance.cancelSwap(swapId)
   }
 
-  async getPostedSwap(encoded: string | BigNumber, initiator: string)
-    : Promise<{ status: PostedSwapStatus, provider?: string }>
-  {
-    if (!initiator) {
-      throw new Error('Please provide the initiator address')
-    }
-    
+  async getPostedSwap(encoded: string | BigNumber): Promise<{
+    status: PostedSwapStatus,
+    initiator?: string,
+    provider?: string,
+  }> {
     let expired
     try {
       const swap = Swap.decode(encoded)
@@ -187,57 +185,36 @@ export class MesonClient {
       throw new Error('Invalid encoded. ' + err.message)
     }
     
-    try {
-      const {
-        initiator: initiatorFromContract,
-        provider,
-        executed,
-      } = await this.mesonInstance.getPostedSwap(encoded)
-      if (executed) {
-        // could be executed for others; need to check events
-        return { status: PostedSwapStatus.Executed }
-      } else if (initiatorFromContract === AddressZero) {
-        // could be executed or cancelled; need to check events
-        return { status: PostedSwapStatus.None }
-      } else if (initiatorFromContract.toLowerCase() !== initiator.toLowerCase()) {
-        return { status: PostedSwapStatus.ErrorMadeByOthers }
-      } else if (expired) {
-        return { status: PostedSwapStatus.ErrorExpired }
-      } else if (provider === AddressZero) {
-        return { status: PostedSwapStatus.Requested }
-      } else {
-        return { status: PostedSwapStatus.Bonded, provider }
-      }
-    } catch (err: any) {
-      throw new Error('Fail to call getPostedSwap. ' + err.message)
+    const { initiator, provider, executed } = await this.mesonInstance.getPostedSwap(encoded)
+    if (executed) {
+      // could be executed for others; need to check events
+      return { status: PostedSwapStatus.Executed }
+    } else if (initiator === AddressZero) {
+      // could be executed or cancelled; need to check events
+      return { status: PostedSwapStatus.None }
+    } else if (expired) {
+      return { status: PostedSwapStatus.ErrorExpired, initiator }
+    } else if (provider === AddressZero) {
+      return { status: PostedSwapStatus.Requested, initiator }
+    } else {
+      return { status: PostedSwapStatus.Bonded, initiator, provider }
     }
   }
 
-  async getLockedSwap(encoded: string | BigNumber, initiator: string)
-    : Promise<{ status: LockedSwapStatus, provider?: string, lockUntil?: number }>
-  {
-    if (!initiator) {
-      throw new Error('Please provide the initiator address')
-    }
-    
-    try {
-      const {
-        initiator: initiatorFromContract,
-        provider,
-        until: lockUntil,
-      } = await this.mesonInstance.getLockedSwap(encoded)
-      if (!lockUntil) {
-        // could be released or cancelled; need to check events
-        return { status: LockedSwapStatus.None }
-      } else if (initiatorFromContract.toLowerCase() !== initiator.toLowerCase()) {
-        return { status: LockedSwapStatus.ErrorMadeForOthers }
-      } else if (lockUntil * 1000 < Date.now()) {
-        return { status: LockedSwapStatus.ErrorExpired, provider, lockUntil }
-      } else {
-        return { status: LockedSwapStatus.Locked, provider, lockUntil }
-      }
-    } catch (err: any) {
-      throw new Error('Fail to call getLockedSwap. ' + err.message)
+  async getLockedSwap(encoded: string | BigNumber): Promise<{
+    status: LockedSwapStatus,
+    initiator?: string,
+    provider?: string,
+    until?: number
+  }> {
+    const { initiator, provider, until } = await this.mesonInstance.getLockedSwap(encoded)
+    if (!until) {
+      // could be released or cancelled; need to check events
+      return { status: LockedSwapStatus.None }
+    } else if (until * 1000 < Date.now()) {
+      return { status: LockedSwapStatus.ErrorExpired, initiator, provider, until }
+    } else {
+      return { status: LockedSwapStatus.Locked, initiator, provider, until }
     }
   }
 }
