@@ -109,7 +109,7 @@ export class MesonPresets {
     const toClient = this.getClientFromShortCoinType(swap.outChain)
 
     const posted = await fromClient.getPostedSwap(encoded)
-    if (posted.status === PostedSwapStatus.Bonded) { // no need to getLockedSwap in other cases
+    if (posted.status | PostedSwapStatus.Bonded) { // no need to getLockedSwap in other cases
       const locked = await toClient.getLockedSwap(encoded)
       return [posted, locked]
     }

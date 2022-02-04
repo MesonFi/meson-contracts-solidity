@@ -18,7 +18,8 @@ export enum PostedSwapStatus {
   Cancelled = 0b0101,
   Error = 0b1000,
   ErrorExpired = 0b1001,
-  ErrorMadeByOthers = 0b1010,
+  ErrorExpiredButBonded = 0b1010,
+  ErrorMadeByOthers = 0b1100,
 }
 
 export enum LockedSwapStatus {
@@ -192,12 +193,18 @@ export class MesonClient {
     } else if (initiator === AddressZero) {
       // could be executed or cancelled; need to check events
       return { status: PostedSwapStatus.None }
-    } else if (expired) {
-      return { status: PostedSwapStatus.ErrorExpired, initiator }
     } else if (provider === AddressZero) {
-      return { status: PostedSwapStatus.Requested, initiator }
+      if (expired) {
+        return { status: PostedSwapStatus.ErrorExpired, initiator }
+      } else {
+        return { status: PostedSwapStatus.Requested, initiator }
+      }
     } else {
-      return { status: PostedSwapStatus.Bonded, initiator, provider }
+      if (expired) {
+        return { status: PostedSwapStatus.ErrorExpiredButBonded, initiator, provider }
+      } else {
+        return { status: PostedSwapStatus.Bonded, initiator, provider }
+      }
     }
   }
 
