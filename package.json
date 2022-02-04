@@ -10,12 +10,14 @@
     "estimate": "hardhat --network hardhat run scripts/estimate-gas.js",
     "estimate2": "hardhat --network hardhat run scripts/estimate-gas-upgradable.js",
     "test": "hardhat --network hardhat test",
+
     "chain": "node scripts/set-chain-config.js",
     "chain:local": "NETWORK_ID=local yarn chain",
     "chain:eth": "NETWORK_ID=mainnet yarn chain",
     "chain:bsc": "NETWORK_ID=bsc yarn chain",
     "chain:cfx": "NETWORK_ID=cfx yarn chain",
     "chain:one": "NETWORK_ID=one yarn chain",
+
     "deploy": "yarn chain && hardhat run scripts/deploy-upgradable.js",
     "deploy:eth": "NETWORK_ID=mainnet yarn deploy",
     "deploy:bsc": "NETWORK_ID=bsc yarn deploy",
@@ -24,7 +26,16 @@
     "deploy:avax": "NETWORK_ID=avax yarn deploy",
     "deploy:one": "NETWORK_ID=one yarn deploy",
     "deploy:cfx": "NETWORK_ID=cfx yarn deploy",
-    "upgrade": "hardhat run scripts/upgrade.js",
+
+    "up": "yarn chain && hardhat run scripts/upgrade.js",
+    "up:eth": "NETWORK_ID=mainnet yarn up",
+    "up:bsc": "NETWORK_ID=bsc yarn up",
+    "up:ftm": "NETWORK_ID=ftm yarn up",
+    "up:poly": "NETWORK_ID=polygon yarn up",
+    "up:avax": "NETWORK_ID=avax yarn up",
+    "up:one": "NETWORK_ID=one yarn up",
+    "up:cfx": "NETWORK_ID=cfx yarn up",
+
     "docgen": "solidity-docgen --solc-module solc -t ./templates",
     "publish": "npm publish --workspaces"
   },

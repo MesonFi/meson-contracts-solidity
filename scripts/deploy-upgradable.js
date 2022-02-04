@@ -52,10 +52,10 @@ async function main() {
   tokens.push(usdc)
   console.log(`${usdc.name} deployed to:`, mockUSDC.address)
 
-  const mesonFactory = await ethers.getContractFactory('UpgradableMeson', wallet)
+  const UpgradableMeson = await ethers.getContractFactory('UpgradableMeson', wallet)
   console.log('Deploying UpgradableMeson...')
   const meson = await upgrades.deployProxy(
-    mesonFactory,
+    UpgradableMeson,
     [[mockUSDT.address, mockUSDC.address]],
     { kind: 'uups', nonce: nonce + 2 }
   )
