@@ -1,6 +1,6 @@
 {
   "name": "@mesonfi/sdk",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "",
   "license": "MIT",
   "repository": "https://github.com/MesonFi/meson-contracts-solidity",
@@ -25,7 +25,7 @@
     "@ethersproject/solidity": "5.5.0",
     "@ethersproject/transactions": "5.5.0",
     "@ethersproject/wallet": "5.5.0",
-    "@mesonfi/contract-types": "^0.3.0"
+    "@mesonfi/contract-types": "^0.3.1"
   },
   "devDependencies": {
     "typescript": "^4.5.4"
