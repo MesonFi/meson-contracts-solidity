@@ -1,6 +1,6 @@
 import type { Provider } from '@ethersproject/providers'
 import { Contract as EthersContract } from '@ethersproject/contracts'
-import { MesonClient } from '@mesonfi/sdk'
+import { MesonClient, Swap, PostedSwapStatus, LockedSwapStatus } from '@mesonfi/sdk'
 import { Meson } from '@mesonfi/contract-abis'
 
 import testnets from './testnets.json'
@@ -87,6 +87,33 @@ export class MesonPresets {
       this._cache.set(id, client)
     }
     return this._cache.get(id)
+  }
+
+  getClientFromShortCoinType(shortCoinType: string) {
+    const network = this.getNetworkFromShortCoinType(shortCoinType)
+    if (!network) {
+      throw new Error(`No network for shortCoinType: ${shortCoinType}`)
+    }
+    if (!this._cache.has(network.id)) {
+      throw new Error(`Client ${network.id} not initialized. Call getClient first.`)
+    }
+    return this._cache.get(network.id)
+  }
+
+  async checkSwapStatus(encoded: string, initiator: string): Promise<[
+    { status: PostedSwapStatus, provider?: string },
+    { status: LockedSwapStatus, provider?: string, lockUntil?: number }?
+  ]> {
+    const swap = Swap.decode(encoded)
+    const fromClient = this.getClientFromShortCoinType(swap.inChain)
+    const toClient = this.getClientFromShortCoinType(swap.outChain)
+
+    const posted = await fromClient.getPostedSwap(encoded, initiator)
+    if (posted.status === PostedSwapStatus.Bonded) { // no need to getLockedSwap in other cases
+      const locked = await toClient.getLockedSwap(encoded, initiator)
+      return [posted, locked]
+    }
+    return [posted]
   }
 }
 
