@@ -1,3 +1,4 @@
+import { BigNumberish } from "@ethersproject/bignumber";
 import type { Wallet } from '@ethersproject/wallet'
 import type { Meson } from '@mesonfi/contract-types'
 import { pack } from '@ethersproject/solidity'
@@ -148,7 +149,7 @@ export class MesonClient {
     return await this.mesonInstance.cancelSwap(swapId)
   }
 
-  async getPostedSwap(encoded: string) {
+  async getPostedSwap(encoded: BigNumberish) {
     const { initiator, provider } = await this.mesonInstance.getPostedSwap(encoded)
     return {
       provider: provider !== AddressZero && provider,
@@ -156,7 +157,7 @@ export class MesonClient {
     }
   }
 
-  async getLockedSwap(encoded: string) {
+  async getLockedSwap(encoded: BigNumberish) {
     const { initiator, provider, until } = await this.mesonInstance.getLockedSwap(encoded)
     return { initiator, provider, until }
   }
