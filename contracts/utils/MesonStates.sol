@@ -15,6 +15,13 @@ contract MesonStates is MesonTokens, MesonHelpers {
   function balanceOf(address token, address addr) external view returns (uint256) {
     uint8 tokenIndex = _indexOfToken[token];
     uint40 providerIndex = indexOfAddress[addr];
+    if (providerIndex == 0 || tokenIndex == 0) {
+      return 0;
+    }
     return _tokenBalanceOf[(uint48(tokenIndex) << 40) | providerIndex];
+  }
+  
+  function mesonFeeCollected(uint8 tokenIndex) external view returns (uint256) {
+    return _tokenBalanceOf[uint48(tokenIndex) << 40];
   }
 }

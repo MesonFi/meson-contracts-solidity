@@ -49,7 +49,11 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _checkRequestSignature(encodedSwap, r, s, v, initiator);
     _postedSwaps[encodedSwap] = postingValue;
 
-    _unsafeDepositToken(_tokenList[uint8(encodedSwap)], initiator, encodedSwap >> 160);
+    _unsafeDepositToken(
+      _tokenList[uint8(encodedSwap)],
+      initiator,
+      (encodedSwap >> 160) + ((encodedSwap >> 88) & 0xFFFFFFFF)
+    );
 
     emit SwapPosted(encodedSwap);
   }
@@ -75,14 +79,14 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   function cancelSwap(uint256 encodedSwap) external {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     require(postedSwap > 1, "Swap does not exist");
-    require((encodedSwap >> 48 & 0xFFFFFFFFFF) < block.timestamp, "Swap is still locked");
+    require(((encodedSwap >> 48) & 0xFFFFFFFFFF) < block.timestamp, "Swap is still locked");
     
     _postedSwaps[encodedSwap] = 0; // Swap expired so the same one cannot be posted again
 
     _safeTransfer(
       _tokenList[uint8(encodedSwap)], // tokenIndex -> token address
       address(uint160(postedSwap >> 40)), // initiator
-      encodedSwap >> 160
+      (encodedSwap >> 160) + ((encodedSwap >> 88) & 0xFFFFFFFF)
     );
 
     emit SwapCancelled(encodedSwap);
@@ -120,18 +124,21 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
       _postedSwaps[encodedSwap] = 1;
     }
 
-    // TODO: fee to meson protocol
-
     _checkReleaseSignature(encodedSwap, recipientHash, r, s, v, address(uint160(postedSwap >> 40)));
 
+    uint48 mesonBalanceIndex = uint48(encodedSwap << 40);
+    uint256 feeToMeson = ((encodedSwap >> 90) & 0x3FFFFFFF); // 25% fee to meson
+    _tokenBalanceOf[mesonBalanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[mesonBalanceIndex], feeToMeson);
+    
+    uint256 amountWithFee = (encodedSwap >> 160) + ((encodedSwap >> 88) & 0xFFFFFFFF) - feeToMeson;
     if (depositToPool) {
-      uint48 balanceIndex = uint48(encodedSwap << 40) | uint40(postedSwap); // TODO: check
-      _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], encodedSwap >> 160);
+      uint48 balanceIndex = mesonBalanceIndex | uint40(postedSwap);
+      _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amountWithFee);
     } else {
       _safeTransfer(
         _tokenList[uint8(encodedSwap)], // tokenIndex -> token address
         addressOfIndex[uint40(postedSwap)], // providerIndex -> provider address
-        encodedSwap >> 160
+        amountWithFee
       );
     }
   }
