@@ -171,6 +171,36 @@ export class MesonClient {
     return await this.mesonInstance.cancelSwap(swapId)
   }
 
+  async isSwapPosted (encoded: string | BigNumber) {
+    const filter = this.mesonInstance.filters.SwapPosted(encoded)
+    const events = await this.mesonInstance.queryFilter(filter)
+    return events.length > 0
+  }
+
+  async isSwapBonded (encoded: string | BigNumber) {
+    const filter = this.mesonInstance.filters.SwapBonded(encoded)
+    const events = await this.mesonInstance.queryFilter(filter)
+    return events.length > 0
+  }
+
+  async isSwapLocked (encoded: string | BigNumber) {
+    const filter = this.mesonInstance.filters.SwapLocked(encoded)
+    const events = await this.mesonInstance.queryFilter(filter)
+    return events.length > 0
+  }
+
+  async isSwapCancelled (encoded: string | BigNumber) {
+    const filter = this.mesonInstance.filters.SwapCancelled(encoded)
+    const events = await this.mesonInstance.queryFilter(filter)
+    return events.length > 0
+  }
+
+  async isSwapReleased (encoded: string | BigNumber) {
+    const filter = this.mesonInstance.filters.SwapReleased(encoded)
+    const events = await this.mesonInstance.queryFilter(filter)
+    return events.length > 0
+  }
+
   async getPostedSwap(encoded: string | BigNumber, initiatorToCheck?: string): Promise<{
     status: PostedSwapStatus,
     initiator?: string,
@@ -188,10 +218,13 @@ export class MesonClient {
     
     const { initiator, provider, executed } = await this.mesonInstance.getPostedSwap(encoded)
     if (executed) {
-      // could be executed for others; need to check events
       return { status: PostedSwapStatus.Executed }
     } else if (initiator === AddressZero) {
-      // could be executed or cancelled; need to check events
+      if (await this.isSwapCancelled(encoded)) {
+        return { status: PostedSwapStatus.Cancelled }
+      } else if (await this.isSwapBonded(encoded) || await this.isSwapPosted(encoded)) {
+        return { status: PostedSwapStatus.Executed }
+      }
       return { status: PostedSwapStatus.None }
     } else if (initiatorToCheck && initiatorToCheck.toLowerCase() !== initiator.toLowerCase()) {
       return { status: PostedSwapStatus.ErrorMadeByOtherInitiator }
@@ -218,8 +251,13 @@ export class MesonClient {
   }> {
     const { initiator, provider, until } = await this.mesonInstance.getLockedSwap(encoded)
     if (!until) {
-      // could be released or cancelled; need to check events
-      return { status: LockedSwapStatus.None }
+      if (await this.isSwapReleased(encoded)) {
+        return { status: LockedSwapStatus.Released }
+      } else if (await this.isSwapLocked(encoded)) {
+        return { status: LockedSwapStatus.Unlocked }
+      } else {
+        return { status: LockedSwapStatus.None }
+      }
     } else if (initiatorToCheck && initiatorToCheck.toLowerCase() !== initiator.toLowerCase()) {
       return { status: LockedSwapStatus.ErrorMadeForOtherInitiator }
     } else if (until * 1000 < Date.now()) {
