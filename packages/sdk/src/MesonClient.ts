@@ -222,7 +222,7 @@ export class MesonClient {
     } else if (initiator === AddressZero) {
       if (await this.isSwapCancelled(encoded)) {
         return { status: PostedSwapStatus.Cancelled }
-      } else if (await this.isSwapBonded(encoded) || await this.isSwapPosted(encoded)) {
+      } else if (await this.isSwapPosted(encoded)) {
         return { status: PostedSwapStatus.Executed }
       }
       return { status: PostedSwapStatus.None }
