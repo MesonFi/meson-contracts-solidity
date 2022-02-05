@@ -28,6 +28,7 @@ export interface MesonPoolsInterface extends utils.Interface {
     "indexOfAddress(address)": FunctionFragment;
     "indexOfToken(address)": FunctionFragment;
     "lock(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
+    "mesonFeeCollected(uint8)": FunctionFragment;
     "release(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
@@ -70,6 +71,10 @@ export interface MesonPoolsInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "lock",
     values: [BigNumberish, BytesLike, BytesLike, BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mesonFeeCollected",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "release",
@@ -119,6 +124,10 @@ export interface MesonPoolsInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "lock", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "mesonFeeCollected",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportedTokens",
@@ -230,6 +239,11 @@ export interface MesonPools extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     release(
       encodedSwap: BigNumberish,
       r: BytesLike,
@@ -309,6 +323,11 @@ export interface MesonPools extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  mesonFeeCollected(
+    tokenIndex: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   release(
     encodedSwap: BigNumberish,
     r: BytesLike,
@@ -385,6 +404,11 @@ export interface MesonPools extends BaseContract {
       initiator: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     release(
       encodedSwap: BigNumberish,
@@ -467,6 +491,11 @@ export interface MesonPools extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     release(
       encodedSwap: BigNumberish,
       r: BytesLike,
@@ -543,6 +572,11 @@ export interface MesonPools extends BaseContract {
       v: BigNumberish,
       initiator: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     release(

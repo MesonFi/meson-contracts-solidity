@@ -34,6 +34,7 @@ export interface UpgradableMesonInterface extends utils.Interface {
     "indexOfToken(address)": FunctionFragment;
     "initialize(address[])": FunctionFragment;
     "lock(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
+    "mesonFeeCollected(uint8)": FunctionFragment;
     "postSwap(uint256,bytes32,bytes32,uint8,uint200)": FunctionFragment;
     "release(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
@@ -108,6 +109,10 @@ export interface UpgradableMesonInterface extends utils.Interface {
     values: [BigNumberish, BytesLike, BytesLike, BigNumberish, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "mesonFeeCollected",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "postSwap",
     values: [BigNumberish, BytesLike, BytesLike, BigNumberish, BigNumberish]
   ): string;
@@ -175,6 +180,10 @@ export interface UpgradableMesonInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "lock", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "mesonFeeCollected",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "postSwap", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
   decodeFunctionResult(
@@ -377,6 +386,11 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     postSwap(
       encodedSwap: BigNumberish,
       r: BytesLike,
@@ -513,6 +527,11 @@ export interface UpgradableMeson extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  mesonFeeCollected(
+    tokenIndex: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   postSwap(
     encodedSwap: BigNumberish,
     r: BytesLike,
@@ -646,6 +665,11 @@ export interface UpgradableMeson extends BaseContract {
       initiator: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     postSwap(
       encodedSwap: BigNumberish,
@@ -811,6 +835,11 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     postSwap(
       encodedSwap: BigNumberish,
       r: BytesLike,
@@ -938,6 +967,11 @@ export interface UpgradableMeson extends BaseContract {
       v: BigNumberish,
       initiator: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     postSwap(

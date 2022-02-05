@@ -28,6 +28,7 @@ export interface MesonSwapTestInterface extends utils.Interface {
     "getShortCoinType()": FunctionFragment;
     "indexOfAddress(address)": FunctionFragment;
     "indexOfToken(address)": FunctionFragment;
+    "mesonFeeCollected(uint8)": FunctionFragment;
     "postSwap(uint256,bytes32,bytes32,uint8,uint200)": FunctionFragment;
     "register(uint40)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
@@ -78,6 +79,10 @@ export interface MesonSwapTestInterface extends utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "mesonFeeCollected",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "postSwap",
     values: [BigNumberish, BytesLike, BytesLike, BigNumberish, BigNumberish]
   ): string;
@@ -119,6 +124,10 @@ export interface MesonSwapTestInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "indexOfToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "mesonFeeCollected",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "postSwap", data: BytesLike): Result;
@@ -240,6 +249,11 @@ export interface MesonSwapTest extends BaseContract {
 
     indexOfToken(token: string, overrides?: CallOverrides): Promise<[number]>;
 
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     postSwap(
       encodedSwap: BigNumberish,
       r: BytesLike,
@@ -313,6 +327,11 @@ export interface MesonSwapTest extends BaseContract {
 
   indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
 
+  mesonFeeCollected(
+    tokenIndex: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   postSwap(
     encodedSwap: BigNumberish,
     r: BytesLike,
@@ -383,6 +402,11 @@ export interface MesonSwapTest extends BaseContract {
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
 
     indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
+
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     postSwap(
       encodedSwap: BigNumberish,
@@ -467,6 +491,11 @@ export interface MesonSwapTest extends BaseContract {
 
     indexOfToken(token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     postSwap(
       encodedSwap: BigNumberish,
       r: BytesLike,
@@ -536,6 +565,11 @@ export interface MesonSwapTest extends BaseContract {
 
     indexOfToken(
       token: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

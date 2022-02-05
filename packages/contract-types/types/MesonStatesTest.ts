@@ -26,6 +26,7 @@ export interface MesonStatesTestInterface extends utils.Interface {
     "getShortCoinType()": FunctionFragment;
     "indexOfAddress(address)": FunctionFragment;
     "indexOfToken(address)": FunctionFragment;
+    "mesonFeeCollected(uint8)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
   };
@@ -76,6 +77,10 @@ export interface MesonStatesTestInterface extends utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "mesonFeeCollected",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "supportedTokens",
     values?: undefined
   ): string;
@@ -109,6 +114,10 @@ export interface MesonStatesTestInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "indexOfToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "mesonFeeCollected",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -213,6 +222,11 @@ export interface MesonStatesTest extends BaseContract {
 
     indexOfToken(token: string, overrides?: CallOverrides): Promise<[number]>;
 
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     supportedTokens(
       overrides?: CallOverrides
     ): Promise<[string[]] & { tokens: string[] }>;
@@ -286,6 +300,11 @@ export interface MesonStatesTest extends BaseContract {
 
   indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
 
+  mesonFeeCollected(
+    tokenIndex: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   supportedTokens(overrides?: CallOverrides): Promise<string[]>;
 
   tokenForIndex(
@@ -357,6 +376,11 @@ export interface MesonStatesTest extends BaseContract {
 
     indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
 
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     supportedTokens(overrides?: CallOverrides): Promise<string[]>;
 
     tokenForIndex(
@@ -420,6 +444,11 @@ export interface MesonStatesTest extends BaseContract {
     indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     indexOfToken(token: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     supportedTokens(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -486,6 +515,11 @@ export interface MesonStatesTest extends BaseContract {
 
     indexOfToken(
       token: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    mesonFeeCollected(
+      tokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
