@@ -128,7 +128,9 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
     uint48 mesonBalanceIndex = uint48(encodedSwap << 40);
     uint256 feeToMeson = ((encodedSwap >> 90) & 0x3FFFFFFF); // 25% fee to meson
-    _tokenBalanceOf[mesonBalanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[mesonBalanceIndex], feeToMeson);
+    if (feeToMeson > 0) {
+      _tokenBalanceOf[mesonBalanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[mesonBalanceIndex], feeToMeson);
+    }
     
     uint256 amountWithFee = (encodedSwap >> 160) + ((encodedSwap >> 88) & 0xFFFFFFFF) - feeToMeson;
     if (depositToPool) {

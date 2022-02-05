@@ -11,7 +11,7 @@ export function getDefaultSwap({
   inToken = 1,
   outToken = 1,
   amount = '100',
-  fee = '1'
+  fee = '10'
 }: OptionalSwapData = {}): PartialSwapData {
   return {
     amount,
