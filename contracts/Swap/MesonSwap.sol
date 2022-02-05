@@ -52,7 +52,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _unsafeDepositToken(
       _tokenList[uint8(encodedSwap)],
       initiator,
-      (encodedSwap >> 160) + ((encodedSwap >> 88) & 0xFFFFFFFF)
+      (encodedSwap >> 160) + ((encodedSwap >> 88) & 0xFFFFFFFFFF)
     );
 
     emit SwapPosted(encodedSwap);
@@ -86,7 +86,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _safeTransfer(
       _tokenList[uint8(encodedSwap)], // tokenIndex -> token address
       address(uint160(postedSwap >> 40)), // initiator
-      (encodedSwap >> 160) + ((encodedSwap >> 88) & 0xFFFFFFFF)
+      (encodedSwap >> 160) + ((encodedSwap >> 88) & 0xFFFFFFFFFF)
     );
 
     emit SwapCancelled(encodedSwap);
@@ -127,12 +127,15 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _checkReleaseSignature(encodedSwap, recipientHash, r, s, v, address(uint160(postedSwap >> 40)));
 
     uint48 mesonBalanceIndex = uint48(encodedSwap << 40);
-    uint256 feeToMeson = ((encodedSwap >> 90) & 0x3FFFFFFF); // 25% fee to meson
-    if (feeToMeson > 0) {
-      _tokenBalanceOf[mesonBalanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[mesonBalanceIndex], feeToMeson);
+    uint256 amountWithFee = (encodedSwap >> 160) + ((encodedSwap >> 88) & 0xFFFFFFFFFF);
+    if ((uint16(encodedSwap >> 8) != 0x003c) && (uint16(encodedSwap >> 32) != 0x003c)) { // no meson fee for eth
+      uint256 feeToMeson = ((encodedSwap >> 89) & 0x7FFFFFFFFF); // 50% fee to meson
+      if (feeToMeson > 0) {
+        _tokenBalanceOf[mesonBalanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[mesonBalanceIndex], feeToMeson);
+      }
+      amountWithFee -= feeToMeson;
     }
     
-    uint256 amountWithFee = (encodedSwap >> 160) + ((encodedSwap >> 88) & 0xFFFFFFFF) - feeToMeson;
     if (depositToPool) {
       uint48 balanceIndex = mesonBalanceIndex | uint40(postedSwap);
       _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amountWithFee);
