@@ -51,7 +51,11 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
     _unsafeDepositToken(_tokenList[uint8(encodedSwap)], initiator, encodedSwap >> 160);
 
-    emit SwapPosted(encodedSwap);
+    if (uint40(postingValue) > 0) {
+      emit SwapBonded(encodedSwap);
+    } else {
+      emit SwapPosted(encodedSwap);
+    }
   }
 
   /// @notice If `postSwap` is called by the initiator of the swap and `providerIndex`
