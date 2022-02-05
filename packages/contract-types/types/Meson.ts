@@ -605,20 +605,30 @@ export interface Meson extends BaseContract {
   };
 
   filters: {
-    "SwapBonded(uint256)"(encodedSwap?: null): SwapBondedEventFilter;
-    SwapBonded(encodedSwap?: null): SwapBondedEventFilter;
+    "SwapBonded(uint256)"(
+      encodedSwap?: BigNumberish | null
+    ): SwapBondedEventFilter;
+    SwapBonded(encodedSwap?: BigNumberish | null): SwapBondedEventFilter;
 
-    "SwapCancelled(uint256)"(encodedSwap?: null): SwapCancelledEventFilter;
-    SwapCancelled(encodedSwap?: null): SwapCancelledEventFilter;
+    "SwapCancelled(uint256)"(
+      encodedSwap?: BigNumberish | null
+    ): SwapCancelledEventFilter;
+    SwapCancelled(encodedSwap?: BigNumberish | null): SwapCancelledEventFilter;
 
-    "SwapLocked(uint256)"(encodedSwap?: null): SwapLockedEventFilter;
-    SwapLocked(encodedSwap?: null): SwapLockedEventFilter;
+    "SwapLocked(uint256)"(
+      encodedSwap?: BigNumberish | null
+    ): SwapLockedEventFilter;
+    SwapLocked(encodedSwap?: BigNumberish | null): SwapLockedEventFilter;
 
-    "SwapPosted(uint256)"(encodedSwap?: null): SwapPostedEventFilter;
-    SwapPosted(encodedSwap?: null): SwapPostedEventFilter;
+    "SwapPosted(uint256)"(
+      encodedSwap?: BigNumberish | null
+    ): SwapPostedEventFilter;
+    SwapPosted(encodedSwap?: BigNumberish | null): SwapPostedEventFilter;
 
-    "SwapReleased(uint256)"(encodedSwap?: null): SwapReleasedEventFilter;
-    SwapReleased(encodedSwap?: null): SwapReleasedEventFilter;
+    "SwapReleased(uint256)"(
+      encodedSwap?: BigNumberish | null
+    ): SwapReleasedEventFilter;
+    SwapReleased(encodedSwap?: BigNumberish | null): SwapReleasedEventFilter;
   };
 
   estimateGas: {

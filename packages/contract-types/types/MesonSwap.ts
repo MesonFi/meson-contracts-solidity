@@ -386,14 +386,20 @@ export interface MesonSwap extends BaseContract {
   };
 
   filters: {
-    "SwapBonded(uint256)"(encodedSwap?: null): SwapBondedEventFilter;
-    SwapBonded(encodedSwap?: null): SwapBondedEventFilter;
+    "SwapBonded(uint256)"(
+      encodedSwap?: BigNumberish | null
+    ): SwapBondedEventFilter;
+    SwapBonded(encodedSwap?: BigNumberish | null): SwapBondedEventFilter;
 
-    "SwapCancelled(uint256)"(encodedSwap?: null): SwapCancelledEventFilter;
-    SwapCancelled(encodedSwap?: null): SwapCancelledEventFilter;
+    "SwapCancelled(uint256)"(
+      encodedSwap?: BigNumberish | null
+    ): SwapCancelledEventFilter;
+    SwapCancelled(encodedSwap?: BigNumberish | null): SwapCancelledEventFilter;
 
-    "SwapPosted(uint256)"(encodedSwap?: null): SwapPostedEventFilter;
-    SwapPosted(encodedSwap?: null): SwapPostedEventFilter;
+    "SwapPosted(uint256)"(
+      encodedSwap?: BigNumberish | null
+    ): SwapPostedEventFilter;
+    SwapPosted(encodedSwap?: BigNumberish | null): SwapPostedEventFilter;
   };
 
   estimateGas: {

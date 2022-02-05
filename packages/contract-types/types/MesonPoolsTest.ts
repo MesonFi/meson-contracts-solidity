@@ -412,11 +412,15 @@ export interface MesonPoolsTest extends BaseContract {
   };
 
   filters: {
-    "SwapLocked(uint256)"(encodedSwap?: null): SwapLockedEventFilter;
-    SwapLocked(encodedSwap?: null): SwapLockedEventFilter;
+    "SwapLocked(uint256)"(
+      encodedSwap?: BigNumberish | null
+    ): SwapLockedEventFilter;
+    SwapLocked(encodedSwap?: BigNumberish | null): SwapLockedEventFilter;
 
-    "SwapReleased(uint256)"(encodedSwap?: null): SwapReleasedEventFilter;
-    SwapReleased(encodedSwap?: null): SwapReleasedEventFilter;
+    "SwapReleased(uint256)"(
+      encodedSwap?: BigNumberish | null
+    ): SwapReleasedEventFilter;
+    SwapReleased(encodedSwap?: BigNumberish | null): SwapReleasedEventFilter;
   };
 
   estimateGas: {
