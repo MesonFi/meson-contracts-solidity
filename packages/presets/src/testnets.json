@@ -63,40 +63,6 @@
     ]
   },
   {
-    "id": "ftm-testnet",
-    "name": "Fantom Testnet",
-    "alias": "FTM",
-    "chainId": "0xfa2",
-    "slip44": "0x800003ef",
-    "shortSlip44": "0x03ef",
-    "extensions": [
-      "metamask"
-    ],
-    "addressFormat": "hex",
-    "url": "https://rpc.testnet.fantom.network",
-    "explorer": "https://testnet.ftmscan.com",
-    "nativeCurrency": {
-      "name": "Fantom",
-      "symbol": "FTM",
-      "decimals": 18
-    },
-    "mesonAddress": "0xdbced1a8a0f6006f5b2e3109a4C0cB109E8e3785",
-    "tokens": [
-      {
-        "name": "FTM USDT",
-        "symbol": "fUSDT",
-        "decimals": 6,
-        "addr": "0x7ce82C334577D9F63f8EefdaAaF121E30F853E7D"
-      },
-      {
-        "name": "FTM USDC",
-        "symbol": "fUSDC",
-        "decimals": 6,
-        "addr": "0x8Def59EaAB7C1b0723bbf322fd86b30DBcEb1B19"
-      }
-    ]
-  },
-  {
     "id": "avax-testnet",
     "name": "Avalanche Testnet (Fuji)",
     "alias": "Ava",
@@ -161,6 +127,40 @@
         "symbol": "pUSDC",
         "decimals": 6,
         "addr": "0x8c31722577d9868a1022F97ED42A0617d5f5397e"
+      }
+    ]
+  },
+  {
+    "id": "ftm-testnet",
+    "name": "Fantom Testnet",
+    "alias": "FTM",
+    "chainId": "0xfa2",
+    "slip44": "0x800003ef",
+    "shortSlip44": "0x03ef",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "hex",
+    "url": "https://rpc.testnet.fantom.network",
+    "explorer": "https://testnet.ftmscan.com",
+    "nativeCurrency": {
+      "name": "Fantom",
+      "symbol": "FTM",
+      "decimals": 18
+    },
+    "mesonAddress": "0xdbced1a8a0f6006f5b2e3109a4C0cB109E8e3785",
+    "tokens": [
+      {
+        "name": "FTM USDT",
+        "symbol": "fUSDT",
+        "decimals": 6,
+        "addr": "0x7ce82C334577D9F63f8EefdaAaF121E30F853E7D"
+      },
+      {
+        "name": "FTM USDC",
+        "symbol": "fUSDC",
+        "decimals": 6,
+        "addr": "0x8Def59EaAB7C1b0723bbf322fd86b30DBcEb1B19"
       }
     ]
   },
