@@ -2,7 +2,7 @@
   {
     "id": "ropsten",
     "name": "Ropsten",
-    "alias": "Ropsten",
+    "alias": "ETH",
     "chainId": "0x3",
     "slip44": "0x8000003c",
     "shortSlip44": "0x003c",
@@ -65,7 +65,7 @@
   {
     "id": "avax-testnet",
     "name": "Avalanche Testnet (Fuji)",
-    "alias": "Ava",
+    "alias": "AVA",
     "chainId": "0xa869",
     "slip44": "0x80002328",
     "shortSlip44": "0x2328",
@@ -99,7 +99,7 @@
   {
     "id": "polygon-testnet",
     "name": "Polygon Testnet (Mumbai)",
-    "alias": "Matic",
+    "alias": "MATIC",
     "chainId": "0x13881",
     "slip44": "0x800003c6",
     "shortSlip44": "0x03c6",
@@ -167,7 +167,7 @@
   {
     "id": "one-testnet",
     "name": "Harmony Testnet",
-    "alias": "One",
+    "alias": "ONE",
     "chainId": "0x6357d2e0",
     "slip44": "0x800003ff",
     "shortSlip44": "0x03ff",
