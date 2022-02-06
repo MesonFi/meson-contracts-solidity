@@ -20,7 +20,7 @@
   "dependencies": {
     "@ethersproject/contracts": "5.5.0",
     "@ethersproject/providers": "5.5.0",
-    "@mesonfi/contract-abis": "^0.3.1",
+    "@mesonfi/contract-abis": "^0.4.0",
     "@mesonfi/sdk": "^0.4.0"
   },
   "devDependencies": {
