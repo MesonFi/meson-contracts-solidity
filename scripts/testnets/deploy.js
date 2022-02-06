@@ -1,6 +1,6 @@
 const path = require('path')
 const fs = require('fs')
-const { ethers, upgrades } = require('hardhat')
+const { ethers } = require('hardhat')
 const { MesonClient } = require('@mesonfi/sdk/src')
 const mainnets = require('@mesonfi/presets/src/mainnets.json')
 const testnets = require('@mesonfi/presets/src/testnets.json')
@@ -52,17 +52,13 @@ async function main() {
   tokens.push(usdc)
   console.log(`${usdc.name} deployed to:`, mockUSDC.address)
 
-  const UpgradableMeson = await ethers.getContractFactory('UpgradableMeson', wallet)
-  console.log('Deploying UpgradableMeson...')
-  const meson = await upgrades.deployProxy(
-    UpgradableMeson,
-    [[mockUSDT.address, mockUSDC.address]],
-    { kind: 'uups', nonce: nonce + 2 }
-  )
+  const Meson = await ethers.getContractFactory('Meson', wallet)
+  console.log('Deploying Meson...')
+  const meson = await Meson.deploy([mockUSDT.address, mockUSDC.address], { nonce: nonce + 2 })
   await meson.deployed()
-  console.log('UpgradableMeson deployed to:', meson.address)
+  console.log('Meson deployed to:', meson.address)
 
-  const mesonClient = await MesonClient.Create(meson)
+  const mesonClient = await MesonClient.Create(mesonContract)
 
   if (mesonClient.shortCoinType !== testnet.shortSlip44) {
     throw new Error('Coin type does not match')
@@ -85,7 +81,7 @@ async function main() {
   testnet.mesonAddress = meson.address
   testnet.tokens = tokens
   testnets.splice(index, 1, testnet)
-  const testnetsPath = path.join(__dirname, '../packages/presets/src/testnets.json')
+  const testnetsPath = path.join(__dirname, '../../packages/presets/src/testnets.json')
   fs.writeFileSync(testnetsPath, JSON.stringify(testnets, null, 2))
 }
 

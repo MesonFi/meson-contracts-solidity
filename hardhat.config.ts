@@ -6,6 +6,7 @@ import '@openzeppelin/hardhat-upgrades'
 import dotenv from 'dotenv'
 
 import { task } from 'hardhat/config'
+import mainnets from '@mesonfi/presets/src/mainnets.json'
 import testnets from '@mesonfi/presets/src/testnets.json'
 import config from './config.json'
 
@@ -13,7 +14,12 @@ dotenv.config()
 
 const INFURA_API_KEY = process.env.INFURA_API_KEY as string
 
-const networks = Object.fromEntries(
+const mainnetConnections = Object.fromEntries(
+  mainnets
+    .filter(item => item.url)
+    .map(item => [item.id, { url: item.url?.replace('${INFURA_API_KEY}', INFURA_API_KEY) }])
+)
+const testnetConnections = Object.fromEntries(
   testnets
     .filter(item => item.url)
     .map(item => [item.id, { url: item.url?.replace('${INFURA_API_KEY}', INFURA_API_KEY) }])
@@ -55,7 +61,8 @@ export default {
       accounts: 'remote',
       timeout: 0,
     },
-    ...networks,
+    ...mainnetConnections,
+    ...testnetConnections,
   },
   typechain: {
     outDir: 'packages/contract-types/types',
