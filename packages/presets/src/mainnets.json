@@ -18,11 +18,24 @@
       "decimals": 18
     },
     "mesonAddress": "",
-    "tokens": []
+    "tokens": [
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xdac17f958d2ee523a2206206994597c13d831ec7"
+      },
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+      }
+    ]
   },
   {
     "id": "bsc",
-    "name": "Binance Smart Chain",
+    "name": "BSC",
     "alias": "BSC",
     "chainId": "0x38",
     "slip44": "0x800002ca",
@@ -39,70 +52,14 @@
       "decimals": 18
     },
     "mesonAddress": "",
-    "tokens": []
-  },
-  {
-    "id": "gnosis",
-    "name": "Gnosis Chain (xDai)",
-    "alias": "xDai",
-    "chainId": "0x64",
-    "slip44": "0x800002bc",
-    "shortSlip44": "0x02bc",
-    "extensions": [
-      "metamask"
-    ],
-    "addressFormat": "hex",
-    "url": "https://rpc.xdaichain.com",
-    "explorer": "https://blockscout.com/xdai/mainnet",
-    "nativeCurrency": {
-      "name": "xDAI",
-      "symbol": "xDAI",
-      "decimals": 18
-    },
-    "mesonAddress": "",
-    "tokens": []
-  },
-  {
-    "id": "polygon",
-    "name": "Polygon",
-    "alias": "Matic",
-    "chainId": "0x89",
-    "slip44": "0x800003c6",
-    "shortSlip44": "0x03c6",
-    "extensions": [
-      "metamask"
-    ],
-    "addressFormat": "hex",
-    "url": "https://polygon-rpc.com/",
-    "explorer": "https://polygonscan.com/",
-    "nativeCurrency": {
-      "name": "MATIC",
-      "symbol": "MATIC",
-      "decimals": 18
-    },
-    "mesonAddress": "",
-    "tokens": []
-  },
-  {
-    "id": "ftm",
-    "name": "Fantom",
-    "alias": "Fantom",
-    "chainId": "0xfa",
-    "slip44": "0x800003ef",
-    "shortSlip44": "0x03ef",
-    "extensions": [
-      "metamask"
-    ],
-    "addressFormat": "hex",
-    "url": "https://rpc.ftm.tools",
-    "explorer": "https://ftmscan.com",
-    "nativeCurrency": {
-      "name": "Fantom",
-      "symbol": "FTM",
-      "decimals": 18
-    },
-    "mesonAddress": "",
-    "tokens": []
+    "tokens": [
+      {
+        "name": "BSC-USD",
+        "symbol": "BSC-USD",
+        "decimals": 18,
+        "addr": "0x55d398326f99059ff775485246999027b3197955"
+      }
+    ]
   },
   {
     "id": "avax",
@@ -123,27 +80,69 @@
       "decimals": 18
     },
     "mesonAddress": "",
-    "tokens": []
+    "tokens": [
+      {
+        "name": "USDC.e",
+        "symbol": "USDC.e",
+        "decimals": 6,
+        "addr": "0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664"
+      }
+    ]
   },
   {
-    "id": "one",
-    "name": "Harmony Shard 0",
-    "alias": "Harmony",
-    "chainId": "0x63564c40",
-    "slip44": "0x800003ff",
-    "shortSlip44": "0x03ff",
+    "id": "polygon",
+    "name": "Polygon",
+    "alias": "Matic",
+    "chainId": "0x89",
+    "slip44": "0x800003c6",
+    "shortSlip44": "0x03c6",
     "extensions": [
       "metamask"
     ],
     "addressFormat": "hex",
-    "url": "https://api.harmony.one",
-    "explorer": "https://explorer.harmony.one",
+    "url": "https://polygon-rpc.com/",
+    "explorer": "https://polygonscan.com/",
     "nativeCurrency": {
-      "name": "ONE",
-      "symbol": "ONE",
+      "name": "MATIC",
+      "symbol": "MATIC",
       "decimals": 18
     },
     "mesonAddress": "",
-    "tokens": []
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+      }
+    ]
+  },
+  {
+    "id": "ftm",
+    "name": "Fantom",
+    "alias": "Fantom",
+    "chainId": "0xfa",
+    "slip44": "0x800003ef",
+    "shortSlip44": "0x03ef",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "hex",
+    "url": "https://rpc.ftm.tools",
+    "explorer": "https://ftmscan.com",
+    "nativeCurrency": {
+      "name": "Fantom",
+      "symbol": "FTM",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x04068da6c83afcfa0e13ba15a6696662335d5b75"
+      }
+    ]
   }
 ]
