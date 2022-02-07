@@ -64,7 +64,7 @@
   },
   {
     "id": "avax-testnet",
-    "name": "Avalanche Testnet (Fuji)",
+    "name": "Avalanche Testnet",
     "alias": "AVA",
     "chainId": "0xa869",
     "slip44": "0x80002328",
@@ -98,7 +98,7 @@
   },
   {
     "id": "polygon-testnet",
-    "name": "Polygon Testnet (Mumbai)",
+    "name": "Polygon Testnet",
     "alias": "MATIC",
     "chainId": "0x13881",
     "slip44": "0x800003c6",

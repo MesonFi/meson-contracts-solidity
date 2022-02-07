@@ -1,39 +1,5 @@
 [
   {
-    "id": "mainnet",
-    "name": "Ethereum",
-    "alias": "ETH",
-    "chainId": "0x1",
-    "slip44": "0x8000003c",
-    "shortSlip44": "0x003c",
-    "extensions": [
-      "metamask"
-    ],
-    "addressFormat": "hex",
-    "url": "https://mainnet.infura.io/v3/${INFURA_API_KEY}",
-    "explorer": "https://etherscan.io",
-    "nativeCurrency": {
-      "name": "Ether",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "",
-    "tokens": [
-      {
-        "name": "USDT",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0xdac17f958d2ee523a2206206994597c13d831ec7"
-      },
-      {
-        "name": "USDC",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
-      }
-    ]
-  },
-  {
     "id": "bsc",
     "name": "BSC",
     "alias": "BSC",
@@ -51,13 +17,13 @@
       "symbol": "BNB",
       "decimals": 18
     },
-    "mesonAddress": "",
+    "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
     "tokens": [
       {
-        "name": "BSC-USD",
-        "symbol": "BSC-USD",
+        "name": "USDC",
+        "symbol": "USDC",
         "decimals": 18,
-        "addr": "0x55d398326f99059ff775485246999027b3197955"
+        "addr": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
       }
     ]
   },
@@ -73,13 +39,13 @@
     ],
     "addressFormat": "hex",
     "url": "https://api.avax.network/ext/bc/C/rpc",
-    "explorer": "https://snowtrace.io/",
+    "explorer": "https://snowtrace.io",
     "nativeCurrency": {
       "name": "Avalanche",
       "symbol": "AVAX",
       "decimals": 18
     },
-    "mesonAddress": "",
+    "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
     "tokens": [
       {
         "name": "USDC.e",
@@ -100,14 +66,14 @@
       "metamask"
     ],
     "addressFormat": "hex",
-    "url": "https://polygon-rpc.com/",
-    "explorer": "https://polygonscan.com/",
+    "url": "https://polygon-rpc.com",
+    "explorer": "https://polygonscan.com",
     "nativeCurrency": {
       "name": "MATIC",
       "symbol": "MATIC",
       "decimals": 18
     },
-    "mesonAddress": "",
+    "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
     "tokens": [
       {
         "name": "USDC",
@@ -135,7 +101,7 @@
       "symbol": "FTM",
       "decimals": 18
     },
-    "mesonAddress": "",
+    "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
     "tokens": [
       {
         "name": "USDC",
