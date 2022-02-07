@@ -36,11 +36,13 @@ export class SignedSwapRequest implements SignedSwapRequestData {
     this.signature = data.signature
   }
 
-  get digest () { return SwapSigner.hashRequest(this.encoded) }
+  getDigest (testnet: boolean) {
+    return SwapSigner.hashRequest(this.encoded, testnet)
+  }
 
-  checkSignature () {
+  checkSignature (testnet: boolean) {
     const [r, s, v] = this.signature
-    const recovered = recoverAddress(this.digest, { r, s, v }).toLowerCase()
+    const recovered = recoverAddress(this.getDigest(testnet), { r, s, v }).toLowerCase()
     if (recovered !== this.initiator) {
       throw new Error('Invalid signature')
     }
@@ -67,7 +69,9 @@ export class SignedSwapRelease extends SignedSwapRequest implements SignedSwapRe
     this.recipient = data.recipient
   }
 
-  get digest () { return SwapSigner.hashRelease(this.encoded, this.recipient) }
+  getDigest (testnet: boolean) {
+    return SwapSigner.hashRelease(this.encoded, this.recipient, testnet)
+  }
 
   toObject (): SignedSwapReleaseData {
     return {
