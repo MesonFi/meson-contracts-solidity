@@ -35,7 +35,7 @@
     "up:ftm": "NETWORK_ID=ftm yarn up",
     "up:one": "NETWORK_ID=one yarn up",
 
-    "deploy": "yarn chain && hardhat run scripts/mainnets/deploy.js",
+    "deploy": "yarn chain && hardhat run scripts/mainnets/deploy-upgradable.js",
     "deploy:eth": "NETWORK_ID=mainnet yarn deploy",
     "deploy:bsc": "NETWORK_ID=bsc yarn deploy",
     "deploy:avax": "NETWORK_ID=avax yarn deploy",

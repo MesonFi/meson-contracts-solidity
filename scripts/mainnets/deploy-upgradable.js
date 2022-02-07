@@ -13,7 +13,9 @@ async function main() {
   hre.changeNetwork(network.id)
 
   const wallet = new ethers.Wallet(PRIVATE_KEY, ethers.provider)
-  const tokens = network.tokens.map(t => t.addr)
+  const tokens = network.tokens
+    .filter(t => t.symbol.startsWith('USDC'))
+    .map(t => t.addr)
 
   const UpgradableMeson = await ethers.getContractFactory('UpgradableMeson', wallet)
   console.log('Deploying UpgradableMeson...')
@@ -21,12 +23,12 @@ async function main() {
   await meson.deployed()
   console.log('UpgradableMeson deployed to:', meson.address)
 
-  const mesonClient = await MesonClient.Create(mesonContract)
-  if (mesonClient.shortCoinType !== netowrk.shortSlip44) {
+  const shortCoinType = await meson.getShortCoinType()
+  if (shortCoinType !== network.shortSlip44) {
     throw new Error('Coin type does not match')
   }
 
-  network.mesonAddress = 'xx'
+  network.mesonAddress = meson.address
   mainnets.splice(index, 1, network)
   const mainnetsPath = path.join(__dirname, '../../packages/presets/src/mainnets.json')
   fs.writeFileSync(mainnetsPath, JSON.stringify(mainnets, null, 2))
