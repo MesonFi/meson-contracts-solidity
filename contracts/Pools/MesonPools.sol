@@ -90,7 +90,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _tokenBalanceOf[balanceIndex] = LowGasSafeMath.sub(_tokenBalanceOf[balanceIndex], encodedSwap >> 160);
     
     _lockedSwaps[encodedSwap] = (uint240(block.timestamp + LOCK_TIME_PERIOD) << 200)
-      | (providerIndex << 160)
+      | (uint240(providerIndex) << 160)
       | uint160(initiator);
 
     emit SwapLocked(encodedSwap);
