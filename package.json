@@ -16,7 +16,9 @@
     "chain:local": "NETWORK_ID=local yarn chain",
     "chain:eth": "NETWORK_ID=mainnet yarn chain",
     "chain:bsc": "NETWORK_ID=bsc yarn chain",
-    "chain:cfx": "NETWORK_ID=cfx yarn chain",
+    "chain:avax": "NETWORK_ID=avax yarn chain",
+    "chain:poly": "NETWORK_ID=polygon yarn chain",
+    "chain:ftm": "NETWORK_ID=ftm yarn chain",
     "chain:one": "NETWORK_ID=one yarn chain",
 
     "testnet": "yarn chain && hardhat run scripts/testnets/deploy-upgradable.js",

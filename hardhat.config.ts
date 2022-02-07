@@ -17,12 +17,18 @@ const INFURA_API_KEY = process.env.INFURA_API_KEY as string
 const mainnetConnections = Object.fromEntries(
   mainnets
     .filter(item => item.url)
-    .map(item => [item.id, { url: item.url?.replace('${INFURA_API_KEY}', INFURA_API_KEY) }])
+    .map(item => [item.id, {
+      url: item.url?.replace('${INFURA_API_KEY}', INFURA_API_KEY),
+      timeout: 0,
+    }])
 )
 const testnetConnections = Object.fromEntries(
   testnets
     .filter(item => item.url)
-    .map(item => [item.id, { url: item.url?.replace('${INFURA_API_KEY}', INFURA_API_KEY) }])
+    .map(item => [item.id, {
+      url: item.url?.replace('${INFURA_API_KEY}', INFURA_API_KEY),
+      timeout: 0,
+    }])
 )
 
 task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
