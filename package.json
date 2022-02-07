@@ -14,7 +14,7 @@
 
     "chain": "node scripts/set-chain-config.js",
     "chain:local": "NETWORK_ID=local yarn chain",
-    "chain:eth": "NETWORK_ID=mainnet yarn chain",
+    "chain:eth": "NETWORK_ID=ropsten yarn chain",
     "chain:bsc": "NETWORK_ID=bsc yarn chain",
     "chain:avax": "NETWORK_ID=avax yarn chain",
     "chain:poly": "NETWORK_ID=polygon yarn chain",
@@ -22,7 +22,7 @@
     "chain:one": "NETWORK_ID=one yarn chain",
 
     "testnet": "yarn chain && hardhat run scripts/testnets/deploy-upgradable.js",
-    "testnet:eth": "NETWORK_ID=mainnet yarn testnet",
+    "testnet:eth": "NETWORK_ID=ropsten yarn testnet",
     "testnet:bsc": "NETWORK_ID=bsc yarn testnet",
     "testnet:avax": "NETWORK_ID=avax yarn testnet",
     "testnet:poly": "NETWORK_ID=polygon yarn testnet",
@@ -30,7 +30,7 @@
     "testnet:one": "NETWORK_ID=one yarn testnet",
 
     "up": "yarn chain && hardhat run scripts/testnets/upgrade.js",
-    "up:eth": "NETWORK_ID=mainnet yarn up",
+    "up:eth": "NETWORK_ID=ropsten yarn up",
     "up:bsc": "NETWORK_ID=bsc yarn up",
     "up:avax": "NETWORK_ID=avax yarn up",
     "up:poly": "NETWORK_ID=polygon yarn up",

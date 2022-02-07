@@ -1,6 +1,6 @@
 const path = require('path')
 const fs = require('fs')
-const presets = require('@mesonfi/presets/src/mainnets.json')
+const presets = require('@mesonfi/presets/src/testnets.json')
 
 const networkId = process.env.NETWORK_ID
 
@@ -18,7 +18,7 @@ async function setChainConfig(networkId) {
   if (networkId === 'local') {
     network = { name: 'Local', shortSlip44: '0x0001' }
   } else {
-    network = presets.find(item => item.id === networkId)
+    network = presets.find(item => item.id.startsWith(networkId))
   }
   if (!network) {
     throw new Error(`Invalid network: ${networkId}`)
