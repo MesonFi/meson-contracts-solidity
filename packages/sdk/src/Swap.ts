@@ -38,6 +38,11 @@ export class Swap implements SwapData {
   private _encoded: string = ''
 
   static decode (encoded: string | BigNumber): Swap {
+    // If input is a string based BigInt, convert into BigNumber
+    if (typeof (encoded) === 'string' && !encoded.startsWith('0x') && encoded.length === 55) {
+      encoded = BigNumber.from(BigInt(encoded));
+    }
+    // If input is a BigNumber now, convert to hex string with padding
     if (typeof encoded !== 'string') {
       encoded = hexZeroPad(encoded.toHexString(), 32)
     }
