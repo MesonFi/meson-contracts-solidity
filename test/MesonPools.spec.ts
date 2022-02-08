@@ -5,7 +5,7 @@ import {
   SignedSwapRequest,
   SignedSwapRelease,
 } from '@mesonfi/sdk'
-import { MockToken, MesonPoolsTest } from '@mesonfi/contract-typs'
+import { MockToken, MesonPoolsTest } from '@mesonfi/contract-types'
 
 import { expect } from './shared/expect'
 import { initiator, provider } from './shared/wallet'
