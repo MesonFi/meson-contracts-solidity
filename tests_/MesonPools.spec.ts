@@ -8,35 +8,33 @@ import { getDefaultSwap } from './shared/meson'
 
 describe('MesonPools', () => {
   describe('#depositAndRegister', () => {
-    it('amount <= 0 ', async () => {
+    it('rejects negative amount', async () => {
+      // Amount must be positive
+    })
+    it('rejects zero amount', async () => {
       //Amount must be positive
     })
-    it('amount  == 0 ', async () => {
+    it('rejects if amount overflow', async () => {
       //Amount must be positive
     })
-    it('amount > 0', async () => {
+    it('rejects the amount if no enough appove', async () => {
       //true
     })
-    it('providerIndex == 0', async () => {
+    it('rejects if provider index is zero', async () => {
       //Cannot use 0 as provider index
     })
-    it('providerIndex != 0', async () => {
+    it('rejects if the address is already registered', async () => {
       //true
     })
-    it('addressOfIndex[providerIndex] == address(0)', async () => {
-      //true
-    })
-    it('addressOfIndex[providerIndex] != address(0)', async () => {
-      //Index already registered
-    })
-    it('indexOfAddress[provider] == 0', async () => {
-      //true
-    })
-    it('indexOfAddress[provider] != 0', async () => {
+    it('rejects if the index is already registered', async () => {
       //Address already registered
+      // expect() error from xxxx
     })
-    it('Finally, check the results', async () => {
+    it('accepts the depoit if all parameters are correct', async () => {
       //true
+      // expect() check token balance of the provider
+      // expect() check token balance of the meson contract
+      // expect() check the pool balance of provider in meson contract
     })
   })
 
@@ -124,6 +122,4 @@ describe('MesonPools', () => {
       //false
     })
   })
-
-
 })
