@@ -7,73 +7,50 @@ import { getDefaultSwap } from './shared/meson'
 describe('MesonSwap', () => {
 
   describe('#postSwap', () => {
-    it('postedSwaps[encodedSwap] == 0', async () => {
-      //true
+    it('rejects Swap already exists', async () => {
+      //expect  check postedSwaps[encodedSwap] != 0
     })
-    it('_postedSwaps[encodedSwap] != 0', async () => {
-      //Swap already exists
+    it('rejects expire ts too early', async () => {
+      //expect  check   delta < MIN_BOND_TIME_PERIOD
     })
-    it('delta > MIN_BOND_TIME_PERIOD', async () => {
-      //true
+    it('accepts postSwap', async () => {
+      //expect check delta < MAX_BOND_TIME_PERIOD
     })
-    it('delta < MIN_BOND_TIME_PERIOD', async () => {
-      //Expire ts too early 
+    it('rejects expire ts too late ', async () => {
+      //expect check delta = MAX_BOND_TIME_PERIOD
     })
-    it('delta =MIN_BOND_TIME_PERIOD', async () => {
-      //Expire ts too early 
-    })
-    it('delta < MAX_BOND_TIME_PERIOD', async () => {
-      //true
-    })
-    it('delta = MAX_BOND_TIME_PERIOD', async () => {
-      //Expire ts too late 
-    })
-    it('delta < MAX_BOND_TIME_PERIOD', async () => {
-      //Expire ts too late 
+    it('rejects  expire ts too late ', async () => {
+      //expect check delta < MAX_BOND_TIME_PERIOD
     })
     it('refuses unsupported token', async () => {
-      //false
+      //expect check token
     })
   })
 
   describe('#executeSwap', () => {
-    it('postedSwap != 0', async () => {
-      //true
+    it('accepts executeSwap', async () => {
+      //expect check  postedSwap != 0
     })
-    it('postedSwap == 0', async () => {
-      //Swap does not exist
+    it('rejects swap does not exist', async () => {
+      //expect check  postedSwap == 0
     })
   })
 
   describe('#bondSwap', () => {
-    it('postedSwap != 0', async () => {
-      //true
+    it('accepts  bondSwap', async () => {
+      //expect check postedSwap != 0
     })
-    it('postedSwap == 0', async () => {
-      //Swap does not exist
-    })
-    it('postedSwap == 0', async () => {
-      //true
-    })
-    it('postedSwap!= 0', async () => {
-      //SSwap bonded to another provider
+    it('rejects swap does not exist ', async () => {
+      //expect check postedSwap == 0
     })
   })
 
   describe('#cancelSwap', () => {
-    it('postedSwap > 1', async () => {
-      //true
+    it('accepts postedSwap', async () => {
+      //expect check  postedSwap > 1
     })
-    it('postedSwap < 1', async () => {
-      //Swap does not exist
-    })
-    it('(encodedSwap >> 48) & 0xFFFFFFFFFF) < block.timestamp', async () => {
-      //true
-    })
-    it('(encodedSwap >> 48) & 0xFFFFFFFFFF) < block.timestamp', async () => {
-      //Swap is still locked
+    it('rejects Swap does not exist ', async () => {
+      //expect check postedSwap < 1
     })
   })
-
-
 })

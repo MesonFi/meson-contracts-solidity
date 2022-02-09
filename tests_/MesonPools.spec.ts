@@ -7,31 +7,30 @@ import { getDefaultSwap } from './shared/meson'
 
 
 describe('MesonPools', () => {
+  
   describe('#depositAndRegister', () => {
     it('rejects negative amount', async () => {
-      // Amount must be positive
+      // expect() check  Amount must be positive
     })
     it('rejects zero amount', async () => {
-      //Amount must be positive
+      // expect() check  Amount must be positive
     })
     it('rejects if amount overflow', async () => {
-      //Amount must be positive
+      // expect() check  Amount must be positive
     })
     it('rejects the amount if no enough appove', async () => {
-      //true
+      // expect() check  amount must be appove
     })
     it('rejects if provider index is zero', async () => {
-      //Cannot use 0 as provider index
+      // expect() check provider the  index
     })
     it('rejects if the address is already registered', async () => {
-      //true
+      // expect() check address  
     })
     it('rejects if the index is already registered', async () => {
-      //Address already registered
-      // expect() error from xxxx
+      // expect() check  provider the Index
     })
     it('accepts the depoit if all parameters are correct', async () => {
-      //true
       // expect() check token balance of the provider
       // expect() check token balance of the meson contract
       // expect() check the pool balance of provider in meson contract
@@ -39,87 +38,56 @@ describe('MesonPools', () => {
   })
 
   describe('#deposit', () => {
-    it('amount <= 0 ', async () => {
-      //Amount must be positive
+    it('rejects negative  amount', async () => {
+      // expect() check  Amount must be positive
     })
-    it('amount  == 0 ', async () => {
-      //Amount must be positive
+    it('rejects zero amount ', async () => {
+      // expect() check  Amount must be positive
     })
-
-    it('amount > 0', async () => {
-      //true
+    it('rejects if amount overflow', async () => {
+      // expect() check  Amount must be positive
     })
-    it('Finally, check the results', async () => {
-      //true
+    it('rejects the amount if no enough appove', async () => {
+      // expect() check  amount must be appove
     })
   })
 
   describe('#lock', async () => {
-    it('_lockedSwaps[encodedSwap] == 0', async () => {
-      //true
+    it('rejects swap  already exists', async () => {
+      // expect() check Swap 
     })
-    it('_lockedSwaps[encodedSwap] != 0', async () => {
-      //Swap already exists
-    })
-    it('providerIndex != 0', async () => {
-      //true
-    })
-    it('providerIndex == 0', async () => {
-      //Caller not registered. Call depositAndRegister.
-    })
-    it('Finally, check the results', async () => {
-      //true
+    it(' rejects caller not registered', async () => {
+      // expect() check  provider the Index
     })
   })
 
-
   describe('#unlock', async () => {
-    it('lockedSwap != 0 ', async () => {
-      //true
+    it('rejects swap  does not exist', async () => {
+      //expect () check lockedSwap
     })
-    it('lockedSwap == 0 ', async () => {
-      //Swap does not exist
+    it('rejects swap still in lock', async () => {
+      //expect () check block.timestamp <
     })
-
-    it('uint240(block.timestamp << 200) > lockedSwap ', async () => {
-      //true
-    })
-    it('uint240(block.timestamp << 200) = lockedSwap ', async () => {
-      //Swap still in lock
-    })
-    it('uint240(block.timestamp << 200) < lockedSwap ', async () => {
-      //Swap still in lock
-    })
-    it('Finally, check the results', async () => {
-      //true
+    it('rejects swap still in lock', async () => {
+      //expect () check block.timestamp ==
     })
   })
 
   describe('#release', async () => {
-    it('lockedSwap != 0 ', async () => {
-      //true
-    })
-    it('lockedSwap == 0 ', async () => {
-      //Swap does not exist
-    })
-    it('lockedSwap < 0 ', async () => {
-      //Swap does not exist
+    it('rejects swap does not exist ', async () => {
+      //expect () check lockedSwap 
     })
     it('refuses unsupported token', async () => {
-      //false
+      //expect () check  unsupported token 
     })
   })
 
-
   describe('#withdraw', () => {
-    it('providerIndex != 0   ', async () => {
-      //true
-    })
-    it('providerIndex == 0   ', async () => {
-      //Caller not registered. Call depositAndRegister
+    it('rejects Caller not registered', async () => {
+      //expect() check  provider the Index
     })
     it('refuses unsupported token', async () => {
-      //false
+      //expect () check  unsupported token 
     })
   })
 })
