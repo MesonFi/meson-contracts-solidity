@@ -4,7 +4,7 @@ import {
   EthersWalletSwapSigner,
   SignedSwapRequest,
   SignedSwapRelease,
-} from '@mesonfi/sdk'
+} from '@mesonfi/sdk/src'
 import { MockToken, MesonPoolsTest } from '@mesonfi/contract-types'
 
 import { expect } from './shared/expect'
