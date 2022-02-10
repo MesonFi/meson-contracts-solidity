@@ -21,7 +21,7 @@
     "chain:ftm": "NETWORK_ID=ftm yarn chain",
     "chain:one": "NETWORK_ID=one yarn chain",
 
-    "testnet": "yarn chain && hardhat run scripts/testnets/deploy-upgradable.js",
+    "testnet": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/deploy-upgradable.js",
     "testnet:eth": "NETWORK_ID=ropsten yarn testnet",
     "testnet:bsc": "NETWORK_ID=bsc yarn testnet",
     "testnet:avax": "NETWORK_ID=avax yarn testnet",
@@ -29,7 +29,7 @@
     "testnet:ftm": "NETWORK_ID=ftm yarn testnet",
     "testnet:one": "NETWORK_ID=one yarn testnet",
 
-    "up": "yarn chain && hardhat run scripts/testnets/upgrade.js",
+    "up": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/upgrade.js",
     "up:eth": "NETWORK_ID=ropsten yarn up",
     "up:bsc": "NETWORK_ID=bsc yarn up",
     "up:avax": "NETWORK_ID=avax yarn up",
