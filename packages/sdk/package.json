@@ -25,7 +25,7 @@
     "@ethersproject/solidity": "5.5.0",
     "@ethersproject/transactions": "5.5.0",
     "@ethersproject/wallet": "5.5.0",
-    "@mesonfi/contract-types": "^0.4.0"
+    "@mesonfi/contract-types": "^0.4.3"
   },
   "devDependencies": {
     "typescript": "^4.5.4"
