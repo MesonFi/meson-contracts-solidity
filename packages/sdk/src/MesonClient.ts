@@ -146,7 +146,11 @@ export class MesonClient {
       signedRequest.initiator
     )
   }
-
+  async unlock(signedRequest: SignedSwapRequest) {
+    return this.mesonInstance.unlock(
+      signedRequest.encoded
+    )
+  }
   async release(signedRelease: SignedSwapRelease) {
     return this.mesonInstance.release(
       signedRelease.encoded,
