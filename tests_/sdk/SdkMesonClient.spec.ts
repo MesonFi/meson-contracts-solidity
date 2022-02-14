@@ -25,8 +25,8 @@ describe('MesonClient', () => {
       initiator.address, provider.address
     ]))
     token = result.token1.connect(provider)
-    mesonInstance = result.pools.connect(provider) // provider is signer
     userClient = await MesonClient.Create(result.pools, new EthersWalletSwapSigner(initiator))
+    mesonInstance = result.pools.connect(provider) // provider is signer
     lpClient = await MesonClient.Create(mesonInstance)
     outChain = lpClient.shortCoinType
     await token.approve(mesonInstance.address, 1000)
@@ -363,7 +363,6 @@ describe('MesonClient', () => {
       try {
         await userClient.requestSwap(getDefaultSwap(), outChain)
       } catch (error) {
-        console.log(error)
         expect(error).to.throw
       }
     })
@@ -384,14 +383,93 @@ describe('MesonClient', () => {
   })
 
   describe('#postSwap', () => {
-    it('rejects address not registered', async () => {
-      //expect() check !providerIndex
-    })
     it('rejects  call depositAndRegister first.', async () => {
-      //expect() check  !providerIndex
+      const swapData = getDefaultSwap()
+      const swap = userClient.requestSwap(swapData, outChain)
+      const request = await swap.signForRequest()
+      const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature()
+      try {
+        await userClient.postSwap(signedRequest)
+      } catch (error) {
+        expect(error).to.throw
+      }
     })
     it('accepts the postSwap if all parameters are correct', async () => {
-      // expect() check postSwap
+      const result = await waffle.loadFixture(() => fixtures([
+        initiator.address, provider.address
+      ]))
+      token = result.token1.connect(initiator)
+      mesonInstance = result.swap // default account is signer
+    
+      userClient = await MesonClient.Create(mesonInstance, new EthersWalletSwapSigner(initiator)) // user is default account
+      lpClient = await MesonClient.Create(mesonInstance.connect(provider))
+  
+      await lpClient.mesonInstance.register(1)
+      const swap = userClient.requestSwap(getDefaultSwap({ fee: '0' }), outChain)
+      const request = await swap.signForRequest()
+
+      const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature()
+      await token.approve(mesonInstance.address, swap.amount)
+      await lpClient.postSwap(signedRequest)
+
+      const posted = await mesonInstance.getPostedSwap(swap.encoded)
+      expect(posted.initiator).to.equal(initiator.address)
+      expect(posted.provider).to.equal(provider.address)
+      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
     })
   })
+
+  describe('#getPostedSwap', () => {
+    it('rejects Invalid encoded.', async () => {
+      const result = await waffle.loadFixture(() => fixtures([
+        initiator.address, provider.address
+      ]))
+      token = result.token1.connect(initiator)
+      mesonInstance = result.swap // default account is signer
+    
+      userClient = await MesonClient.Create(mesonInstance, new EthersWalletSwapSigner(initiator)) // user is default account
+      lpClient = await MesonClient.Create(mesonInstance.connect(provider))
+  
+      await lpClient.mesonInstance.register(1)
+      const swap = userClient.requestSwap(getDefaultSwap({ fee: '0' }), outChain)
+      const request = await swap.signForRequest()
+
+      const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature()
+      await token.approve(mesonInstance.address, swap.amount)
+      await lpClient.postSwap(signedRequest)
+  
+      const posted = await mesonInstance.getPostedSwap(swap.encoded+'bad')
+      expect(posted.initiator).to.equal('0x0000000000000000000000000000000000000000')
+      expect(posted.provider).to.equal('0x0000000000000000000000000000000000000000')
+    })
+ 
+    it('accepts the getPostedSwap if all parameters are correct', async () => {
+      const result = await waffle.loadFixture(() => fixtures([
+        initiator.address, provider.address
+      ]))
+      token = result.token1.connect(initiator)
+      mesonInstance = result.swap // default account is signer
+    
+      userClient = await MesonClient.Create(mesonInstance, new EthersWalletSwapSigner(initiator)) // user is default account
+      lpClient = await MesonClient.Create(mesonInstance.connect(provider))
+  
+      await lpClient.mesonInstance.register(1)
+      const swap = userClient.requestSwap(getDefaultSwap({ fee: '0' }), outChain)
+      const request = await swap.signForRequest()
+
+      const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature()
+      await token.approve(mesonInstance.address, swap.amount)
+      await lpClient.postSwap(signedRequest)
+
+      const posted = await mesonInstance.getPostedSwap(swap.encoded)
+      expect(posted.initiator).to.equal(initiator.address)
+      expect(posted.provider).to.equal(provider.address)
+      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
+    })
+  })
+
 })
