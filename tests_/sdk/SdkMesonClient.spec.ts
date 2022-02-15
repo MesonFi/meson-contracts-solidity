@@ -280,7 +280,6 @@ describe('MesonClient', () => {
         expect(error).to.throw
       }
     })
-
     it('rejects swap does not exist', async () => {
       let amount: string = '100'
       let providerIndex: string = '1'
@@ -445,7 +444,6 @@ describe('MesonClient', () => {
       expect(posted.initiator).to.equal('0x0000000000000000000000000000000000000000')
       expect(posted.provider).to.equal('0x0000000000000000000000000000000000000000')
     })
- 
     it('accepts the getPostedSwap if all parameters are correct', async () => {
       const result = await waffle.loadFixture(() => fixtures([
         initiator.address, provider.address
