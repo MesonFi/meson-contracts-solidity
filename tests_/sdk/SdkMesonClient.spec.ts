@@ -9,9 +9,7 @@ import { MockToken, MesonPoolsTest } from '@mesonfi/contract-types'
 import { expect } from '../shared/expect'
 import { initiator, provider } from '../shared/wallet'
 import { fixtures, TOKEN_BALANCE } from '../shared/fixtures'
-import { getDefaultSwap, getDefaultSwap2 } from '../shared/meson'
-
-
+import { getDefaultSwap } from '../shared/meson'
 
 describe('MesonClient', () => {
   let token: MockToken
@@ -229,7 +227,7 @@ describe('MesonClient', () => {
       let amount: string = '1000'
       let providerIndex: string = '1'
       await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
-      const swap = userClient.requestSwap(getDefaultSwap2(), outChain)
+      const swap = userClient.requestSwap(getDefaultSwap({ inToken:10}), outChain)
       const request = await swap.signForRequest()
       const signedRequest = new SignedSwapRequest(request)
       signedRequest.checkSignature()
@@ -290,7 +288,7 @@ describe('MesonClient', () => {
       const signedRequest = new SignedSwapRequest(request)
       signedRequest.checkSignature()
       await lpClient.lock(signedRequest)
-      const swapData2 = getDefaultSwap2()
+      const swapData2 = getDefaultSwap({ inToken:10})
       const swap2 = userClient.requestSwap(swapData2, outChain)
       const release = await swap2.signForRelease(swapData2.recipient)
       const signedRelease = new SignedSwapRelease(release)
