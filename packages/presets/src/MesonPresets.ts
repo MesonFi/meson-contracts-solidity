@@ -110,6 +110,7 @@ export class MesonPresets {
 
     const posted = await fromClient.getPostedSwap(encoded, initiator)
     if ([
+      PostedSwapStatus.NoneOrAfterRunning,
       PostedSwapStatus.Bonded,
       PostedSwapStatus.Executed,
       PostedSwapStatus.ErrorExpiredButBonded
