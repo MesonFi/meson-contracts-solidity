@@ -131,8 +131,8 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
       uint256 feeToMeson = _feeToMesonFrom(encodedSwap);
       if (feeToMeson > 0) {
         _tokenBalanceOf[mesonBalanceIndex] += feeToMeson;
+        amountWithFee -= feeToMeson;
       }
-      amountWithFee -= feeToMeson;
     }
     
     if (depositToPool) {
