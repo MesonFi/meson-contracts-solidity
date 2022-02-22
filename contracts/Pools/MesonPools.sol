@@ -23,7 +23,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(amount > 0, 'Amount must be positive');
 
     address provider = _msgSender();
-    uint40 providerIndex = uint40(balanceIndex);
+    uint40 providerIndex = _providerIndexFromBalanceIndex(balanceIndex);
     require(providerIndex != 0, "Cannot use 0 as provider index");
     require(addressOfIndex[providerIndex] == address(0), "Index already registered");
     require(indexOfAddress[provider] == 0, "Address already registered");

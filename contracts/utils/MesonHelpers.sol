@@ -108,6 +108,10 @@ contract MesonHelpers is MesonConfig {
     return uint8(balanceIndex >> 40);
   }
 
+  function _providerIndexFromBalanceIndex(uint48 balanceIndex) internal pure returns (uint40) {
+    return uint40(balanceIndex);
+  }
+
   function _balanceIndexFromTokenIndex(uint8 tokenIndex, uint40 providerIndex) internal pure returns (uint48) {
     return (uint48(tokenIndex) << 40) | providerIndex;
   }
