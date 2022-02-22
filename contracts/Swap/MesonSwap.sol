@@ -67,6 +67,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     require(postedSwap != 0, "Swap does not exist");
     require(uint40(postedSwap) == 0, "Swap bonded to another provider");
+    require(indexOfAddress[msg.sender] == providerIndex, "Can only bound to signer");
 
     _postedSwaps[encodedSwap] = postedSwap | providerIndex;
     emit SwapBonded(encodedSwap);
