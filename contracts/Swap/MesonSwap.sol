@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-import "../libraries/LowGasSafeMath.sol";
-
 import "./IMesonSwapEvents.sol";
 import "../utils/MesonStates.sol";
 
@@ -132,14 +130,14 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     if ((uint16(encodedSwap >> 8) != 0x003c) && (uint16(encodedSwap >> 32) != 0x003c)) { // no meson fee for eth
       uint256 feeToMeson = ((encodedSwap >> 89) & 0x7FFFFFFFFF); // 50% fee to meson
       if (feeToMeson > 0) {
-        _tokenBalanceOf[mesonBalanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[mesonBalanceIndex], feeToMeson);
+        _tokenBalanceOf[mesonBalanceIndex] += feeToMeson;
       }
       amountWithFee -= feeToMeson;
     }
     
     if (depositToPool) {
       uint48 balanceIndex = mesonBalanceIndex | uint40(postedSwap);
-      _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amountWithFee);
+      _tokenBalanceOf[balanceIndex] += amountWithFee;
     } else {
       _safeTransfer(
         _tokenList[uint8(encodedSwap)], // tokenIndex -> token address

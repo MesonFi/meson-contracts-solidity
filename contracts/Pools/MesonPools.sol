@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-import "../libraries/LowGasSafeMath.sol";
-
 import "./IMesonPoolsEvents.sol";
 import "../utils/MesonStates.sol";
 
@@ -32,7 +30,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     addressOfIndex[providerIndex] = provider;
     indexOfAddress[provider] = providerIndex;
 
-    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amount);
+    _tokenBalanceOf[balanceIndex] += amount;
     _unsafeDepositToken(_tokenList[uint8(balanceIndex >> 40)], provider, amount);
   }
 
@@ -45,7 +43,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @param balanceIndex In format of`[tokenIndex:uint8][providerIndex:uint40]
   function deposit(uint256 amount, uint48 balanceIndex) external {
     require(amount > 0, 'Amount must be positive');
-    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], amount);
+    _tokenBalanceOf[balanceIndex] += amount;
     _unsafeDepositToken(_tokenList[uint8(balanceIndex >> 40)], _msgSender(), amount);
   }
 
@@ -59,7 +57,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(providerIndex != 0, 'Caller not registered. Call depositAndRegister');
 
     uint48 balanceIndex = (uint48(tokenIndex) << 40) | providerIndex;
-    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.sub(_tokenBalanceOf[balanceIndex], amount);
+    _tokenBalanceOf[balanceIndex] -= amount;
     _safeTransfer(_tokenList[tokenIndex], provider, amount);
   }
 
@@ -87,7 +85,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(providerIndex != 0, "Caller not registered. Call depositAndRegister.");
 
     uint48 balanceIndex = uint48((encodedSwap & 0xFF000000) << 16) | providerIndex;
-    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.sub(_tokenBalanceOf[balanceIndex], encodedSwap >> 160);
+    _tokenBalanceOf[balanceIndex] -= encodedSwap >> 160;
     
     _lockedSwaps[encodedSwap] = (uint240(block.timestamp + LOCK_TIME_PERIOD) << 200)
       | (uint240(providerIndex) << 160)
@@ -104,7 +102,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(uint240(block.timestamp << 200) > lockedSwap, "Swap still in lock");
 
     uint48 balanceIndex = uint48((encodedSwap & 0xFF000000) << 16) | uint40(lockedSwap >> 160);
-    _tokenBalanceOf[balanceIndex] = LowGasSafeMath.add(_tokenBalanceOf[balanceIndex], encodedSwap >> 160);
+    _tokenBalanceOf[balanceIndex] += encodedSwap >> 160;
     _lockedSwaps[encodedSwap] = 0;
   }
 
