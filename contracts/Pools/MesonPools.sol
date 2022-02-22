@@ -31,7 +31,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     indexOfAddress[provider] = providerIndex;
 
     _tokenBalanceOf[balanceIndex] += amount;
-    _unsafeDepositToken(_tokenList[uint8(balanceIndex >> 40)], provider, amount);
+    _unsafeDepositToken(_tokenList[_tokenIndexFromBalanceIndex(balanceIndex)], provider, amount);
   }
 
   /// @notice Deposit tokens into the liquidity pool.
@@ -44,7 +44,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   function deposit(uint256 amount, uint48 balanceIndex) external {
     require(amount > 0, 'Amount must be positive');
     _tokenBalanceOf[balanceIndex] += amount;
-    _unsafeDepositToken(_tokenList[uint8(balanceIndex >> 40)], _msgSender(), amount);
+    _unsafeDepositToken(_tokenList[_tokenIndexFromBalanceIndex(balanceIndex)], _msgSender(), amount);
   }
 
   /// @notice Withdraw tokens from the liquidity pool.
@@ -56,8 +56,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint40 providerIndex = indexOfAddress[provider];
     require(providerIndex != 0, 'Caller not registered. Call depositAndRegister');
 
-    uint48 balanceIndex = (uint48(tokenIndex) << 40) | providerIndex;
-    _tokenBalanceOf[balanceIndex] -= amount;
+    _tokenBalanceOf[_balanceIndexFromTokenIndex(tokenIndex, providerIndex)] -= amount;
     _safeTransfer(_tokenList[tokenIndex], provider, amount);
   }
 
@@ -84,12 +83,13 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint40 providerIndex = indexOfAddress[_msgSender()];
     require(providerIndex != 0, "Caller not registered. Call depositAndRegister.");
 
-    uint48 balanceIndex = uint48((encodedSwap & 0xFF000000) << 16) | providerIndex;
-    _tokenBalanceOf[balanceIndex] -= encodedSwap >> 160;
+    uint256 until = block.timestamp + LOCK_TIME_PERIOD;
+    require(until < _expireTsFrom(encodedSwap), "Cannot lock because expireTs is soon.");
+
+    uint48 balanceIndex = _outTokenBalanceIndexFrom(encodedSwap, providerIndex);
+    _tokenBalanceOf[balanceIndex] -= _amountFrom(encodedSwap);
     
-    _lockedSwaps[encodedSwap] = (uint240(block.timestamp + LOCK_TIME_PERIOD) << 200)
-      | (uint240(providerIndex) << 160)
-      | uint160(initiator);
+    _lockedSwaps[encodedSwap] = _lockedSwapFrom(until, providerIndex, initiator);
 
     emit SwapLocked(encodedSwap);
   }
@@ -101,8 +101,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(lockedSwap != 0, "Swap does not exist");
     require(uint240(block.timestamp << 200) > lockedSwap, "Swap still in lock");
 
-    uint48 balanceIndex = uint48((encodedSwap & 0xFF000000) << 16) | uint40(lockedSwap >> 160);
-    _tokenBalanceOf[balanceIndex] += encodedSwap >> 160;
+    uint48 balanceIndex = _outTokenBalanceIndexFrom(encodedSwap, _providerIndexFromLocked(lockedSwap));
+    _tokenBalanceOf[balanceIndex] += _amountFrom(encodedSwap);
     _lockedSwaps[encodedSwap] = 0;
   }
 
@@ -126,11 +126,11 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint240 lockedSwap = _lockedSwaps[encodedSwap];
     require(lockedSwap != 0, "Swap does not exist");
 
-    _checkReleaseSignature(encodedSwap, keccak256(abi.encodePacked(recipient)), r, s, v, address(uint160(lockedSwap)));
+    _checkReleaseSignature(encodedSwap, keccak256(abi.encodePacked(recipient)), r, s, v, _initiatorFromLocked(lockedSwap));
     _lockedSwaps[encodedSwap] = 0;
 
-    address token = _tokenList[uint8(encodedSwap >> 24)];
-    _safeTransfer(token, recipient, encodedSwap >> 160);
+    address token = _tokenList[_outTokenIndexFrom(encodedSwap)];
+    _safeTransfer(token, recipient, _amountFrom(encodedSwap));
 
     emit SwapReleased(encodedSwap);
   }
@@ -140,13 +140,13 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     returns (address initiator, address provider, uint40 until)
   {
     uint240 lockedSwap = _lockedSwaps[encodedSwap];
-    initiator = address(uint160(lockedSwap));
-    provider = addressOfIndex[uint40(lockedSwap >> 160)];
-    until = uint40(lockedSwap >> 200);
+    initiator = _initiatorFromLocked(lockedSwap);
+    provider = addressOfIndex[_providerIndexFromLocked(lockedSwap)];
+    until = _untilFromLocked(lockedSwap);
   }
 
   modifier forTargetChain(uint256 encodedSwap) {
-    require(uint16(encodedSwap >> 32) == SHORT_COIN_TYPE, "Swap not for this chain");
+    require(_outChainFrom(encodedSwap) == SHORT_COIN_TYPE, "Swap not for this chain");
     _;
   }
 }

@@ -36,6 +36,82 @@ contract MesonHelpers is MesonConfig {
     IERC20Minimal(token).transferFrom(sender, address(this), amount);
   }
 
+  function _amountFrom(uint256 encodedSwap) internal pure returns (uint256) {
+    return encodedSwap >> 160;
+  }
+
+  function _feeFrom(uint256 encodedSwap) internal pure returns (uint256) {
+    return (encodedSwap >> 88) & 0xFFFFFFFFFF;
+  }
+
+  function _feeToMesonFrom(uint256 encodedSwap) internal pure returns (uint256) {
+    return ((encodedSwap >> 89) & 0x7FFFFFFFFF); // 50% fee to meson
+  }
+
+  function _saltFrom(uint256 encodedSwap) internal pure returns (uint32) {
+    return uint32(encodedSwap >> 128);
+  }
+
+  function _expireTsFrom(uint256 encodedSwap) internal pure returns (uint256) {
+    return (encodedSwap >> 48) & 0xFFFFFFFFFF;
+  }
+
+  function _inChainFrom(uint256 encodedSwap) internal pure returns (uint16) {
+    return uint16(encodedSwap >> 8);
+  }
+
+  function _inTokenIndexFrom(uint256 encodedSwap) internal pure returns (uint8) {
+    return uint8(encodedSwap);
+  }
+
+  function _outChainFrom(uint256 encodedSwap) internal pure returns (uint16) {
+    return uint16(encodedSwap >> 32);
+  }
+
+  function _outTokenIndexFrom(uint256 encodedSwap) internal pure returns (uint8) {
+    return uint8(encodedSwap >> 24);
+  }
+
+  function _balanceIndexForMesonFrom(uint256 encodedSwap) internal pure returns (uint48) {
+    return uint48(encodedSwap << 40);
+  }
+
+  function _outTokenBalanceIndexFrom(uint256 encodedSwap, uint48 providerIndex) internal pure returns (uint48) {
+    return uint48((encodedSwap & 0xFF000000) << 16) | providerIndex;
+  }
+
+  function _initiatorFromPosted(uint200 postedSwap) internal pure returns (address) {
+    return address(uint160(postedSwap >> 40));
+  }
+
+  function _providerIndexFromPosted(uint200 postedSwap) internal pure returns (uint40) {
+    return uint40(postedSwap);
+  }
+
+  function _lockedSwapFrom(uint256 until, uint40 providerIndex, address initiator) internal pure returns (uint240) {
+    return (uint240(until) << 200) | (uint240(providerIndex) << 160) | uint160(initiator);
+  }
+
+  function _initiatorFromLocked(uint240 lockedSwap) internal pure returns (address) {
+    return address(uint160(lockedSwap));
+  }
+
+  function _providerIndexFromLocked(uint240 lockedSwap) internal pure returns (uint40) {
+    return uint40(lockedSwap >> 160);
+  }
+
+  function _untilFromLocked(uint240 lockedSwap) internal pure returns (uint40) {
+    return uint40(lockedSwap >> 200);
+  }
+
+  function _tokenIndexFromBalanceIndex(uint240 balanceIndex) internal pure returns (uint8) {
+    return uint8(balanceIndex >> 40);
+  }
+
+  function _balanceIndexFromTokenIndex(uint8 tokenIndex, uint40 providerIndex) internal pure returns (uint48) {
+    return (uint48(tokenIndex) << 40) | providerIndex;
+  }
+
   function _checkRequestSignature(
     uint256 encodedSwap,
     bytes32 r,
