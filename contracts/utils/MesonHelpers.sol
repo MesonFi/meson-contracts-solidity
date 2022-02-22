@@ -76,7 +76,7 @@ contract MesonHelpers is MesonConfig {
     return uint48(encodedSwap << 40);
   }
 
-  function _outTokenBalanceIndexFrom(uint256 encodedSwap, uint48 providerIndex) internal pure returns (uint48) {
+  function _outTokenBalanceIndexFrom(uint256 encodedSwap, uint40 providerIndex) internal pure returns (uint48) {
     return uint48((encodedSwap & 0xFF000000) << 16) | providerIndex;
   }
 
@@ -104,7 +104,7 @@ contract MesonHelpers is MesonConfig {
     return uint40(lockedSwap >> 200);
   }
 
-  function _tokenIndexFromBalanceIndex(uint240 balanceIndex) internal pure returns (uint8) {
+  function _tokenIndexFromBalanceIndex(uint48 balanceIndex) internal pure returns (uint8) {
     return uint8(balanceIndex >> 40);
   }
 
