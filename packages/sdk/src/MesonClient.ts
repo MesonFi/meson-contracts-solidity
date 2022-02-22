@@ -100,6 +100,7 @@ export class MesonClient {
 
   async _depositAndRegister(amount: string, tokenIndex: number, providerIndex: string) {
     const balanceIndex = pack(['uint8', 'uint40'], [tokenIndex, providerIndex])
+    console.log(balanceIndex)
     return this.mesonInstance.depositAndRegister(amount, balanceIndex)
   }
 

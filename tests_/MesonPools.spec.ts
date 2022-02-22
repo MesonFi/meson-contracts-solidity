@@ -1,79 +1,176 @@
-import { waffle } from 'hardhat'
-import {
-  MesonClient,
-  EthersWalletSwapSigner,
-  SignedSwapRequest,
-  SignedSwapRelease,
-} from '@mesonfi/sdk/src'
-import { MockToken, MesonPoolsTest } from '@mesonfi/contract-types'
+const { ethers, upgrades } = require('hardhat')
 import { expect } from './shared/expect'
 import { initiator, provider } from './shared/wallet'
-import { fixtures, TOKEN_BALANCE, TOKEN_TOTAL_SUPPLY } from './shared/fixtures'
-import { getDefaultSwap } from './shared/meson'
-
-
 describe('MesonPools', () => {
-  let token: MockToken
-  let mesonInstance: MesonPoolsTest
-  let outChain: string
-  let userClient: MesonClient
-  let lpClient: MesonClient
-
+  let totalSupply = 1000000000000
+  let overrides = {
+    gasLimit: 8984120,
+    gasPrice: 500000000000
+  };
+  let mesonContract;
+  let tokenContract;
+  let tokenUsdcContract;
+  let mesonFactory;
+  let tokenUsddContract;
   beforeEach('deploy MesonPoolsTest', async () => {
-
+    const MockToken = await ethers.getContractFactory('MockToken')
+    tokenContract = await MockToken.deploy('Mock Token Usdt', 'MUsdt', totalSupply)
+    await tokenContract.deployed()
+    tokenUsdcContract = await MockToken.deploy('Mock Token Usdc', 'MUsdc', totalSupply)
+    await tokenUsdcContract.deployed()
+    mesonFactory = await ethers.getContractFactory('UpgradableMeson')
+    mesonContract = await upgrades.deployProxy(mesonFactory, [[tokenContract.address, tokenUsdcContract.address,tokenUsddContract.address]], { kind: 'uups' })
+    await mesonContract.deployed()
+    let approve = await tokenContract.approve(mesonContract.address, 1000)
+    await approve
   })
 
   describe('#depositAndRegister', () => {
-    it('accepts the depoit if all parameters are correct', async () => {
-
-    })
-    it('rejects negative amount', async () => {
-
-    })
     it('rejects zero amount', async () => {
-
+      let balanceIndex=0x010000000001
+      let amount = 0
+      try {
+        await mesonContract.depositAndRegister(amount, balanceIndex)
+      } catch (error) {
+        expect(error).to.throw
+      }
     })
     it('rejects if amount overflow', async () => {
-
+      let amount = 10000000000000000000000000000
+      let balanceIndex=0x010000000001
+      try {
+        await mesonContract.depositAndRegister(amount, balanceIndex)
+      } catch (error) {
+        expect(error).to.throw
+      }
     })
     it('rejects the amount if no enough appove', async () => {
-
+      let amount = 100
+      let balanceIndex=0x010000000001
+      try {
+        await mesonContract.depositAndRegister(amount, balanceIndex)
+      } catch (error) {
+        expect(error).to.throw
+      }
     })
     it('rejects Index already registered', async () => {
-
+      let amount = 100
+      let balanceIndex=0x010000000001
+      let balanceIndex2=0x010000000001
+      try {
+        await mesonContract.depositAndRegister(amount, balanceIndex)
+        await mesonContract.depositAndRegister(amount, balanceIndex2)
+      } catch (error) {
+        expect(error).to.throw
+      }
     })
     it('rejects if provider index is zero', async () => {
-
+      let amount = 100
+      let balanceIndex=0x010000000000
+      try {
+        await mesonContract.depositAndRegister(amount,balanceIndex )
+      } catch (error) {
+        expect(error).to.throw
+      }
     })
     it('rejects if the address is already registered', async () => {
-
+      let amount = 100
+      let balanceIndex=0x010000000001
+      let balanceIndex2=0x010000000002
+      try {
+        await mesonContract.depositAndRegister(amount, balanceIndex)
+        await mesonContract.depositAndRegister(amount, balanceIndex2)
+      } catch (error) {
+        expect(error).to.throw
+      }
     })
-    it('rejects if the index is already registered', async () => {
 
-    })
     it('refuses unsupported token', async () => {
+      let amount = 100
+      let balanceIndex=0x030000000001
+      try {
+        await mesonContract.depositAndRegister(amount, balanceIndex)
+      } catch (error) {
+        // console.log(error)
+        expect(error).to.throw
+      }
+    })
+    it('accepts the depositAndRegister if all parameters are correct', async () => {
+      let amount = 1000
+      let balanceIndex=0x010000000001
+      let deposit = await mesonContract.depositAndRegister(amount, balanceIndex)
+      expect(await tokenContract.balanceOf(mesonContract.address)).to.equal(amount)
+      expect(await tokenContract.balanceOf(provider.address)).to.equal(totalSupply - amount)
 
     })
   })
 
   describe('#deposit', () => {
-    it('rejects negative  amount', async () => {
-
-    })
     it('rejects zero amount ', async () => {
-
+      let balanceIndex=0x010000000001
+      let amount = 0
+      try {
+        await mesonContract.deposit(amount, balanceIndex)
+      } catch (error) {
+        expect(error).to.throw
+      }
     })
     it('rejects if amount overflow', async () => {
-
+      let balanceIndex=0x010000000001
+      let amount = 10000000000000000000000000000
+      try {
+        await mesonContract.deposit(amount, balanceIndex)
+      } catch (error) {
+        expect(error).to.throw
+      }
     })
     it('rejects the amount if no enough appove', async () => {
-
+      let balanceIndex=0x010000000001
+      let amount = 1000000
+      try {
+        await mesonContract.deposit(amount, balanceIndex)
+      } catch (error) {
+        expect(error).to.throw
+      }
+    })
+    it('accepts the deposit if all parameters are correct', async () => {
+      let balanceIndex=0x010000000001
+      let amount = 100
+      await mesonContract.deposit(amount, balanceIndex)
+      expect(await tokenContract.balanceOf(mesonContract.address)).to.equal(amount)
+      expect(await tokenContract.balanceOf(provider.address)).to.equal(totalSupply - amount)
     })
   })
-
+  describe('#withdraw', () => {
+    it('rejects Caller not registered. Call depositAndRegister', async () => {
+      let tokenIndex = 0x01
+      let amount = 100
+   try {
+    await mesonContract.withdraw(amount, tokenIndex)
+   } catch (error) {
+    expect(error).to.throw
+   }
+    })
+    // it('refuses unsupported token', async () => {
+    //   let tokenIndex = 0x02
+    //   let balanceIndex = 0x010000000001
+    //   let amount = 100
+    //   await mesonContract.depositAndRegister(amount, balanceIndex)
+    //    await mesonContract.withdraw(amount, tokenIndex)
+    //    ProviderError: Error: VM Exception while processing transaction: reverted with panic code 0x11 (Arithmetic operation underflowed or overflowed outside of an unchecked block)
+    // })
+    it('accepts the withdraw if all parameters are correct', async () => {
+      let tokenIndex = 0x01
+      let balanceIndex = 0x010000000001
+      let amount = 100
+      await mesonContract.depositAndRegister(amount, balanceIndex)
+      await mesonContract.withdraw(amount, tokenIndex)
+      expect(await tokenContract.balanceOf(mesonContract.address)).to.equal(0)
+      expect(await tokenContract.balanceOf(provider.address)).to.equal(totalSupply)
+    })
+  })
   describe('#lock', async () => {
     it('rejects swap  already exists', async () => {
-      // expect() check Swap 
     })
     it(' rejects caller not registered', async () => {
       // expect() check  provider the Index
@@ -101,13 +198,5 @@ describe('MesonPools', () => {
     })
   })
 
-  describe('#withdraw', () => {
-    it('rejects Caller not registered', async () => {
-      //expect() check  provider the Index
 
-    })
-    it('refuses unsupported token', async () => {
-      //expect () check  unsupported token 
-    })
-  })
 })
