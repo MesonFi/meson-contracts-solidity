@@ -100,8 +100,8 @@ contract MesonHelpers is MesonConfig {
     return uint40(lockedSwap >> 160);
   }
 
-  function _untilFromLocked(uint240 lockedSwap) internal pure returns (uint40) {
-    return uint40(lockedSwap >> 200);
+  function _untilFromLocked(uint240 lockedSwap) internal pure returns (uint256) {
+    return (lockedSwap >> 200) & 0xFFFFFFFFFF;
   }
 
   function _tokenIndexFromBalanceIndex(uint48 balanceIndex) internal pure returns (uint8) {

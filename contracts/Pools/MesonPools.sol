@@ -99,7 +99,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   function unlock(uint256 encodedSwap) external {
     uint240 lockedSwap = _lockedSwaps[encodedSwap];
     require(lockedSwap != 0, "Swap does not exist");
-    require(uint240(block.timestamp << 200) > lockedSwap, "Swap still in lock");
+    require(_untilFromLocked(lockedSwap) < block.timestamp, "Swap still in lock");
 
     uint48 balanceIndex = _outTokenBalanceIndexFrom(encodedSwap, _providerIndexFromLocked(lockedSwap));
     _tokenBalanceOf[balanceIndex] += _amountFrom(encodedSwap);
@@ -142,7 +142,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint240 lockedSwap = _lockedSwaps[encodedSwap];
     initiator = _initiatorFromLocked(lockedSwap);
     provider = addressOfIndex[_providerIndexFromLocked(lockedSwap)];
-    until = _untilFromLocked(lockedSwap);
+    until = uint40(_untilFromLocked(lockedSwap));
   }
 
   modifier forTargetChain(uint256 encodedSwap) {
