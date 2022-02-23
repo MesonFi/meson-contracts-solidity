@@ -3,19 +3,19 @@ import { PartialSwapData } from '@mesonfi/sdk'
 type OptionalSwapData = {
   inToken?: number,
   outToken?: number,
-  amount?: string,
+  amount?: number,
   fee?: string,
 }
 
 export function getDefaultSwap({
   inToken = 1,
   outToken = 1,
-  amount = '100',
+  amount = 100,
   fee = '10'
 }: OptionalSwapData = {}): PartialSwapData {
   return {
     amount,
-    salt: Math.floor(Math.random() * 10000),
+    salt: Math.floor(Math.random() * 10000).toString(),
     fee,
     inToken,
     outToken,
