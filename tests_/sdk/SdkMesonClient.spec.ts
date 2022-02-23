@@ -192,7 +192,6 @@ describe('MesonClient', () => {
       const swap = userClient.requestSwap(getDefaultSwap(), outChain)
       const request = await swap.signForRequest()
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
       await lpClient.lock(signedRequest)
       try {
         await lpClient.lock(signedRequest)
@@ -204,7 +203,6 @@ describe('MesonClient', () => {
       const swap = userClient.requestSwap(getDefaultSwap(), outChain)
       const request = await swap.signForRequest()
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
       try {
         await lpClient.lock(signedRequest)
       } catch (error) {
@@ -216,7 +214,6 @@ describe('MesonClient', () => {
       const swap = userClient.requestSwap(getDefaultSwap(), outChain)
       const request = await swap.signForRequest()
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
       await lpClient.lock(signedRequest)
       expect(await mesonInstance.balanceOf(lpClient.token(1), initiator.address)).to.equal(0)
     })
@@ -230,7 +227,6 @@ describe('MesonClient', () => {
       const swap = userClient.requestSwap(getDefaultSwap({ inToken:10}), outChain)
       const request = await swap.signForRequest()
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
       try {
         await lpClient.unlock(signedRequest)
       } catch (error) {
@@ -244,7 +240,6 @@ describe('MesonClient', () => {
       const swap = userClient.requestSwap(getDefaultSwap(), outChain)
       const request = await swap.signForRequest()
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
       await lpClient.lock(signedRequest)
       try {
         await lpClient.unlock(signedRequest)
@@ -266,12 +261,10 @@ describe('MesonClient', () => {
       const swap = userClient.requestSwap(swapData, outChain)
       const request = await swap.signForRequest()
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
       await lpClient.lock(signedRequest)
       const swap2 = userClient.requestSwap(swapData, "0x02ca")
       const release = await swap2.signForRelease(swapData.recipient)
       const signedRelease = new SignedSwapRelease(release)
-      signedRelease.checkSignature()
       try {
         await lpClient.release(signedRelease)
       } catch (error) {
@@ -286,13 +279,11 @@ describe('MesonClient', () => {
       const swap = userClient.requestSwap(swapData, outChain)
       const request = await swap.signForRequest()
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
       await lpClient.lock(signedRequest)
       const swapData2 = getDefaultSwap({ inToken:10})
       const swap2 = userClient.requestSwap(swapData2, outChain)
       const release = await swap2.signForRelease(swapData2.recipient)
       const signedRelease = new SignedSwapRelease(release)
-      signedRelease.checkSignature()
       try {
         await lpClient.release(signedRelease)
       } catch (error) {
@@ -309,12 +300,10 @@ describe('MesonClient', () => {
       const request = await swap.signForRequest()
 
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
       await lpClient.lock(signedRequest)
 
       const release = await swap.signForRelease(swapData.recipient)
       const signedRelease = new SignedSwapRelease(release)
-      signedRelease.checkSignature()
       await lpClient.release(signedRelease)
 
       expect(await mesonInstance.balanceOf(lpClient.token(1), initiator.address)).to.equal(0)
@@ -385,7 +374,6 @@ describe('MesonClient', () => {
       const swap = userClient.requestSwap(swapData, outChain)
       const request = await swap.signForRequest()
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
       try {
         await userClient.postSwap(signedRequest)
       } catch (error) {
@@ -407,7 +395,6 @@ describe('MesonClient', () => {
       const request = await swap.signForRequest()
 
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
@@ -434,7 +421,6 @@ describe('MesonClient', () => {
       const request = await swap.signForRequest()
 
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
   
@@ -457,7 +443,6 @@ describe('MesonClient', () => {
       const request = await swap.signForRequest()
 
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
