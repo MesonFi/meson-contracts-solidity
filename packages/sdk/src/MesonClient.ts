@@ -11,7 +11,7 @@ import { SwapSigner } from './SwapSigner'
 import { SignedSwapRequest, SignedSwapRelease } from './SignedSwap'
 
 export enum PostedSwapStatus {
-  None = 0, // nothing found on chain
+  NoneOrAfterRunning = 0, // nothing found on chain
   Requested = 0b0001,
   Bonded = 0b0010,
   Executed = 0b0100,
@@ -23,7 +23,7 @@ export enum PostedSwapStatus {
 }
 
 export enum LockedSwapStatus {
-  None = 0, // nothing found on chain
+  NoneOrAfterRunning = 0, // nothing found on chain
   Locked = 0b0001,
   Released = 0b0100,
   Unlocked = 0b0101,
@@ -225,12 +225,7 @@ export class MesonClient {
     if (executed) {
       return { status: PostedSwapStatus.Executed }
     } else if (initiator === AddressZero) {
-      if (await this.isSwapCancelled(encoded)) {
-        return { status: PostedSwapStatus.Cancelled }
-      } else if (await this.isSwapPosted(encoded)) {
-        return { status: PostedSwapStatus.Executed }
-      }
-      return { status: PostedSwapStatus.None }
+      return { status: PostedSwapStatus.NoneOrAfterRunning }
     } else if (initiatorToCheck && initiatorToCheck.toLowerCase() !== initiator.toLowerCase()) {
       return { status: PostedSwapStatus.ErrorMadeByOtherInitiator }
     } else if (provider === AddressZero) {
@@ -256,13 +251,7 @@ export class MesonClient {
   }> {
     const { initiator, provider, until } = await this.mesonInstance.getLockedSwap(encoded)
     if (!until) {
-      if (await this.isSwapReleased(encoded)) {
-        return { status: LockedSwapStatus.Released }
-      } else if (await this.isSwapLocked(encoded)) {
-        return { status: LockedSwapStatus.Unlocked }
-      } else {
-        return { status: LockedSwapStatus.None }
-      }
+      return { status: LockedSwapStatus.NoneOrAfterRunning }
     } else if (initiatorToCheck && initiatorToCheck.toLowerCase() !== initiator.toLowerCase()) {
       return { status: LockedSwapStatus.ErrorMadeForOtherInitiator }
     } else if (until * 1000 < Date.now()) {

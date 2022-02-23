@@ -36,13 +36,13 @@ contract MesonStatesTest is MesonStates {
     bytes2 inChain,
     uint8 inTokenIndex
   ) {
-    amount = uint96(encodedSwap >> 160);
-    salt = uint32(encodedSwap >> 128);
-    expireTs = uint40(encodedSwap >> 48);
-    outChain = bytes2(uint16(encodedSwap >> 32));
-    outTokenIndex = uint8(encodedSwap >> 24);
-    inChain = bytes2(uint16(encodedSwap >> 8));
-    inTokenIndex = uint8(encodedSwap);
+    amount = uint96(_amountFrom(encodedSwap));
+    salt = _saltFrom(encodedSwap);
+    expireTs = uint40(_expireTsFrom(encodedSwap));
+    outChain = bytes2(_outChainFrom(encodedSwap));
+    outTokenIndex = _outTokenIndexFrom(encodedSwap);
+    inChain = bytes2(_inChainFrom(encodedSwap));
+    inTokenIndex = _inTokenIndexFrom(encodedSwap);
   }
 
   function checkRequestSignature(

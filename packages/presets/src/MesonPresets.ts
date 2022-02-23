@@ -110,13 +110,16 @@ export class MesonPresets {
 
     const posted = await fromClient.getPostedSwap(encoded, initiator)
     if ([
+      PostedSwapStatus.NoneOrAfterRunning,
       PostedSwapStatus.Bonded,
       PostedSwapStatus.Executed,
       PostedSwapStatus.ErrorExpiredButBonded
     ].includes(posted.status)) {
       // no need to getLockedSwap in other cases
-      const locked = await toClient.getLockedSwap(encoded, initiator)
-      return [posted, locked]
+      try {
+        const locked = await toClient.getLockedSwap(encoded, initiator)
+        return [posted, locked]
+      } catch {}
     }
     return [posted]
   }
