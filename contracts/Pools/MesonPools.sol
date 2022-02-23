@@ -65,7 +65,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// by `postSwap`. This method will lock swapping fund on the target chain
   /// for `LOCK_TIME_PERIOD` and wait for fund release and execution.
   /// @dev Designed to be used by liquidity providers
-  /// @param encodedSwap Encoded swap information; also used as the key of `_lockedSwaps`
+  /// @param encodedSwap Encoded swap information
   /// @param r Part of the signature (the one given by `postSwap` call)
   /// @param s Part of the signature (the one given by `postSwap` call)
   /// @param v Part of the signature (the one given by `postSwap` call)
@@ -113,7 +113,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// but anyone (initiator herself, the LP, and other people) with the signature 
   /// can call it to make sure the swapping fund is guaranteed to be released.
   /// @dev Designed to be used by anyone
-  /// @param encodedSwap Encoded swap information; also used as the key of `_lockedSwaps`
+  /// @param encodedSwap Encoded swap information
   /// @param r Part of the release signature (same as in the `executeSwap` call)
   /// @param s Part of the release signature (same as in the `executeSwap` call)
   /// @param v Part of the release signature (same as in the `executeSwap` call)
