@@ -38,6 +38,9 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   {
     require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
 
+    uint256 amount = _amountFrom(encodedSwap);
+    require(amount <= 1e11, "For security reason, amount cannot be greater than 100k");
+
     uint256 delta = _expireTsFrom(encodedSwap) - block.timestamp;
     // Underflow would trigger "Expire ts too late" error
     require(delta > MIN_BOND_TIME_PERIOD, "Expire ts too early");
@@ -50,7 +53,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _unsafeDepositToken(
       _tokenList[_inTokenIndexFrom(encodedSwap)],
       initiator,
-      _amountFrom(encodedSwap) + _feeFrom(encodedSwap)
+      amount + _feeFrom(encodedSwap)
     );
 
     emit SwapPosted(encodedSwap);
