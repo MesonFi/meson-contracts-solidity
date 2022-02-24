@@ -8,7 +8,7 @@
     "postbuild": "cp artifacts/contracts/Meson.sol/Meson.json packages/contract-abis/abis/Meson.json",
     "cleanbuild": "hardhat clean && yarn build",
     "docgen": "solidity-docgen --solc-module solc -t ./templates",
-    "test": "hardhat --network hardhat test",
+    "test": "TESTNET_MODE=true NETWORK_ID=ropsten yarn chain && hardhat --network hardhat test",
     "estimate": "hardhat --network hardhat run scripts/estimate-gas.js",
     "estimate2": "hardhat --network hardhat run scripts/estimate-gas-upgradable.js",
 
@@ -21,7 +21,7 @@
     "chain:ftm": "NETWORK_ID=ftm yarn chain",
     "chain:one": "NETWORK_ID=one yarn chain",
 
-    "testnet": "yarn chain && hardhat run scripts/testnets/deploy-upgradable.js",
+    "testnet": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/deploy-upgradable.js",
     "testnet:eth": "NETWORK_ID=ropsten yarn testnet",
     "testnet:bsc": "NETWORK_ID=bsc yarn testnet",
     "testnet:avax": "NETWORK_ID=avax yarn testnet",
@@ -29,7 +29,7 @@
     "testnet:ftm": "NETWORK_ID=ftm yarn testnet",
     "testnet:one": "NETWORK_ID=one yarn testnet",
 
-    "up": "yarn chain && hardhat run scripts/testnets/upgrade.js",
+    "up": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/upgrade.js",
     "up:eth": "NETWORK_ID=ropsten yarn up",
     "up:bsc": "NETWORK_ID=bsc yarn up",
     "up:avax": "NETWORK_ID=avax yarn up",

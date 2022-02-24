@@ -12,6 +12,8 @@ import { expect } from './shared/expect'
 import { wallet } from './shared/wallet'
 import { getDefaultSwap } from './shared/meson'
 
+const testnetMode = true
+
 describe('MesonStates', () => {
   let mesonInstance: MesonStatesTest
   let mesonClient: MesonClient
@@ -79,14 +81,14 @@ describe('MesonStates', () => {
 
   describe('#checkRequestSignature', () => {
     it('validates a request signature', async () => {
-      const sigs = (await swap.signForRequest()).signature
+      const sigs = (await swap.signForRequest(testnetMode)).signature
       await mesonInstance.checkRequestSignature(swap.encoded, ...sigs, wallet.address)
     })
   })
 
   describe('#checkReleaseSignature', () => {
     it('validates a release signature', async () => {
-      const sigs = (await swap.signForRelease(swapData.recipient)).signature
+      const sigs = (await swap.signForRelease(swapData.recipient, testnetMode)).signature
       await mesonInstance.checkReleaseSignature(swap.encoded, swapData.recipient, ...sigs, wallet.address)
     })
   })

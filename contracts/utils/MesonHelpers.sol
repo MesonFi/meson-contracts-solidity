@@ -45,14 +45,11 @@ contract MesonHelpers is MesonConfig {
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
     bytes32 digest;
+    bytes32 typeHash = SWAP_REQUEST_TYPE_HASH;
     assembly {
       mstore(0, encodedSwap)
       mstore(0x20, keccak256(0, 0x20))
-
-      // The HEX string below is keccak256("bytes32 Sign to request a swap on Meson")
-      // mstore(0, 0x9862d877599564bcd97c37305a7b0fdbe621d9c2a125026f2ad601f754a75abc)
-      // The HEX string below is keccak256("bytes32 Sign to request a swap on Meson (Testnet)")
-      mstore(0, 0x7b521e60f64ab56ff03ddfb26df49be54b20672b7acfffc1adeb256b554ccb25)
+      mstore(0, typeHash)
       digest := keccak256(0, 0x40)
     }
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
@@ -68,15 +65,12 @@ contract MesonHelpers is MesonConfig {
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
     bytes32 digest;
+    bytes32 typeHash = SWAP_RELEASE_TYPE_HASH;
     assembly {
       mstore(0, encodedSwap)
       mstore(0x20, recipientHash)
       mstore(0x20, keccak256(0, 0x40))
-
-      // The HEX string below is keccak256("bytes32 Sign to release a swap on Meson" + "bytes32 Recipient hash")
-      // mstore(0, 0x5ef297f2881340f11ed62c7c08e0e0c235c333ad8f340d7285f529f16716968a)
-      // The HEX string below is keccak256("bytes32 Sign to release a swap on Meson (Testnet)" + "bytes32 Recipient hash")
-      mstore(0, 0x245d0b306958178c99fe38132cee72cfd0c1c10b4d7c67cbbd322d6b1af894f9)
+      mstore(0, typeHash)
       digest := keccak256(0, 0x40)
     }
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
