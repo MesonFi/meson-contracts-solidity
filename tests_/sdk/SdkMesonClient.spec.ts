@@ -8,7 +8,7 @@ import {
 import { MockToken, MesonPoolsTest } from '@mesonfi/contract-types'
 import { expect } from '../shared/expect'
 import { initiator, provider } from '../shared/wallet'
-import { fixtures, TOKEN_BALANCE } from '../shared/fixtures'
+import { fixtures, TOKEN_BALANCE,TOKEN_TOTAL_SUPPLY } from '../shared/fixtures'
 import { getDefaultSwap } from '../shared/meson'
 
 describe('MesonClient', () => {
@@ -19,12 +19,13 @@ describe('MesonClient', () => {
   let lpClient: MesonClient
 
   beforeEach('deploy MesonPoolsTest', async () => {
+
     const result = await waffle.loadFixture(() => fixtures([
       initiator.address, provider.address
     ]))
     token = result.token1.connect(provider)
-    userClient = await MesonClient.Create(result.pools, new EthersWalletSwapSigner(initiator))
     mesonInstance = result.pools.connect(provider) // provider is signer
+    userClient = await MesonClient.Create(result.pools, new EthersWalletSwapSigner(initiator))
     lpClient = await MesonClient.Create(mesonInstance)
     outChain = lpClient.shortCoinType
     await token.approve(mesonInstance.address, 1000)
@@ -37,6 +38,7 @@ describe('MesonClient', () => {
       try {
         await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
       } catch (error) {
+        console.log(error)
         expect(error.reason).to.equal("value out-of-bounds")
       }
     })
@@ -91,17 +93,20 @@ describe('MesonClient', () => {
     it('rejects if the address is already registered', async () => {
       let amount: string = '100'
       let providerIndex: string = '1'
+      let providerIndex2: string = '2'
       try {
         await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
-        await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
+        await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex2)
       } catch (error) {
+        console.log(error)
         expect(error).to.throw
       }
     })
     it('rejects if the index is already registered', async () => {
-      let amount: string = '1000'
+      let amount: string = '100'
       let providerIndex: string = '1'
       try {
+        await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
         await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
       } catch (error) {
         expect(error).to.throw
@@ -119,13 +124,11 @@ describe('MesonClient', () => {
     it('accepts the depoit if all parameters are correct', async () => {
       let amount: string = '1000'
       let providerIndex: string = '1'
-      await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
-      expect(await mesonInstance.balanceOf(lpClient.token(1), provider.address)).to.equal(amount)
-      expect(await token.balanceOf(mesonInstance.address)).to.equal(amount)
-      expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.sub(amount))
-    })
+      await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
+      expect(await mesonInstance.balanceOf(lpClient.token(1), provider.address)).to.equal(1000)
+      expect(await token.balanceOf(mesonInstance.address)).to.equal(1000)
   })
-
+})
   describe('#deposit', () => {
     it('rejects negative  amount', async () => {
       let amount: string = '100'
@@ -176,6 +179,7 @@ describe('MesonClient', () => {
       let amount: string = '10'
       let amount2: string = '10'
       let providerIndex: string = '1'
+      let TOKEN_BALANCE = await token.balanceOf(provider.address)
       await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
       await lpClient.deposit(lpClient.token(1), amount2)
       expect(await mesonInstance.balanceOf(lpClient.token(1), provider.address)).to.equal(20)
@@ -333,8 +337,10 @@ describe('MesonClient', () => {
       }
     })
     it('accepts the depoit if all parameters are correct', async () => {
+
+      let TOKEN_BALANCE = await token.balanceOf(provider.address)
       await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
-      await mesonInstance.withdraw('1000', 1)
+      await lpClient.mesonInstance.withdraw('1000', 1)
       expect(await token.balanceOf(mesonInstance.address)).to.equal(0)
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE)
     })

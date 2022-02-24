@@ -12,14 +12,15 @@ import { fixtures, TOKEN_BALANCE } from './shared/fixtures'
 import { expect } from './shared/expect'
 describe('MesonPools', () => {
   let totalSupply = 1000000000000
-  let overrides = {
-    gasLimit: 8984120,
-    gasPrice: 500000000000
-  };
   let mesonContract;
   let tokenContract;
   let tokenUsdcContract;
   let mesonFactory;
+  let userClient: MesonClient
+  let signedRequest
+  let outChain
+  let swap
+  let swapData
 
   beforeEach('deploy MesonPoolsTest', async () => {
     const MockToken = await ethers.getContractFactory('MockToken')
@@ -32,6 +33,12 @@ describe('MesonPools', () => {
     await mesonContract.deployed()
     let approve = await tokenContract.approve(mesonContract.address, 1000)
     await approve
+    userClient = await MesonClient.Create(mesonContract, new EthersWalletSwapSigner(initiator))
+    outChain = await mesonContract.getShortCoinType()
+    swap = userClient.requestSwap(getDefaultSwap(), outChain)
+    const request = await swap.signForRequest()
+    signedRequest = new SignedSwapRequest(request)
+    swapData = getDefaultSwap()
   })
 
   describe('#depositAndRegister', () => {
@@ -83,8 +90,8 @@ describe('MesonPools', () => {
       }
     })
     it('rejects if the address is already registered', async () => {
-      let amount = 100
       let balanceIndex = 0x010000000001
+      let amount = 100
       let balanceIndex2 = 0x010000000002
       try {
         await mesonContract.depositAndRegister(amount, balanceIndex)
@@ -184,17 +191,8 @@ describe('MesonPools', () => {
   })
 
   describe('#lock', async () => {
-    let userClient: MesonClient
     let balanceIndex = 0x010000000001
     let amount = 100
-    let signedRequest
-    beforeEach('deploy MesonPoolsTest', async () => {
-      userClient = await MesonClient.Create(mesonContract, new EthersWalletSwapSigner(initiator))
-      const outChain = await mesonContract.getShortCoinType()
-      const swap = userClient.requestSwap(getDefaultSwap(), outChain)
-      const request = await swap.signForRequest()
-      signedRequest = new SignedSwapRequest(request)
-    })
     it('rejects lock  already exists', async () => {
       await mesonContract.depositAndRegister(amount, balanceIndex)
       await mesonContract.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
@@ -203,7 +201,6 @@ describe('MesonPools', () => {
       } catch (error) {
         expect(error).to.throw
       }
-
     })
     it('rejects caller not registered', async () => {
       try {
@@ -221,17 +218,8 @@ describe('MesonPools', () => {
   })
 
   describe('#unlock', async () => {
-    let userClient: MesonClient
     let balanceIndex = 0x010000000001
     let amount = 100
-    let signedRequest
-    beforeEach('deploy MesonPoolsTest', async () => {
-      userClient = await MesonClient.Create(mesonContract, new EthersWalletSwapSigner(initiator))
-      const outChain = await mesonContract.getShortCoinType()
-      const swap = userClient.requestSwap(getDefaultSwap(), outChain)
-      const request = await swap.signForRequest()
-      signedRequest = new SignedSwapRequest(request)
-    })
     it('rejects swap  does not exist', async () => {
       await mesonContract.depositAndRegister(amount, balanceIndex)
       await mesonContract.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
@@ -264,21 +252,8 @@ describe('MesonPools', () => {
   })
 
   describe('#release', async () => {
-    let userClient: MesonClient
     let balanceIndex = 0x010000000001
     let amount = 100
-    let signedRequest
-    let outChain
-    let swap
-    let swapData
-    beforeEach('deploy MesonPoolsTest', async () => {
-      userClient = await MesonClient.Create(mesonContract, new EthersWalletSwapSigner(initiator))
-      outChain = await mesonContract.getShortCoinType()
-      swap = userClient.requestSwap(getDefaultSwap(), outChain)
-      const request = await swap.signForRequest()
-      signedRequest = new SignedSwapRequest(request)
-      swapData = getDefaultSwap()
-    })
     it('rejects swap does not exist ', async () => {
       await mesonContract.depositAndRegister(amount, balanceIndex)
       await mesonContract.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
@@ -301,4 +276,25 @@ describe('MesonPools', () => {
     })
   })
 
+  describe('#getLockSwap', async () => {
+    it('rejects Swap not for this chain', async () => {
+      let balanceIndex = 0x010000000001
+      let amount = 100
+      try {
+        await mesonContract.depositAndRegister(amount, balanceIndex)
+        await mesonContract.lock(signedRequest.encoded + '0', ...signedRequest.signature, signedRequest.initiator)
+      } catch (error) {
+        expect(error).to.throw
+      }
+    })
+    it('accepts the getLockSwap if all parameters are correct ', async () => {
+      let balanceIndex = 0x010000000001
+      let amount = 100
+      await mesonContract.depositAndRegister(amount, balanceIndex)
+      await mesonContract.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
+      const getLockedSwap = await mesonContract.getLockedSwap(signedRequest.encoded)
+      expect(signedRequest.initiator).to.equal(getLockedSwap.initiator.toLowerCase())
+    })
+  })
 })
+ 
