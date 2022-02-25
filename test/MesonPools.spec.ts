@@ -12,6 +12,8 @@ import { initiator, provider } from './shared/wallet'
 import { fixtures, TOKEN_BALANCE, TOKEN_TOTAL_SUPPLY } from './shared/fixtures'
 import { getDefaultSwap } from './shared/meson'
 
+const testnetMode = true
+
 describe('MesonPools', () => {
   let token: MockToken
   let mesonInstance: MesonPoolsTest
@@ -86,10 +88,10 @@ describe('MesonPools', () => {
       await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
 
       const swap = userClient.requestSwap(getDefaultSwap(), outChain)
-      const request = await swap.signForRequest()
+      const request = await swap.signForRequest(testnetMode)
 
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
+      signedRequest.checkSignature(testnetMode)
       await lpClient.lock(signedRequest)
 
       expect(await mesonInstance.balanceOf(lpClient.token(1), initiator.address)).to.equal(0)
@@ -103,15 +105,15 @@ describe('MesonPools', () => {
 
       const swapData = getDefaultSwap()
       const swap = userClient.requestSwap(swapData, outChain)
-      const request = await swap.signForRequest()
+      const request = await swap.signForRequest(testnetMode)
       
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
+      signedRequest.checkSignature(testnetMode)
       await lpClient.lock(signedRequest)
 
-      const release = await swap.signForRelease(swapData.recipient)
+      const release = await swap.signForRelease(swapData.recipient, testnetMode)
       const signedRelease = new SignedSwapRelease(release)
-      signedRelease.checkSignature()
+      signedRelease.checkSignature(testnetMode)
       await lpClient.release(signedRelease)
 
       expect(await mesonInstance.balanceOf(lpClient.token(1), initiator.address)).to.equal(0)

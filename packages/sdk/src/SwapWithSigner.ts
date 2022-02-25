@@ -10,7 +10,7 @@ export class SwapWithSigner extends Swap {
     this.swapSigner = swapSigner
   }
 
-  async signForRequest(testnet?: boolean): Promise<SignedSwapRequestData> {
+  async signForRequest(testnet: boolean): Promise<SignedSwapRequestData> {
     const initiator = this.swapSigner.getAddress()
     const signature = await this.swapSigner.signSwapRequest(this.encoded, testnet)
     return {
@@ -20,7 +20,7 @@ export class SwapWithSigner extends Swap {
     }
   }
 
-  async signForRelease(recipient: string, testnet?: boolean): Promise<SignedSwapReleaseData> {
+  async signForRelease(recipient: string, testnet: boolean): Promise<SignedSwapReleaseData> {
     const initiator = this.swapSigner.getAddress()
     const signature = await this.swapSigner.signSwapRelease(this.encoded, recipient, testnet)
     return {

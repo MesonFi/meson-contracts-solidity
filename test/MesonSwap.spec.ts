@@ -12,6 +12,8 @@ import { initiator, provider } from './shared/wallet'
 import { fixtures, TOKEN_BALANCE } from './shared/fixtures'
 import { getDefaultSwap } from './shared/meson'
 
+const testnetMode = true
+
 describe('MesonSwap', () => {
   let token: MockToken
   let unsupportedToken: MockToken
@@ -38,10 +40,10 @@ describe('MesonSwap', () => {
   describe('#postSwap', () => {
     it('posts a swap', async () => {
       const swap = userClient.requestSwap(getDefaultSwap({ fee: '0' }), outChain)
-      const request = await swap.signForRequest()
+      const request = await swap.signForRequest(testnetMode)
 
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
+      signedRequest.checkSignature(testnetMode)
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
@@ -53,10 +55,10 @@ describe('MesonSwap', () => {
 
     it('refuses unsupported token', async () => {
       const swap = userClient.requestSwap(getDefaultSwap({ inToken: 2, fee: '0' }), outChain)
-      const request = await swap.signForRequest()
+      const request = await swap.signForRequest(testnetMode)
 
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
+      signedRequest.checkSignature(testnetMode)
       await unsupportedToken.approve(mesonInstance.address, swap.amount)
       await expect(lpClient.postSwap(signedRequest)).to.be.reverted
     })
@@ -66,16 +68,16 @@ describe('MesonSwap', () => {
     it('can execute a swap', async () => {
       const swapData = getDefaultSwap({ fee: '0' })
       const swap = userClient.requestSwap(swapData, outChain)
-      const request = await swap.signForRequest()
+      const request = await swap.signForRequest(testnetMode)
       
       const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature()
+      signedRequest.checkSignature(testnetMode)
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
-      const release = await swap.signForRelease(swapData.recipient)
+      const release = await swap.signForRelease(swapData.recipient, testnetMode)
       const signedRelease = new SignedSwapRelease(release)
-      signedRelease.checkSignature()
+      signedRelease.checkSignature(testnetMode)
       await lpClient.executeSwap(signedRelease, false)
 
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
