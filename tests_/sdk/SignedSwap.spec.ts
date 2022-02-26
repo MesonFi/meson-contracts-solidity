@@ -1,37 +1,16 @@
-import { waffle } from 'hardhat'
 import {
   MesonClient,
-  EthersWalletSwapSigner,
   SignedSwapRequest,
   SignedSwapRelease,
 } from '@mesonfi/sdk/src'
-import { MockToken, MesonPoolsTest } from '@mesonfi/contract-types'
 import { expect } from '../shared/expect'
-import { initiator, provider } from '../shared/wallet'
-import { fixtures } from '../shared/fixtures'
 import { getDefaultSwap } from '../shared/meson'
 
-describe('SignedSwap', () => {
-  let token: MockToken
-  let mesonInstance: MesonPoolsTest
+describe('SignedSwapRequest', () => {
   let outChain: string
   let userClient: MesonClient
-  let lpClient: MesonClient
-
-  beforeEach('deploy MesonPoolsTest', async () => {
-    const result = await waffle.loadFixture(() => fixtures([
-      initiator.address, provider.address
-    ]))
-    token = result.token1.connect(provider)
-    userClient = await MesonClient.Create(result.pools, new EthersWalletSwapSigner(initiator))
-    mesonInstance = result.pools.connect(provider) // provider is signer
-    lpClient = await MesonClient.Create(mesonInstance)
-    outChain = lpClient.shortCoinType
-    let amount: number = 1000
-    await token.approve(mesonInstance.address, amount)
-  })
-
-  describe('#SignedSwapRequest', () => {
+  
+  describe('#constructor', () => {
     it('rejects missing encoded', async () => {
       try {
         const signedRequest = new SignedSwapRequest({
@@ -90,10 +69,23 @@ describe('SignedSwap', () => {
       expect(signedRequest.initiator).to.equal(request.initiator.toLowerCase())
       expect(signedRequest.signature).to.equal(request.signature)
     })
-
   })
 
-  describe('#SignedSwapRelease', () => {
+  describe('#getDigest', () => {
+  })
+
+  describe('#checkSignature', () => {
+  })
+
+  describe('#toObject', () => {
+  })
+})
+
+describe('SignedSwapRelease', () => {
+  let outChain: string
+  let userClient: MesonClient
+  
+  describe('#constructor', () => {
     it('rejects missing recipient', async () => {
       try {
         const signedRelease = new SignedSwapRelease({
@@ -119,5 +111,14 @@ describe('SignedSwap', () => {
       expect(signedRelease.initiator).to.equal(release.initiator.toLowerCase())
       expect(signedRelease.signature).to.equal(release.signature)
     })
+  })
+
+  describe('#getDigest', () => {
+  })
+
+  describe('#checkSignature', () => {
+  })
+
+  describe('#toObject', () => {
   })
 })

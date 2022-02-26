@@ -1,42 +1,13 @@
-import { waffle } from 'hardhat'
 import {
   Swap,
-  MesonClient,
-  PartialSwapData,
-  EthersWalletSwapSigner,
-  SwapWithSigner
 } from '@mesonfi/sdk/src'
-import { MockToken, MesonSwapTest } from '@mesonfi/contract-types'
 import { expect } from '../shared/expect'
-import { initiator } from '../shared/wallet'
 import { getDefaultSwap } from '../shared/meson'
-describe('MesonSwap', () => {
-  let mesonInstance: MesonSwapTest
-  let userClient: MesonClient
-  let swap: SwapWithSigner
-  let swapData: PartialSwapData
-  const fixture = async () => {
-    const factory = await ethers.getContractFactory('MesonStatesTest')
-    return (await factory.deploy()) as MesonStatesTest
-  }
 
-  beforeEach('deploy MesonStatesTest', async () => {
-    mesonInstance = await waffle.loadFixture(fixture)
-    const outChain = await mesonInstance.getShortCoinType()
-    userClient = await MesonClient.Create(mesonInstance as any, new EthersWalletSwapSigner(initiator))
-    swapData = getDefaultSwap({ inToken: 2, outToken: 3 })
-    swap = userClient.requestSwap(swapData, outChain)
-  })
-  describe('#Swap', () => {
+describe('Swap', () => {
+  describe('#constructor', () => {
     it('rejects missing amount', async () => {
-
-      try {
-        const swap2 = new Swap(getDefaultSwap({ amount: '' }))
-      } catch (error) {
-         
-        expect(error).to.match(/Missing amount/)
-      }
-
+      expect(new Swap(getDefaultSwap({ amount: '' }))).to.throw(/Missing amount/)
     })
     it('rejects missing expireTs', async () => {
       try {
@@ -124,7 +95,7 @@ describe('MesonSwap', () => {
     })
   })
 
-  describe('#decode', () => {
+  describe('#Swap.decode', () => {
     it('encoded swap should be a hex string of length 66', async () => {
       try {
         const swap2 = Swap.decode('')
@@ -142,6 +113,11 @@ describe('MesonSwap', () => {
       expect(swap2.outToken).to.equal(swap.outToken)
       expect(swap2.inChain).to.equal(swap.inChain)
       expect(swap2.inToken).to.equal(swap.inToken)
+    })
+  })
+
+  describe('#toObject', () => {
+    it('exports the swap as an object', async () => {
     })
   })
 })
