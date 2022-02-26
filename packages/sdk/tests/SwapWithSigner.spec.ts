@@ -1,6 +1,7 @@
 import {
   SwapWithSigner,
-} from '@mesonfi/sdk/src'
+} from '../src'
+import { expect } from 'chai'
 
 describe('SwapWithSigner', () => {
   let swapWithSigner: SwapWithSigner

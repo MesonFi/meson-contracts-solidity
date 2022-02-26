@@ -2,7 +2,8 @@ import {
   SwapSigner,
   EthersWalletSwapSigner,
   RemoteSwapSigner,
-} from '@mesonfi/sdk/src'
+} from '../src'
+import { expect } from 'chai'
 
 describe('SwapSigner', () => {
   let swapSigner: SwapSigner

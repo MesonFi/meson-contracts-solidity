@@ -4,12 +4,13 @@ import {
   EthersWalletSwapSigner,
   SignedSwapRequest,
   SignedSwapRelease,
-} from '@mesonfi/sdk/src'
+} from '../src'
 import { MockToken, MesonPoolsTest } from '@mesonfi/contract-types'
-import { expect } from '../shared/expect'
-import { initiator, provider } from '../shared/wallet'
-import { fixtures, TOKEN_BALANCE, TOKEN_TOTAL_SUPPLY } from '../shared/fixtures'
-import { getDefaultSwap } from '../shared/meson'
+import { expect } from 'chai'
+import { getDefaultSwap } from './shared'
+
+import { initiator, provider } from '../../../tests_/shared/wallet'
+import { fixtures, TOKEN_BALANCE, TOKEN_TOTAL_SUPPLY } from '../../../tests_/shared/fixtures'
 
 describe('MesonClient', () => {
   let token: MockToken

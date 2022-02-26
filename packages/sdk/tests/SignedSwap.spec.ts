@@ -2,9 +2,9 @@ import {
   MesonClient,
   SignedSwapRequest,
   SignedSwapRelease,
-} from '@mesonfi/sdk/src'
-import { expect } from '../shared/expect'
-import { getDefaultSwap } from '../shared/meson'
+} from '../src'
+import { expect } from 'chai'
+import { getDefaultSwap } from './shared'
 
 describe('SignedSwapRequest', () => {
   let outChain: string
