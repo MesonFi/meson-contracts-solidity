@@ -17,16 +17,19 @@ describe('SwapSigner', () => {
   
   describe('#getAddress', () => {
     it('returns the signer address"', async () => {
+      swapSigner.getAddress()
     })
   })
 
   describe('#signSwapRequest', () => {
     it('rejects by "Not implemented"', async () => {
+      swapSigner.signSwapRequest(encodedSwap)
     })
   })
 
   describe('#signSwapRelease', () => {
     it('rejects by "Not implemented"', async () => {
+      swapSigner.signSwapRelease(encodedSwap, recipient)
     })
   })
 
@@ -65,6 +68,7 @@ describe('RemoteSwapSigner', () => {
   
   describe('#getAddress', () => {
     it('returns the signer address', async () => {
+      swapSigner.getAddress()
     })
   })
 
@@ -101,6 +105,7 @@ describe('EthersWalletSwapSigner', () => {
   
   describe('#getAddress', () => {
     it('rejects by "Not implemented"', async () => {
+      swapSigner.getAddress()
     })
   })
 
