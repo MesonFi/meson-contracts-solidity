@@ -91,7 +91,6 @@ describe('RemoteSwapSigner', () => {
   let encodedSwap: string = ''
   let recipient: string = ''
 
-
   beforeEach('create RemoteSwapSigner', async () => {
   })
   
