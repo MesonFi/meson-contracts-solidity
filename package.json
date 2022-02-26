@@ -8,7 +8,7 @@
     "postbuild": "cp artifacts/contracts/Meson.sol/Meson.json packages/contract-abis/abis/Meson.json",
     "cleanbuild": "hardhat clean && yarn build",
     "docgen": "solidity-docgen --solc-module solc -t ./templates",
-    "test": "TESTNET_MODE=true NETWORK_ID=ropsten yarn chain && hardhat --network hardhat test",
+    "test": "set TESTNET_MODE=true && set NETWORK_ID=ropsten&& yarn chain && hardhat --network hardhat test",
     "estimate": "hardhat --network hardhat run scripts/estimate-gas.js",
     "estimate2": "hardhat --network hardhat run scripts/estimate-gas-upgradable.js",
 

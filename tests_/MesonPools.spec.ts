@@ -7,8 +7,6 @@ import {
   SignedSwapRequest,
   SignedSwapRelease
 } from '@mesonfi/sdk/src'
-import { MockToken, MesonPoolsTest } from '@mesonfi/contract-types'
-import { fixtures, TOKEN_BALANCE } from './shared/fixtures'
 import { expect } from './shared/expect'
 describe('MesonPools', () => {
   let totalSupply = 1000000000000

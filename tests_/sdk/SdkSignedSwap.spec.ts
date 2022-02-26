@@ -44,7 +44,7 @@ describe('SignedSwap', () => {
           ],
         })
       } catch (error) {
-        expect(error).to.throw
+        expect(error).to.match(/Missing encoded/)
       }
     })
     it('rejects missing initiator', async () => {
@@ -59,7 +59,7 @@ describe('SignedSwap', () => {
           ],
         })
       } catch (error) {
-        expect(error).to.throw
+        expect(error).to.match(/Missing initiator/)
       }
     })
     it('rejects  missing signature', async () => {
@@ -70,7 +70,7 @@ describe('SignedSwap', () => {
           signature: null,
         })
       } catch (error) {
-        expect(error).to.throw
+        expect(error).to.match(/Missing signature/)
       }
       // const signedRequest = new SignedSwapRequest({
       //   encoded: '0x000000000000000000000064000003c1000000000a00620a4c3e000101000101',
@@ -107,7 +107,7 @@ describe('SignedSwap', () => {
           ],
         })
       } catch (error) {
-        expect(error).to.throw
+        expect(error).to.match(/Missing recipient/)
       }
     })
     it('accepts signedSwapRequest', async () => {

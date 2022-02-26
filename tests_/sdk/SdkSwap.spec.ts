@@ -33,7 +33,8 @@ describe('MesonSwap', () => {
       try {
         const swap2 = new Swap(getDefaultSwap({ amount: '' }))
       } catch (error) {
-        expect(error).to.throw
+         
+        expect(error).to.match(/Missing amount/)
       }
 
     })
@@ -41,35 +42,62 @@ describe('MesonSwap', () => {
       try {
         const swap2 = new Swap(getDefaultSwap({ expireTs: '' }))
       } catch (error) {
-        expect(error).to.throw
+         
+        expect(error).to.match(/Missing expireTs/)
       }
     })
     it('rejects Missing fee', async () => {
       try {
         const swap2 = new Swap(getDefaultSwap({ fee: '' }))
       } catch (error) {
-        expect(error).to.throw
+      expect(error).to.match(/Missing fee/)
       }
     })
     it('rejects Missing inChain', async () => {
       try {
-        const swap2 = new Swap(getDefaultSwap({ inChain: null }))
+        const swap2 = new Swap({
+          inToken:1,
+          outToken:1,
+          amount : '1000',
+          fee: '0',
+          expireTs:100,
+          inChain:'',
+          outChain:'1'
+        })
       } catch (error) {
-        expect(error).to.throw
+        expect(error).to.match(/Missing inChain/)
       }
     })
     it('rejects Missing outChain', async () => {
       try {
-        const swap2 = new Swap(getDefaultSwap({ outChain: null }))
+        const swap2 = new Swap({
+          inToken:1,
+          outToken:1,
+          amount : '1000',
+          fee: '0',
+          expireTs:100,
+          inChain:'1',
+          outChain:''
+        })
       } catch (error) {
-        expect(error).to.throw
+         
+        expect(error).to.match(/Missing outChain/)
       }
     })
     it('rejects Invalid outToken', async () => {
       try {
-        const swap2 = new Swap(getDefaultSwap({ outToken: null }))
+        const swap2 = new Swap({
+          inToken:1,
+          outToken:null,
+          amount : '1000',
+          fee: '0',
+          expireTs:100,
+          inChain:'1',
+          outChain:'1'
+        })
       } catch (error) {
-        expect(error).to.throw
+         
+        expect(error).to.match(/Invalid outToken/)
       }
 
     })
@@ -101,7 +129,7 @@ describe('MesonSwap', () => {
       try {
         const swap2 = Swap.decode('')
       } catch (error) {
-        expect(error).to.throw
+        expect(error).to.match(/encoded swap should be a hex string of length 66/)
       }
     })
     it('accepts the Swap if all parameters are correct', async () => {

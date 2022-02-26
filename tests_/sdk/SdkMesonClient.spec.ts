@@ -8,7 +8,7 @@ import {
 import { MockToken, MesonPoolsTest } from '@mesonfi/contract-types'
 import { expect } from '../shared/expect'
 import { initiator, provider } from '../shared/wallet'
-import { fixtures, TOKEN_BALANCE,TOKEN_TOTAL_SUPPLY } from '../shared/fixtures'
+import { fixtures, TOKEN_BALANCE, TOKEN_TOTAL_SUPPLY } from '../shared/fixtures'
 import { getDefaultSwap } from '../shared/meson'
 
 describe('MesonClient', () => {
@@ -17,7 +17,7 @@ describe('MesonClient', () => {
   let outChain: string
   let userClient: MesonClient
   let lpClient: MesonClient
-
+  const testnetMode = true
   beforeEach('deploy MesonPoolsTest', async () => {
 
     const result = await waffle.loadFixture(() => fixtures([
@@ -38,7 +38,6 @@ describe('MesonClient', () => {
       try {
         await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
       } catch (error) {
-        console.log(error)
         expect(error.reason).to.equal("value out-of-bounds")
       }
     })
@@ -48,17 +47,8 @@ describe('MesonClient', () => {
       try {
         await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
       } catch (error) {
-        expect(error).to.throw
-      }
-    })
-    it('rejects if amount overflow', async () => {
-      try {
-        let value: Number = 10 * 1000 * 1000 * 1000
-        let amount: string = value.toString()
-        let providerIndex: string = '1'
-        await lpClient.depositAndRegister(lpClient.token(1), amount, '1')
-      } catch (error) {
-        expect(error.reason).to.throw
+
+        expect(error).to.match(/Amount must be positive/)
       }
     })
     it('rejects the amount if no enough appove', async () => {
@@ -67,7 +57,8 @@ describe('MesonClient', () => {
         let providerIndex: string = '1'
         await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
       } catch (error) {
-        expect(error).to.throw
+
+        expect(error).to.match(/transfer amount exceeds allowance/)
       }
     })
     it('rejects Index already registered', async () => {
@@ -78,7 +69,8 @@ describe('MesonClient', () => {
         await lpClient.depositAndRegister(lpClient.token(1), amount, '1')
         await lpClient.depositAndRegister(lpClient.token(1), amount2, providerIndex)
       } catch (error) {
-        expect(error).to.throw
+
+        expect(error).to.match(/Index already registered/)
       }
     })
     it('rejects if provider index is zero', async () => {
@@ -87,7 +79,8 @@ describe('MesonClient', () => {
       try {
         await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
       } catch (error) {
-        expect(error).to.throw
+
+        expect(error).to.match(/Cannot use 0 as provider index/)
       }
     })
     it('rejects if the address is already registered', async () => {
@@ -98,8 +91,8 @@ describe('MesonClient', () => {
         await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
         await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex2)
       } catch (error) {
-        console.log(error)
-        expect(error).to.throw
+
+        expect(error).to.match(/Address already registered/)
       }
     })
     it('rejects if the index is already registered', async () => {
@@ -109,7 +102,8 @@ describe('MesonClient', () => {
         await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
         await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
       } catch (error) {
-        expect(error).to.throw
+
+        expect(error).to.match(/Index already registered/)
       }
     })
     it('refuses unsupported token', async () => {
@@ -127,8 +121,8 @@ describe('MesonClient', () => {
       await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
       expect(await mesonInstance.balanceOf(lpClient.token(1), provider.address)).to.equal(1000)
       expect(await token.balanceOf(mesonInstance.address)).to.equal(1000)
+    })
   })
-})
   describe('#deposit', () => {
     it('rejects negative  amount', async () => {
       let amount: string = '100'
@@ -138,7 +132,8 @@ describe('MesonClient', () => {
         await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
         await lpClient.deposit(lpClient.token(1), amount2)
       } catch (error) {
-        expect(error).to.throw
+
+        expect(error).to.match(/value out-of-bounds/)
       }
     })
     it('rejects zero amount ', async () => {
@@ -149,19 +144,8 @@ describe('MesonClient', () => {
         await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
         await lpClient.deposit(lpClient.token(1), amount2)
       } catch (error) {
-        expect(error).to.throw
-      }
-    })
-    it('rejects if amount overflow', async () => {
-      let value: Number = 2 ** 256 + 1
-      let amount: string = value.toString()
-      let amount2: string = '10'
-      let providerIndex: string = '1'
-      try {
-        await lpClient.depositAndRegister(lpClient.token(1), amount2, providerIndex)
-        await lpClient.deposit(lpClient.token(1), amount)
-      } catch (error) {
-        expect(error).to.throw
+
+        expect(error).to.match(/Amount must be positive/)
       }
     })
     it('rejects the amount if no enough appove', async () => {
@@ -172,7 +156,8 @@ describe('MesonClient', () => {
         await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
         await lpClient.deposit(lpClient.token(1), amount2)
       } catch (error) {
-        expect(error).to.throw
+
+        expect(error).to.match(/transfer amount exceeds allowance/)
       }
     })
     it('accepts the depoit if all parameters are correct', async () => {
@@ -194,30 +179,35 @@ describe('MesonClient', () => {
       let providerIndex: string = '1'
       await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
       const swap = userClient.requestSwap(getDefaultSwap(), outChain)
-      const request = await swap.signForRequest()
+      const request = await swap.signForRequest(testnetMode)
       const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature(testnetMode)
       await lpClient.lock(signedRequest)
       try {
         await lpClient.lock(signedRequest)
       } catch (error) {
-        expect(error).to.throw
+
+        expect(error).to.match(/Swap already exists/)
       }
     })
     it(' rejects caller not registered', async () => {
       const swap = userClient.requestSwap(getDefaultSwap(), outChain)
-      const request = await swap.signForRequest()
+      const request = await swap.signForRequest(testnetMode)
       const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature(testnetMode)
       try {
         await lpClient.lock(signedRequest)
       } catch (error) {
-        expect(error).to.throw
+
+        expect(error).to.match(/Caller not registered. Call depositAndRegister/)
       }
     })
     it('accepts the lock if all parameters are correct', async () => {
       await lpClient.depositAndRegister(lpClient.token(1), '1000', '1')
       const swap = userClient.requestSwap(getDefaultSwap(), outChain)
-      const request = await swap.signForRequest()
+      const request = await swap.signForRequest(testnetMode)
       const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature(testnetMode)
       await lpClient.lock(signedRequest)
       expect(await mesonInstance.balanceOf(lpClient.token(1), initiator.address)).to.equal(0)
     })
@@ -228,13 +218,15 @@ describe('MesonClient', () => {
       let amount: string = '1000'
       let providerIndex: string = '1'
       await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
-      const swap = userClient.requestSwap(getDefaultSwap({ inToken:10}), outChain)
-      const request = await swap.signForRequest()
+      const swap = userClient.requestSwap(getDefaultSwap({ inToken: 10 }), outChain)
+      const request = await swap.signForRequest(testnetMode)
       const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature(testnetMode)
       try {
         await lpClient.unlock(signedRequest)
       } catch (error) {
-        expect(error).to.throw
+
+        expect(error).to.match(/Swap does not exist/)
       }
     })
     it('rejects swap still in lock', async () => {
@@ -242,13 +234,15 @@ describe('MesonClient', () => {
       let providerIndex: string = '1'
       await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
       const swap = userClient.requestSwap(getDefaultSwap(), outChain)
-      const request = await swap.signForRequest()
+      const request = await swap.signForRequest(testnetMode)
       const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature(testnetMode)
       await lpClient.lock(signedRequest)
       try {
         await lpClient.unlock(signedRequest)
       } catch (error) {
-        expect(error).to.throw
+
+        expect(error).to.match(/Swap still in lock/)
       }
     })
     it('accepts the depoit if all parameters are correct', async () => {
@@ -257,41 +251,25 @@ describe('MesonClient', () => {
   })
 
   describe('#release', async () => {
-    it('Swap not for this chain', async () => {
-      let amount: string = '100'
-      let providerIndex: string = '1'
-      await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
-      const swapData = getDefaultSwap()
-      const swap = userClient.requestSwap(swapData, outChain)
-      const request = await swap.signForRequest()
-      const signedRequest = new SignedSwapRequest(request)
-      await lpClient.lock(signedRequest)
-      const swap2 = userClient.requestSwap(swapData, "0x02ca")
-      const release = await swap2.signForRelease(swapData.recipient)
-      const signedRelease = new SignedSwapRelease(release)
-      try {
-        await lpClient.release(signedRelease)
-      } catch (error) {
-        expect(error).to.throw
-      }
-    })
     it('rejects swap does not exist', async () => {
       let amount: string = '100'
       let providerIndex: string = '1'
       await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
       const swapData = getDefaultSwap()
       const swap = userClient.requestSwap(swapData, outChain)
-      const request = await swap.signForRequest()
+      const request = await swap.signForRequest(testnetMode)
       const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature(testnetMode)
       await lpClient.lock(signedRequest)
-      const swapData2 = getDefaultSwap({ inToken:10})
+      const swapData2 = getDefaultSwap({ inToken: 10 })
       const swap2 = userClient.requestSwap(swapData2, outChain)
-      const release = await swap2.signForRelease(swapData2.recipient)
+      const release = await swap2.signForRelease(swapData2.recipient, testnetMode)
       const signedRelease = new SignedSwapRelease(release)
       try {
         await lpClient.release(signedRelease)
       } catch (error) {
-        expect(error).to.throw
+
+        expect(error).to.match(/Swap does not exist/)
       }
     })
     it('accepts the depoit if all parameters are correct', async () => {
@@ -301,12 +279,12 @@ describe('MesonClient', () => {
 
       const swapData = getDefaultSwap()
       const swap = userClient.requestSwap(swapData, outChain)
-      const request = await swap.signForRequest()
-
+      const request = await swap.signForRequest(testnetMode)
       const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature(testnetMode)
       await lpClient.lock(signedRequest)
 
-      const release = await swap.signForRelease(swapData.recipient)
+      const release = await swap.signForRelease(swapData.recipient, testnetMode)
       const signedRelease = new SignedSwapRelease(release)
       await lpClient.release(signedRelease)
 
@@ -322,18 +300,19 @@ describe('MesonClient', () => {
       try {
         await mesonInstance.withdraw(amount, providerIndex)
       } catch (error) {
-        expect(error).to.throw
+
+        expect(error).to.match(/Caller not registered/)
       }
     })
-    it('rejects if amount overflow', async () => {
+    it('rejects if value overflow', async () => {
       let amount: string = '1000'
-      let amount2: string = '1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+      let amount2: string = '10000000000000000000000000000000000000000000000000'
       let providerIndex: string = '1'
       await lpClient.depositAndRegister(lpClient.token(1), amount, providerIndex)
       try {
         await mesonInstance.withdraw(amount2, 1)
       } catch (error) {
-        expect(error).to.throw
+        expect(error).to.match(/reverted with panic code 0x11/)
       }
     })
     it('accepts the depoit if all parameters are correct', async () => {
@@ -355,7 +334,7 @@ describe('MesonClient', () => {
       try {
         await userClient.requestSwap(getDefaultSwap(), outChain)
       } catch (error) {
-        expect(error).to.throw
+        expect(error).to.match(/No swap signer assigned/)
       }
     })
     it('accepts return SwapWithSigner', async () => {
@@ -378,12 +357,13 @@ describe('MesonClient', () => {
     it('rejects  call depositAndRegister first.', async () => {
       const swapData = getDefaultSwap()
       const swap = userClient.requestSwap(swapData, outChain)
-      const request = await swap.signForRequest()
+      const request = await swap.signForRequest(testnetMode)
       const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature(testnetMode)
       try {
         await userClient.postSwap(signedRequest)
       } catch (error) {
-        expect(error).to.throw
+        expect(error).to.match(/call depositAndRegister first/)
       }
     })
     it('accepts the postSwap if all parameters are correct', async () => {
@@ -392,22 +372,23 @@ describe('MesonClient', () => {
       ]))
       token = result.token1.connect(initiator)
       mesonInstance = result.swap // default account is signer
-    
+
       userClient = await MesonClient.Create(mesonInstance, new EthersWalletSwapSigner(initiator)) // user is default account
       lpClient = await MesonClient.Create(mesonInstance.connect(provider))
-  
+
       await lpClient.mesonInstance.register(1)
       const swap = userClient.requestSwap(getDefaultSwap({ fee: '0' }), outChain)
-      const request = await swap.signForRequest()
-
+      const request = await swap.signForRequest(testnetMode)
       const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature(testnetMode)
+
+
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
       expect(posted.initiator).to.equal(initiator.address)
       expect(posted.provider).to.equal(provider.address)
-      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
     })
   })
 
@@ -418,19 +399,19 @@ describe('MesonClient', () => {
       ]))
       token = result.token1.connect(initiator)
       mesonInstance = result.swap // default account is signer
-    
+
       userClient = await MesonClient.Create(mesonInstance, new EthersWalletSwapSigner(initiator)) // user is default account
       lpClient = await MesonClient.Create(mesonInstance.connect(provider))
-  
+
       await lpClient.mesonInstance.register(1)
       const swap = userClient.requestSwap(getDefaultSwap({ fee: '0' }), outChain)
-      const request = await swap.signForRequest()
-
+      const request = await swap.signForRequest(testnetMode)
       const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature(testnetMode)
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
-  
-      const posted = await mesonInstance.getPostedSwap(swap.encoded+'bad')
+
+      const posted = await mesonInstance.getPostedSwap(swap.encoded + 'bad')
       expect(posted.initiator).to.equal('0x0000000000000000000000000000000000000000')
       expect(posted.provider).to.equal('0x0000000000000000000000000000000000000000')
     })
@@ -440,22 +421,21 @@ describe('MesonClient', () => {
       ]))
       token = result.token1.connect(initiator)
       mesonInstance = result.swap // default account is signer
-    
+
       userClient = await MesonClient.Create(mesonInstance, new EthersWalletSwapSigner(initiator)) // user is default account
       lpClient = await MesonClient.Create(mesonInstance.connect(provider))
-  
+
       await lpClient.mesonInstance.register(1)
       const swap = userClient.requestSwap(getDefaultSwap({ fee: '0' }), outChain)
-      const request = await swap.signForRequest()
-
+      const request = await swap.signForRequest(testnetMode)
       const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature(testnetMode)
       await token.approve(mesonInstance.address, swap.amount)
       await lpClient.postSwap(signedRequest)
 
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
       expect(posted.initiator).to.equal(initiator.address)
       expect(posted.provider).to.equal(provider.address)
-      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(swap.amount))
     })
   })
 
