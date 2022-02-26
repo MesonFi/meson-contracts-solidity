@@ -9,10 +9,7 @@ describe('SwapSigner', () => {
   let encodedSwap: string = ''
   let recipient: string = ''
 
-  const fixture = async () => {
-  }
-
-  beforeEach('deploy MesonStatesTest', async () => {
+  beforeEach('create SwapSigner', async () => {
   })
   
   describe('#getAddress', () => {
@@ -34,36 +31,33 @@ describe('SwapSigner', () => {
   })
 
   describe('#SwapSigner.hashRequest', () => {
-    it('hashes swap request for testnet', async () => {
+    it('hashes a swap request for testnet', async () => {
       SwapSigner.hashRequest(encodedSwap, true)
     })
 
-    it('hashes swap request for mainnet', async () => {
+    it('hashes a swap request for mainnet', async () => {
       SwapSigner.hashRequest(encodedSwap, false)
     })
   })
 
   describe('#SwapSigner.hashRelease', () => {
-    it('hashes swap release for testnet', async () => {
+    it('hashes a swap release for testnet', async () => {
       SwapSigner.hashRelease(encodedSwap, recipient, true)
     })
 
-    it('hashes swap release for mainnet', async () => {
+    it('hashes a swap release for mainnet', async () => {
       SwapSigner.hashRelease(encodedSwap, recipient, false)
     })
   })
 })
 
 
-describe('RemoteSwapSigner', () => {
+describe('EthersWalletSwapSigner', () => {
   let swapSigner: EthersWalletSwapSigner
   let encodedSwap: string = ''
   let recipient: string = ''
 
-  const fixture = async () => {
-  }
-
-  beforeEach('deploy MesonStatesTest', async () => {
+  beforeEach('create EthersWalletSwapSigner', async () => {
   })
   
   describe('#getAddress', () => {
@@ -92,15 +86,13 @@ describe('RemoteSwapSigner', () => {
 })
 
 
-describe('EthersWalletSwapSigner', () => {
+describe('RemoteSwapSigner', () => {
   let swapSigner: RemoteSwapSigner
   let encodedSwap: string = ''
   let recipient: string = ''
 
-  const fixture = async () => {
-  }
 
-  beforeEach('deploy MesonStatesTest', async () => {
+  beforeEach('create RemoteSwapSigner', async () => {
   })
   
   describe('#getAddress', () => {
