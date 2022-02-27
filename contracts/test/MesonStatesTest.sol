@@ -37,24 +37,24 @@ contract MesonStatesTest is MesonStates {
     uint256 feeToMeson,
     uint32 salt,
     uint256 expireTs,
-    uint16 inChain,
+    bytes2 inChain,
     uint8 inTokenIndex,
-    uint16 outChain,
+    bytes2 outChain,
     uint8 outTokenIndex,
-    uint48 balanceIndexForMeson,
-    uint48 outTokenBalanceIndex
+    bytes6 balanceIndexForMeson,
+    bytes6 outTokenBalanceIndex
   ) {
     amount = _amountFrom(encodedSwap);
     fee = _feeFrom(encodedSwap);
     feeToMeson = _feeToMesonFrom(encodedSwap);
     salt = _saltFrom(encodedSwap);
     expireTs = _expireTsFrom(encodedSwap);
-    inChain = _inChainFrom(encodedSwap);
+    inChain = bytes2(_inChainFrom(encodedSwap));
     inTokenIndex = _inTokenIndexFrom(encodedSwap);
-    outChain = _outChainFrom(encodedSwap);
+    outChain = bytes2(_outChainFrom(encodedSwap));
     outTokenIndex = _outTokenIndexFrom(encodedSwap);
-    balanceIndexForMeson = _balanceIndexForMesonFrom(encodedSwap);
-    outTokenBalanceIndex = _outTokenBalanceIndexFrom(encodedSwap, providerIndex);
+    balanceIndexForMeson = bytes6(_balanceIndexForMesonFrom(encodedSwap));
+    outTokenBalanceIndex = bytes6(_outTokenBalanceIndexFrom(encodedSwap, providerIndex));
   }
 
   function decodePostedSwap(uint200 postedSwap) external pure returns (
@@ -79,8 +79,8 @@ contract MesonStatesTest is MesonStates {
     until = _untilFromLocked(lockedSwap);
   }
 
-  function balanceIndexFrom(uint8 tokenIndex, uint40 providerIndex) external pure returns (uint48) {
-    return _balanceIndexFrom(tokenIndex, providerIndex);
+  function balanceIndexFrom(uint8 tokenIndex, uint40 providerIndex) external pure returns (bytes6) {
+    return bytes6(_balanceIndexFrom(tokenIndex, providerIndex));
   }
 
   function decodeBalanceIndex(uint48 balanceIndex) external pure returns (

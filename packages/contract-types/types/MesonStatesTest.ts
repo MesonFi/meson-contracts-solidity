@@ -230,7 +230,7 @@ export interface MesonStatesTest extends BaseContract {
       tokenIndex: BigNumberish,
       providerIndex: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[number]>;
+    ): Promise<[string]>;
 
     balanceOf(
       token: string,
@@ -291,24 +291,24 @@ export interface MesonStatesTest extends BaseContract {
         BigNumber,
         number,
         BigNumber,
+        string,
         number,
+        string,
         number,
-        number,
-        number,
-        number,
-        number
+        string,
+        string
       ] & {
         amount: BigNumber;
         fee: BigNumber;
         feeToMeson: BigNumber;
         salt: number;
         expireTs: BigNumber;
-        inChain: number;
+        inChain: string;
         inTokenIndex: number;
-        outChain: number;
+        outChain: string;
         outTokenIndex: number;
-        balanceIndexForMeson: number;
-        outTokenBalanceIndex: number;
+        balanceIndexForMeson: string;
+        outTokenBalanceIndex: string;
       }
     >;
 
@@ -367,7 +367,7 @@ export interface MesonStatesTest extends BaseContract {
     tokenIndex: BigNumberish,
     providerIndex: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<number>;
+  ): Promise<string>;
 
   balanceOf(
     token: string,
@@ -426,24 +426,24 @@ export interface MesonStatesTest extends BaseContract {
       BigNumber,
       number,
       BigNumber,
+      string,
       number,
+      string,
       number,
-      number,
-      number,
-      number,
-      number
+      string,
+      string
     ] & {
       amount: BigNumber;
       fee: BigNumber;
       feeToMeson: BigNumber;
       salt: number;
       expireTs: BigNumber;
-      inChain: number;
+      inChain: string;
       inTokenIndex: number;
-      outChain: number;
+      outChain: string;
       outTokenIndex: number;
-      balanceIndexForMeson: number;
-      outTokenBalanceIndex: number;
+      balanceIndexForMeson: string;
+      outTokenBalanceIndex: string;
     }
   >;
 
@@ -500,7 +500,7 @@ export interface MesonStatesTest extends BaseContract {
       tokenIndex: BigNumberish,
       providerIndex: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<number>;
+    ): Promise<string>;
 
     balanceOf(
       token: string,
@@ -561,24 +561,24 @@ export interface MesonStatesTest extends BaseContract {
         BigNumber,
         number,
         BigNumber,
+        string,
         number,
+        string,
         number,
-        number,
-        number,
-        number,
-        number
+        string,
+        string
       ] & {
         amount: BigNumber;
         fee: BigNumber;
         feeToMeson: BigNumber;
         salt: number;
         expireTs: BigNumber;
-        inChain: number;
+        inChain: string;
         inTokenIndex: number;
-        outChain: number;
+        outChain: string;
         outTokenIndex: number;
-        balanceIndexForMeson: number;
-        outTokenBalanceIndex: number;
+        balanceIndexForMeson: string;
+        outTokenBalanceIndex: string;
       }
     >;
 
