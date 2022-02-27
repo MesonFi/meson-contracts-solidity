@@ -6,10 +6,10 @@ import {
   SignedSwapRelease,
 } from '@mesonfi/sdk/src'
 import { MockToken, MesonPoolsTest } from '@mesonfi/contract-types'
-import { expect } from '../shared/expect'
-import { initiator, provider } from '../shared/wallet'
-import { fixtures, TOKEN_BALANCE, TOKEN_TOTAL_SUPPLY } from '../shared/fixtures'
-import { getDefaultSwap } from '../shared/meson'
+import { expect } from 'chai'
+import { initiator, provider } from './shared/wallet'
+import { fixtures, TOKEN_BALANCE, TOKEN_TOTAL_SUPPLY } from './shared/fixtures'
+import { getDefaultSwap } from './shared/meson'
 
 describe('MesonClient', () => {
   let token: MockToken

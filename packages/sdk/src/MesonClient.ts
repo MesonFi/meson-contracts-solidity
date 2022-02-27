@@ -171,11 +171,11 @@ export class MesonClient {
     )
   }
 
-  async cancelSwap(swapId: string, signer?: Wallet) {
+  async cancelSwap(encodedSwap: string, signer?: Wallet) {
     if (signer) {
-      return await this.mesonInstance.connect(signer).cancelSwap(swapId)
+      return await this.mesonInstance.connect(signer).cancelSwap(encodedSwap)
     }
-    return await this.mesonInstance.cancelSwap(swapId)
+    return await this.mesonInstance.cancelSwap(encodedSwap)
   }
 
   async isSwapPosted(encoded: string | BigNumber) {
