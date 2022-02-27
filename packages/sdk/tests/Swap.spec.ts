@@ -1,13 +1,14 @@
+import { expect } from 'chai'
+
 import {
   Swap,
 } from '../src'
-import { expect } from 'chai'
 import { getDefaultSwap } from './shared'
 
 describe('Swap', () => {
   describe('#constructor', () => {
     it('rejects missing amount', async () => {
-      expect(new Swap(getDefaultSwap({ amount: '' }))).to.throw(/Missing amount/)
+      expect(() => new Swap(getDefaultSwap({ amount: '' }))).to.throw(/Missing amount/)
     })
     it('rejects missing expireTs', async () => {
       try {

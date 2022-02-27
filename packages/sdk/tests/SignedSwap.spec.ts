@@ -1,9 +1,10 @@
+import { expect } from 'chai'
+
 import {
   MesonClient,
   SignedSwapRequest,
   SignedSwapRelease,
 } from '../src'
-import { expect } from 'chai'
 import { getDefaultSwap } from './shared'
 
 describe('SignedSwapRequest', () => {

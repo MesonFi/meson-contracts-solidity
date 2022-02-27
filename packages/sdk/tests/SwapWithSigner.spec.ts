@@ -1,7 +1,8 @@
+import { expect } from 'chai'
+
 import {
   SwapWithSigner,
 } from '../src'
-import { expect } from 'chai'
 
 describe('SwapWithSigner', () => {
   let swapWithSigner: SwapWithSigner
