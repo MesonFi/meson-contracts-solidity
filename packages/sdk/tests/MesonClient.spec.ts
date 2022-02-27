@@ -1,6 +1,9 @@
-import { expect } from 'chai'
+import chai, { expect } from 'chai'
+import chaiAsPromised from 'chai-as-promised'
 
-import { Contract } from '@ethersproject/contracts'
+import { MockProvider } from 'ethereum-waffle';
+import { Wallet } from '@ethersproject/wallet'
+import { ContractFactory } from '@ethersproject/contracts'
 import { AddressZero } from '@ethersproject/constants'
 import { Meson } from '@mesonfi/contract-types'
 import { Meson as MesonAbi } from '@mesonfi/contract-abis'
@@ -8,24 +11,37 @@ import { Meson as MesonAbi } from '@mesonfi/contract-abis'
 import {
   MesonClient,
   EthersWalletSwapSigner,
-  SignedSwapRequest,
-  SignedSwapRelease,
+  SwapWithSigner,
 } from '../src'
 
 import { getDefaultSwap } from './shared'
 
+const outChain = '0x1234'
+const token = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
+const unsupported = AddressZero
+
+chai.use(chaiAsPromised)
+
 describe('MesonClient', () => {
+  let initiator: Wallet
+  let provider: Wallet
+  let swapSigner: EthersWalletSwapSigner
   let mesonInstance: Meson
   let mesonClient: MesonClient
 
-  beforeEach('deploy MesonPoolsTest', async () => {
-    mesonInstance = new Contract(AddressZero, MesonAbi.abi) as Meson
-    mesonClient = new MesonClient(mesonInstance, '0')
+  beforeEach('deploy Meson contract', async () => {
+    const wallets = new MockProvider().getWallets()
+    initiator = wallets[1]
+    provider = wallets[2]
+    swapSigner = new EthersWalletSwapSigner(initiator)
+    const mesonFactory = new ContractFactory(MesonAbi.abi, MesonAbi.bytecode, wallets[0])
+    mesonInstance = await mesonFactory.deploy([token]) as Meson
+    mesonClient = await MesonClient.Create(mesonInstance)
   })
 
-  describe('#MesonClient.Create', () => {
-    it('returns an MesonClient instance with shortCoinType', () => {
-      // expect(mesonClient.shortCoinType).to.equal()
+  describe('#shortCoinType', () => {
+    it('returns the shortCoinType', () => {
+      expect(mesonClient.shortCoinType).to.equal('0x003c')
     })
   })
 
@@ -35,34 +51,44 @@ describe('MesonClient', () => {
       expect(() => mesonClient.token(0)).to.throw('Token index cannot be zero')
     })
     it('returns token for an in-range index', () => {
-      
+      expect(mesonClient.token(1)).to.equal(token)
     })
     it('returns undefined for out-of-range index', () => {
-
+      expect(mesonClient.token(2)).to.equal('')
     })
   })
 
   describe('#requestSwap', () => {
     it('rejects if swap signer is not set', () => {
-
+      expect(() => mesonClient.requestSwap(getDefaultSwap(), outChain))
+        .to.throw('No swap signer assigned')
     })
     it('returns a SwapWithSigner if swap signer is set', () => {
-      
+      mesonClient.setSwapSigner(swapSigner)
+      const swap = mesonClient.requestSwap(getDefaultSwap(), outChain)
+      expect(swap).to.be.an.instanceof(SwapWithSigner)
     })
   })
 
   describe('#depositAndRegister', () => {
-    it('rejects negative amount', async () => {
+    it('rejects unsupported token', async () => {
+      await expect(mesonClient.depositAndRegister(unsupported, '1', '1'))
+        .to.be.rejectedWith('Token not supported')
     })
   })
 
   describe('#deposit', () => {
-    it('rejects negative  amount', async () => {
+    it('rejects unsupported token', async () => {
+      await expect(mesonClient.deposit(unsupported, '1'))
+        .to.be.rejectedWith('Token not supported')
     })
   })
 
   describe('#postSwap', () => {
-    it('rejects negative  amount', async () => {
+    it('rejects unregistered provider', async () => {
+      const signedRequest = {}
+      await expect(mesonClient.postSwap(signedRequest))
+        .to.be.rejectedWith(/not registered/)
     })
   })
 
@@ -92,7 +118,9 @@ describe('MesonClient', () => {
   })
 
   describe('#getPostedSwap', () => {
-    it('rejects Caller not registered', async () => {
+    it('rejects invalid encoded', async () => {
+      await expect(mesonClient.getPostedSwap(''))
+        .to.be.rejectedWith(/Invalid encoded\./)
     })
   })
 

@@ -5,7 +5,7 @@ export function getDefaultSwap({
   outToken = 1,
   amount = '100',
   fee = '10'
-}): PartialSwapData {
+} = {}): PartialSwapData {
   return {
     amount,
     salt: Math.floor(Math.random() * 10000),
