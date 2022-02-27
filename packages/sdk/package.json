@@ -29,6 +29,8 @@
     "@mesonfi/contract-types": "^0.4.3"
   },
   "devDependencies": {
+    "@ethersproject/contracts": "5.5.0",
+    "@mesonfi/contract-abis": "^0.4.3",
     "@types/chai": "^4.3.0",
     "@types/mocha": "^9.1.0",
     "chai": "^4.3.6",
