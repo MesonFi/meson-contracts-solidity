@@ -56,7 +56,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint40 providerIndex = indexOfAddress[provider];
     require(providerIndex != 0, 'Caller not registered. Call depositAndRegister');
 
-    _tokenBalanceOf[_balanceIndexFromTokenIndex(tokenIndex, providerIndex)] -= amount;
+    _tokenBalanceOf[_balanceIndexFrom(tokenIndex, providerIndex)] -= amount;
     _safeTransfer(_tokenList[tokenIndex], provider, amount);
   }
 
