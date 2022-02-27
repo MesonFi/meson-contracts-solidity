@@ -19,10 +19,10 @@ export function getSwap({
   amount = '100',
   fee = '1',
   expireTs = Math.floor(Date.now() / 1000) + 5400,
-  inChain = '0x0000',
-  inToken = 1,
-  outChain = '0x0001',
-  outToken = 1,
+  inChain = '0x0001',
+  inToken = 2,
+  outChain = '0x0002',
+  outToken = 3,
 } = {}): SwapData {
   return {
     amount,
