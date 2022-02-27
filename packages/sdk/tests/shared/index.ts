@@ -2,7 +2,7 @@ import { PartialSwapData, SwapData } from '../..'
 
 export function getPartialSwap({
   amount = '100',
-  fee = '10',
+  fee = '1',
   inToken = 1,
   outToken = 1,
 } = {}): PartialSwapData {
@@ -17,7 +17,7 @@ export function getPartialSwap({
 
 export function getSwap({
   amount = '100',
-  fee = '10',
+  fee = '1',
   expireTs = Math.floor(Date.now() / 1000) + 5400,
   inChain = '0x0000',
   inToken = 1,
