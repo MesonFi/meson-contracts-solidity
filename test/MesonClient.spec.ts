@@ -4,9 +4,10 @@ import {
   EthersWalletSwapSigner,
   SignedSwapRequest,
   SignedSwapRelease,
-} from '@mesonfi/sdk/src'
+} from '@mesonfi/sdk'
 import { MockToken, MesonPoolsTest } from '@mesonfi/contract-types'
-import { expect } from 'chai'
+
+import { expect } from './shared/expect'
 import { initiator, provider } from './shared/wallet'
 import { fixtures, TOKEN_BALANCE, TOKEN_TOTAL_SUPPLY } from './shared/fixtures'
 import { getDefaultSwap } from './shared/meson'
@@ -18,8 +19,8 @@ describe('MesonClient', () => {
   let userClient: MesonClient
   let lpClient: MesonClient
   const testnetMode = true
-  beforeEach('deploy MesonPoolsTest', async () => {
 
+  beforeEach('deploy MesonPoolsTest', async () => {
     const result = await waffle.loadFixture(() => fixtures([
       initiator.address, provider.address
     ]))
@@ -123,6 +124,7 @@ describe('MesonClient', () => {
       expect(await token.balanceOf(mesonInstance.address)).to.equal(1000)
     })
   })
+  
   describe('#deposit', () => {
     it('rejects negative  amount', async () => {
       let amount: string = '100'

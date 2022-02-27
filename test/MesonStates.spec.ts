@@ -7,16 +7,16 @@ import {
   SwapWithSigner,
 } from '@mesonfi/sdk'
 import { MesonStatesTest } from '@mesonfi/contract-types'
+import { AddressZero } from '@ethersproject/constants'
 
 import { expect } from './shared/expect'
-import { wallet } from './shared/wallet'
+import { initiator } from './shared/wallet'
 import { getDefaultSwap } from './shared/meson'
 
-const testnetMode = true
-
-describe('MesonStates', () => {
+describe('MesonSwap', () => {
+  const testnetMode = true
+  const OtherAddress = '0x7F342A0D04B951e8600dA1eAdD46afe614DaC20B'
   let mesonInstance: MesonStatesTest
-  let mesonClient: MesonClient
   let swapData: PartialSwapData
   let swap: SwapWithSigner
 
@@ -27,69 +27,110 @@ describe('MesonStates', () => {
 
   beforeEach('deploy MesonStatesTest', async () => {
     mesonInstance = await waffle.loadFixture(fixture)
-    const outChain = await mesonInstance.getShortCoinType()
-    mesonClient = await MesonClient.Create(mesonInstance as any, new EthersWalletSwapSigner(wallet))
+    const swapSigner = new EthersWalletSwapSigner(initiator)
+    const mesonClient = await MesonClient.Create(mesonInstance as any, swapSigner)
     swapData = getDefaultSwap({ inToken: 2, outToken: 3 })
-    swap = mesonClient.requestSwap(swapData, outChain)
+    swap = mesonClient.requestSwap(swapData, '0x1234')
+  })
+
+  describe('#addSupportToken', () => {
+    it('rejects zero index', async () => {
+      await expect(mesonInstance.addSupportToken(OtherAddress, 0))
+        .to.revertedWith('Cannot use 0 as token index')
+    })
+    it('accepts non-zero index', async () => {
+      await mesonInstance.addSupportToken(OtherAddress, 1)
+    })
+  })
+
+  describe('#tokenForIndex', () => {
+    it('returns the token address by index', async () => {
+      await mesonInstance.addSupportToken(OtherAddress, 1)
+      expect(await mesonInstance.tokenForIndex(0)).to.equal(AddressZero)
+      expect(await mesonInstance.tokenForIndex(1)).to.equal(OtherAddress)
+      expect(await mesonInstance.tokenForIndex(2)).to.equal(AddressZero)
+    })
+  })
+
+  describe('#indexOfToken', () => {
+    it('returns the token index by address', async () => {
+      await mesonInstance.addSupportToken(OtherAddress, 1)
+      expect(await mesonInstance.indexOfToken(AddressZero)).to.equal(0)
+      expect(await mesonInstance.indexOfToken(OtherAddress)).to.equal(1)
+    })
+  })
+
+  describe('#supportedTokens', () => {
+    it('returns the array of supported tokens', async () => {
+      await mesonInstance.addSupportToken(OtherAddress, 1)
+      await mesonInstance.addSupportToken(OtherAddress, 2)
+      expect(await mesonInstance.supportedTokens()).to.deep.equal([OtherAddress, OtherAddress])
+    })
+  })
+
+  describe('#getShortCoinType', () => {
+    it('returns the short coin type', async () => {
+      expect(await mesonInstance.getShortCoinType()).to.equal('0x003c')
+    })
   })
 
   describe('#encodeSwap', () => {
-    it('returns same result as js function', async () => {
-      const encodedSwapFromContract = await mesonInstance.encodeSwap(
-        swap.amount,
-        swap.salt,
-        swap.fee,
-        swap.expireTs,
-        swap.outChain,
-        swap.outToken,
-        swap.inChain,
-        swap.inToken
-      )
-
-      expect(encodedSwapFromContract).to.equal(swap.encoded)
+    it('', async () => {
     })
   })
 
   describe('#decodeSwap', () => {
-    it('returns decoded swap data', async () => {
-      const decoded = await mesonInstance.decodeSwap(swap.encoded)
-      expect(decoded[0]).to.equal(swap.amount)
-      expect(decoded[1]).to.equal(swap.salt)
-      expect(decoded[2]).to.equal(swap.expireTs)
-      expect(decoded[3]).to.equal(swap.outChain)
-      expect(decoded[4]).to.equal(swap.outToken)
-      expect(decoded[5]).to.equal(swap.inChain)
-      expect(decoded[6]).to.equal(swap.inToken)
+    it('', async () => {
     })
   })
 
-  describe('#Swap.decode', () => {
-    it('decodes a swap', async () => {
+  describe('#decodePostedSwap', () => {
+    it('', async () => {
+    })
+  })
 
-      
-      const swap2 = Swap.decode(swap.encoded)
-      expect(swap2.amount).to.equal(swap.amount)
-      expect(swap2.salt).to.equal(swap.salt)
-      expect(swap2.fee).to.equal(swap.fee)
-      expect(swap2.expireTs).to.equal(swap.expireTs)
-      expect(swap2.outChain).to.equal(swap.outChain)
-      expect(swap2.outToken).to.equal(swap.outToken)
-      expect(swap2.inChain).to.equal(swap.inChain)
-      expect(swap2.inToken).to.equal(swap.inToken)
+  describe('#lockedSwapFrom', () => {
+    it('', async () => {
+    })
+  })
+
+  describe('#decodeLockedSwap', () => {
+    it('', async () => {
+    })
+  })
+
+  describe('#balanceIndexFrom', () => {
+    it('', async () => {
+    })
+  })
+
+  describe('#decodeBalanceIndex', () => {
+    it('', async () => {
     })
   })
 
   describe('#checkRequestSignature', () => {
-    it('validates a request signature', async () => {
+
+    it('rejects invalid signature"', async () => {
       const sigs = (await swap.signForRequest(testnetMode)).signature
-      await mesonInstance.checkRequestSignature(swap.encoded, ...sigs, wallet.address)
+      await expect(mesonInstance.checkRequestSignature(swap.encoded, ...sigs, OtherAddress))
+        .to.revertedWith('Invalid signature')
+    })
+    it('accepts a valid signature', async () => {
+      const sigs = (await swap.signForRequest(testnetMode)).signature
+      await mesonInstance.checkRequestSignature(swap.encoded, ...sigs, initiator.address)
     })
   })
 
   describe('#checkReleaseSignature', () => {
-    it('validates a release signature', async () => {
+    it('accepts validates a release signature', async () => {
       const sigs = (await swap.signForRelease(swapData.recipient, testnetMode)).signature
-      await mesonInstance.checkReleaseSignature(swap.encoded, swapData.recipient, ...sigs, wallet.address)
+      await expect(mesonInstance.checkReleaseSignature(swap.encoded, swapData.recipient, ...sigs, OtherAddress))
+        .to.revertedWith('Invalid signature')
+    })
+    it('Invalid signature', async () => {
+      const sigs = (await swap.signForRelease(swapData.recipient, testnetMode)).signature
+      await mesonInstance.checkReleaseSignature(swap.encoded, swapData.recipient, ...sigs, initiator.address)
     })
   })
 })

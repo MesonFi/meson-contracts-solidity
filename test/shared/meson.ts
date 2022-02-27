@@ -5,6 +5,9 @@ type OptionalSwapData = {
   outToken?: number,
   amount?: string,
   fee?: string,
+  expireTs?: string,
+  inChain?:string
+  outChain?:string
 }
 
 export function getDefaultSwap({
