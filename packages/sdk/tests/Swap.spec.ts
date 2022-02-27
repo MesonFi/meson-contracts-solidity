@@ -1,124 +1,95 @@
 import { expect } from 'chai'
+import { BigNumber } from '@ethersproject/bignumber'
 
 import {
   Swap,
 } from '../src'
-import { getDefaultSwap } from './shared'
+import { getSwap } from './shared'
 
 describe('Swap', () => {
   describe('#constructor', () => {
-    it('rejects missing amount', async () => {
-      expect(() => new Swap(getDefaultSwap({ amount: '' }))).to.throw(/Missing amount/)
+    it('rejects if missing amount', () => {
+      expect(() => new Swap(getSwap({ amount: '' }))).to.throw('Missing amount')
     })
-    it('rejects missing expireTs', async () => {
-      try {
-        const swap2 = new Swap(getDefaultSwap({ expireTs: '' }))
-      } catch (error) {
-         
-        expect(error).to.match(/Missing expireTs/)
-      }
+    it('rejects Missing fee', () => {
+      expect(() => new Swap(getSwap({ fee: '' }))).to.throw('Missing fee')
     })
-    it('rejects Missing fee', async () => {
-      try {
-        const swap2 = new Swap(getDefaultSwap({ fee: '' }))
-      } catch (error) {
-      expect(error).to.match(/Missing fee/)
-      }
+    it('rejects if missing expireTs', () => {
+      expect(() => new Swap(getSwap({ expireTs: 0 }))).to.throw('Missing expireTs')
     })
-    it('rejects Missing inChain', async () => {
-      try {
-        const swap2 = new Swap({
-          inToken:1,
-          outToken:1,
-          amount : '1000',
-          fee: '0',
-          expireTs:100,
-          inChain:'',
-          outChain:'1'
-        })
-      } catch (error) {
-        expect(error).to.match(/Missing inChain/)
-      }
+    it('rejects if missing inChain', () => {
+      expect(() => new Swap(getSwap({ inChain: '' }))).to.throw('Missing inChain')
     })
-    it('rejects Missing outChain', async () => {
-      try {
-        const swap2 = new Swap({
-          inToken:1,
-          outToken:1,
-          amount : '1000',
-          fee: '0',
-          expireTs:100,
-          inChain:'1',
-          outChain:''
-        })
-      } catch (error) {
-         
-        expect(error).to.match(/Missing outChain/)
-      }
+    it('rejects if inToken is not a number', () => {
+      expect(() => new Swap(getSwap({ inToken: '' }))).to.throw('Invalid inToken')
     })
-    it('rejects Invalid outToken', async () => {
-      try {
-        const swap2 = new Swap({
-          inToken:1,
-          outToken:null,
-          amount : '1000',
-          fee: '0',
-          expireTs:100,
-          inChain:'1',
-          outChain:'1'
-        })
-      } catch (error) {
-         
-        expect(error).to.match(/Invalid outToken/)
-      }
+    it('rejects if missing outChain', () => {
+      expect(() => new Swap(getSwap({ outChain: '' }))).to.throw('Missing outChain')
+    })
+    it('rejects if outToken is not a number', () => {
+      expect(() => new Swap(getSwap({ outToken: '' }))).to.throw('Invalid outToken')
+    })
 
-    })
-    it('accepts the Swap if all parameters are correct', async () => {
-      const swapData = {
-        amount: '10',
-        salt: 10,
-        fee: '10',
-        expireTs: 12376874,
-        inChain: '0x0001',
-        inToken: 1,
-        outChain: '1',
-        outToken: 1,
-      }
-      const swap2 = new Swap(swapData)
-      expect(swap2.amount).to.equal(swapData.amount)
-      expect(swap2.salt).to.equal(swapData.salt)
-      expect(swap2.fee).to.equal(swapData.fee)
-      expect(swap2.expireTs).to.equal(swapData.expireTs)
-      expect(swap2.outChain).to.equal(swapData.outChain)
-      expect(swap2.outToken).to.equal(swapData.outToken)
-      expect(swap2.inChain).to.equal(swapData.inChain)
-      expect(swap2.inToken).to.equal(swapData.inToken)
+    it('creates a Swap if all parameters are correct', () => {
+      const swapData = getSwap()
+      const swap = new Swap(swapData)
+      expect(swap.amount).to.equal(swapData.amount)
+      expect(swap.salt).to.be.a('number')
+      expect(swap.fee).to.equal(swapData.fee)
+      expect(swap.expireTs).to.equal(swapData.expireTs)
+      expect(swap.inChain).to.equal(swapData.inChain)
+      expect(swap.inToken).to.equal(swapData.inToken)
+      expect(swap.outChain).to.equal(swapData.outChain)
+      expect(swap.outToken).to.equal(swapData.outToken)
     })
   })
 
   describe('#Swap.decode', () => {
-    it('encoded swap should be a hex string of length 66', async () => {
-      try {
-        const swap2 = Swap.decode('')
-      } catch (error) {
-        expect(error).to.match(/encoded swap should be a hex string of length 66/)
-      }
+    it('rejects invalid encoded', () => {
+      expect(() => Swap.decode('')).to.throw('encoded swap should be a hex string of length 66')
     })
-    it('accepts the Swap if all parameters are correct', async () => {
-      const swap2 = Swap.decode(swap.encoded)
-      expect(swap2.amount).to.equal(swap.amount)
-      expect(swap2.salt).to.equal(swap.salt)
-      expect(swap2.fee).to.equal(swap.fee)
-      expect(swap2.expireTs).to.equal(swap.expireTs)
-      expect(swap2.outChain).to.equal(swap.outChain)
-      expect(swap2.outToken).to.equal(swap.outToken)
-      expect(swap2.inChain).to.equal(swap.inChain)
-      expect(swap2.inToken).to.equal(swap.inToken)
+
+    const swapData = getSwap()
+    const swap = new Swap(swapData)
+    it('decodes the a valid hex string', () => {
+      const decodedSwap = Swap.decode(swap.encoded)
+      expect(decodedSwap.amount).to.equal(swap.amount)
+      expect(decodedSwap.salt).to.equal(swap.salt)
+      expect(decodedSwap.fee).to.equal(swap.fee)
+      expect(decodedSwap.expireTs).to.equal(swap.expireTs)
+      expect(decodedSwap.inChain).to.equal(swap.inChain)
+      expect(decodedSwap.inToken).to.equal(swap.inToken)
+      expect(decodedSwap.outChain).to.equal(swap.outChain)
+      expect(decodedSwap.outToken).to.equal(swap.outToken)
+    })
+
+    it('decodes the a valid BigNumber', () => {
+      const decodedSwap = Swap.decode(BigNumber.from(swap.encoded))
+      expect(decodedSwap.amount).to.equal(swap.amount)
+      expect(decodedSwap.salt).to.equal(swap.salt)
+      expect(decodedSwap.fee).to.equal(swap.fee)
+      expect(decodedSwap.expireTs).to.equal(swap.expireTs)
+      expect(decodedSwap.inChain).to.equal(swap.inChain)
+      expect(decodedSwap.inToken).to.equal(swap.inToken)
+      expect(decodedSwap.outChain).to.equal(swap.outChain)
+      expect(decodedSwap.outToken).to.equal(swap.outToken)
     })
   })
 
   describe('#toObject', () => {
-    it('exports the swap as an object', async () => {
+    const swapData = getSwap()
+    const swap = new Swap(swapData)
+    it('exports the swap as an object', () => {
+      const swapObject = swap.toObject()
+      expect(swapObject.encoded).to.equal(swap.encoded)
+      expect(swapObject.amount).to.equal(swap.amount)
+      expect(swapObject.salt).to.equal(swap.salt)
+      expect(swapObject.fee).to.equal(swap.fee)
+      expect(swapObject.expireTs).to.equal(swap.expireTs)
+      expect(swapObject.inChain).to.equal(swap.inChain)
+      expect(swapObject.inToken).to.equal(swap.inToken)
+      expect(swapObject.outChain).to.equal(swap.outChain)
+      expect(swapObject.outToken).to.equal(swap.outToken)
     })
   })
 })

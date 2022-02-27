@@ -14,7 +14,7 @@ import {
   SwapWithSigner,
 } from '../src'
 
-import { getDefaultSwap } from './shared'
+import { getPartialSwap } from './shared'
 
 const outChain = '0x1234'
 const token = '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211'
@@ -60,12 +60,12 @@ describe('MesonClient', () => {
 
   describe('#requestSwap', () => {
     it('rejects if swap signer is not set', () => {
-      expect(() => mesonClient.requestSwap(getDefaultSwap(), outChain))
+      expect(() => mesonClient.requestSwap(getPartialSwap(), outChain))
         .to.throw('No swap signer assigned')
     })
     it('returns a SwapWithSigner if swap signer is set', () => {
       mesonClient.setSwapSigner(swapSigner)
-      const swap = mesonClient.requestSwap(getDefaultSwap(), outChain)
+      const swap = mesonClient.requestSwap(getPartialSwap(), outChain)
       expect(swap).to.be.an.instanceof(SwapWithSigner)
     })
   })
