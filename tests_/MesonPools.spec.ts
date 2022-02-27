@@ -1,6 +1,6 @@
 const { ethers, upgrades, waffle } = require('hardhat')
 import { initiator, provider } from './shared/wallet'
-const { getDefaultSwap } = require('../test/shared/meson')
+import { getDefaultSwap } from './shared/meson'
 import {
   MesonClient,
   EthersWalletSwapSigner,
@@ -19,7 +19,7 @@ describe('MesonPools', () => {
   let outChain
   let swap
   let swapData
-
+  const testnetMode = true
   beforeEach('deploy MesonPoolsTest', async () => {
     const MockToken = await ethers.getContractFactory('MockToken')
     tokenContract = await MockToken.deploy('Mock Token Usdt', 'MUsdt', totalSupply)
@@ -34,8 +34,9 @@ describe('MesonPools', () => {
     userClient = await MesonClient.Create(mesonContract, new EthersWalletSwapSigner(initiator))
     outChain = await mesonContract.getShortCoinType()
     swap = userClient.requestSwap(getDefaultSwap(), outChain)
-    const request = await swap.signForRequest()
+    const request = await swap.signForRequest(testnetMode)
     signedRequest = new SignedSwapRequest(request)
+    signedRequest.checkSignature(testnetMode)
     swapData = getDefaultSwap()
   })
 
@@ -266,8 +267,9 @@ describe('MesonPools', () => {
     it('accepts the release if all parameters are correct ', async () => {
       await mesonContract.depositAndRegister(amount, balanceIndex)
       await mesonContract.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
-      const release = await swap.signForRelease(swapData.recipient)
+      const release = await swap.signForRelease(swapData.recipient, testnetMode)
       const signedRelease = new SignedSwapRelease(release)
+      signedRelease.checkSignature(testnetMode)
       await mesonContract.release(signedRelease.encoded, ...signedRelease.signature, signedRelease.recipient)
       expect(await tokenContract.balanceOf(swapData.recipient)).to.equal(amount);
       expect(await tokenContract.balanceOf(mesonContract.address)).to.equal(0);
@@ -295,4 +297,3 @@ describe('MesonPools', () => {
     })
   })
 })
- 
