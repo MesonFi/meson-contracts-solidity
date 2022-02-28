@@ -10,12 +10,12 @@ import { ERC20 as ERC20Abi, Meson as MesonAbi } from '@mesonfi/contract-abis'
 
 import {
   MesonClient,
+  PostedSwapStatus,
+  LockedSwapStatus,
   EthersWalletSwapSigner,
   SwapWithSigner,
   SignedSwapRequest,
   SignedSwapRelease,
-  PostedSwapStatus,
-  LockedSwapStatus,
 } from '../src'
 
 import { getPartialSwap } from './shared'
