@@ -160,20 +160,12 @@ describe('MesonPools', () => {
 
   describe('#lock', async () => {
     it('rejects if provider not registered', async () => {
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: '100' }), outChain)
-      const signedRequestData = await swap.signForRequest(true)
-      const signedRequest = new SignedSwapRequest(signedRequestData)
-
       await expect(mesonClientForProvider.lock(signedRequest))
         .to.be.revertedWith('Caller not registered. Call depositAndRegister.')
     })
     it('rejects if expireTs is soon', async () => {
       await token.approve(mesonInstance.address, 100)
       await mesonClientForProvider.depositAndRegister(token.address, '100', '1')
-
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: '100' }), outChain)
-      const signedRequestData = await swap.signForRequest(true)
-      const signedRequest = new SignedSwapRequest(signedRequestData)
 
       await ethers.provider.send('evm_increaseTime', [4200])
       await expect(mesonClientForProvider.lock(signedRequest))
@@ -184,24 +176,15 @@ describe('MesonPools', () => {
       await token.approve(mesonInstance.address, 99)
       await mesonClientForProvider.depositAndRegister(token.address, '99', '1')
 
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: '100' }), outChain)
-      const signedRequestData = await swap.signForRequest(true)
-      const signedRequest = new SignedSwapRequest(signedRequestData)
-      signedRequest.checkSignature(true)
-
       await expect(mesonClientForProvider.lock(signedRequest))
         .to.be.revertedWith('reverted with panic code 0x11')
     })
-    it('lockes a swap', async () => {
+    it('lockes a valid swap', async () => {
       await token.approve(mesonInstance.address, 200)
       await mesonClientForProvider.depositAndRegister(token.address, '200', '1')
 
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: '100' }), outChain)
-      const signedRequestData = await swap.signForRequest(true)
-      const signedRequest = new SignedSwapRequest(signedRequestData)
-      signedRequest.checkSignature(true)
-
       await mesonClientForProvider.lock(signedRequest)
+      
       expect(await mesonInstance.balanceOf(mesonClientForProvider.token(1), provider.address)).to.equal(100)
       const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded)
       expect(locked.status).to.equal(LockedSwapStatus.Locked)
@@ -212,46 +195,26 @@ describe('MesonPools', () => {
       await token.approve(mesonInstance.address, 200)
       await mesonClientForProvider.depositAndRegister(token.address, '200', '1')
 
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: '100' }), outChain)
-      const signedRequestData = await swap.signForRequest(true)
-      const signedRequest = new SignedSwapRequest(signedRequestData)
-      signedRequest.checkSignature(true)
-
       await mesonClientForProvider.lock(signedRequest)
-
       await expect(mesonClientForProvider.lock(signedRequest)).to.be.revertedWith('Swap already exists')
     })
   })
 
   describe('#unlock', async () => {
     it('rejects if swap does not exist', async () => {
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: '100' }), outChain)
-      const signedRequestData = await swap.signForRequest(true)
-      const signedRequest = new SignedSwapRequest(signedRequestData)
-
       await expect(mesonClientForProvider.unlock(signedRequest)).to.be.revertedWith('Swap does not exist')
     })
     it('rejects if swap is still in lock', async () => {
       await token.approve(mesonInstance.address, 200)
       await mesonClientForProvider.depositAndRegister(token.address, '200', '1')
 
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: '100' }), outChain)
-      const signedRequestData = await swap.signForRequest(true)
-      const signedRequest = new SignedSwapRequest(signedRequestData)
-      signedRequest.checkSignature(true)
-
       await mesonClientForProvider.lock(signedRequest)
 
       await expect(mesonClientForProvider.unlock(signedRequest)).to.be.revertedWith('Swap still in lock')
     })
-    it('unlocks a swap', async () => {
+    it('unlocks a valid swap', async () => {
       await token.approve(mesonInstance.address, 200)
       await mesonClientForProvider.depositAndRegister(token.address, '200', '1')
-
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: '100' }), outChain)
-      const signedRequestData = await swap.signForRequest(true)
-      const signedRequest = new SignedSwapRequest(signedRequestData)
-      signedRequest.checkSignature(true)
 
       await mesonClientForProvider.lock(signedRequest)
       await ethers.provider.send('evm_increaseTime', [1800])
@@ -269,27 +232,13 @@ describe('MesonPools', () => {
 
   describe('#release', async () => {
     it('rejects if swap does not exist', async () => {
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: '100' }), outChain)
-      const signedReleaseData = await swap.signForRelease(TestAddress, true)
-      const signedRelease = new SignedSwapRelease(signedReleaseData)
-
       await expect(mesonClientForProvider.release(signedRelease)).to.be.revertedWith('Swap does not exist')
     })
-    it('releases a swap', async () => {
+    it('releases a valid swap', async () => {
       await token.approve(mesonInstance.address, 200)
       await mesonClientForProvider.depositAndRegister(token.address, '200', '1')
 
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: '100' }), outChain)
-      const signedRequestData = await swap.signForRequest(true)
-      const signedRequest = new SignedSwapRequest(signedRequestData)
-      signedRequest.checkSignature(true)
-
       await mesonClientForProvider.lock(signedRequest)
-
-      const signedReleaseData = await swap.signForRelease(TestAddress, true)
-      const signedRelease = new SignedSwapRelease(signedReleaseData)
-      signedRelease.checkSignature(true)
-
       await mesonClientForProvider.release(signedRelease)
 
       expect(await token.balanceOf(TestAddress)).to.equal(100)
@@ -301,23 +250,14 @@ describe('MesonPools', () => {
   })
 
   describe('#getLockSwap', async () => {
-    // it('rejects Swap not for this chain', async () => {
-    //   let balanceIndex = 0x010000000001
-    //   let amount = 100
-    //   try {
-    //     await mesonContract.depositAndRegister(amount, balanceIndex)
-    //     await mesonContract.lock(signedRequest.encoded + '0', ...signedRequest.signature, signedRequest.initiator)
-    //   } catch (error) {
-    //     expect(error).to.throw
-    //   }
-    // })
-    // it('accepts the getLockSwap if all parameters are correct ', async () => {
-    //   let balanceIndex = 0x010000000001
-    //   let amount = 100
-    //   await mesonContract.depositAndRegister(amount, balanceIndex)
-    //   await mesonContract.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
-    //   const getLockedSwap = await mesonContract.getLockedSwap(signedRequest.encoded)
-    //   expect(signedRequest.initiator).to.equal(getLockedSwap.initiator.toLowerCase())
-    // })
+    it('returns the locked swap', async () => {
+      await token.approve(mesonInstance.address, 200)
+      await mesonClientForProvider.depositAndRegister(token.address, '200', '1')
+      await mesonClientForProvider.lock(signedRequest)
+
+      const locked = await mesonInstance.getLockedSwap(swap.encoded)
+      expect(locked.initiator).to.equal(initiator.address)
+      expect(locked.provider).to.equal(provider.address)
+    })
   })
 })
