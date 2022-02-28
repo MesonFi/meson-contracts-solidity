@@ -6,7 +6,7 @@ import {
   SignedSwapRequest,
   SignedSwapRelease,
 } from '@mesonfi/sdk'
-import { MockToken, MesonSwapTest } from '@mesonfi/contract-typs'
+import { MockToken, MesonSwapTest } from '@mesonfi/contract-types'
 import { pack } from '@ethersproject/solidity'
 import { AddressZero } from '@ethersproject/constants'
 
@@ -42,7 +42,7 @@ describe('MesonSwap', () => {
     mesonClientForInitiator = await MesonClient.Create(mesonInstance.connect(initiator), swapSigner) // user is default account
     mesonClientForProvider = await MesonClient.Create(mesonInstance.connect(provider))
     
-    await mesonClientForProvider.mesonInstance.register(1)
+    await mesonInstance.connect(provider).register(1)
 
     swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
     const signedRequestData = await swap.signForRequest(true)
