@@ -94,13 +94,57 @@ describe('MesonSwap', () => {
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
       expect(posted.initiator).to.equal(initiator.address)
       expect(posted.provider).to.equal(provider.address)
+      expect(posted.executed).to.equal(false)
+      
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(101))
+      expect(await token.balanceOf(mesonInstance.address)).to.equal(101)
     })
     it('rejects if swap already exists', async () => {
       await token.connect(initiator).approve(mesonInstance.address, 101)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await expect(mesonClientForProvider.postSwap(signedRequest)).to.be.revertedWith('Swap already exists')
+    })
+  })
+
+  describe('#bondSwap', () => {
+    it('', async () => {
+    })
+    it('', async () => {
+    })
+  })
+
+  describe('#cancelSwap', () => {
+    it('rejects if swap does not exist', async () => {
+      await expect(mesonClientForProvider.cancelSwap(swap.encoded)).to.be.revertedWith('x')
+    })
+    it('rejects if swap does not expire', async () => {
+      await token.connect(initiator).approve(mesonInstance.address, 101)
+      await mesonClientForProvider.postSwap(signedRequest)
+
+      await expect(mesonClientForProvider.cancelSwap(swap.encoded)).to.be.revertedWith('x')
+    })
+    it('rejects  Swap is still locked ', async () => {
+      const swapData = getDefaultSwap({ fee: '0' })
+      const swap = userClient.requestSwap(swapData, outChain)
+      const request = await swap.signForRequest(testnetMode)
+      const signedRequest = new SignedSwapRequest(request)
+      signedRequest.checkSignature(testnetMode)
+      await mesonContract.postSwap(
+        signedRequest.encoded,
+        signedRequest.signature[0],
+        signedRequest.signature[1],
+        signedRequest.signature[2],
+        pack(['address', 'uint40'], [
+          signedRequest.initiator,
+          '1'
+        ])
+      )
+      try {
+        await mesonContract.cancelSwap(signedRequest.encoded)
+      } catch (error) {
+        expect(error).to.match(/Swap is still locked/)
+      }
     })
   })
 
@@ -138,48 +182,15 @@ describe('MesonSwap', () => {
     })
   })
 
-  describe('#cancelSwap', () => {
-    it('accepts cancelSwap', async () => {
-      //How to cancelswap It takes 30 minutes to unlock and then cancel
-    })
-    it('rejects Swap does not exist ', async () => {
-      await mesonContract.postSwap(
-        signedRequest.encoded,
-        signedRequest.signature[0],
-        signedRequest.signature[1],
-        signedRequest.signature[2],
-        pack(['address', 'uint40'], [
-          signedRequest.initiator,
-          '1'
-        ])
-      )
-      try {
-        await mesonContract.cancelSwap(signedRequest.encoded + '1')
-      } catch (error) {
-        expect(error).to.match(/Swap does not exist/)
-      }
-    })
-    it('rejects  Swap is still locked ', async () => {
-      const swapData = getDefaultSwap({ fee: '0' })
-      const swap = userClient.requestSwap(swapData, outChain)
-      const request = await swap.signForRequest(testnetMode)
-      const signedRequest = new SignedSwapRequest(request)
-      signedRequest.checkSignature(testnetMode)
-      await mesonContract.postSwap(
-        signedRequest.encoded,
-        signedRequest.signature[0],
-        signedRequest.signature[1],
-        signedRequest.signature[2],
-        pack(['address', 'uint40'], [
-          signedRequest.initiator,
-          '1'
-        ])
-      )
-      try {
-        await mesonContract.cancelSwap(signedRequest.encoded)
-      } catch (error) {
-        expect(error).to.match(/Swap is still locked/)
-      }
+  describe('#getPostedSwap', () => {
+    it('returns the posted swap', async () => {
+      await token.connect(initiator).approve(mesonInstance.address, 101)
+      await mesonClientForProvider.postSwap(signedRequest)
+
+      const posted = await mesonInstance.getPostedSwap(swap.encoded)
+      expect(posted.initiator).to.equal(initiator.address)
+      expect(posted.provider).to.equal(provider.address)
+      expect(posted.executed).to.equal(false)
     })
   })
 })
