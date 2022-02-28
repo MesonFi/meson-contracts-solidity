@@ -1,21 +1,7 @@
 import { expect } from 'chai'
 
-import {
-  SignedSwapRequest,
-  SignedSwapRequestData,
-  SignedSwapRelease,
-  SignedSwapReleaseData,
-} from '../src'
-
-const signedSwapRequestData = {
-  encoded: '0x000000000000000000000064000003c1000000000a00620a4c3e000101000101',
-  initiator: '0x83bcD6A6a860EAac800A45BB1f4c30248e5Dc619',
-  signature: [
-    '0xc08846c00968ffbc5f8ed98432d043ac9a786816ee9b50daffa493b6560b1bf0',
-    '0x712a685a28b53faa636237b215f40b125ec6e33bd590894dc38203c3a75b2bed',
-    28
-  ],
-} as SignedSwapRequestData
+import { SignedSwapRequest, SignedSwapRelease } from '../src'
+import { signedSwapRequestData, signedSwapReleaseData } from './shared'
 
 describe('SignedSwapRequest', () => {
   const signedRequest = new SignedSwapRequest(signedSwapRequestData)
@@ -33,7 +19,7 @@ describe('SignedSwapRequest', () => {
       const cloned = { ...signedSwapRequestData, signature: undefined }
       expect(() => new SignedSwapRequest(cloned)).to.throw('Missing signature')
     })
-    it('creates a SignedSwapRequest', async () => {
+    it('creates a SignedSwapRequest', () => {
       const signedRequest = new SignedSwapRequest(signedSwapRequestData)
       expect(signedRequest.encoded).to.equal(signedSwapRequestData.encoded)
       expect(signedRequest.initiator).to.equal(signedSwapRequestData.initiator.toLowerCase())
@@ -42,18 +28,23 @@ describe('SignedSwapRequest', () => {
   })
 
   describe('#getDigest', () => {
-    it('generates digest for testnet & mainnet', async () => {
-      expect(signedRequest.getDigest(true)).to.equal('0xe51e4bc1c03aaa02b2482d3b4d688eb33f640cf7bae316c7f652e684e34a43b5')
-      expect(signedRequest.getDigest(false)).to.equal('0x71276bfb0b3f0beb0564997742671cee2fe5ab42e5dafbf749f402424e3e64ac')
+    it('generates digest for testnet & mainnet', () => {
+      expect(signedRequest.getDigest(true)).to.equal(signedSwapRequestData.digest)
+      expect(signedRequest.getDigest(false)).to.equal(signedSwapRequestData.mainnetDigest)
     })
   })
 
   describe('#checkSignature', () => {
-    it('validates the signature for mainnet', async () => {
-      expect(signedRequest.checkSignature(false)).to.be.undefined
+    it('validates the signature for testnet', () => {
+      expect(signedRequest.checkSignature(true)).to.be.undefined
     })
-    it('rejects the same signature for testnet', async () => {
-      expect(() => signedRequest.checkSignature(true)).to.throw('Invalid signature')
+    it('rejects the same signature for mainnet', () => {
+      expect(() => signedRequest.checkSignature(false)).to.throw('Invalid signature')
+    })
+    it('accepcts the mainnet signature for mainnet', () => {
+      const cloned = { ...signedSwapRequestData, signature: signedSwapRequestData.mainnetSignature }
+      const signedRequest = new SignedSwapRequest(cloned)
+      expect(signedRequest.checkSignature(false)).to.be.undefined
     })
   })
 
@@ -67,17 +58,6 @@ describe('SignedSwapRequest', () => {
   })
 })
 
-const signedSwapReleaseData = {
-  encoded: '0x0000000000000000000000c800000d28000000000a00620b5b0e000101000101',
-  initiator: '0x83bcd6a6a860eaac800a45bb1f4c30248e5dc619',
-  recipient: '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211',
-  signature: [
-    '0x171dd43bce19128b15f10c0aa4bddca8e4449a0c6bef5488e8208be4317f3bc9',
-    '0x7f2f55df42529cf26aa5738b11debc57954f993aaa9693b2453a6923f6e6ce04',
-    27
-  ],
-} as SignedSwapReleaseData
-
 describe('SignedSwapRelease', () => {
   const signedRelease = new SignedSwapRelease(signedSwapReleaseData)
   
@@ -86,7 +66,7 @@ describe('SignedSwapRelease', () => {
       const cloned = { ...signedSwapReleaseData, recipient: undefined }
       expect(() => new SignedSwapRelease(cloned)).to.throw('Missing recipient')
     })
-    it('creates a SignedSwapRelease', async () => {
+    it('creates a SignedSwapRelease', () => {
       const signedRelease = new SignedSwapRelease(signedSwapReleaseData)
       expect(signedRelease.encoded).to.equal(signedSwapReleaseData.encoded)
       expect(signedRelease.initiator).to.equal(signedSwapReleaseData.initiator.toLowerCase())
@@ -96,18 +76,23 @@ describe('SignedSwapRelease', () => {
   })
 
   describe('#getDigest', () => {
-    it('generates digest for testnet & mainnet', async () => {
-      expect(signedRelease.getDigest(true)).to.equal('0x64a7ae116eb51bb689d153b09516d8bc0e1e31c07328f3ce36d35d69f12895c7')
-      expect(signedRelease.getDigest(false)).to.equal('0xe23c3d0215db3cfb518cd355efcf9032491d4c83e94b5c5e76a74530c200a1a5')
+    it('generates digest for testnet & mainnet', () => {
+      expect(signedRelease.getDigest(true)).to.equal(signedSwapReleaseData.digest)
+      expect(signedRelease.getDigest(false)).to.equal(signedSwapReleaseData.mainnetDigest)
     })
   })
 
   describe('#checkSignature', () => {
-    it('validates the signature for mainnet', async () => {
-      expect(signedRelease.checkSignature(false)).to.be.undefined
+    it('validates the signature for testnet', () => {
+      expect(signedRelease.checkSignature(true)).to.be.undefined
     })
-    it('rejects the same signature for testnet', async () => {
-      expect(() => signedRelease.checkSignature(true)).to.throw('Invalid signature')
+    it('rejects the same signature for mainnet', () => {
+      expect(() => signedRelease.checkSignature(false)).to.throw('Invalid signature')
+    })
+    it('accepcts the mainnet signature for mainnet', () => {
+      const cloned = { ...signedSwapReleaseData, signature: signedSwapReleaseData.mainnetSignature }
+      const signedRelease = new SignedSwapRelease(cloned)
+      expect(signedRelease.checkSignature(false)).to.be.undefined
     })
   })
 

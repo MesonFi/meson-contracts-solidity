@@ -17,7 +17,6 @@ import {
   SignedSwapRequest,
   SignedSwapRelease,
 } from '../src'
-
 import { getPartialSwap } from './shared'
 
 const outChain = '0x003c'
@@ -108,7 +107,7 @@ describe('MesonClient', () => {
     })
   })
 
-  describe('#postSwap', async () => {
+  describe('#postSwap', () => {
     let signedRequest
 
     beforeEach('prepare for postSwap', async () => {
@@ -132,7 +131,7 @@ describe('MesonClient', () => {
     })
   })
 
-  describe('#lock', async () => {
+  describe('#lock', () => {
     let signedRequest
 
     beforeEach('prepare for lock', async () => {
@@ -149,7 +148,7 @@ describe('MesonClient', () => {
     })
   })
 
-  describe('#unlock', async () => {
+  describe('#unlock', () => {
     let signedRequest
 
     beforeEach('prepare for lock', async () => {
@@ -168,7 +167,7 @@ describe('MesonClient', () => {
     })
   })
 
-  describe('#release', async () => {
+  describe('#release', () => {
     let signedRequest
     let signedRelease
 

@@ -1,42 +1,47 @@
 import { expect } from 'chai'
+import { MockProvider } from 'ethereum-waffle'
 import { Wallet } from '@ethersproject/wallet'
-import { getSwap } from './shared'
-import { solidity, MockProvider } from 'ethereum-waffle';
-import {
-  SwapWithSigner,
-  EthersWalletSwapSigner
-} from '../src'
 
+import { SwapWithSigner, EthersWalletSwapSigner } from '../src'
+import { signedSwapRequestData, signedSwapReleaseData } from './shared'
 
 describe('SwapWithSigner', () => {
   let swapWithSigner: SwapWithSigner
   let initiator: Wallet
-  let recipient: Wallet
-  beforeEach('create SwapWithSigner', async () => {
+
+  beforeEach('create SwapWithSigner', () => {
     const wallets = new MockProvider().getWallets()
     initiator = wallets[1]
-    recipient = wallets[2]
     const swapSigner = new EthersWalletSwapSigner(initiator)
-    swapWithSigner = new SwapWithSigner(getSwap(), swapSigner)
+    const swap = SwapWithSigner.decode(signedSwapRequestData.encoded)
+    swapWithSigner = new SwapWithSigner(swap, swapSigner)
   })
 
   describe('#signForRequest', () => {
     it('signs a swap request for testnet', async () => {
-      expect(await (await swapWithSigner.signForRequest(true)).initiator).to.equal(initiator.address)
+      const signedSwapRequest = await swapWithSigner.signForRequest(true)
+      expect(signedSwapRequest.initiator).to.equal(initiator.address)
+      expect(signedSwapRequest.signature).to.deep.equal(signedSwapRequestData.signature)
     })
     it('signs a swap request for mainnet', async () => {
-      expect(await (await swapWithSigner.signForRequest(false)).initiator).to.equal(initiator.address)
+      const signedSwapRequest = await swapWithSigner.signForRequest(false)
+      expect(signedSwapRequest.initiator).to.equal(initiator.address)
+      expect(signedSwapRequest.signature).to.deep.equal(signedSwapRequestData.mainnetSignature)
     })
   })
 
   describe('#signForRelease', () => {
     it('signs a swap release for testnet', async () => {
-      expect((await swapWithSigner.signForRelease(recipient.address, true)).initiator).to.equal(initiator.address)
-      expect((await swapWithSigner.signForRelease(recipient.address, true)).recipient).to.equal(recipient.address)
+      const signedSwapRelease = await swapWithSigner.signForRelease(signedSwapReleaseData.recipient, true)
+      expect(signedSwapRelease.initiator).to.equal(initiator.address)
+      expect(signedSwapRelease.recipient).to.equal(signedSwapReleaseData.recipient)
+      expect(signedSwapRelease.signature).to.deep.equal(signedSwapReleaseData.signature)
     })
     it('signs a swap release for mainnet', async () => {
-      expect((await swapWithSigner.signForRelease(recipient.address, false)).initiator).to.equal(initiator.address)
-      expect((await swapWithSigner.signForRelease(recipient.address, false)).recipient).to.equal(recipient.address)
+      const signedSwapRelease = await swapWithSigner.signForRelease(signedSwapReleaseData.recipient, false)
+      expect(signedSwapRelease.initiator).to.equal(initiator.address)
+      expect(signedSwapRelease.recipient).to.equal(signedSwapReleaseData.recipient)
+      expect(signedSwapRelease.signature).to.deep.equal(signedSwapReleaseData.mainnetSignature)
     })
   })
 })
