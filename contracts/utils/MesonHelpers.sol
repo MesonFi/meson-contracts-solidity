@@ -136,8 +136,8 @@ contract MesonHelpers is MesonConfig {
     address signer
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
+    bytes32 typehash = REQUEST_TYPE_HASH;
     bytes32 digest;
-    bytes32 typeHash = SWAP_REQUEST_TYPE_HASH;
     assembly {
       mstore(0, encodedSwap)
       mstore(0x20, keccak256(0, 0x20))
@@ -156,8 +156,8 @@ contract MesonHelpers is MesonConfig {
     address signer
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
+    bytes32 typehash = RELEASE_TYPE_HASH;
     bytes32 digest;
-    bytes32 typeHash = SWAP_RELEASE_TYPE_HASH;
     assembly {
       mstore(0, encodedSwap)
       mstore(0x20, recipientHash)

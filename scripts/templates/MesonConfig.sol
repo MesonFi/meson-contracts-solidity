@@ -11,6 +11,9 @@ contract MesonConfig {
   uint256 constant MAX_BOND_TIME_PERIOD = 2 hours;
   uint256 constant LOCK_TIME_PERIOD = 20 minutes;
 
-  bytes32 constant SWAP_REQUEST_TYPE_HASH = CONFIG_SWAP_REQUEST_TYPE_HASH;
-  bytes32 constant SWAP_RELEASE_TYPE_HASH = CONFIG_SWAP_RELEASE_TYPE_HASH;
+  // keccak256("bytes32 Sign to request a swap on MesonCONFIG_TESTNET_MODE")
+  bytes32 constant REQUEST_TYPE_HASH = CONFIG_REQUEST_TYPE_HASH;
+  
+  // keccak256("bytes32 Sign to release a swap on MesonCONFIG_TESTNET_MODE" + "bytes32 Recipient hash")
+  bytes32 constant RELEASE_TYPE_HASH = CONFIG_REQUEST_TYPE_HASH;
 }
