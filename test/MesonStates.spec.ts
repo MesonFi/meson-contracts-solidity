@@ -6,11 +6,11 @@ import { AddressZero } from '@ethersproject/constants'
 
 import { expect } from './shared/expect'
 import { initiator } from './shared/wallet'
-import { getSwap } from './shared/meson'
+import { getSwap, TestAddress } from './shared/meson'
 
 describe('MesonStates', () => {
   const testnetMode = true
-  const TestAddress = '0x7F342A0D04B951e8600dA1eAdD46afe614DaC20B'
+  
   let mesonInstance: MesonStatesTest
   let swap: SwapWithSigner
 

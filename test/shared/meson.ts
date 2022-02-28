@@ -10,6 +10,8 @@ type OptionalSwapData = {
   outChain?:string
 }
 
+export const TestAddress = '0x7F342A0D04B951e8600dA1eAdD46afe614DaC20B'
+
 export function getPartialSwap({
   amount = '100',
   fee = '1',

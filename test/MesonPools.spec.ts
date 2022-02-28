@@ -9,15 +9,11 @@ import {
 } from '@mesonfi/sdk/src'
 import { MockToken, MesonPoolsTest } from '@mesonfi/contract-types'
 import { pack } from '@ethersproject/solidity'
-import { AddressZero } from '@ethersproject/constants'
 
 import { expect } from './shared/expect'
 import { initiator, provider } from './shared/wallet'
 import { fixtures, TOKEN_BALANCE, TOKEN_TOTAL_SUPPLY } from './shared/fixtures'
-import { getPartialSwap } from './shared/meson'
-
-const testnetMode = true
-const TestAddress = '0x7F342A0D04B951e8600dA1eAdD46afe614DaC20B'
+import { getPartialSwap, TestAddress } from './shared/meson'
 
 describe('MesonPools', () => {
   let token: MockToken

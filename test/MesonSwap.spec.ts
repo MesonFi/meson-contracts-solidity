@@ -13,12 +13,11 @@ import { AddressZero } from '@ethersproject/constants'
 import { expect } from './shared/expect'
 import { initiator, provider } from './shared/wallet'
 import { fixtures, TOKEN_BALANCE } from './shared/fixtures'
-import { getPartialSwap } from './shared/meson'
-
-const outChain = '0x1234'
-const TestAddress = '0x7F342A0D04B951e8600dA1eAdD46afe614DaC20B'
+import { getPartialSwap, TestAddress } from './shared/meson'
 
 describe('MesonSwap', () => {
+  const outChain = '0x1234'
+  
   let token: MockToken
   let unsupportedToken: MockToken
 
