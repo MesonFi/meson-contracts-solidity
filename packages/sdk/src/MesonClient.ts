@@ -39,10 +39,7 @@ export interface PartialSwapData {
   inToken: number,
   outToken: number,
 }
-let data = {
-  gasLimit: 900000,
-  gasPrice: 50000000000
-}
+
 export class MesonClient {
   readonly mesonInstance: Meson
   readonly shortCoinType: string
@@ -103,7 +100,7 @@ export class MesonClient {
 
   async _depositAndRegister(amount: string, tokenIndex: number, providerIndex: string) {
     const balanceIndex = pack(['uint8', 'uint40'], [tokenIndex, providerIndex])
-    return this.mesonInstance.depositAndRegister(amount, balanceIndex, data)
+    return this.mesonInstance.depositAndRegister(amount, balanceIndex)
   }
 
   async deposit(token: string, amount: string) {
@@ -121,7 +118,7 @@ export class MesonClient {
 
   async _deposit(amount: string, tokenIndex: number, providerIndex: number) {
     const balanceIndex = pack(['uint8', 'uint40'], [tokenIndex, providerIndex])
-    return this.mesonInstance.deposit(amount, balanceIndex, data)
+    return this.mesonInstance.deposit(amount, balanceIndex)
   }
 
   async postSwap(signedRequest: SignedSwapRequest) {
@@ -138,7 +135,7 @@ export class MesonClient {
       pack(['address', 'uint40'], [
         signedRequest.initiator,
         providerIndex
-      ]), data
+      ])
     )
   }
 
