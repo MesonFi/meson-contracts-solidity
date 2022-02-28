@@ -31,7 +31,6 @@ describe('SwapSigner', () => {
 
   describe('#signSwapRequest', () => {
     it('rejects by "Not implemented"', async () => {
-
       try {
         await swapSigner.signSwapRequest(encodedSwap)
       } catch (error) {
@@ -98,36 +97,44 @@ describe('SwapSigner', () => {
     })
 
 
-    //   describe('RemoteSwapSigner', () => {
-    //     let swapSigner: RemoteSwapSigner
-    //     let encodedSwap: string = ''
-    //     let recipient: string = ''
+    describe('RemoteSwapSigner', () => {
+      let remoteSwapSigner: RemoteSwapSigner
+      let encodedSwap: string = '0x000000000000000000000064000003c1000000000a00620a4c3e000101000101'
+      let recipient: string = '0x83bcD6A6a860EAac800A45BB1f4c30248e5Dc619'
 
-    //     beforeEach('create RemoteSwapSigner', async () => {
-    //       swapSigner = new RemoteSwapSigner()
-    //     })
+      beforeEach('create RemoteSwapSigner', async () => {
+        remoteSwapSigner = new RemoteSwapSigner()
+      })
+      describe('#getAddress', () => {
+        it('rejects by "Not implemented"', async () => {
+          try {
+            await remoteSwapSigner.signSwapRelease(encodedSwap, recipient)
+          } catch (error) {
+            expect(error).to.match(/Not implemented/)
+          }
+        })
+      })
 
-    //     describe('#getAddress', () => {
-    //       it('rejects by "Not implemented"', async () => {
-    //         swapSigner.getAddress()
-    //       })
-    //     })
+      describe('#signSwapRequest', () => {
+        it('signs a swap request for testnet', async () => {
+          expect(remoteSwapSigner.signSwapRequest(encodedSwap, true)).to.not.null
+        })
+        it('signs a swap request for mainnet', async () => {
+          expect(remoteSwapSigner.signSwapRequest(encodedSwap)).to.not.null
+        })
+      })
 
-    //     describe('#signSwapRequest', () => {
-    //       it('signs a swap request for testnet', async () => {
-    //         swapSigner.signSwapRequest(encodedSwap, true)
-    //       })
-    //       it('signs a swap request for mainnet', async () => {
-    //         swapSigner.signSwapRequest(encodedSwap, false)
-    //       })
-    //     })
+      describe('#signSwapRelease', () => {
+        it('signs a swap release for testnet', async () => {
+          expect(remoteSwapSigner.signSwapRelease(encodedSwap, recipient, true)).to.not.null
+        })
+        it('signs a swap release for mainnet', async () => {
+          expect(remoteSwapSigner.signSwapRelease(encodedSwap, recipient, false)).to.not.null
+        })
 
-    //     describe('#signSwapRelease', () => {
-    //       it('signs a swap release for testnet', async () => {
-    //         swapSigner.signSwapRelease(encodedSwap, recipient, true)
-    //       })
-    //       it('signs a swap release for mainnet', async () => {
-    //         swapSigner.signSwapRelease(encodedSwap, recipient, false)
+      })
+
+    })
+
   })
-
 })
