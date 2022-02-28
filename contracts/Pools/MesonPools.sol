@@ -56,7 +56,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint40 providerIndex = indexOfAddress[provider];
     require(providerIndex != 0, 'Caller not registered. Call depositAndRegister');
 
-    _tokenBalanceOf[_balanceIndexFromTokenIndex(tokenIndex, providerIndex)] -= amount;
+    _tokenBalanceOf[_balanceIndexFrom(tokenIndex, providerIndex)] -= amount;
     _safeTransfer(_tokenList[tokenIndex], provider, amount);
   }
 
@@ -101,7 +101,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     uint80 lockedSwap = _lockedSwaps[swapId];
     require(lockedSwap != 0, "Swap does not exist");
-    require(uint80(block.timestamp << 40) > lockedSwap, "Swap still in lock");
+    require(_untilFromLocked(lockedSwap) < block.timestamp, "Swap still in lock");
 
     uint48 balanceIndex = _outTokenBalanceIndexFrom(encodedSwap, _providerIndexFromLocked(lockedSwap));
     _tokenBalanceOf[balanceIndex] += _amountFrom(encodedSwap);
@@ -146,7 +146,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     uint80 lockedSwap = _lockedSwaps[swapId];
     provider = addressOfIndex[_providerIndexFromLocked(lockedSwap)];
-    until = _untilFromLocked(lockedSwap);
+    until = uint40(_untilFromLocked(lockedSwap));
   }
 
   modifier forTargetChain(uint256 encodedSwap) {

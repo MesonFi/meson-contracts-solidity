@@ -6,7 +6,9 @@ const {
   SignedSwapRelease,
 } = require('@mesonfi/sdk/src')
 const { wallet } = require('../test/shared/wallet')
-const { getDefaultSwap } = require('../test/shared/meson')
+const { getPartialSwap } = require('../test/shared/meson')
+
+const testnetMode = true
 
 async function main() {
   // const signer = await hre.ethers.getSigner()
@@ -40,18 +42,18 @@ async function main() {
   await depositTx2.wait(1)
 
   // requestSwap (no gas)
-  const swapData = getDefaultSwap({ inToken: 1, outToken: 1 })
+  const swapData = getPartialSwap({ inToken: 1, outToken: 1 })
   const outChain = await mesonContract.getShortCoinType()
   const swap = mesonClient.requestSwap(swapData, outChain)
-  const request = await swap.signForRequest()
+  const request = await swap.signForRequest(testnetMode)
   const signedRequest = new SignedSwapRequest(request)
-  signedRequest.checkSignature()
+  signedRequest.checkSignature(testnetMode)
 
-  const swapData2 = getDefaultSwap({ amount: '200', inToken: 1, outToken: 1 })
+  const swapData2 = getPartialSwap({ amount: '200', inToken: 1, outToken: 1 })
   const swap2 = mesonClient.requestSwap(swapData2, outChain)
-  const request2 = await swap2.signForRequest()
+  const request2 = await swap2.signForRequest(testnetMode)
   const signedRequest2 = new SignedSwapRequest(request2)
-  signedRequest2.checkSignature()
+  signedRequest2.checkSignature(testnetMode)
 
   // postSwap
   const postSwapTx1 = await mesonClient.postSwap(signedRequest)
@@ -68,9 +70,9 @@ async function main() {
   await lockTx.wait(1)
 
   // export release signature
-  const release = await swap.signForRelease(swapData.recipient)
+  const release = await swap.signForRelease(swapData.recipient, testnetMode)
   const signedRelease = new SignedSwapRelease(release)
-  signedRelease.checkSignature()
+  signedRelease.checkSignature(testnetMode)
 
   // release
   const releaseTx = await mesonClient.release(signedRelease)
