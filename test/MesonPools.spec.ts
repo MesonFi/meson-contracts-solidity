@@ -1,4 +1,4 @@
-import { waffle } from 'hardhat'
+import { ethers, waffle } from 'hardhat'
 import {
   MesonClient,
   LockedSwapStatus,
@@ -228,8 +228,26 @@ describe('MesonPools', () => {
     //     expect(error).to.throw
     //   }
     // })
-    it('accepts the unlock if all parameters are correct', async () => {
-      //How to test ？The time requirement is 30 minutes later
+    it('unlocks a swap', async () => {
+      await token.approve(mesonInstance.address, 200)
+      await mesonClientForProvider.depositAndRegister(token.address, '200', '1')
+
+      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: '100' }), outChain)
+      const signedRequestData = await swap.signForRequest(true)
+      const signedRequest = new SignedSwapRequest(signedRequestData)
+      signedRequest.checkSignature(true)
+
+      await mesonClientForProvider.lock(signedRequest)
+      await ethers.provider.send('evm_increaseTime', [1800])
+      await mesonClientForProvider.unlock(signedRequest)
+
+      expect(await mesonInstance.balanceOf(mesonClientForProvider.token(1), provider.address)).to.equal(200)
+      const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded)
+      expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
+      expect(locked.initiator).to.be.undefined
+      expect(locked.provider).to.be.undefined
+
+      await ethers.provider.send('evm_increaseTime', [-1800])
     })
   })
 
@@ -258,7 +276,7 @@ describe('MesonPools', () => {
     //   expect(await tokenContract.balanceOf(mesonContract.address)).to.equal(0);
     // })
 
-    it('accepts a release', async () => {
+    it('releases a swap', async () => {
       await token.approve(mesonInstance.address, 200)
       await mesonClientForProvider.depositAndRegister(token.address, '200', '1')
 
