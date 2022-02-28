@@ -99,16 +99,13 @@ describe('SwapSigner', () => {
 
     describe('RemoteSwapSigner', () => {
       let remoteSwapSigner: RemoteSwapSigner
-      let encodedSwap: string = '0x000000000000000000000064000003c1000000000a00620a4c3e000101000101'
-      let recipient: string = '0x83bcD6A6a860EAac800A45BB1f4c30248e5Dc619'
-
       beforeEach('create RemoteSwapSigner', async () => {
         remoteSwapSigner = new RemoteSwapSigner()
       })
       describe('#getAddress', () => {
         it('rejects by "Not implemented"', async () => {
           try {
-            await remoteSwapSigner.signSwapRelease(encodedSwap, recipient)
+            await remoteSwapSigner.getAddress()
           } catch (error) {
             expect(error).to.match(/Not implemented/)
           }
