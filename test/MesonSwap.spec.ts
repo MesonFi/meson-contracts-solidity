@@ -39,8 +39,8 @@ describe('MesonSwap', () => {
     mesonInstance = result.swap // default account is signer
 
     const swapSigner = new EthersWalletSwapSigner(initiator)
-    mesonClientForInitiator = await MesonClient.Create(mesonInstance.connect(initiator), swapSigner) // user is default account
-    mesonClientForProvider = await MesonClient.Create(mesonInstance.connect(provider))
+    mesonClientForInitiator = await MesonClient.Create((mesonInstance as any).connect(initiator), swapSigner) // user is default account
+    mesonClientForProvider = await MesonClient.Create((mesonInstance as any).connect(provider))
     
     await mesonInstance.connect(provider).register(1)
 

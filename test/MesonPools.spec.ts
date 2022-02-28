@@ -32,7 +32,7 @@ describe('MesonPools', () => {
 
     const swapSigner = new EthersWalletSwapSigner(initiator)
     mesonClientForInitiator = await MesonClient.Create(result.pools, swapSigner)
-    mesonClientForProvider = await MesonClient.Create(mesonInstance.connect(provider))
+    mesonClientForProvider = await MesonClient.Create((mesonInstance as any).connect(provider))
     outChain = mesonClientForProvider.shortCoinType
 
     await token.approve(mesonInstance.address, 1000)
