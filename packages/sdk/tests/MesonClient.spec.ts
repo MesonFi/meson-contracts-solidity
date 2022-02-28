@@ -22,6 +22,7 @@ import { getPartialSwap } from './shared'
 
 const outChain = '0x003c'
 const unsupported = AddressZero
+const TestAddress = '0x7F342A0D04B951e8600dA1eAdD46afe614DaC20B'
 
 chai.use(chaiAsPromised)
 chai.use(solidity)
@@ -29,7 +30,6 @@ chai.use(solidity)
 describe('MesonClient', () => {
   let initiator: Wallet
   let provider: Wallet
-  let swapSigner: EthersWalletSwapSigner
   let token: MockToken
   let mesonInstance: Meson
   let mesonClientForInitiator: MesonClient
@@ -39,7 +39,7 @@ describe('MesonClient', () => {
     const wallets = new MockProvider().getWallets()
     initiator = wallets[1]
     provider = wallets[2]
-    swapSigner = new EthersWalletSwapSigner(initiator)
+    const swapSigner = new EthersWalletSwapSigner(initiator)
 
     const tokenFactory = new ContractFactory(ERC20Abi.abi, ERC20Abi.bytecode, wallets[0])
     token = await tokenFactory.deploy('MockToken', 'MT', 1000000) as MockToken
@@ -173,11 +173,10 @@ describe('MesonClient', () => {
     let signedRelease
 
     beforeEach('prepare for lock', async () => {
-      const swapData = getPartialSwap()
-      const swap = mesonClientForInitiator.requestSwap(swapData, outChain)
+      const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
       signedRequest = new SignedSwapRequest(signedRequestData)
-      const signedReleaseData = await swap.signForRelease(swapData.recipient, true)
+      const signedReleaseData = await swap.signForRelease(TestAddress, true)
       signedRelease = new SignedSwapRelease(signedReleaseData)
 
       await token.connect(provider).approve(mesonInstance.address, 100)
@@ -197,11 +196,10 @@ describe('MesonClient', () => {
     beforeEach('prepare for lock', async () => {
       await token.connect(initiator).approve(mesonInstance.address, 101)
 
-      const swapData = getPartialSwap()
-      const swap = mesonClientForInitiator.requestSwap(swapData, outChain)
+      const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
       signedRequest = new SignedSwapRequest(signedRequestData)
-      const signedReleaseData = await swap.signForRelease(swapData.recipient, true)
+      const signedReleaseData = await swap.signForRelease(TestAddress, true)
       signedRelease = new SignedSwapRelease(signedReleaseData)
 
       await token.connect(provider).approve(mesonInstance.address, 1)
