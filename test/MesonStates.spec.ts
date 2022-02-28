@@ -1,23 +1,17 @@
 import { ethers, waffle } from 'hardhat'
-import {
-  MesonClient,
-  EthersWalletSwapSigner,
-  PartialSwapData,
-  SwapWithSigner,
-} from '@mesonfi/sdk'
+import { EthersWalletSwapSigner, SwapWithSigner } from '@mesonfi/sdk'
 import { MesonStatesTest } from '@mesonfi/contract-types'
 import { pack } from '@ethersproject/solidity'
 import { AddressZero } from '@ethersproject/constants'
 
 import { expect } from './shared/expect'
 import { initiator } from './shared/wallet'
-import { getDefaultSwap } from './shared/meson'
+import { getSwap } from './shared/meson'
 
 describe('MesonStates', () => {
   const testnetMode = true
   const TestAddress = '0x7F342A0D04B951e8600dA1eAdD46afe614DaC20B'
   let mesonInstance: MesonStatesTest
-  let swapData: PartialSwapData
   let swap: SwapWithSigner
 
   const fixture = async () => {
@@ -28,9 +22,7 @@ describe('MesonStates', () => {
   beforeEach('deploy MesonStatesTest', async () => {
     mesonInstance = await waffle.loadFixture(fixture)
     const swapSigner = new EthersWalletSwapSigner(initiator)
-    const mesonClient = await MesonClient.Create(mesonInstance as any, swapSigner)
-    swapData = getDefaultSwap({ inToken: 2, outToken: 3, fee: '11' })
-    swap = mesonClient.requestSwap(swapData, '0x1234')
+    swap = new SwapWithSigner(getSwap(), swapSigner)
   })
 
   describe('#addSupportToken', () => {
@@ -165,13 +157,13 @@ describe('MesonStates', () => {
 
   describe('#checkReleaseSignature', () => {
     it('accepts validates a release signature', async () => {
-      const sigs = (await swap.signForRelease(swapData.recipient, testnetMode)).signature
-      await expect(mesonInstance.checkReleaseSignature(swap.encoded, swapData.recipient, ...sigs, TestAddress))
+      const sigs = (await swap.signForRelease(TestAddress, testnetMode)).signature
+      await expect(mesonInstance.checkReleaseSignature(swap.encoded, TestAddress, ...sigs, TestAddress))
         .to.revertedWith('Invalid signature')
     })
     it('Invalid signature', async () => {
-      const sigs = (await swap.signForRelease(swapData.recipient, testnetMode)).signature
-      await mesonInstance.checkReleaseSignature(swap.encoded, swapData.recipient, ...sigs, initiator.address)
+      const sigs = (await swap.signForRelease(TestAddress, testnetMode)).signature
+      await mesonInstance.checkReleaseSignature(swap.encoded, TestAddress, ...sigs, initiator.address)
     })
   })
 })

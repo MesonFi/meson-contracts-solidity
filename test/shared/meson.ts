@@ -1,4 +1,4 @@
-import { PartialSwapData } from '@mesonfi/sdk'
+import { PartialSwapData, SwapData } from '@mesonfi/sdk'
 
 type OptionalSwapData = {
   inToken?: number,
@@ -10,17 +10,37 @@ type OptionalSwapData = {
   outChain?:string
 }
 
-export function getDefaultSwap({
+export function getPartialSwap({
+  amount = '100',
+  fee = '1',
   inToken = 1,
   outToken = 1,
-  amount = '100',
-  fee = '10'
-}: OptionalSwapData = {}): PartialSwapData {
+} = {}): PartialSwapData {
   return {
     amount,
-    salt: Math.floor(Math.random() * 10000),
     fee,
     inToken,
+    outToken,
+    recipient: '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211',
+  }
+}
+
+export function getSwap({
+  amount = '100',
+  fee = '1',
+  expireTs = Math.floor(Date.now() / 1000) + 5400,
+  inChain = '0x0001',
+  inToken = 2,
+  outChain = '0x0002',
+  outToken = 3,
+} = {}): SwapData {
+  return {
+    amount,
+    fee,
+    expireTs,
+    inChain,
+    inToken,
+    outChain,
     outToken,
     recipient: '0x2ef8a51f8ff129dbb874a0efb021702f59c1b211',
   }
