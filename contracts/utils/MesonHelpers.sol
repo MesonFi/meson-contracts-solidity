@@ -141,7 +141,7 @@ contract MesonHelpers is MesonConfig {
     assembly {
       mstore(0, encodedSwap)
       mstore(0x20, keccak256(0, 0x20))
-      mstore(0, typeHash)
+      mstore(0, typehash)
       digest := keccak256(0, 0x40)
     }
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
@@ -162,7 +162,7 @@ contract MesonHelpers is MesonConfig {
       mstore(0, encodedSwap)
       mstore(0x20, recipientHash)
       mstore(0x20, keccak256(0, 0x40))
-      mstore(0, typeHash)
+      mstore(0, typehash)
       digest := keccak256(0, 0x40)
     }
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
