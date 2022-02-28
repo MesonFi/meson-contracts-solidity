@@ -7,7 +7,6 @@ import {
   SignedSwapRelease,
 } from '@mesonfi/sdk'
 import { MockToken, MesonSwapTest } from '@mesonfi/contract-typs'
-import { keccak256 } from '@ethersproject/keccak256'
 import { pack } from '@ethersproject/solidity'
 import { AddressZero } from '@ethersproject/constants'
 
@@ -16,7 +15,6 @@ import { initiator, provider } from './shared/wallet'
 import { fixtures, TOKEN_BALANCE } from './shared/fixtures'
 import { getPartialSwap } from './shared/meson'
 
-const testnetMode = true
 const outChain = '0x1234'
 const TestAddress = '0x7F342A0D04B951e8600dA1eAdD46afe614DaC20B'
 
@@ -79,7 +77,7 @@ describe('MesonSwap', () => {
       await expect(mesonClientForProvider.postSwap(signedRequest)).to.be.revertedWith('Expire ts too early')
     })
     it('rejects if expireTs is too late ', async () => {
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain, 7200 + 600)
+      const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain, 7200 + 1200)
       const signedRequestData = await swap.signForRequest(true)
       const signedRequest = new SignedSwapRequest(signedRequestData)
 
