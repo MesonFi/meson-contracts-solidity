@@ -45,7 +45,7 @@ export class Swap implements SwapData {
       throw new Error('encoded swap should be a hex string of length 66')
     }
     const amount = parseInt(`0x${encoded.substring(2, 14)}`, 16)
-    const salt = BigNumber.from(`0x${encoded.substring(14, 34)}`).toString()
+    const salt = `0x${encoded.substring(14, 34)}`
     const fee = BigNumber.from(`0x${encoded.substring(34, 44)}`).toString()
     const expireTs = parseInt(`0x${encoded.substring(44, 54)}`, 16)
     const outChain = `0x${encoded.substring(54, 58)}`
@@ -75,13 +75,18 @@ export class Swap implements SwapData {
     }
 
     this.amount = amount
-    this.salt = data.salt || Math.floor(Math.random() * 4294967296).toString()
+    this.salt = data.salt || this._newRandomSalt()
     this.fee = data.fee
     this.expireTs = data.expireTs
     this.inChain = data.inChain
     this.inToken = data.inToken
     this.outChain = data.outChain
     this.outToken = data.outToken
+  }
+
+  private _newRandomSalt(): string {
+    const rnd = BigNumber.from(Math.floor(Math.random() * 4294967296))
+    return hexZeroPad(rnd.toHexString(), 10)
   }
 
   get encoded(): string {
