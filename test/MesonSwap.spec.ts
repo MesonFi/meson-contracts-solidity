@@ -90,7 +90,7 @@ describe('MesonSwap', () => {
       const signedRequest = new SignedSwapRequest(signedRequestData)
 
       await expect(mesonClientForProvider.postSwap(signedRequest))
-        .to.be.revertedWith('For security reason, amount cannot be greater than 100k')
+        .to.be.revertedWith('Amount cannot be greater than 100k')
     })
 
     const amount = ethers.utils.parseUnits('1001', 6)
@@ -191,6 +191,24 @@ describe('MesonSwap', () => {
     it('rejects if swap does not exist', async () => {
       await expect(mesonClientForProvider.executeSwap(signedRelease, true))
         .to.be.revertedWith('Swap does not exist')
+    })
+    it('rejects if fee > max(100, 0.5% * amount)', async () => {
+      await token.connect(initiator).approve(mesonInstance.address, ethers.utils.parseUnits('30000', 6))
+
+      const swapData = getPartialSwap({
+        amount: ethers.utils.parseUnits('22000', 6),
+        fee: ethers.utils.parseUnits('111', 6)
+      })
+      const swap = mesonClientForInitiator.requestSwap(swapData, outChain)
+
+      const signedRequestData = await swap.signForRequest(true)
+      const signedRequest = new SignedSwapRequest(signedRequestData)
+      await mesonClientForProvider.postSwap(signedRequest)
+
+      const signedReleaseData = await swap.signForRelease(TestAddress, true)
+      signedRelease = new SignedSwapRelease(signedReleaseData)
+      await expect(mesonClientForProvider.executeSwap(signedRelease, true))
+        .to.be.revertedWith('The fee must be less than 100 or 0.5% of the swap amount')
     })
 
     const amount = ethers.utils.parseUnits('1001', 6)

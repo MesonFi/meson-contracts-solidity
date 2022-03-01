@@ -39,7 +39,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
 
     uint256 amount = _amountFrom(encodedSwap);
-    require(amount <= 1e11, "For security reason, amount cannot be greater than 100k");
+    require(amount <= 1e11, "Amount cannot be greater than 100k");
 
     uint256 delta = _expireTsFrom(encodedSwap) - block.timestamp;
     // Underflow would trigger "Expire ts too late" error
@@ -129,13 +129,18 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _checkReleaseSignature(encodedSwap, recipient, r, s, v, _initiatorFromPosted(postedSwap));
 
     uint48 mesonBalanceIndex = _balanceIndexForMesonFrom(encodedSwap);
-    uint256 amountWithFee = _amountFrom(encodedSwap) + _feeFrom(encodedSwap);
+    uint256 amount = _amountFrom(encodedSwap);
+    uint256 fee = _feeFrom(encodedSwap);
+    uint256 amountWithFee = amount + fee;
     if ((_inChainFrom(encodedSwap) != 0x003c) && (_outChainFrom(encodedSwap) != 0x003c)) { // no meson fee for eth
+      require(fee <= 1e6 || fee * 200 <= amount, "The fee must be less than 1 or 0.5% of the swap amount");
       uint256 feeToMeson = _feeToMesonFrom(encodedSwap);
       if (feeToMeson > 0) {
         _tokenBalanceOf[mesonBalanceIndex] += feeToMeson;
         amountWithFee -= feeToMeson;
       }
+    } else {
+      require(fee <= 1e8 || fee * 200 <= amount, "The fee must be less than 100 or 0.5% of the swap amount");
     }
     
     if (depositToPool) {

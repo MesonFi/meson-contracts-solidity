@@ -1,8 +1,8 @@
 import { ethers } from 'hardhat'
 import { MockToken, MesonPoolsTest, MesonSwapTest } from '@mesonfi/contract-types'
 
-export const TOKEN_BALANCE = ethers.utils.parseUnits('3000', 6)
-export const TOKEN_TOTAL_SUPPLY = ethers.utils.parseUnits('10000', 6)
+export const TOKEN_BALANCE = ethers.utils.parseUnits('30000', 6)
+export const TOKEN_TOTAL_SUPPLY = ethers.utils.parseUnits('100000', 6)
 
 export async function fixtures (accounts: string[] | undefined) {
   const signer = (await ethers.getSigners())[0]
