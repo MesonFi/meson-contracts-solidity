@@ -61,7 +61,7 @@ contract MesonHelpers is MesonConfig {
   }
 
   function _feeToMesonFrom(uint256 encodedSwap) internal pure returns (uint256) {
-    return ((encodedSwap >> 89) & 0x7FFFFFFFFF); // 50% fee to meson
+    return ((encodedSwap >> 90) & 0x3FFFFFFFFF); // 25% fee to meson
   }
 
   function _saltFrom(uint256 encodedSwap) internal pure returns (uint80) {
