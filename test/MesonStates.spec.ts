@@ -143,7 +143,7 @@ describe('MesonStates', () => {
   })
 
   describe('#checkRequestSignature', () => {
-    it('rejects invalid signature"', async () => {
+    it('rejects invalid signature', async () => {
       const sigs = (await swap.signForRequest(testnetMode)).signature
       await expect(mesonInstance.checkRequestSignature(swap.encoded, ...sigs, TestAddress))
         .to.revertedWith('Invalid signature')
@@ -155,12 +155,12 @@ describe('MesonStates', () => {
   })
 
   describe('#checkReleaseSignature', () => {
-    it('accepts validates a release signature', async () => {
+    it('rejects invalid signature', async () => {
       const sigs = (await swap.signForRelease(TestAddress, testnetMode)).signature
       await expect(mesonInstance.checkReleaseSignature(swap.encoded, TestAddress, ...sigs, TestAddress))
         .to.revertedWith('Invalid signature')
     })
-    it('Invalid signature', async () => {
+    it('accepts a valid signature', async () => {
       const sigs = (await swap.signForRelease(TestAddress, testnetMode)).signature
       await mesonInstance.checkReleaseSignature(swap.encoded, TestAddress, ...sigs, initiator.address)
     })
