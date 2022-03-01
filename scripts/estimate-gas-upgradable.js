@@ -16,7 +16,7 @@ async function main() {
 
   //#####################---deploy contract ---#############################
   const MockToken = await ethers.getContractFactory('MockToken')
-  const totalSupply = '1000000000000'
+  const totalSupply = ethers.utils.parseUnits('10000', 6)
   const tokenContract = await MockToken.deploy('Mock Token', 'MT', totalSupply)
   console.log('MockToken deployed to:', tokenContract.address)
 
@@ -33,24 +33,24 @@ async function main() {
   await approveTx.wait(1)
 
   // deposits
-  const swapAmount = '1000000000'
-  const depositTx1 = await mesonClient.depositAndRegister(mesonClient.token(1), swapAmount, '1')
+  const amount = ethers.utils.parseUnits('1000', 6)
+  const depositTx1 = await mesonClient.depositAndRegister(mesonClient.token(1), amount, '1')
   getUsedGas('first deposit', depositTx1.hash)
   await depositTx1.wait(1)
 
-  const depositTx2 = await mesonClient.deposit(mesonClient.token(1), swapAmount)
+  const depositTx2 = await mesonClient.deposit(mesonClient.token(1), amount)
   getUsedGas('another deposit', depositTx2.hash)
   await depositTx2.wait(1)
 
   // requestSwap (no gas)
-  const swapData = getPartialSwap({ inToken: 1, outToken: 1 })
+  const swapData = getPartialSwap()
   const outChain = await mesonContract.getShortCoinType()
   const swap = mesonClient.requestSwap(swapData, outChain)
   const request = await swap.signForRequest(testnetMode)
   const signedRequest = new SignedSwapRequest(request)
   signedRequest.checkSignature(testnetMode)
 
-  const swapData2 = getPartialSwap({ amount: 200, inToken: 1, outToken: 1 })
+  const swapData2 = getPartialSwap({ amount: ethers.utils.parseUnits('500', 6) })
   const swap2 = mesonClient.requestSwap(swapData2, outChain)
   const request2 = await swap2.signForRequest(testnetMode)
   const signedRequest2 = new SignedSwapRequest(request2)
