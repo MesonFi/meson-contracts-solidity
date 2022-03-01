@@ -29,7 +29,6 @@ export enum LockedSwapStatus {
   Unlocked = 0b0101,
   Error = 0b1000,
   ErrorExpired = 0b1001,
-  ErrorMadeForOtherInitiator = 0b1010,
 }
 
 export interface PartialSwapData {
@@ -155,6 +154,7 @@ export class MesonClient {
     return this.mesonInstance.release(
       signedRelease.encoded,
       ...signedRelease.signature,
+      signedRelease.initiator,
       signedRelease.recipient
     )
   }
@@ -242,21 +242,18 @@ export class MesonClient {
     }
   }
 
-  async getLockedSwap(encoded: string | BigNumber, initiatorToCheck?: string): Promise<{
+  async getLockedSwap(encoded: string | BigNumber, initiator: string): Promise<{
     status: LockedSwapStatus,
-    initiator?: string,
     provider?: string,
     until?: number
   }> {
-    const { initiator, provider, until } = await this.mesonInstance.getLockedSwap(encoded)
+    const { provider, until } = await this.mesonInstance.getLockedSwap(encoded, initiator)
     if (!until) {
       return { status: LockedSwapStatus.NoneOrAfterRunning }
-    } else if (initiatorToCheck && initiatorToCheck.toLowerCase() !== initiator.toLowerCase()) {
-      return { status: LockedSwapStatus.ErrorMadeForOtherInitiator }
     } else if (until * 1000 < Date.now()) {
-      return { status: LockedSwapStatus.ErrorExpired, initiator, provider, until }
+      return { status: LockedSwapStatus.ErrorExpired, provider, until }
     } else {
-      return { status: LockedSwapStatus.Locked, initiator, provider, until }
+      return { status: LockedSwapStatus.Locked, provider, until }
     }
   }
 }

@@ -9,10 +9,10 @@ import "../utils/MesonStates.sol";
 /// Methods in this class will be executed when a swap initiator wants to
 /// swap into this chain.
 contract MesonPools is IMesonPoolsEvents, MesonStates {
-    /// @notice Locked Swaps
+  /// @notice Locked Swaps
   /// key: encodedSwap in format of `amount:uint96|salt:uint32|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
-  /// value: in format of until:uint40|providerIndex:uint40|initiator:uint160
-  mapping(uint256 => uint240) internal _lockedSwaps;
+  /// value: in format of until:uint40|providerIndex:uint40
+  mapping(bytes32 => uint80) internal _lockedSwaps;
 
   /// @notice Deposit tokens into the liquidity pool and register an index 
   /// for future use (will save gas).
@@ -65,7 +65,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// by `postSwap`. This method will lock swapping fund on the target chain
   /// for `LOCK_TIME_PERIOD` and wait for fund release and execution.
   /// @dev Designed to be used by liquidity providers
-  /// @param encodedSwap Encoded swap information; also used as the key of `_lockedSwaps`
+  /// @param encodedSwap Encoded swap information
   /// @param r Part of the signature (the one given by `postSwap` call)
   /// @param s Part of the signature (the one given by `postSwap` call)
   /// @param v Part of the signature (the one given by `postSwap` call)
@@ -77,7 +77,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint8 v,
     address initiator
   ) external forTargetChain(encodedSwap) {
-    require(_lockedSwaps[encodedSwap] == 0, "Swap already exists");
+    bytes32 swapId = _getSwapId(encodedSwap, initiator);
+    require(_lockedSwaps[swapId] == 0, "Swap already exists");
     _checkRequestSignature(encodedSwap, r, s, v, initiator);
 
     uint40 providerIndex = indexOfAddress[_msgSender()];
@@ -89,21 +90,22 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint48 balanceIndex = _outTokenBalanceIndexFrom(encodedSwap, providerIndex);
     _tokenBalanceOf[balanceIndex] -= _amountFrom(encodedSwap);
     
-    _lockedSwaps[encodedSwap] = _lockedSwapFrom(until, providerIndex, initiator);
+    _lockedSwaps[swapId] = _lockedSwapFrom(until, providerIndex);
 
     emit SwapLocked(encodedSwap);
   }
 
   /// @notice If the locked swap is not released after `LOCK_TIME_PERIOD`,
   /// the LP can call this method to unlock the swapping fund.
-  function unlock(uint256 encodedSwap) external {
-    uint240 lockedSwap = _lockedSwaps[encodedSwap];
+  function unlock(uint256 encodedSwap, address initiator) external {
+    bytes32 swapId = _getSwapId(encodedSwap, initiator);
+    uint80 lockedSwap = _lockedSwaps[swapId];
     require(lockedSwap != 0, "Swap does not exist");
     require(_untilFromLocked(lockedSwap) < block.timestamp, "Swap still in lock");
 
     uint48 balanceIndex = _outTokenBalanceIndexFrom(encodedSwap, _providerIndexFromLocked(lockedSwap));
     _tokenBalanceOf[balanceIndex] += _amountFrom(encodedSwap);
-    _lockedSwaps[encodedSwap] = 0;
+    _lockedSwaps[swapId] = 0;
   }
 
   /// @notice Release tokens to satisfy a locked swap. This is step 3️⃣  in a swap.
@@ -111,7 +113,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// but anyone (initiator herself, the LP, and other people) with the signature 
   /// can call it to make sure the swapping fund is guaranteed to be released.
   /// @dev Designed to be used by anyone
-  /// @param encodedSwap Encoded swap information; also used as the key of `_lockedSwaps`
+  /// @param encodedSwap Encoded swap information
   /// @param r Part of the release signature (same as in the `executeSwap` call)
   /// @param s Part of the release signature (same as in the `executeSwap` call)
   /// @param v Part of the release signature (same as in the `executeSwap` call)
@@ -121,13 +123,15 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     bytes32 r,
     bytes32 s,
     uint8 v,
+    address initiator,
     address recipient
   ) external {
-    uint240 lockedSwap = _lockedSwaps[encodedSwap];
+    bytes32 swapId = _getSwapId(encodedSwap, initiator);
+    uint80 lockedSwap = _lockedSwaps[swapId];
     require(lockedSwap != 0, "Swap does not exist");
 
-    _checkReleaseSignature(encodedSwap, keccak256(abi.encodePacked(recipient)), r, s, v, _initiatorFromLocked(lockedSwap));
-    _lockedSwaps[encodedSwap] = 0;
+    _checkReleaseSignature(encodedSwap, keccak256(abi.encodePacked(recipient)), r, s, v, initiator);
+    _lockedSwaps[swapId] = 0;
 
     address token = _tokenList[_outTokenIndexFrom(encodedSwap)];
     _safeTransfer(token, recipient, _amountFrom(encodedSwap));
@@ -136,11 +140,11 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   }
 
   /// @notice Read information for a locked swap
-  function getLockedSwap(uint256 encodedSwap) external view
-    returns (address initiator, address provider, uint40 until)
+  function getLockedSwap(uint256 encodedSwap, address initiator) external view
+    returns (address provider, uint40 until)
   {
-    uint240 lockedSwap = _lockedSwaps[encodedSwap];
-    initiator = _initiatorFromLocked(lockedSwap);
+    bytes32 swapId = _getSwapId(encodedSwap, initiator);
+    uint80 lockedSwap = _lockedSwaps[swapId];
     provider = addressOfIndex[_providerIndexFromLocked(lockedSwap)];
     until = uint40(_untilFromLocked(lockedSwap));
   }

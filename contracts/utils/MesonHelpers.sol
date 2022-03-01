@@ -48,6 +48,10 @@ contract MesonHelpers is MesonConfig {
     IERC20Minimal(token).transferFrom(sender, address(this), amount);
   }
 
+  function _getSwapId(uint256 encodedSwap, address initiator) internal pure returns (bytes32) {
+    return keccak256(abi.encodePacked(encodedSwap, initiator));
+  }
+
   function _amountFrom(uint256 encodedSwap) internal pure returns (uint256) {
     return encodedSwap >> 160;
   }
@@ -100,20 +104,16 @@ contract MesonHelpers is MesonConfig {
     return uint40(postedSwap);
   }
 
-  function _lockedSwapFrom(uint256 until, uint40 providerIndex, address initiator) internal pure returns (uint240) {
-    return (uint240(until) << 200) | (uint240(providerIndex) << 160) | uint160(initiator);
+  function _lockedSwapFrom(uint256 until, uint40 providerIndex) internal pure returns (uint80) {
+    return (uint80(until) << 40) | providerIndex;
   }
 
-  function _initiatorFromLocked(uint240 lockedSwap) internal pure returns (address) {
-    return address(uint160(lockedSwap));
+  function _providerIndexFromLocked(uint80 lockedSwap) internal pure returns (uint40) {
+    return uint40(lockedSwap);
   }
 
-  function _providerIndexFromLocked(uint240 lockedSwap) internal pure returns (uint40) {
-    return uint40(lockedSwap >> 160);
-  }
-
-  function _untilFromLocked(uint240 lockedSwap) internal pure returns (uint256) {
-    return (lockedSwap >> 200) & 0xFFFFFFFFFF;
+  function _untilFromLocked(uint80 lockedSwap) internal pure returns (uint256) {
+    return uint256(lockedSwap >> 40);
   }
 
   function _balanceIndexFrom(uint8 tokenIndex, uint40 providerIndex) internal pure returns (uint48) {
