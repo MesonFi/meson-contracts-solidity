@@ -83,7 +83,7 @@ describe('MesonSwap', () => {
       await expect(mesonClientForProvider.postSwap(signedRequest)).to.be.revertedWith('Expire ts too late')
     })
     it('rejects if amount > 100k', async () => {
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: '100000000001' }), outChain)
+      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: 100000000001 }), outChain)
       const signedRequestData = await swap.signForRequest(true)
       const signedRequest = new SignedSwapRequest(signedRequestData)
 
