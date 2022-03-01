@@ -57,8 +57,8 @@ export class Swap implements SwapData {
   }
 
   constructor(data: SwapData) {
-    if (!data.amount) {
-      throw new Error('Missing amount')
+    if (typeof data.amount !== 'number' || !data.amount) {
+      throw new Error('Invalid amount')
     } else if (!data.fee) {
       throw new Error('Missing fee')
     } else if (!data.expireTs) {
