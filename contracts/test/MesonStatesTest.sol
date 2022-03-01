@@ -104,6 +104,6 @@ contract MesonStatesTest is MesonStates {
     uint8 v,
     address signer
   ) external pure {
-    _checkReleaseSignature(encodedSwap, keccak256(abi.encodePacked(recipient)), r, s, v, signer);
+    _checkReleaseSignature(encodedSwap, recipient, r, s, v, signer);
   }
 }

@@ -140,16 +140,16 @@ contract MesonHelpers is MesonConfig {
     bytes32 digest;
     assembly {
       mstore(0, encodedSwap)
-      mstore(0x20, keccak256(0, 0x20))
+      mstore(32, keccak256(0, 32))
       mstore(0, typehash)
-      digest := keccak256(0, 0x40)
+      digest := keccak256(0, 64)
     }
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }
 
   function _checkReleaseSignature(
     uint256 encodedSwap,
-    bytes32 recipientHash,
+    address recipient,
     bytes32 r,
     bytes32 s,
     uint8 v,
@@ -159,11 +159,11 @@ contract MesonHelpers is MesonConfig {
     bytes32 typehash = RELEASE_TYPE_HASH;
     bytes32 digest;
     assembly {
+      mstore(20, recipient)
       mstore(0, encodedSwap)
-      mstore(0x20, recipientHash)
-      mstore(0x20, keccak256(0, 0x40))
+      mstore(32, keccak256(0, 52))
       mstore(0, typehash)
-      digest := keccak256(0, 0x40)
+      digest := keccak256(0, 64)
     }
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }

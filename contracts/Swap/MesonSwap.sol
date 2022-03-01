@@ -100,17 +100,17 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// will receive funds deposited by the swap initiator.
   /// @dev Designed to be used by the current bonding LP
   /// @param encodedSwap Encoded swap information; also used as the key of `_postedSwaps`
-  /// @param recipientHash The keccak256 hash of the recipient address
   /// @param r Part of the release signature (same as in the `release` call)
   /// @param s Part of the release signature (same as in the `release` call)
   /// @param v Part of the release signature (same as in the `release` call)
+  /// @param recipient The recipient address of the swap
   /// @param depositToPool Choose to deposit funds to the pool (will save gas)
   function executeSwap(
     uint256 encodedSwap,
-    bytes32 recipientHash,
     bytes32 r,
     bytes32 s,
     uint8 v,
+    address recipient,
     bool depositToPool
   ) external {
     uint200 postedSwap = _postedSwaps[encodedSwap];
@@ -126,7 +126,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
       _postedSwaps[encodedSwap] = 1;
     }
 
-    _checkReleaseSignature(encodedSwap, recipientHash, r, s, v, _initiatorFromPosted(postedSwap));
+    _checkReleaseSignature(encodedSwap, recipient, r, s, v, _initiatorFromPosted(postedSwap));
 
     uint48 mesonBalanceIndex = _balanceIndexForMesonFrom(encodedSwap);
     uint256 amountWithFee = _amountFrom(encodedSwap) + _feeFrom(encodedSwap);

@@ -15,5 +15,5 @@ contract MesonConfig {
   bytes32 constant REQUEST_TYPE_HASH = CONFIG_REQUEST_TYPE_HASH;
   
   // keccak256("bytes32 Sign to release a swap on MesonCONFIG_TESTNET_MODE" + "bytes32 Recipient hash")
-  bytes32 constant RELEASE_TYPE_HASH = CONFIG_REQUEST_TYPE_HASH;
+  bytes32 constant RELEASE_TYPE_HASH = CONFIG_RELEASE_TYPE_HASH;
 }

@@ -35,24 +35,24 @@ export class SwapSigner {
 
   static hashRequest(encoded: string, testnet?: boolean): string {
     const notice = testnet ? NOTICE_TESTNET_SIGN_REQUEST : NOTICE_SIGN_REQUEST
-    const domainHash = keccak256(pack(['string'], [`bytes32 ${notice}`]))
+    const typeHash = keccak256(pack(['string'], [`bytes32 ${notice}`]))
     return keccak256(pack(
       ['bytes32', 'bytes32'],
-      [domainHash, keccak256(encoded)],
+      [typeHash, keccak256(encoded)],
     ))
   }
 
   static hashRelease(encoded: string, recipient: string, testnet?: boolean): string {
     const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
-    const domainHash = keccak256(pack(
+    const typeHash = keccak256(pack(
       ['string', 'string'],
-      [`bytes32 ${notice}`, 'bytes32 Recipient hash']
+      [`bytes32 ${notice}`, 'address Recipient']
     ))
     return keccak256(pack(
       ['bytes32', 'bytes32'],
       [
-        domainHash,
-        keccak256(pack(['bytes32', 'bytes32'], [encoded, keccak256(recipient)])),
+        typeHash,
+        keccak256(pack(['bytes32', 'address'], [encoded, recipient])),
       ],
     ))
   }
@@ -112,7 +112,7 @@ export class RemoteSwapSigner extends SwapSigner {
     const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
     const data = [
       { type: 'bytes32', name: notice, value: encoded },
-      { type: 'bytes32', name: 'Recipient hash', value: keccak256(recipient) },
+      { type: 'address', name: 'Recipient', value: recipient },
     ]
     const signature = await this.remoteSigner.signTypedData(data)
     return this._separateSignature(signature)

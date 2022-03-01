@@ -2,7 +2,6 @@ import type { BigNumber } from "@ethersproject/bignumber";
 import type { Wallet } from '@ethersproject/wallet'
 import type { Meson } from '@mesonfi/contract-types'
 import { pack } from '@ethersproject/solidity'
-import { keccak256 } from '@ethersproject/keccak256'
 import { AddressZero } from '@ethersproject/constants'
 
 import { Swap } from './Swap'
@@ -153,8 +152,8 @@ export class MesonClient {
   async executeSwap(signedRelease: SignedSwapRelease, depositToPool: boolean = false) {
     return this.mesonInstance.executeSwap(
       signedRelease.encoded,
-      keccak256(signedRelease.recipient),
       ...signedRelease.signature,
+      signedRelease.recipient,
       depositToPool
     )
   }

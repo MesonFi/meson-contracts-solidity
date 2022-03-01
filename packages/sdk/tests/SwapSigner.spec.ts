@@ -95,13 +95,13 @@ describe('RemoteSwapSigner', () => {
   const remoteSigner = {
     getAddress: () => initiator.address,
     signTypedData: async data => {
-      const domainHash = keccak256(pack(
+      const typeHash = keccak256(pack(
         data.map(() => 'string'),
         data.map(({ type, name }) => `${type} ${name}`)
       ))
       const types = data.map(({ type }) => type)
       const values = data.map(({ value }) => value)
-      const digest = keccak256(pack(['bytes32', 'bytes32'], [domainHash, keccak256(pack(types, values))] ))
+      const digest = keccak256(pack(['bytes32', 'bytes32'], [typeHash, keccak256(pack(types, values))] ))
       const { r, s, v } = initiator._signingKey().signDigest(digest)
       return pack(['bytes32', 'bytes32', 'uint8'], [r, s, v])
     }
