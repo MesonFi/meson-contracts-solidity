@@ -23,7 +23,7 @@ export interface MesonSwapInterface extends utils.Interface {
     "balanceOf(address,address)": FunctionFragment;
     "bondSwap(uint256,uint40)": FunctionFragment;
     "cancelSwap(uint256)": FunctionFragment;
-    "executeSwap(uint256,bytes32,bytes32,bytes32,uint8,bool)": FunctionFragment;
+    "executeSwap(uint256,bytes32,bytes32,uint8,address,bool)": FunctionFragment;
     "getPostedSwap(uint256)": FunctionFragment;
     "getShortCoinType()": FunctionFragment;
     "indexOfAddress(address)": FunctionFragment;
@@ -52,14 +52,7 @@ export interface MesonSwapInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "executeSwap",
-    values: [
-      BigNumberish,
-      BytesLike,
-      BytesLike,
-      BytesLike,
-      BigNumberish,
-      boolean
-    ]
+    values: [BigNumberish, BytesLike, BytesLike, BigNumberish, string, boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "getPostedSwap",
@@ -218,10 +211,10 @@ export interface MesonSwap extends BaseContract {
 
     executeSwap(
       encodedSwap: BigNumberish,
-      recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      recipient: string,
       depositToPool: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -291,10 +284,10 @@ export interface MesonSwap extends BaseContract {
 
   executeSwap(
     encodedSwap: BigNumberish,
-    recipientHash: BytesLike,
     r: BytesLike,
     s: BytesLike,
     v: BigNumberish,
+    recipient: string,
     depositToPool: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -362,10 +355,10 @@ export interface MesonSwap extends BaseContract {
 
     executeSwap(
       encodedSwap: BigNumberish,
-      recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      recipient: string,
       depositToPool: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -451,10 +444,10 @@ export interface MesonSwap extends BaseContract {
 
     executeSwap(
       encodedSwap: BigNumberish,
-      recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      recipient: string,
       depositToPool: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -517,10 +510,10 @@ export interface MesonSwap extends BaseContract {
 
     executeSwap(
       encodedSwap: BigNumberish,
-      recipientHash: BytesLike,
       r: BytesLike,
       s: BytesLike,
       v: BigNumberish,
+      recipient: string,
       depositToPool: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
