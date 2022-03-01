@@ -3,7 +3,7 @@ import { PartialSwapData, SwapData } from '@mesonfi/sdk'
 type OptionalSwapData = {
   inToken?: number,
   outToken?: number,
-  amount?: string,
+  amount?: number,
   fee?: string,
   expireTs?: string,
   inChain?:string

@@ -9,8 +9,8 @@ contract MesonStatesTest is MesonStates {
   }
 
   function encodeSwap(
-    uint96 amount,
-    uint32 salt,
+    uint48 amount,
+    uint80 salt,
     uint40 fee,
     uint40 expireTs,
     bytes2 outChain,

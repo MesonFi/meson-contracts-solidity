@@ -32,8 +32,8 @@ export enum LockedSwapStatus {
 }
 
 export interface PartialSwapData {
-  amount: string,
-  salt?: number,
+  amount: number,
+  salt?: string,
   fee: string,
   inToken: number,
   outToken: number,
