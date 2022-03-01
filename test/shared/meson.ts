@@ -13,7 +13,7 @@ type OptionalSwapData = {
 export const TestAddress = '0x7F342A0D04B951e8600dA1eAdD46afe614DaC20B'
 
 export function getPartialSwap({
-  amount = 100,
+  amount = 1000,
   fee = '1',
   inToken = 1,
   outToken = 1,
@@ -28,7 +28,7 @@ export function getPartialSwap({
 }
 
 export function getSwap({
-  amount = 100,
+  amount = 1000,
   fee = '1',
   expireTs = Math.floor(Date.now() / 1000) + 5400,
   inChain = '0x0001',

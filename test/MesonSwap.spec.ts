@@ -91,7 +91,7 @@ describe('MesonSwap', () => {
         .to.be.revertedWith('For security reason, amount cannot be greater than 100k')
     })
     it('posts a valid swap', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 101)
+      await token.connect(initiator).approve(mesonInstance.address, 1001)
       await mesonClientForProvider.postSwap(signedRequest)
 
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
@@ -99,11 +99,11 @@ describe('MesonSwap', () => {
       expect(posted.provider).to.equal(provider.address)
       expect(posted.executed).to.equal(false)
       
-      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(101))
-      expect(await token.balanceOf(mesonInstance.address)).to.equal(101)
+      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(1001))
+      expect(await token.balanceOf(mesonInstance.address)).to.equal(1001)
     })
     it('rejects if swap already exists', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 101)
+      await token.connect(initiator).approve(mesonInstance.address, 1001)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await expect(mesonClientForProvider.postSwap(signedRequest)).to.be.revertedWith('Swap already exists')
@@ -116,14 +116,14 @@ describe('MesonSwap', () => {
         .to.be.revertedWith('Swap does not exist')
     })
     it('rejects if swap bonded to others', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 101)
+      await token.connect(initiator).approve(mesonInstance.address, 1001)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await expect(mesonInstance.bondSwap(swap.encoded, 2))
         .to.be.revertedWith('Swap bonded to another provider')
     })
     it('rejects if providerIndex is not for signer', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 101)
+      await token.connect(initiator).approve(mesonInstance.address, 1001)
       await mesonInstance.postSwap(
         signedRequest.encoded,
         signedRequest.signature[0],
@@ -135,7 +135,7 @@ describe('MesonSwap', () => {
         .to.be.revertedWith('Can only bound to signer')
     })
     it('bonds a valid swap', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 101)
+      await token.connect(initiator).approve(mesonInstance.address, 1001)
       await mesonInstance.postSwap(
         signedRequest.encoded,
         signedRequest.signature[0],
@@ -153,14 +153,14 @@ describe('MesonSwap', () => {
         .to.be.revertedWith('Swap does not exist')
     })
     it('rejects if swap does not expire', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 101)
+      await token.connect(initiator).approve(mesonInstance.address, 1001)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await expect(mesonClientForProvider.cancelSwap(swap.encoded))
         .to.be.revertedWith('Swap is still locked')
     })
     it('cancels a valid swap', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 101)
+      await token.connect(initiator).approve(mesonInstance.address, 1001)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await ethers.provider.send('evm_increaseTime', [5400])
@@ -185,7 +185,7 @@ describe('MesonSwap', () => {
         .to.be.revertedWith('Swap does not exist')
     })
     it('executes a valid swap and deposit to pool', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 101)
+      await token.connect(initiator).approve(mesonInstance.address, 1001)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await mesonClientForProvider.executeSwap(signedRelease, true)
@@ -195,23 +195,23 @@ describe('MesonSwap', () => {
       expect(posted.provider).to.equal(AddressZero)
       expect(posted.executed).to.equal(true)
 
-      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(101))
+      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(1001))
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE)
-      expect(await token.balanceOf(mesonInstance.address)).to.equal(101)
-      expect(await mesonInstance.balanceOf(token.address, provider.address)).to.equal(101)
+      expect(await token.balanceOf(mesonInstance.address)).to.equal(1001)
+      expect(await mesonInstance.balanceOf(token.address, provider.address)).to.equal(1001)
     })
     it('executes a valid swap and withdraw', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 101)
+      await token.connect(initiator).approve(mesonInstance.address, 1001)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await mesonClientForProvider.executeSwap(signedRelease, false)
 
-      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(101))
-      expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.add(101))
+      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(1001))
+      expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.add(1001))
       expect(await token.balanceOf(mesonInstance.address)).to.equal(0)
     })
     it('executes a valid swap after some time', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 101)
+      await token.connect(initiator).approve(mesonInstance.address, 1001)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await ethers.provider.send('evm_increaseTime', [3600])
@@ -229,7 +229,7 @@ describe('MesonSwap', () => {
 
   describe('#getPostedSwap', () => {
     it('returns the posted swap', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 101)
+      await token.connect(initiator).approve(mesonInstance.address, 1001)
       await mesonClientForProvider.postSwap(signedRequest)
 
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
