@@ -131,24 +131,15 @@ export class MesonClient {
       signedRequest.signature[0],
       signedRequest.signature[1],
       signedRequest.signature[2],
-      pack(['address', 'uint40'], [
-        signedRequest.initiator,
-        providerIndex
-      ])
+      pack(['address', 'uint40'], [signedRequest.initiator, providerIndex])
     )
   }
 
   async lock(signedRequest: SignedSwapRequest) {
-    return this.mesonInstance.lock(
-      signedRequest.encoded,
-      ...signedRequest.signature,
-      signedRequest.initiator
-    )
+    return this.mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
   }
   async unlock(signedRequest: SignedSwapRequest) {
-    return this.mesonInstance.unlock(
-      signedRequest.encoded
-    )
+    return this.mesonInstance.unlock(signedRequest.encoded, signedRequest.initiator)
   }
   async release(signedRelease: SignedSwapRelease) {
     return this.mesonInstance.release(
