@@ -1,3 +1,4 @@
+import { ethers } from 'hardhat'
 import { PartialSwapData, SwapData } from '@mesonfi/sdk'
 
 type OptionalSwapData = {
@@ -13,8 +14,8 @@ type OptionalSwapData = {
 export const TestAddress = '0x7F342A0D04B951e8600dA1eAdD46afe614DaC20B'
 
 export function getPartialSwap({
-  amount = 1000,
-  fee = '1',
+  amount = ethers.utils.parseUnits('1000', 6).toNumber(),
+  fee = ethers.utils.parseUnits('1', 6).toString(),
   inToken = 1,
   outToken = 1,
 } = {}): PartialSwapData {
@@ -28,8 +29,8 @@ export function getPartialSwap({
 }
 
 export function getSwap({
-  amount = 1000,
-  fee = '1',
+  amount = ethers.utils.parseUnits('1000', 6).toNumber(),
+  fee = ethers.utils.parseUnits('1', 6).toString(),
   expireTs = Math.floor(Date.now() / 1000) + 5400,
   inChain = '0x0001',
   inToken = 2,

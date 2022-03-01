@@ -2,6 +2,7 @@ import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 
 import { solidity, MockProvider } from 'ethereum-waffle';
+import { parseUnits } from '@ethersproject/units'
 import { Wallet } from '@ethersproject/wallet'
 import { ContractFactory } from '@ethersproject/contracts'
 import { AddressZero } from '@ethersproject/constants'
@@ -41,9 +42,9 @@ describe('MesonClient', () => {
     const swapSigner = new EthersWalletSwapSigner(initiator)
 
     const tokenFactory = new ContractFactory(ERC20Abi.abi, ERC20Abi.bytecode, wallets[0])
-    token = await tokenFactory.deploy('MockToken', 'MT', 1000000) as MockToken
-    await token.transfer(initiator.address, 10000)
-    await token.transfer(provider.address, 100000)
+    token = await tokenFactory.deploy('MockToken', 'MT', parseUnits('10000', 6)) as MockToken
+    await token.transfer(initiator.address, parseUnits('3000', 6))
+    await token.transfer(provider.address, parseUnits('5000', 6))
 
     const mesonFactory = new ContractFactory(MesonAbi.abi, MesonAbi.bytecode, wallets[0])
     mesonInstance = await mesonFactory.deploy([token.address]) as Meson
@@ -84,13 +85,14 @@ describe('MesonClient', () => {
   })
 
   describe('#depositAndRegister', () => {
+    const amount = parseUnits('100', 6)
     it('rejects unsupported token', async () => {
-      await expect(mesonClientForProvider.depositAndRegister(unsupported, '100', '1'))
+      await expect(mesonClientForProvider.depositAndRegister(unsupported, amount.toString(), '1'))
         .to.be.rejectedWith('Token not supported')
     })
     it('accepts a supported token deposit', async () => {
-      await token.connect(provider).approve(mesonInstance.address, 100)
-      await mesonClientForProvider.depositAndRegister(token.address, '100', '1')
+      await token.connect(provider).approve(mesonInstance.address, amount)
+      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
     })
   })
 
@@ -101,9 +103,10 @@ describe('MesonClient', () => {
     })
 
     it('accepts a supported token deposit', async () => {
-      await token.connect(provider).approve(mesonInstance.address, 100)
-      await mesonClientForProvider.depositAndRegister(token.address, '10', '1')
-      await mesonClientForProvider.deposit(token.address, '10')
+      const amount = parseUnits('10', 6)
+      await token.connect(provider).approve(mesonInstance.address, parseUnits('100', 6))
+      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.deposit(token.address, amount.toString())
     })
   })
 
@@ -111,7 +114,7 @@ describe('MesonClient', () => {
     let signedRequest
 
     beforeEach('prepare for postSwap', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+      await token.connect(initiator).approve(mesonInstance.address, parseUnits('1001', 6))
 
       const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
@@ -139,8 +142,9 @@ describe('MesonClient', () => {
       const signedRequestData = await swap.signForRequest(true)
       signedRequest = new SignedSwapRequest(signedRequestData)
 
-      await token.connect(provider).approve(mesonInstance.address, 1000)
-      await mesonClientForProvider.depositAndRegister(token.address, '1000', '1')
+      const amount = parseUnits('1000', 6)
+      await token.connect(provider).approve(mesonInstance.address, amount)
+      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
     })
 
     it('locks a swap', async () => {
@@ -151,13 +155,14 @@ describe('MesonClient', () => {
   describe('#unlock', () => {
     let signedRequest
 
-    beforeEach('prepare for lock', async () => {
+    beforeEach('prepare for unlock', async () => {
       const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
       signedRequest = new SignedSwapRequest(signedRequestData)
 
-      await token.connect(provider).approve(mesonInstance.address, 1000)
-      await mesonClientForProvider.depositAndRegister(token.address, '1000', '1')
+      const amount = parseUnits('1000', 6)
+      await token.connect(provider).approve(mesonInstance.address, amount)
+      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
     })
 
     it('tries to unlock a swap', async () => {
@@ -171,15 +176,16 @@ describe('MesonClient', () => {
     let signedRequest
     let signedRelease
 
-    beforeEach('prepare for lock', async () => {
+    beforeEach('prepare for release', async () => {
       const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
       signedRequest = new SignedSwapRequest(signedRequestData)
       const signedReleaseData = await swap.signForRelease(TestAddress, true)
       signedRelease = new SignedSwapRelease(signedReleaseData)
 
-      await token.connect(provider).approve(mesonInstance.address, 1000)
-      await mesonClientForProvider.depositAndRegister(token.address, '1000', '1')
+      const amount = parseUnits('1000', 6)
+      await token.connect(provider).approve(mesonInstance.address, amount)
+      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
     })
 
     it('releases a swap', async () => {
@@ -193,7 +199,7 @@ describe('MesonClient', () => {
     let signedRelease
 
     beforeEach('prepare for lock', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+      await token.connect(initiator).approve(mesonInstance.address, parseUnits('1001', 6))
 
       const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
@@ -214,8 +220,8 @@ describe('MesonClient', () => {
   describe('#cancelSwap', () => {
     let signedRequest
 
-    beforeEach('prepare for lock', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+    beforeEach('prepare for cancel', async () => {
+      await token.connect(initiator).approve(mesonInstance.address, parseUnits('1001', 6))
 
       const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
@@ -235,8 +241,8 @@ describe('MesonClient', () => {
   describe('#getPostedSwap', () => {
     let signedRequest
 
-    beforeEach('prepare for lock', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+    beforeEach('prepare for getPostedSwap', async () => {
+      await token.connect(initiator).approve(mesonInstance.address, parseUnits('1001', 6))
 
       const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
@@ -264,13 +270,14 @@ describe('MesonClient', () => {
   describe('#getLockedSwap', () => {
     let signedRequest
 
-    beforeEach('prepare for lock', async () => {
+    beforeEach('prepare for getLockedSwap', async () => {
       const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
       signedRequest = new SignedSwapRequest(signedRequestData)
 
-      await token.connect(provider).approve(mesonInstance.address, 1000)
-      await mesonClientForProvider.depositAndRegister(token.address, '1000', '1')
+      const amount = parseUnits('1000', 6)
+      await token.connect(provider).approve(mesonInstance.address, amount)
+      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
 
       await mesonClientForProvider.lock(signedRequest)
     })

@@ -1,8 +1,9 @@
+import { parseUnits } from '@ethersproject/units'
 import { PartialSwapData, SwapData, SignedSwapRequestData, SignedSwapReleaseData } from '../..'
 
 export function getPartialSwap({
-  amount = 1000,
-  fee = '1',
+  amount = parseUnits('1000', 6).toNumber(),
+  fee = parseUnits('1', 6).toString(),
   inToken = 1,
   outToken = 1,
 } = {}): PartialSwapData {
@@ -16,8 +17,8 @@ export function getPartialSwap({
 }
 
 export function getSwap({
-  amount = 1000,
-  fee = '1',
+  amount = parseUnits('1000', 6).toNumber(),
+  fee = parseUnits('1', 6).toString(),
   expireTs = Math.floor(Date.now() / 1000) + 5400,
   inChain = '0x0001',
   inToken = 2,
@@ -42,19 +43,19 @@ interface ExtendedSignedSwapRequestData extends SignedSwapRequestData {
 }
 
 export const signedSwapRequestData = {
-  encoded: '0x0000000003e800000000000081403287000000000100621d7ef8003c01003c01',
+  encoded: '0x00003b9aca000000000000008140328700000f424000621d7ef8003c01003c01',
   initiator: '0x63FC2aD3d021a4D7e64323529a55a9442C444dA0',
-  digest: '0x5a520ce810bfbe1608d6d31326d1ce6085d6eeaff8cbb08efe687f425fc3f99f',
+  digest: '0x412a992ebcc7bc875222e7c69adf148b1fe145110d1fc9dc29f0a0268d7e54df',
   signature: [
-    '0xba30cf35f1bad01751af60b00ce7912e8d2ab69286b2125f2f9ff7bf18605b5f',
-    '0x3992f77437133fa2d2c20cdc057ce53a1f5193cb6573ec2993a8bb6643dd8627',
+    '0x59fa1a243a6003c21e50ceb2322cd8fcf09601e8dd4ac1b3baf54b93515fc29a',
+    '0x2e6796f3c146d0ffd926a5898341c88d8947149917833647e1064c8644cd6a4c',
     28
   ],
-  mainnetDigest: '0x7a282d244ab253a3c3ca393a96a91ddf2296896e27317788d8fff7412eeb248f',
+  mainnetDigest: '0x62260aeff2d08a819fbcfe8eec99b98371255aa95c1413d56fc230be4377c9f5',
   mainnetSignature: [
-    '0x6028bdad3eff9f83b42364184e7d009ecd864ef88e4a1576fb09dc1e22b9de15',
-    '0x0d428ab598e504d8193e64e1ae46883cf462aed7adacc97a9daacfaec11b68c3',
-    27
+    '0x895e02db52b697000e81a14be19ee8bcb9336487fca9f8418ade1baf2ee8cd1c',
+    '0x6c73c13f9d6c5a257cda7d0ec85b6297d643da45c838eb03aa745b6435050fb8',
+    28
   ]
 } as ExtendedSignedSwapRequestData
 
@@ -65,19 +66,19 @@ interface ExtendedSignedSwapReleaseData extends SignedSwapReleaseData {
 }
 
 export const signedSwapReleaseData = {
-  encoded: '0x0000000003e800000000000081403287000000000100621d7ef8003c01003c01',
+  encoded: '0x00003b9aca000000000000008140328700000f424000621d7ef8003c01003c01',
   initiator: '0x63FC2aD3d021a4D7e64323529a55a9442C444dA0',
   recipient: '0xD1D84F0e28D6fedF03c73151f98dF95139700aa7',
-  digest: '0x4d6b782744a6c3675d0cef6d87baf380c3df2286ae6eef7816b8cec04a4da473',
+  digest: '0x1e82a182a014967a4fa1f945fb72b191d3efa7a949c4e364064db05ecea46a3a',
   signature: [
-    '0xb3a991e53dfc320b3dc0919e00a2f3d83c4034b7473136b4736dadc7782cce3a',
-    '0x79c24cb0805df4147458ddeeba8d963c4be05336156106d8ddf9ce7a0cb11af5',
-    28
+    '0x0dcb3f16caecf58d5cb4f322205b2050197a570d5414b40ded15a25a0a0ed513',
+    '0x77932f8852466065b981da7a3b7c06c178ee519638b23ec41e65456e6f73a712',
+    27
   ],
-  mainnetDigest: '0x0f2f859b0759e339781b54c2d7b433fdfb1425f62234c455d98a36dcc015f93a',
+  mainnetDigest: '0x3c651888c7d3e8ac90f7a335300c44a9d01c92f2c3d420d7a617dcc953eb49eb',
   mainnetSignature: [
-    '0x0cbeea0764b3d95f1c5feeb35f7e0def6dedd8cd5799044bbbed3cfd6469cab7',
-    '0x287939f3ac22206b57408fd563722a64c0759c017131a48bae7323fce5452f4c',
+    '0x02b12b894cbebe57d319ea6a02c8acecfcf5b7c3f637133d239ed18bf0ca3b1f',
+    '0x032be9e60296b2c5757aedc1e900e8cac52bc048e0258e552d200abc7cefd25a',
     28
   ]
 } as ExtendedSignedSwapReleaseData

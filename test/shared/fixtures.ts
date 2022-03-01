@@ -3,7 +3,7 @@ import { MockToken } from '../../typechain/MockToken'
 import { MesonPoolsTest } from '../../typechain/MesonPoolsTest'
 import { MesonSwapTest } from '../../typechain/MesonSwapTest'
 
-export const TOKEN_BALANCE = ethers.utils.parseUnits('1000', 6)
+export const TOKEN_BALANCE = ethers.utils.parseUnits('3000', 6)
 export const TOKEN_TOTAL_SUPPLY = ethers.utils.parseUnits('10000', 6)
 
 export async function fixtures (accounts: string[] | undefined) {

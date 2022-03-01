@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@ethersproject/contracts": "5.5.0",
+    "@ethersproject/units": "5.5.0",
     "@mesonfi/contract-abis": "^0.6.0",
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.5",

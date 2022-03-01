@@ -82,16 +82,20 @@ describe('MesonSwap', () => {
 
       await expect(mesonClientForProvider.postSwap(signedRequest)).to.be.revertedWith('Expire ts too late')
     })
+
     it('rejects if amount > 100k', async () => {
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: 100000000001 }), outChain)
+      const amount = ethers.utils.parseUnits('100001', 6)
+      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: amount.toNumber() }), outChain)
       const signedRequestData = await swap.signForRequest(true)
       const signedRequest = new SignedSwapRequest(signedRequestData)
 
       await expect(mesonClientForProvider.postSwap(signedRequest))
         .to.be.revertedWith('For security reason, amount cannot be greater than 100k')
     })
+
+    const amount = ethers.utils.parseUnits('1001', 6)
     it('posts a valid swap', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+      await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonClientForProvider.postSwap(signedRequest)
 
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
@@ -99,11 +103,11 @@ describe('MesonSwap', () => {
       expect(posted.provider).to.equal(provider.address)
       expect(posted.executed).to.equal(false)
       
-      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(1001))
-      expect(await token.balanceOf(mesonInstance.address)).to.equal(1001)
+      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(amount))
+      expect(await token.balanceOf(mesonInstance.address)).to.equal(amount)
     })
     it('rejects if swap already exists', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+      await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await expect(mesonClientForProvider.postSwap(signedRequest)).to.be.revertedWith('Swap already exists')
@@ -115,15 +119,17 @@ describe('MesonSwap', () => {
       await expect(mesonInstance.bondSwap(swap.encoded, 1))
         .to.be.revertedWith('Swap does not exist')
     })
+
+    const amount = ethers.utils.parseUnits('1001', 6)
     it('rejects if swap bonded to others', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+      await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await expect(mesonInstance.bondSwap(swap.encoded, 2))
         .to.be.revertedWith('Swap bonded to another provider')
     })
     it('rejects if providerIndex is not for signer', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+      await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonInstance.postSwap(
         signedRequest.encoded,
         signedRequest.signature[0],
@@ -135,7 +141,7 @@ describe('MesonSwap', () => {
         .to.be.revertedWith('Can only bound to signer')
     })
     it('bonds a valid swap', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+      await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonInstance.postSwap(
         signedRequest.encoded,
         signedRequest.signature[0],
@@ -152,15 +158,17 @@ describe('MesonSwap', () => {
       await expect(mesonClientForProvider.cancelSwap(swap.encoded))
         .to.be.revertedWith('Swap does not exist')
     })
+
+    const amount = ethers.utils.parseUnits('1001', 6)
     it('rejects if swap does not expire', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+      await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await expect(mesonClientForProvider.cancelSwap(swap.encoded))
         .to.be.revertedWith('Swap is still locked')
     })
     it('cancels a valid swap', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+      await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await ethers.provider.send('evm_increaseTime', [5400])
@@ -184,8 +192,10 @@ describe('MesonSwap', () => {
       await expect(mesonClientForProvider.executeSwap(signedRelease, true))
         .to.be.revertedWith('Swap does not exist')
     })
+
+    const amount = ethers.utils.parseUnits('1001', 6)
     it('executes a valid swap and deposit to pool', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+      await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await mesonClientForProvider.executeSwap(signedRelease, true)
@@ -195,23 +205,23 @@ describe('MesonSwap', () => {
       expect(posted.provider).to.equal(AddressZero)
       expect(posted.executed).to.equal(true)
 
-      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(1001))
+      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(amount))
       expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE)
-      expect(await token.balanceOf(mesonInstance.address)).to.equal(1001)
-      expect(await mesonInstance.balanceOf(token.address, provider.address)).to.equal(1001)
+      expect(await token.balanceOf(mesonInstance.address)).to.equal(amount)
+      expect(await mesonInstance.balanceOf(token.address, provider.address)).to.equal(amount)
     })
     it('executes a valid swap and withdraw', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+      await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await mesonClientForProvider.executeSwap(signedRelease, false)
 
-      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(1001))
-      expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.add(1001))
+      expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(amount))
+      expect(await token.balanceOf(provider.address)).to.equal(TOKEN_BALANCE.add(amount))
       expect(await token.balanceOf(mesonInstance.address)).to.equal(0)
     })
     it('executes a valid swap after some time', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+      await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonClientForProvider.postSwap(signedRequest)
 
       await ethers.provider.send('evm_increaseTime', [3600])
@@ -228,8 +238,9 @@ describe('MesonSwap', () => {
   })
 
   describe('#getPostedSwap', () => {
+    const amount = ethers.utils.parseUnits('1001', 6)
     it('returns the posted swap', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, 1001)
+      await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonClientForProvider.postSwap(signedRequest)
 
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
