@@ -15,7 +15,7 @@ const swapStruct = [
 
 export interface SwapData {
   encoded?: string,
-  amount: number,
+  amount: number | string,
   salt?: string,
   fee: string,
   expireTs: number,
@@ -57,7 +57,8 @@ export class Swap implements SwapData {
   }
 
   constructor(data: SwapData) {
-    if (typeof data.amount !== 'number' || !data.amount) {
+    const amount = parseInt(data.amount.toString())
+    if (!amount) {
       throw new Error('Invalid amount')
     } else if (!data.fee) {
       throw new Error('Missing fee')
@@ -73,7 +74,7 @@ export class Swap implements SwapData {
       throw new Error('Invalid outToken')
     }
 
-    this.amount = data.amount
+    this.amount = amount
     this.salt = data.salt || Math.floor(Math.random() * 4294967296).toString()
     this.fee = data.fee
     this.expireTs = data.expireTs
