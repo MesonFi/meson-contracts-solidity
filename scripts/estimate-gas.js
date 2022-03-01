@@ -49,7 +49,7 @@ async function main() {
   const signedRequest = new SignedSwapRequest(request)
   signedRequest.checkSignature(testnetMode)
 
-  const swapData2 = getPartialSwap({ amount: '200', inToken: 1, outToken: 1 })
+  const swapData2 = getPartialSwap({ amount: 200, inToken: 1, outToken: 1 })
   const swap2 = mesonClient.requestSwap(swapData2, outChain)
   const request2 = await swap2.signForRequest(testnetMode)
   const signedRequest2 = new SignedSwapRequest(request2)
