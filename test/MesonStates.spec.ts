@@ -111,17 +111,16 @@ describe('MesonStates', () => {
   describe('#lockedSwapFrom', () => {
     it('returns same result as js function', async () => {
       const ts = Math.floor(Date.now() / 1000)
-      const lockedSwap = pack(['uint40', 'uint40', 'address'], [ts, 1, TestAddress])
-      expect(await mesonInstance.lockedSwapFrom(ts, 1, TestAddress)).to.equal(lockedSwap)
+      const lockedSwap = pack(['uint40', 'uint40'], [ts, 1])
+      expect(await mesonInstance.lockedSwapFrom(ts, 1)).to.equal(lockedSwap)
     })
   })
 
   describe('#decodeLockedSwap', () => {
     it('returns decoded locked swap data', async () => {
       const ts = Math.floor(Date.now() / 1000)
-      const lockedSwap = pack(['uint40', 'uint40', 'address'], [ts, 1, TestAddress])
+      const lockedSwap = pack(['uint40', 'uint40'], [ts, 1])
       const decodedLocked = await mesonInstance.decodeLockedSwap(lockedSwap)
-      expect(decodedLocked.initiator).to.equal(TestAddress)
       expect(decodedLocked.providerIndex).to.equal(1)
       expect(decodedLocked.until).to.equal(ts)
     })

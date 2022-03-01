@@ -35,7 +35,7 @@ contract MesonStatesTest is MesonStates {
     uint256 amount,
     uint256 fee,
     uint256 feeToMeson,
-    uint32 salt,
+    uint80 salt,
     uint256 expireTs,
     bytes2 inChain,
     uint8 inTokenIndex,
@@ -65,16 +65,11 @@ contract MesonStatesTest is MesonStates {
     providerIndex = _providerIndexFromPosted(postedSwap);
   }
 
-  function lockedSwapFrom(uint256 until, uint40 providerIndex, address initiator) external pure returns (uint240) {
-    return _lockedSwapFrom(until, providerIndex, initiator);
+  function lockedSwapFrom(uint256 until, uint40 providerIndex) external pure returns (uint80) {
+    return _lockedSwapFrom(until, providerIndex);
   }
 
-  function decodeLockedSwap(uint240 lockedSwap) external pure returns (
-    address initiator,
-    uint40 providerIndex,
-    uint256 until
-  ) {
-    initiator = _initiatorFromLocked(lockedSwap);
+  function decodeLockedSwap(uint80 lockedSwap) external pure returns (uint40 providerIndex, uint256 until) {
     providerIndex = _providerIndexFromLocked(lockedSwap);
     until = _untilFromLocked(lockedSwap);
   }

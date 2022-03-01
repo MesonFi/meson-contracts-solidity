@@ -276,9 +276,8 @@ describe('MesonClient', () => {
     })
 
     it('returns the locked swap', async () => {
-      const locked = await mesonClientForInitiator.getLockedSwap(signedRequest.encoded)
+      const locked = await mesonClientForInitiator.getLockedSwap(signedRequest.encoded, initiator.address)
       expect(locked.status).to.equal(LockedSwapStatus.Locked)
-      expect(locked.initiator).to.equal(initiator.address)
       expect(locked.provider).to.equal(provider.address)
     })
   })

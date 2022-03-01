@@ -182,9 +182,8 @@ describe('MesonPools', () => {
       await mesonClientForProvider.lock(signedRequest)
       
       expect(await mesonInstance.balanceOf(mesonClientForProvider.token(1), provider.address)).to.equal(100)
-      const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded)
+      const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
       expect(locked.status).to.equal(LockedSwapStatus.Locked)
-      expect(locked.initiator).to.equal(initiator.address)
       expect(locked.provider).to.equal(provider.address)
     })
     it('rejects if swap already exists', async () => {
@@ -217,9 +216,8 @@ describe('MesonPools', () => {
       await mesonClientForProvider.unlock(signedRequest)
 
       expect(await mesonInstance.balanceOf(mesonClientForProvider.token(1), provider.address)).to.equal(200)
-      const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded)
+      const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
       expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
-      expect(locked.initiator).to.be.undefined
       expect(locked.provider).to.be.undefined
 
       await ethers.provider.send('evm_increaseTime', [-1800])
@@ -238,9 +236,8 @@ describe('MesonPools', () => {
       await mesonClientForProvider.release(signedRelease)
 
       expect(await token.balanceOf(TestAddress)).to.equal(100)
-      const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded)
+      const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
       expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
-      expect(locked.initiator).to.be.undefined
       expect(locked.provider).to.be.undefined
     })
   })
@@ -251,8 +248,7 @@ describe('MesonPools', () => {
       await mesonClientForProvider.depositAndRegister(token.address, '200', '1')
       await mesonClientForProvider.lock(signedRequest)
 
-      const locked = await mesonInstance.getLockedSwap(swap.encoded)
-      expect(locked.initiator).to.equal(initiator.address)
+      const locked = await mesonInstance.getLockedSwap(swap.encoded, initiator.address)
       expect(locked.provider).to.equal(provider.address)
     })
   })

@@ -7,7 +7,7 @@ import { getSwap } from './shared'
 describe('Swap', () => {
   describe('#constructor', () => {
     it('rejects if missing amount', () => {
-      expect(() => new Swap(getSwap({ amount: '' }))).to.throw('Missing amount')
+      expect(() => new Swap(getSwap({ amount: 0 }))).to.throw('Invalid amount')
     })
     it('rejects Missing fee', () => {
       expect(() => new Swap(getSwap({ fee: '' }))).to.throw('Missing fee')
@@ -28,11 +28,11 @@ describe('Swap', () => {
       expect(() => new Swap(getSwap({ outToken: '' }))).to.throw('Invalid outToken')
     })
 
-    it('creates a Swap if all parameters are correct', () => {
+    it('creates a swap if all parameters are correct', () => {
       const swapData = getSwap()
       const swap = new Swap(swapData)
       expect(swap.amount).to.equal(swapData.amount)
-      expect(swap.salt).to.be.a('number')
+      expect(swap.salt).to.be.a('string')
       expect(swap.fee).to.equal(swapData.fee)
       expect(swap.expireTs).to.equal(swapData.expireTs)
       expect(swap.inChain).to.equal(swapData.inChain)
