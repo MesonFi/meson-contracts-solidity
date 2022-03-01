@@ -35,7 +35,7 @@ describe('MesonPools', () => {
     mesonInstance = result.pools.connect(provider) // provider is signer
 
     const swapSigner = new EthersWalletSwapSigner(initiator)
-    mesonClientForInitiator = await MesonClient.Create(result.pools, swapSigner)
+    mesonClientForInitiator = await MesonClient.Create(result.pools as any, swapSigner)
     mesonClientForProvider = await MesonClient.Create((mesonInstance as any).connect(provider))
     outChain = mesonClientForProvider.shortCoinType
 
@@ -59,7 +59,7 @@ describe('MesonPools', () => {
   describe('#depositAndRegister', () => {
       const amount = ethers.utils.parseUnits('1000', 6)
       it('rejects zero provider index', async () => {
-      await expect(mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '0'))
+      await expect(mesonClientForProvider.depositAndRegister(token.address, amount, '0'))
         .to.be.revertedWith('Cannot use 0 as provider index')
     })
     it('rejects zero amount', async () => {
@@ -67,7 +67,7 @@ describe('MesonPools', () => {
         .to.be.revertedWith('Amount must be positive')
     })
     it('rejects if token not supported', async () => {
-      await expect(mesonClientForProvider.depositAndRegister(TestAddress, amount.toString(), '1'))
+      await expect(mesonClientForProvider.depositAndRegister(TestAddress, amount, '1'))
         .to.be.rejectedWith('Token not supported')
 
       const balanceIndex = pack(['uint8', 'uint40'], [2, 1])
@@ -76,24 +76,24 @@ describe('MesonPools', () => {
     })
     it('rejects if not approved', async () => {
       await token.approve(mesonInstance.address, ethers.utils.parseUnits('999', 6))
-      await expect(mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1'))
+      await expect(mesonClientForProvider.depositAndRegister(token.address, amount, '1'))
         .to.be.revertedWith('ERC20: transfer amount exceeds allowance')
     })
     it('accepts a valid depositAndRegister', async () => {
       await token.approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
-      expect(await mesonInstance.balanceOf(token.address, provider.address)).to.equal(amount.toString())
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
+      expect(await mesonInstance.balanceOf(token.address, provider.address)).to.equal(amount)
     })
     it('rejects if index is already registered', async () => {
       await token.approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
-      await expect(mesonClientForInitiator.depositAndRegister(token.address, amount.toString(), '1'))
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
+      await expect(mesonClientForInitiator.depositAndRegister(token.address, amount, '1'))
         .to.be.revertedWith('Index already registered')
     })
     it('rejects if provider is already registered', async () => {
       await token.approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
-      await expect(mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '2'))
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
+      await expect(mesonClientForProvider.depositAndRegister(token.address, amount, '2'))
         .to.be.revertedWith('Address already registered')
     })
   })
@@ -105,16 +105,16 @@ describe('MesonPools', () => {
         .to.be.rejectedWith('not registered. Please call depositAndRegister first.')
     })
     it('rejects zero amount', async () => {
-      await token.approve(mesonInstance.address, amount.toString())
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await token.approve(mesonInstance.address, amount)
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
       await expect(mesonClientForProvider.deposit(token.address, '0'))
         .to.be.revertedWith('Amount must be positive')
     })
     it('rejects if token not supported', async () => {
       await token.approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
-      await expect(mesonClientForProvider.deposit(TestAddress, amount.toString()))
+      await expect(mesonClientForProvider.deposit(TestAddress, amount))
         .to.be.rejectedWith('Token not supported')
 
       const balanceIndex = pack(['uint8', 'uint40'], [2, 1])
@@ -123,15 +123,15 @@ describe('MesonPools', () => {
     })
     it('rejects if not approved', async () => {
       await token.approve(mesonInstance.address, ethers.utils.parseUnits('1999', 6))
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
-      await expect(mesonClientForProvider.deposit(token.address, amount.toString()))
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
+      await expect(mesonClientForProvider.deposit(token.address, amount))
         .to.be.revertedWith('ERC20: transfer amount exceeds allowance')
     })
     it('accepts a valid deposit', async () => {
       const doubleAmount = ethers.utils.parseUnits('2000', 6)
       await token.approve(mesonInstance.address, doubleAmount)
-      await mesonClientForProvider.depositAndRegister(token.address,  amount.toString(), '1')
-      await mesonClientForProvider.deposit(token.address,  amount.toString())
+      await mesonClientForProvider.depositAndRegister(token.address,  amount, '1')
+      await mesonClientForProvider.deposit(token.address,  amount)
       expect(await mesonInstance.balanceOf(token.address, provider.address)).to.equal(doubleAmount)
     })
   })
@@ -144,14 +144,14 @@ describe('MesonPools', () => {
     })
     it('rejects if overdrawn', async () => {
       await token.approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
       await expect(mesonInstance.withdraw(ethers.utils.parseUnits('1001', 6), 1))
         .to.be.revertedWith('reverted with panic code 0x11')
     })
     it('accepts a valid withdraw', async () => {
       await token.approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
       const withdrawAmount = ethers.utils.parseUnits('1', 6)
       await mesonInstance.withdraw(withdrawAmount, 1)
@@ -167,7 +167,7 @@ describe('MesonPools', () => {
     it('rejects if expireTs is soon', async () => {
       const amount = ethers.utils.parseUnits('1000', 6)
       await token.approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
       await ethers.provider.send('evm_increaseTime', [4200])
       await expect(mesonClientForProvider.lock(signedRequest))
@@ -177,7 +177,7 @@ describe('MesonPools', () => {
     it('rejects if deposit is not enough', async () => {
       const amount = ethers.utils.parseUnits('999', 6)
       await token.approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
       await expect(mesonClientForProvider.lock(signedRequest))
         .to.be.revertedWith('reverted with panic code 0x11')
@@ -185,7 +185,7 @@ describe('MesonPools', () => {
     it('lockes a valid swap', async () => {
       const amount = ethers.utils.parseUnits('2000', 6)
       await token.approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
       await mesonClientForProvider.lock(signedRequest)
       
@@ -197,7 +197,7 @@ describe('MesonPools', () => {
     it('rejects if swap already exists', async () => {
       const amount = ethers.utils.parseUnits('2000', 6)
       await token.approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
       await mesonClientForProvider.lock(signedRequest)
       await expect(mesonClientForProvider.lock(signedRequest)).to.be.revertedWith('Swap already exists')
@@ -211,7 +211,7 @@ describe('MesonPools', () => {
     it('rejects if swap is still in lock', async () => {
       const amount = ethers.utils.parseUnits('2000', 6)
       await token.approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
       await mesonClientForProvider.lock(signedRequest)
 
@@ -220,7 +220,7 @@ describe('MesonPools', () => {
     it('unlocks a valid swap', async () => {
       const amount = ethers.utils.parseUnits('2000', 6)
       await token.approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
       await mesonClientForProvider.lock(signedRequest)
       await ethers.provider.send('evm_increaseTime', [1800])
@@ -242,7 +242,7 @@ describe('MesonPools', () => {
     it('releases a valid swap', async () => {
       const amount = ethers.utils.parseUnits('2000', 6)
       await token.approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
       await mesonClientForProvider.lock(signedRequest)
       await mesonClientForProvider.release(signedRelease)
@@ -258,7 +258,7 @@ describe('MesonPools', () => {
     it('returns the locked swap', async () => {
       const amount = ethers.utils.parseUnits('2000', 6)
       await token.approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
       await mesonClientForProvider.lock(signedRequest)
 
       const locked = await mesonInstance.getLockedSwap(swap.encoded, initiator.address)

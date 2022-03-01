@@ -1,7 +1,5 @@
 import { ethers } from 'hardhat'
-import { MockToken } from '../../typechain/MockToken'
-import { MesonPoolsTest } from '../../typechain/MesonPoolsTest'
-import { MesonSwapTest } from '../../typechain/MesonSwapTest'
+import { MockToken, MesonPoolsTest, MesonSwapTest } from '@mesonfi/contract-types'
 
 export const TOKEN_BALANCE = ethers.utils.parseUnits('3000', 6)
 export const TOKEN_TOTAL_SUPPLY = ethers.utils.parseUnits('10000', 6)
@@ -10,8 +8,8 @@ export async function fixtures (accounts: string[] | undefined) {
   const signer = (await ethers.getSigners())[0]
 
   const tokenFactory = await ethers.getContractFactory('MockToken')
-  const token1: MockToken = await tokenFactory.deploy('Mock Token 1', 'MT1', TOKEN_TOTAL_SUPPLY)
-  const token2: MockToken = await tokenFactory.deploy('Mock Token 2', 'MT2', TOKEN_TOTAL_SUPPLY)
+  const token1 = await tokenFactory.deploy('Mock Token 1', 'MT1', TOKEN_TOTAL_SUPPLY) as MockToken
+  const token2 = await tokenFactory.deploy('Mock Token 2', 'MT2', TOKEN_TOTAL_SUPPLY) as MockToken
 
   if (accounts) {
     for (const account of accounts) {
@@ -25,10 +23,10 @@ export async function fixtures (accounts: string[] | undefined) {
   }
 
   const poolsFactory = await ethers.getContractFactory('MesonPoolsTest')
-  const pools: MesonPoolsTest = await poolsFactory.deploy(token1.address)
+  const pools = await poolsFactory.deploy(token1.address) as MesonPoolsTest
 
   const swapFactory = await ethers.getContractFactory('MesonSwapTest')
-  const swap: MesonSwapTest = await swapFactory.deploy(token1.address)
+  const swap = await swapFactory.deploy(token1.address) as MesonSwapTest
 
   return { pools, swap, token1, token2 }
 }

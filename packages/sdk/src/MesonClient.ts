@@ -1,4 +1,4 @@
-import type { BigNumber } from "@ethersproject/bignumber";
+import type { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import type { Wallet } from '@ethersproject/wallet'
 import type { Meson } from '@mesonfi/contract-types'
 import { pack } from '@ethersproject/solidity'
@@ -31,9 +31,9 @@ export enum LockedSwapStatus {
 }
 
 export interface PartialSwapData {
-  amount: number,
+  amount: BigNumberish,
   salt?: string,
-  fee: string,
+  fee: BigNumberish,
   inToken: number,
   outToken: number,
 }
@@ -88,7 +88,7 @@ export class MesonClient {
     }, this.#signer)
   }
 
-  async depositAndRegister(token: string, amount: string, providerIndex: string) {
+  async depositAndRegister(token: string, amount: BigNumberish, providerIndex: string) {
     const tokenIndex = 1 + this.#tokens.indexOf(token.toLowerCase())
     if (!tokenIndex) {
       throw new Error(`Token not supported`)
@@ -96,12 +96,12 @@ export class MesonClient {
     return this._depositAndRegister(amount, tokenIndex, providerIndex)
   }
 
-  async _depositAndRegister(amount: string, tokenIndex: number, providerIndex: string) {
+  async _depositAndRegister(amount: BigNumberish, tokenIndex: number, providerIndex: string) {
     const balanceIndex = pack(['uint8', 'uint40'], [tokenIndex, providerIndex])
     return this.mesonInstance.depositAndRegister(amount, balanceIndex)
   }
 
-  async deposit(token: string, amount: string) {
+  async deposit(token: string, amount: BigNumberish) {
     const tokenIndex = 1 + this.#tokens.indexOf(token.toLowerCase())
     if (!tokenIndex) {
       throw new Error(`Token not supported`)
@@ -114,7 +114,7 @@ export class MesonClient {
     return this._deposit(amount, tokenIndex, providerIndex)
   }
 
-  async _deposit(amount: string, tokenIndex: number, providerIndex: number) {
+  async _deposit(amount: BigNumberish, tokenIndex: number, providerIndex: number) {
     const balanceIndex = pack(['uint8', 'uint40'], [tokenIndex, providerIndex])
     return this.mesonInstance.deposit(amount, balanceIndex)
   }

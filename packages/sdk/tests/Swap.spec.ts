@@ -6,11 +6,18 @@ import { getSwap } from './shared'
 
 describe('Swap', () => {
   describe('#constructor', () => {
-    it('rejects if missing amount', () => {
-      expect(() => new Swap(getSwap({ amount: 0 }))).to.throw('Invalid amount')
+    it('rejects invalid amount', () => {
+      expect(() => new Swap(getSwap({ amount: 'x' }))).to.throw('Invalid amount')
     })
-    it('rejects Missing fee', () => {
-      expect(() => new Swap(getSwap({ fee: '' }))).to.throw('Missing fee')
+    it('rejects non-positive amount', () => {
+      expect(() => new Swap(getSwap({ amount: 0 }))).to.throw('Amount must be positive')
+      expect(() => new Swap(getSwap({ amount: -1 }))).to.throw('Amount must be positive')
+    })
+    it('rejects invalid fee', () => {
+      expect(() => new Swap(getSwap({ fee: 'x' }))).to.throw('Invalid fee')
+    })
+    it('rejects negative fee', () => {
+      expect(() => new Swap(getSwap({ fee: -1 }))).to.throw('Fee must be non-negative')
     })
     it('rejects if missing expireTs', () => {
       expect(() => new Swap(getSwap({ expireTs: 0 }))).to.throw('Missing expireTs')

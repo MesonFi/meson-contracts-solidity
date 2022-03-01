@@ -87,12 +87,12 @@ describe('MesonClient', () => {
   describe('#depositAndRegister', () => {
     const amount = parseUnits('100', 6)
     it('rejects unsupported token', async () => {
-      await expect(mesonClientForProvider.depositAndRegister(unsupported, amount.toString(), '1'))
+      await expect(mesonClientForProvider.depositAndRegister(unsupported, amount, '1'))
         .to.be.rejectedWith('Token not supported')
     })
     it('accepts a supported token deposit', async () => {
       await token.connect(provider).approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
     })
   })
 
@@ -105,8 +105,8 @@ describe('MesonClient', () => {
     it('accepts a supported token deposit', async () => {
       const amount = parseUnits('10', 6)
       await token.connect(provider).approve(mesonInstance.address, parseUnits('100', 6))
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
-      await mesonClientForProvider.deposit(token.address, amount.toString())
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
+      await mesonClientForProvider.deposit(token.address, amount)
     })
   })
 
@@ -144,7 +144,7 @@ describe('MesonClient', () => {
 
       const amount = parseUnits('1000', 6)
       await token.connect(provider).approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
     })
 
     it('locks a swap', async () => {
@@ -162,7 +162,7 @@ describe('MesonClient', () => {
 
       const amount = parseUnits('1000', 6)
       await token.connect(provider).approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
     })
 
     it('tries to unlock a swap', async () => {
@@ -185,7 +185,7 @@ describe('MesonClient', () => {
 
       const amount = parseUnits('1000', 6)
       await token.connect(provider).approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
     })
 
     it('releases a swap', async () => {
@@ -277,7 +277,7 @@ describe('MesonClient', () => {
 
       const amount = parseUnits('1000', 6)
       await token.connect(provider).approve(mesonInstance.address, amount)
-      await mesonClientForProvider.depositAndRegister(token.address, amount.toString(), '1')
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
       await mesonClientForProvider.lock(signedRequest)
     })

@@ -85,7 +85,7 @@ describe('MesonSwap', () => {
 
     it('rejects if amount > 100k', async () => {
       const amount = ethers.utils.parseUnits('100001', 6)
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount: amount.toNumber() }), outChain)
+      const swap = mesonClientForInitiator.requestSwap(getPartialSwap({ amount }), outChain)
       const signedRequestData = await swap.signForRequest(true)
       const signedRequest = new SignedSwapRequest(signedRequestData)
 
