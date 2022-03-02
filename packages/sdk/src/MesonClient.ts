@@ -1,8 +1,7 @@
-import type { BigNumber } from "@ethersproject/bignumber";
+import type { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import type { Wallet } from '@ethersproject/wallet'
 import type { Meson } from '@mesonfi/contract-types'
 import { pack } from '@ethersproject/solidity'
-import { keccak256 } from '@ethersproject/keccak256'
 import { AddressZero } from '@ethersproject/constants'
 
 import { Swap } from './Swap'
@@ -11,7 +10,7 @@ import { SwapSigner } from './SwapSigner'
 import { SignedSwapRequest, SignedSwapRelease } from './SignedSwap'
 
 export enum PostedSwapStatus {
-  None = 0, // nothing found on chain
+  NoneOrAfterRunning = 0, // nothing found on chain
   Requested = 0b0001,
   Bonded = 0b0010,
   Executed = 0b0100,
@@ -23,19 +22,18 @@ export enum PostedSwapStatus {
 }
 
 export enum LockedSwapStatus {
-  None = 0, // nothing found on chain
+  NoneOrAfterRunning = 0, // nothing found on chain
   Locked = 0b0001,
   Released = 0b0100,
   Unlocked = 0b0101,
   Error = 0b1000,
   ErrorExpired = 0b1001,
-  ErrorMadeForOtherInitiator = 0b1010,
 }
 
 export interface PartialSwapData {
-  amount: string,
-  salt?: number,
-  fee: string,
+  amount: BigNumberish,
+  salt?: string,
+  fee: BigNumberish,
   inToken: number,
   outToken: number,
 }
@@ -43,7 +41,7 @@ export interface PartialSwapData {
 export class MesonClient {
   readonly mesonInstance: Meson
   readonly shortCoinType: string
-  
+
   #signer: SwapSigner | null = null
   #tokens: string[] = []
 
@@ -62,16 +60,16 @@ export class MesonClient {
     this.shortCoinType = shortCoinType
   }
 
-  setSwapSigner (swapSigner: SwapSigner) {
+  setSwapSigner(swapSigner: SwapSigner) {
     this.#signer = swapSigner
   }
 
-  async _getSupportedTokens () {
+  async _getSupportedTokens() {
     const tokens = await this.mesonInstance.supportedTokens()
     this.#tokens = tokens.map(addr => addr.toLowerCase())
   }
 
-  token (index: number) {
+  token(index: number) {
     if (!index) {
       throw new Error(`Token index cannot be zero`)
     }
@@ -90,7 +88,7 @@ export class MesonClient {
     }, this.#signer)
   }
 
-  async depositAndRegister(token: string, amount: string, providerIndex: string) {
+  async depositAndRegister(token: string, amount: BigNumberish, providerIndex: string) {
     const tokenIndex = 1 + this.#tokens.indexOf(token.toLowerCase())
     if (!tokenIndex) {
       throw new Error(`Token not supported`)
@@ -98,12 +96,12 @@ export class MesonClient {
     return this._depositAndRegister(amount, tokenIndex, providerIndex)
   }
 
-  async _depositAndRegister(amount: string, tokenIndex: number, providerIndex: string) {
+  async _depositAndRegister(amount: BigNumberish, tokenIndex: number, providerIndex: string) {
     const balanceIndex = pack(['uint8', 'uint40'], [tokenIndex, providerIndex])
     return this.mesonInstance.depositAndRegister(amount, balanceIndex)
   }
 
-  async deposit(token: string, amount: string) {
+  async deposit(token: string, amount: BigNumberish) {
     const tokenIndex = 1 + this.#tokens.indexOf(token.toLowerCase())
     if (!tokenIndex) {
       throw new Error(`Token not supported`)
@@ -116,7 +114,7 @@ export class MesonClient {
     return this._deposit(amount, tokenIndex, providerIndex)
   }
 
-  async _deposit(amount: string, tokenIndex: number, providerIndex: number) {
+  async _deposit(amount: BigNumberish, tokenIndex: number, providerIndex: number) {
     const balanceIndex = pack(['uint8', 'uint40'], [tokenIndex, providerIndex])
     return this.mesonInstance.deposit(amount, balanceIndex)
   }
@@ -132,25 +130,21 @@ export class MesonClient {
       signedRequest.signature[0],
       signedRequest.signature[1],
       signedRequest.signature[2],
-      pack(['address', 'uint40'], [
-        signedRequest.initiator,
-        providerIndex
-      ])
+      pack(['address', 'uint40'], [signedRequest.initiator, providerIndex])
     )
   }
 
   async lock(signedRequest: SignedSwapRequest) {
-    return this.mesonInstance.lock(
-      signedRequest.encoded,
-      ...signedRequest.signature,
-      signedRequest.initiator
-    )
+    return this.mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
   }
-
+  async unlock(signedRequest: SignedSwapRequest) {
+    return this.mesonInstance.unlock(signedRequest.encoded, signedRequest.initiator)
+  }
   async release(signedRelease: SignedSwapRelease) {
     return this.mesonInstance.release(
       signedRelease.encoded,
       ...signedRelease.signature,
+      signedRelease.initiator,
       signedRelease.recipient
     )
   }
@@ -158,44 +152,44 @@ export class MesonClient {
   async executeSwap(signedRelease: SignedSwapRelease, depositToPool: boolean = false) {
     return this.mesonInstance.executeSwap(
       signedRelease.encoded,
-      keccak256(signedRelease.recipient),
       ...signedRelease.signature,
+      signedRelease.recipient,
       depositToPool
     )
   }
 
-  async cancelSwap(swapId: string, signer?: Wallet) {
+  async cancelSwap(encodedSwap: string, signer?: Wallet) {
     if (signer) {
-      return await this.mesonInstance.connect(signer).cancelSwap(swapId)
+      return await this.mesonInstance.connect(signer).cancelSwap(encodedSwap)
     }
-    return await this.mesonInstance.cancelSwap(swapId)
+    return await this.mesonInstance.cancelSwap(encodedSwap)
   }
 
-  async isSwapPosted (encoded: string | BigNumber) {
+  async isSwapPosted(encoded: string | BigNumber) {
     const filter = this.mesonInstance.filters.SwapPosted(encoded)
     const events = await this.mesonInstance.queryFilter(filter)
     return events.length > 0
   }
 
-  async isSwapBonded (encoded: string | BigNumber) {
+  async isSwapBonded(encoded: string | BigNumber) {
     const filter = this.mesonInstance.filters.SwapBonded(encoded)
     const events = await this.mesonInstance.queryFilter(filter)
     return events.length > 0
   }
 
-  async isSwapLocked (encoded: string | BigNumber) {
+  async isSwapLocked(encoded: string | BigNumber) {
     const filter = this.mesonInstance.filters.SwapLocked(encoded)
     const events = await this.mesonInstance.queryFilter(filter)
     return events.length > 0
   }
 
-  async isSwapCancelled (encoded: string | BigNumber) {
+  async isSwapCancelled(encoded: string | BigNumber) {
     const filter = this.mesonInstance.filters.SwapCancelled(encoded)
     const events = await this.mesonInstance.queryFilter(filter)
     return events.length > 0
   }
 
-  async isSwapReleased (encoded: string | BigNumber) {
+  async isSwapReleased(encoded: string | BigNumber) {
     const filter = this.mesonInstance.filters.SwapReleased(encoded)
     const events = await this.mesonInstance.queryFilter(filter)
     return events.length > 0
@@ -215,17 +209,12 @@ export class MesonClient {
     } catch (err: any) {
       throw new Error('Invalid encoded. ' + err.message)
     }
-    
+
     const { initiator, provider, executed } = await this.mesonInstance.getPostedSwap(encoded)
     if (executed) {
       return { status: PostedSwapStatus.Executed }
     } else if (initiator === AddressZero) {
-      if (await this.isSwapCancelled(encoded)) {
-        return { status: PostedSwapStatus.Cancelled }
-      } else if (await this.isSwapPosted(encoded)) {
-        return { status: PostedSwapStatus.Executed }
-      }
-      return { status: PostedSwapStatus.None }
+      return { status: PostedSwapStatus.NoneOrAfterRunning }
     } else if (initiatorToCheck && initiatorToCheck.toLowerCase() !== initiator.toLowerCase()) {
       return { status: PostedSwapStatus.ErrorMadeByOtherInitiator }
     } else if (provider === AddressZero) {
@@ -243,27 +232,18 @@ export class MesonClient {
     }
   }
 
-  async getLockedSwap(encoded: string | BigNumber, initiatorToCheck?: string): Promise<{
+  async getLockedSwap(encoded: string | BigNumber, initiator: string): Promise<{
     status: LockedSwapStatus,
-    initiator?: string,
     provider?: string,
     until?: number
   }> {
-    const { initiator, provider, until } = await this.mesonInstance.getLockedSwap(encoded)
+    const { provider, until } = await this.mesonInstance.getLockedSwap(encoded, initiator)
     if (!until) {
-      if (await this.isSwapReleased(encoded)) {
-        return { status: LockedSwapStatus.Released }
-      } else if (await this.isSwapLocked(encoded)) {
-        return { status: LockedSwapStatus.Unlocked }
-      } else {
-        return { status: LockedSwapStatus.None }
-      }
-    } else if (initiatorToCheck && initiatorToCheck.toLowerCase() !== initiator.toLowerCase()) {
-      return { status: LockedSwapStatus.ErrorMadeForOtherInitiator }
+      return { status: LockedSwapStatus.NoneOrAfterRunning }
     } else if (until * 1000 < Date.now()) {
-      return { status: LockedSwapStatus.ErrorExpired, initiator, provider, until }
+      return { status: LockedSwapStatus.ErrorExpired, provider, until }
     } else {
-      return { status: LockedSwapStatus.Locked, initiator, provider, until }
+      return { status: LockedSwapStatus.Locked, provider, until }
     }
   }
 }

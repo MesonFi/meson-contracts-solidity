@@ -2,19 +2,13 @@ const path = require('path')
 const fs = require('fs')
 const { ethers } = require('hardhat')
 const { MesonClient } = require('@mesonfi/sdk/src')
-const mainnets = require('@mesonfi/presets/src/mainnets.json')
-const testnets = require('@mesonfi/presets/src/testnets.json')
 require('dotenv').config()
 
 const { NETWORK_ID, PRIVATE_KEY, DEPOSIT_ON_DEPLOY } = process.env
 
 async function main() {
-  const network = mainnets.find(item => item.id === NETWORK_ID)
-  if (!network) {
-    throw new Error(`Invalid network: ${NETWORK_ID}`)
-  }
-
-  const index = testnets.findIndex(item => item.slip44 === network.slip44)
+  const testnets = require('@mesonfi/presets/src/testnets.json')
+  const index = testnets.findIndex(item => item.id.startsWith(NETWORK_ID))
   if (index === -1) {
     throw new Error(`Invalid network: ${NETWORK_ID}`)
   }

@@ -4,6 +4,8 @@ import { keccak256 } from '@ethersproject/keccak256'
 
 const NOTICE_SIGN_REQUEST = 'Sign to request a swap on Meson'
 const NOTICE_SIGN_RELEASE = 'Sign to release a swap on Meson'
+const NOTICE_TESTNET_SIGN_REQUEST = 'Sign to request a swap on Meson (Testnet)'
+const NOTICE_TESTNET_SIGN_RELEASE = 'Sign to release a swap on Meson (Testnet)'
 
 export type Signature = [string, string, number]
 
@@ -16,11 +18,11 @@ export class SwapSigner {
     throw new Error('Not implemented')
   }
 
-  async signSwapRequest(encoded: string): Promise<Signature> {
+  async signSwapRequest(encoded: string, testnet?: boolean): Promise<Signature> {
     throw new Error('Not implemented')
   }
 
-  async signSwapRelease(encoded: string, recipient: string): Promise<Signature> {
+  async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<Signature> {
     throw new Error('Not implemented')
   }
 
@@ -31,24 +33,26 @@ export class SwapSigner {
     return [r, s, v]
   }
 
-  static hashRequest(encoded: string): string {
-    const domainHash = keccak256(pack(['string'], [`bytes32 ${NOTICE_SIGN_REQUEST}`]))
+  static hashRequest(encoded: string, testnet?: boolean): string {
+    const notice = testnet ? NOTICE_TESTNET_SIGN_REQUEST : NOTICE_SIGN_REQUEST
+    const typeHash = keccak256(pack(['string'], [`bytes32 ${notice}`]))
     return keccak256(pack(
       ['bytes32', 'bytes32'],
-      [domainHash, keccak256(encoded)],
+      [typeHash, keccak256(encoded)],
     ))
   }
 
-  static hashRelease(encoded: string, recipient: string): string {
-    const domainHash = keccak256(pack(
+  static hashRelease(encoded: string, recipient: string, testnet?: boolean): string {
+    const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
+    const typeHash = keccak256(pack(
       ['string', 'string'],
-      [`bytes32 ${NOTICE_SIGN_RELEASE}`, 'bytes32 Recipient hash']
+      [`bytes32 ${notice}`, 'address Recipient']
     ))
     return keccak256(pack(
       ['bytes32', 'bytes32'],
       [
-        domainHash,
-        keccak256(pack(['bytes32', 'bytes32'], [encoded, keccak256(recipient)])),
+        typeHash,
+        keccak256(pack(['bytes32', 'address'], [encoded, recipient])),
       ],
     ))
   }
@@ -66,14 +70,14 @@ export class EthersWalletSwapSigner extends SwapSigner {
     return this.wallet.address
   }
 
-  async signSwapRequest(encoded: string): Promise<Signature> {
-    const digest = SwapSigner.hashRequest(encoded)
+  async signSwapRequest(encoded: string, testnet?: boolean): Promise<Signature> {
+    const digest = SwapSigner.hashRequest(encoded, testnet)
     const signature = await this.wallet._signingKey().signDigest(digest)
     return [signature.r, signature.s, signature.v]
   }
 
-  async signSwapRelease(encoded: string, recipient: string): Promise<Signature> {
-    const digest = SwapSigner.hashRelease(encoded, recipient)
+  async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<Signature> {
+    const digest = SwapSigner.hashRelease(encoded, recipient, testnet)
     const signature = await this.wallet._signingKey().signDigest(digest)
     return [signature.r, signature.s, signature.v]
   }
@@ -97,16 +101,18 @@ export class RemoteSwapSigner extends SwapSigner {
     return this.remoteSigner.getAddress()
   }
 
-  async signSwapRequest(encoded: string): Promise<Signature> {
-    const data = [{ type: 'bytes32', name: NOTICE_SIGN_REQUEST, value: encoded }]
+  async signSwapRequest(encoded: string, testnet?: boolean): Promise<Signature> {
+    const notice = testnet ? NOTICE_TESTNET_SIGN_REQUEST : NOTICE_SIGN_REQUEST
+    const data = [{ type: 'bytes32', name: notice, value: encoded }]
     const signature = await this.remoteSigner.signTypedData(data)
     return this._separateSignature(signature)
   }
 
-  async signSwapRelease(encoded: string, recipient: string): Promise<Signature> {
+  async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<Signature> {
+    const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
     const data = [
-      { type: 'bytes32', name: NOTICE_SIGN_RELEASE, value: encoded },
-      { type: 'bytes32', name: 'Recipient hash', value: keccak256(recipient) },
+      { type: 'bytes32', name: notice, value: encoded },
+      { type: 'address', name: 'Recipient', value: recipient },
     ]
     const signature = await this.remoteSigner.signTypedData(data)
     return this._separateSignature(signature)

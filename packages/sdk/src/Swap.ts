@@ -1,10 +1,10 @@
 import { pack } from '@ethersproject/solidity'
 import { hexZeroPad } from '@ethersproject/bytes'
-import { BigNumber } from '@ethersproject/bignumber'
+import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 
 const swapStruct = [
-  { name: 'amount', type: 'uint96' },
-  { name: 'salt', type: 'uint32' },
+  { name: 'amount', type: 'uint48' },
+  { name: 'salt', type: 'uint80' },
   { name: 'fee', type: 'uint40' },
   { name: 'expireTs', type: 'uint40' },
   { name: 'outChain', type: 'bytes2' },
@@ -15,9 +15,9 @@ const swapStruct = [
 
 export interface SwapData {
   encoded?: string,
-  amount: string,
-  salt?: number,
-  fee: string,
+  amount: BigNumberish,
+  salt?: string,
+  fee: BigNumberish,
   expireTs: number,
   inChain: string,
   inToken: number,
@@ -26,9 +26,9 @@ export interface SwapData {
 }
 
 export class Swap implements SwapData {
-  readonly amount: string
-  readonly salt: number
-  readonly fee: string
+  readonly amount: BigNumber
+  readonly salt: string
+  readonly fee: BigNumber
   readonly expireTs: number
   readonly inChain: string
   readonly inToken: number
@@ -44,9 +44,9 @@ export class Swap implements SwapData {
     if (!encoded.startsWith('0x') || encoded.length !== 66) {
       throw new Error('encoded swap should be a hex string of length 66')
     }
-    const amount = BigNumber.from(`0x${encoded.substring(2, 26)}`).toString()
-    const salt = parseInt(`0x${encoded.substring(26, 34)}`, 16)
-    const fee = BigNumber.from(`0x${encoded.substring(34, 44)}`).toString()
+    const amount = BigNumber.from(`0x${encoded.substring(2, 14)}`)
+    const salt = `0x${encoded.substring(14, 34)}`
+    const fee = BigNumber.from(`0x${encoded.substring(34, 44)}`)
     const expireTs = parseInt(`0x${encoded.substring(44, 54)}`, 16)
     const outChain = `0x${encoded.substring(54, 58)}`
     const outToken = parseInt(`0x${encoded.substring(58, 60)}`, 16)
@@ -57,10 +57,21 @@ export class Swap implements SwapData {
   }
 
   constructor(data: SwapData) {
-    if (!data.amount) {
-      throw new Error('Missing amount')
-    } else if (!data.fee) {
-      throw new Error('Missing fee')
+    try {
+      this.amount = BigNumber.from(data.amount)
+    } catch {
+      throw new Error('Invalid amount')
+    }
+    try {
+      this.fee = BigNumber.from(data.fee || 0)
+    } catch {
+      throw new Error('Invalid fee')
+    }
+
+    if (this.amount.lte(0)) {
+      throw new Error('Amount must be positive')
+    } else if (this.fee.lt(0)) {
+      throw new Error('Fee must be non-negative')
     } else if (!data.expireTs) {
       throw new Error('Missing expireTs')
     } else if (!data.inChain) {
@@ -73,14 +84,17 @@ export class Swap implements SwapData {
       throw new Error('Invalid outToken')
     }
 
-    this.amount = data.amount
-    this.salt = typeof data.salt === 'number' ? data.salt : Math.floor(Math.random() * 4294967296)
-    this.fee = data.fee
+    this.salt = data.salt || this._newRandomSalt()
     this.expireTs = data.expireTs
     this.inChain = data.inChain
     this.inToken = data.inToken
     this.outChain = data.outChain
     this.outToken = data.outToken
+  }
+
+  private _newRandomSalt(): string {
+    const rnd = BigNumber.from(Math.floor(Math.random() * 4294967296))
+    return hexZeroPad(rnd.toHexString(), 10)
   }
 
   get encoded(): string {
@@ -95,9 +109,9 @@ export class Swap implements SwapData {
   toObject(): SwapData {
     return {
       encoded: this.encoded,
-      amount: this.amount,
+      amount: this.amount.toNumber(),
       salt: this.salt,
-      fee: this.fee,
+      fee: this.fee.toNumber(),
       expireTs: this.expireTs,
       inChain: this.inChain,
       inToken: this.inToken,

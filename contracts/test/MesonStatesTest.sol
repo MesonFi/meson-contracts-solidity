@@ -4,9 +4,13 @@ pragma solidity =0.8.6;
 import "../utils/MesonStates.sol";
 
 contract MesonStatesTest is MesonStates {
+  function addSupportToken(address token, uint8 index) external {
+    _addSupportToken(token, index);
+  }
+
   function encodeSwap(
-    uint96 amount,
-    uint32 salt,
+    uint48 amount,
+    uint80 salt,
     uint40 fee,
     uint40 expireTs,
     bytes2 outChain,
@@ -27,22 +31,59 @@ contract MesonStatesTest is MesonStates {
       );
   }
 
-  function decodeSwap(uint256 encodedSwap) external pure returns (
-    uint96 amount,
-    uint32 salt,
-    uint40 expireTs,
+  function decodeSwap(uint256 encodedSwap, uint40 providerIndex) external pure returns (
+    uint256 amount,
+    uint256 fee,
+    uint256 feeToMeson,
+    uint80 salt,
+    uint256 expireTs,
+    bytes2 inChain,
+    uint8 inTokenIndex,
     bytes2 outChain,
     uint8 outTokenIndex,
-    bytes2 inChain,
-    uint8 inTokenIndex
+    bytes6 balanceIndexForMeson,
+    bytes6 outTokenBalanceIndex
   ) {
-    amount = uint96(encodedSwap >> 160);
-    salt = uint32(encodedSwap >> 128);
-    expireTs = uint40(encodedSwap >> 48);
-    outChain = bytes2(uint16(encodedSwap >> 32));
-    outTokenIndex = uint8(encodedSwap >> 24);
-    inChain = bytes2(uint16(encodedSwap >> 8));
-    inTokenIndex = uint8(encodedSwap);
+    amount = _amountFrom(encodedSwap);
+    fee = _feeFrom(encodedSwap);
+    feeToMeson = _feeToMesonFrom(encodedSwap);
+    salt = _saltFrom(encodedSwap);
+    expireTs = _expireTsFrom(encodedSwap);
+    inChain = bytes2(_inChainFrom(encodedSwap));
+    inTokenIndex = _inTokenIndexFrom(encodedSwap);
+    outChain = bytes2(_outChainFrom(encodedSwap));
+    outTokenIndex = _outTokenIndexFrom(encodedSwap);
+    balanceIndexForMeson = bytes6(_balanceIndexForMesonFrom(encodedSwap));
+    outTokenBalanceIndex = bytes6(_outTokenBalanceIndexFrom(encodedSwap, providerIndex));
+  }
+
+  function decodePostedSwap(uint200 postedSwap) external pure returns (
+    address initiator,
+    uint40 providerIndex
+  ) {
+    initiator = _initiatorFromPosted(postedSwap);
+    providerIndex = _providerIndexFromPosted(postedSwap);
+  }
+
+  function lockedSwapFrom(uint256 until, uint40 providerIndex) external pure returns (uint80) {
+    return _lockedSwapFrom(until, providerIndex);
+  }
+
+  function decodeLockedSwap(uint80 lockedSwap) external pure returns (uint40 providerIndex, uint256 until) {
+    providerIndex = _providerIndexFromLocked(lockedSwap);
+    until = _untilFromLocked(lockedSwap);
+  }
+
+  function balanceIndexFrom(uint8 tokenIndex, uint40 providerIndex) external pure returns (bytes6) {
+    return bytes6(_balanceIndexFrom(tokenIndex, providerIndex));
+  }
+
+  function decodeBalanceIndex(uint48 balanceIndex) external pure returns (
+    uint8 tokenIndex,
+    uint40 providerIndex
+  ) {
+    tokenIndex = _tokenIndexFromBalanceIndex(balanceIndex);
+    providerIndex = _providerIndexFromBalanceIndex(balanceIndex);
   }
 
   function checkRequestSignature(
@@ -51,7 +92,7 @@ contract MesonStatesTest is MesonStates {
     bytes32 s,
     uint8 v,
     address signer
-  ) public pure {
+  ) external pure {
     _checkRequestSignature(encodedSwap, r, s, v, signer);
   }
 
@@ -62,7 +103,7 @@ contract MesonStatesTest is MesonStates {
     bytes32 s,
     uint8 v,
     address signer
-  ) public pure {
-    _checkReleaseSignature(encodedSwap, keccak256(abi.encodePacked(recipient)), r, s, v, signer);
+  ) external pure {
+    _checkReleaseSignature(encodedSwap, recipient, r, s, v, signer);
   }
 }

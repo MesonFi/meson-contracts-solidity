@@ -1,7 +1,6 @@
 const path = require('path')
 const fs = require('fs')
 const { ethers } = require('hardhat')
-const { MesonClient } = require('@mesonfi/sdk/src')
 require('dotenv').config()
 
 const { NETWORK_ID, PRIVATE_KEY } = process.env
