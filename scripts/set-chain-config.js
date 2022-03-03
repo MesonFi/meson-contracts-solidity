@@ -3,7 +3,7 @@ const fs = require('fs')
 const presets = require('@mesonfi/presets/src/testnets.json')
 
 const testnetMode = process.env.TESTNET_MODE
-const networkId = process.env.NETWORK_ID
+const networkId = process.env.NETWORK_ID || process.env.HARDHAT_NETWORK
 
 async function setChainConfig(networkId) {
   if (!networkId) {

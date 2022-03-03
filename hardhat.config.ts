@@ -20,6 +20,8 @@ const mainnetConnections = Object.fromEntries(
     .map(item => [item.id, {
       url: item.url?.replace('${INFURA_API_KEY}', INFURA_API_KEY),
       timeout: 0,
+      gas: 'auto',
+      gasMultiplier: 1.1,
     }])
 )
 const testnetConnections = Object.fromEntries(

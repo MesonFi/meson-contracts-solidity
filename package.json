@@ -38,11 +38,11 @@
     "up:one": "NETWORK_ID=one yarn up",
 
     "deploy": "yarn chain && hardhat run scripts/mainnets/deploy-upgradable.js",
-    "deploy:eth": "NETWORK_ID=mainnet yarn deploy",
-    "deploy:bsc": "NETWORK_ID=bsc yarn deploy",
-    "deploy:avax": "NETWORK_ID=avax yarn deploy",
-    "deploy:poly": "NETWORK_ID=polygon yarn deploy",
-    "deploy:ftm": "NETWORK_ID=ftm yarn deploy"
+    "deploy:eth": "HARDHAT_NETWORK=mainnet yarn deploy",
+    "deploy:bsc": "HARDHAT_NETWORK=bsc yarn deploy",
+    "deploy:avax": "HARDHAT_NETWORK=avax yarn deploy",
+    "deploy:poly": "HARDHAT_NETWORK=polygon yarn deploy",
+    "deploy:ftm": "HARDHAT_NETWORK=ftm yarn deploy"
   },
   "devDependencies": {
     "@mesonfi/contract-abis": "^0.6.0",
