@@ -42,7 +42,9 @@
     "deploy:bsc": "HARDHAT_NETWORK=bsc yarn deploy",
     "deploy:avax": "HARDHAT_NETWORK=avax yarn deploy",
     "deploy:poly": "HARDHAT_NETWORK=polygon yarn deploy",
-    "deploy:ftm": "HARDHAT_NETWORK=ftm yarn deploy"
+    "deploy:ftm": "HARDHAT_NETWORK=ftm yarn deploy",
+
+    "deposit": "yarn chain && hardhat run scripts/mainnets/deposit.js"
   },
   "devDependencies": {
     "@mesonfi/contract-abis": "^0.6.0",
