@@ -46,19 +46,19 @@
       "symbol": "tBNB",
       "decimals": 18
     },
-    "mesonAddress": "0x5C6CAe005dc5014194D5d336129f64E5f18f8Eb0",
+    "mesonAddress": "0x3078b92e2515141cAAB53e2DF0e7a12fd8670E22",
     "tokens": [
       {
         "name": "BSC USDT",
         "symbol": "bUSDT",
-        "decimals": 6,
-        "addr": "0x9E200736410cb42Bae8FD2cd2F5d5935af8def05"
+        "decimals": 18,
+        "addr": "0x14c810CF6e357A600B6c12ca676818BA5367fdE6"
       },
       {
         "name": "BSC USDC",
         "symbol": "bUSDC",
-        "decimals": 6,
-        "addr": "0x5572941dD89e728E4574B7137748d60e83b110Fc"
+        "decimals": 18,
+        "addr": "0xc3f1585228D02bb9A6Fb9E7E29b8890533048BD7"
       }
     ]
   },
