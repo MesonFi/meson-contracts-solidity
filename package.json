@@ -16,6 +16,7 @@
     "test": "TESTNET_MODE=true NETWORK_ID=ropsten yarn chain && hardhat --network hardhat test",
     "estimate": "hardhat --network hardhat run scripts/estimate-gas.js",
     "estimate2": "hardhat --network hardhat run scripts/estimate-gas-upgradable.js",
+    "dev": "NETWORK_ID=local TESTNET_MODE=true yarn chain && yarn build:packages && hardhat --network localhost run scripts/setup-dev.ts",
 
     "chain": "node scripts/set-chain-config.js",
     "chain:local": "NETWORK_ID=local yarn chain",
