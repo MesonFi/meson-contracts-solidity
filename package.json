@@ -3,9 +3,13 @@
   "version": "0.6.0",
   "main": "index.js",
   "private": true,
+  "engines": {
+    "node": "16"
+  },
   "scripts": {
     "build": "hardhat compile --config hardhat.config.ts",
-    "build:packages": "cd packages/sdk && yarn install && cd ../presets && yarn install && cd ../../",
+    "build:packages": "yarn workspace @mesonfi/sdk build && yarn workspace @mesonfi/presets build",
+    "build:types": "TESTNET_MODE=true yarn chain:eth && yarn cleanbuild ",
     "postbuild": "cp artifacts/contracts/Meson.sol/Meson.json packages/contract-abis/abis/Meson.json && cp artifacts/contracts/test/MockToken.sol/MockToken.json packages/contract-abis/abis/ERC20.json",
     "cleanbuild": "hardhat clean && yarn build",
     "docgen": "solidity-docgen --solc-module solc -t ./templates",
@@ -14,7 +18,7 @@
     "estimate2": "hardhat --network hardhat run scripts/estimate-gas-upgradable.js",
 
     "chain": "node scripts/set-chain-config.js",
-    "chain:local": "TESTNET_MODE=true NETWORK_ID=local yarn chain",
+    "chain:local": "NETWORK_ID=local yarn chain",
     "chain:eth": "NETWORK_ID=ropsten yarn chain",
     "chain:bsc": "NETWORK_ID=bsc yarn chain",
     "chain:avax": "NETWORK_ID=avax yarn chain",

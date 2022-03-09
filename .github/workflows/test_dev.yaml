@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ develop ]
 
-env:
-  NPM_CONFIG_GITHUB_NPM_TOKEN: ${{secrets.NPM_CONFIG_GITHUB_NPM_TOKEN}}
-
 jobs:
   test:
     runs-on: ubuntu-latest

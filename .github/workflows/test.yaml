@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ main ]
 
-env:
-  NPM_CONFIG_GITHUB_NPM_TOKEN: ${{secrets.NPM_CONFIG_GITHUB_NPM_TOKEN}}
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -23,5 +20,5 @@ jobs:
       - name: Build packages
         run: yarn run build:packages
       - name: Check generated abis/types
-        run: yarn chain:local && yarn cleanbuild && git diff --exit-code
+        run: build:types && git diff --exit-code
       - run: yarn test
