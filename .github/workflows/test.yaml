@@ -26,4 +26,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
         run: yarn install --immutable --immutable-cache --check-cache
+      - name: Build packages
+        run: yarn run build:packages
+      - name: Check generated abis/types
+        run: yarn chain:local && yarn cleanbuild && git diff --exit-code
       - run: yarn test

@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "build": "hardhat compile --config hardhat.config.ts",
+    "build:packages": "cd packages/sdk && yarn install && cd ../presets && yarn install && cd ../../",
     "postbuild": "cp artifacts/contracts/Meson.sol/Meson.json packages/contract-abis/abis/Meson.json && cp artifacts/contracts/test/MockToken.sol/MockToken.json packages/contract-abis/abis/ERC20.json",
     "cleanbuild": "hardhat clean && yarn build",
     "docgen": "solidity-docgen --solc-module solc -t ./templates",
