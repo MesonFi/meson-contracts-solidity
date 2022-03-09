@@ -1,10 +1,10 @@
-name: Main branch CI
+name: Develop branch CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ develop ]
 
 env:
   NPM_CONFIG_GITHUB_NPM_TOKEN: ${{secrets.NPM_CONFIG_GITHUB_NPM_TOKEN}}
@@ -22,6 +22,4 @@ jobs:
         run: yarn install --immutable --immutable-cache --check-cache
       - name: Build packages
         run: yarn run build:packages
-      - name: Check generated abis/types
-        run: yarn chain:local && yarn cleanbuild && git diff --exit-code
       - run: yarn test
