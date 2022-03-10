@@ -1,8 +1,8 @@
 [
   {
-    "id": "bsc",
-    "name": "BSC",
-    "alias": "BSC",
+    "id": "bnb",
+    "name": "BNB",
+    "alias": "BNB",
     "chainId": "0x38",
     "slip44": "0x800002ca",
     "shortSlip44": "0x02ca",

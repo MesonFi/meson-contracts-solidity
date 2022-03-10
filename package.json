@@ -20,7 +20,7 @@
     "chain": "node scripts/set-chain-config.js",
     "chain:local": "NETWORK_ID=local yarn chain",
     "chain:eth": "NETWORK_ID=ropsten yarn chain",
-    "chain:bsc": "NETWORK_ID=bsc yarn chain",
+    "chain:bnb": "NETWORK_ID=bnb yarn chain",
     "chain:avax": "NETWORK_ID=avax yarn chain",
     "chain:poly": "NETWORK_ID=polygon yarn chain",
     "chain:ftm": "NETWORK_ID=ftm yarn chain",
@@ -28,7 +28,7 @@
 
     "testnet": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/deploy-upgradable.js",
     "testnet:eth": "NETWORK_ID=ropsten yarn testnet",
-    "testnet:bsc": "NETWORK_ID=bsc yarn testnet",
+    "testnet:bnb": "NETWORK_ID=bnb yarn testnet",
     "testnet:avax": "NETWORK_ID=avax yarn testnet",
     "testnet:poly": "NETWORK_ID=polygon yarn testnet",
     "testnet:ftm": "NETWORK_ID=ftm yarn testnet",
@@ -36,7 +36,7 @@
 
     "up": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/upgrade.js",
     "up:eth": "NETWORK_ID=ropsten yarn up",
-    "up:bsc": "NETWORK_ID=bsc yarn up",
+    "up:bnb": "NETWORK_ID=bnb yarn up",
     "up:avax": "NETWORK_ID=avax yarn up",
     "up:poly": "NETWORK_ID=polygon yarn up",
     "up:ftm": "NETWORK_ID=ftm yarn up",
@@ -44,7 +44,7 @@
 
     "deploy": "yarn chain && hardhat run scripts/mainnets/deploy-upgradable.js",
     "deploy:eth": "HARDHAT_NETWORK=mainnet yarn deploy",
-    "deploy:bsc": "HARDHAT_NETWORK=bsc yarn deploy",
+    "deploy:bnb": "HARDHAT_NETWORK=bnb yarn deploy",
     "deploy:avax": "HARDHAT_NETWORK=avax yarn deploy",
     "deploy:poly": "HARDHAT_NETWORK=polygon yarn deploy",
     "deploy:ftm": "HARDHAT_NETWORK=ftm yarn deploy",
@@ -54,7 +54,7 @@
   "devDependencies": {
     "@mesonfi/contract-abis": "^0.6.0",
     "@mesonfi/contract-types": "^0.6.0",
-    "@mesonfi/presets": "^0.6.2",
+    "@mesonfi/presets": "^0.6.3",
     "@mesonfi/sdk": "^0.6.0",
     "@nomiclabs/hardhat-ethers": "^2.0.3",
     "@nomiclabs/hardhat-waffle": "^2.0.1",

@@ -29,9 +29,9 @@
     ]
   },
   {
-    "id": "bsc-testnet",
-    "name": "BSC Testnet",
-    "alias": "BSC",
+    "id": "bnb-testnet",
+    "name": "BNB Testnet",
+    "alias": "BNB",
     "chainId": "0x61",
     "slip44": "0x800002ca",
     "shortSlip44": "0x02ca",
@@ -49,13 +49,13 @@
     "mesonAddress": "0x3078b92e2515141cAAB53e2DF0e7a12fd8670E22",
     "tokens": [
       {
-        "name": "BSC USDT",
+        "name": "BNB USDT",
         "symbol": "bUSDT",
         "decimals": 18,
         "addr": "0x14c810CF6e357A600B6c12ca676818BA5367fdE6"
       },
       {
-        "name": "BSC USDC",
+        "name": "BNB USDC",
         "symbol": "bUSDC",
         "decimals": 18,
         "addr": "0xc3f1585228D02bb9A6Fb9E7E29b8890533048BD7"
