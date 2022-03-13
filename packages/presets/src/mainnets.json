@@ -1,8 +1,8 @@
 [
   {
-    "id": "bsc",
-    "name": "BSC",
-    "alias": "BSC",
+    "id": "bnb",
+    "name": "BNB",
+    "alias": "BNB",
     "chainId": "0x38",
     "slip44": "0x800002ca",
     "shortSlip44": "0x02ca",
@@ -17,7 +17,7 @@
       "symbol": "BNB",
       "decimals": 18
     },
-    "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
+    "mesonAddress": "0xFD2236a956BEa85Ba619789Aaf72C789853d49C7",
     "tokens": [
       {
         "name": "USDC",
@@ -45,7 +45,7 @@
       "symbol": "AVAX",
       "decimals": 18
     },
-    "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
+    "mesonAddress": "0x40DbB93F63D69a5Da840F7092988317Cb4C55399",
     "tokens": [
       {
         "name": "USDC.e",
@@ -73,7 +73,7 @@
       "symbol": "MATIC",
       "decimals": 18
     },
-    "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
+    "mesonAddress": "0xc29a08368604567237F8A396428E2bf5332a7686",
     "tokens": [
       {
         "name": "USDC",
@@ -101,7 +101,7 @@
       "symbol": "FTM",
       "decimals": 18
     },
-    "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
+    "mesonAddress": "0x40DbB93F63D69a5Da840F7092988317Cb4C55399",
     "tokens": [
       {
         "name": "USDC",

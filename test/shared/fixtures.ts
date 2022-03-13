@@ -8,8 +8,8 @@ export async function fixtures (accounts: string[] | undefined) {
   const signer = (await ethers.getSigners())[0]
 
   const tokenFactory = await ethers.getContractFactory('MockToken')
-  const token1 = await tokenFactory.deploy('Mock Token 1', 'MT1', TOKEN_TOTAL_SUPPLY) as MockToken
-  const token2 = await tokenFactory.deploy('Mock Token 2', 'MT2', TOKEN_TOTAL_SUPPLY) as MockToken
+  const token1 = await tokenFactory.deploy('Mock Token 1', 'MT1', TOKEN_TOTAL_SUPPLY, 6) as MockToken
+  const token2 = await tokenFactory.deploy('Mock Token 2', 'MT2', TOKEN_TOTAL_SUPPLY, 18) as MockToken
 
   if (accounts) {
     for (const account of accounts) {

@@ -15,13 +15,13 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   mapping(uint256 => uint200) internal _postedSwaps;
 
   /// @notice Anyone can call this method to post a swap request. This is step 1️⃣  in a swap.
-  /// The r,s,v signature must be signed by the swap initiator. The initiator can call 
-  /// this method directly, in which case `providerIndex` should be zero and wait for LPs 
-  /// to call `bondSwap`. Initiators can also send the swap requests offchain (through the 
+  /// The r,s,v signature must be signed by the swap initiator. The initiator can call
+  /// this method directly, in which case `providerIndex` should be zero and wait for LPs
+  /// to call `bondSwap`. Initiators can also send the swap requests offchain (through the
   /// meson relayer service). An liquidity provider who receives requests through the relayer
   /// can call this method to post and bond the swap in a single contract execution,
   /// in which case he should give his own `providerIndex`.
-  /// 
+  ///
   /// The swap will last until `expireTs` and at most one LP can bond to it.
   /// After the swap expires, the initiator can cancel the swap ande withdraw funds.
   ///
@@ -66,7 +66,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @param providerIndex An index for the LP; call `depositAndRegister` to get an index
   function bondSwap(uint256 encodedSwap, uint40 providerIndex) external {
     uint200 postedSwap = _postedSwaps[encodedSwap];
-    require(postedSwap != 0, "Swap does not exist");
+    require(postedSwap > 1, "Swap does not exist");
     require(_providerIndexFromPosted(postedSwap) == 0, "Swap bonded to another provider");
     require(indexOfAddress[msg.sender] == providerIndex, "Can only bound to signer");
 
@@ -82,7 +82,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     require(postedSwap > 1, "Swap does not exist");
     require(_expireTsFrom(encodedSwap) < block.timestamp, "Swap is still locked");
-    
+
     _postedSwaps[encodedSwap] = 0; // Swap expired so the same one cannot be posted again
 
     _safeTransfer(
@@ -114,7 +114,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     bool depositToPool
   ) external {
     uint200 postedSwap = _postedSwaps[encodedSwap];
-    require(postedSwap != 0, "Swap does not exist");
+    require(postedSwap > 1, "Swap does not exist");
 
     if (_expireTsFrom(encodedSwap) < block.timestamp + MIN_BOND_TIME_PERIOD) {
       // Swap expiredTs < current + MIN_BOND_TIME_PERIOD
@@ -137,7 +137,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
         amountWithFee -= feeToMeson;
       }
     }
-    
+
     if (depositToPool) {
       uint48 balanceIndex = mesonBalanceIndex | _providerIndexFromPosted(postedSwap);
       _tokenBalanceOf[balanceIndex] += amountWithFee;
