@@ -50,13 +50,15 @@
     "deploy:ftm": "HARDHAT_NETWORK=ftm yarn deploy",
 
     "up": "yarn chain && hardhat run scripts/mainnets/upgrade.js",
-    "up:eth": "HARDHAT_NETWORK=mainnet yarn up",
+    "up:eth": "HARDHAT_NETWORK=eth yarn up",
     "up:bnb": "HARDHAT_NETWORK=bnb yarn up",
     "up:avax": "HARDHAT_NETWORK=avax yarn up",
     "up:poly": "HARDHAT_NETWORK=polygon yarn up",
     "up:ftm": "HARDHAT_NETWORK=ftm yarn up",
 
-    "deposit": "yarn chain && hardhat run scripts/mainnets/deposit.js"
+    "deposit": "hardhat run scripts/mainnets/deposit.js",
+    "deposit:eth": "HARDHAT_NETWORK=eth yarn deposit",
+    "deposit:bnb": "HARDHAT_NETWORK=bnb yarn deposit"
   },
   "devDependencies": {
     "@mesonfi/contract-abis": "^0.6.0",
