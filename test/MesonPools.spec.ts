@@ -223,7 +223,7 @@ describe('MesonPools', () => {
       await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
       await mesonClientForProvider.lock(signedRequest)
-      await ethers.provider.send('evm_increaseTime', [1800])
+      await ethers.provider.send('evm_increaseTime', [3600])
       await mesonClientForProvider.unlock(signedRequest)
 
       expect(await mesonInstance.balanceOf(mesonClientForProvider.token(1), provider.address)).to.equal(amount)
@@ -231,7 +231,7 @@ describe('MesonPools', () => {
       expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
       expect(locked.provider).to.be.undefined
 
-      await ethers.provider.send('evm_increaseTime', [-1800])
+      await ethers.provider.send('evm_increaseTime', [-3600])
     })
   })
 

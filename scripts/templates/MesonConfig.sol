@@ -9,7 +9,7 @@ contract MesonConfig {
 
   uint256 constant MIN_BOND_TIME_PERIOD = 1 hours;
   uint256 constant MAX_BOND_TIME_PERIOD = 2 hours;
-  uint256 constant LOCK_TIME_PERIOD = 20 minutes;
+  uint256 constant LOCK_TIME_PERIOD = CONFIG_LOCK_TIME;
 
   // keccak256("bytes32 Sign to request a swap on MesonCONFIG_TESTNET_MODE")
   bytes32 constant REQUEST_TYPE_HASH = CONFIG_REQUEST_TYPE_HASH;
