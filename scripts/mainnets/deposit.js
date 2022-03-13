@@ -1,4 +1,4 @@
-const { ethers, upgrades } = require('hardhat')
+const { ethers } = require('hardhat')
 const CustomGasFeeProviderWrapper = require('./CustomGasFeeProviderWrapper')
 const { ERC20, Meson } = require('@mesonfi/contract-abis')
 
@@ -6,7 +6,7 @@ require('dotenv').config()
 
 const { HARDHAT_NETWORK, LP_PRIVATE_KEY } = process.env
 
-const amount = 'AMOUNT_TO_DEPOSIT'
+const amount = '1000'
 
 async function main() {
   const mainnets = require('@mesonfi/presets/src/mainnets.json')
@@ -15,19 +15,25 @@ async function main() {
 
   const wallet = new ethers.Wallet(LP_PRIVATE_KEY, ethers.provider)
 
-  const usdc = new ethers.Contract(network.tokens[0].addr, ERC20.abi, wallet)
+  const token1 = new ethers.Contract(network.tokens[0].addr, ERC20.abi, wallet)
   const meson = new ethers.Contract(network.mesonAddress, Meson.abi, wallet)
 
-  const providerIndex = await meson.indexOfAddress(wallet.address)
-  const balanceIndex = 2**40 + providerIndex
-  console.log(`provider index: ${providerIndex}, balance index: ${balanceIndex}`)
+  console.log(`lp address: ${wallet.address}`)
 
   console.log(`approving for ${amount}...`)
-  await (await usdc.approve(network.mesonAddress, amount)).wait(1)
+  await (await token1.approve(network.mesonAddress, ethers.utils.parseUnits(amount, 18))).wait(1)
 
   console.log(`depositing for ${amount}...`)
-  const tx = await meson.deposit(amount, balanceIndex)
-  // const tx = await meson.depositAndRegister(amount, balanceIndex)
+  const providerIndex = await meson.indexOfAddress(wallet.address)
+  const needRegister = providerIndex == 0
+  const balanceIndex = 2**40 + (needRegister ? 1 : providerIndex)
+
+  let tx
+  if (needRegister) {
+    tx = await meson.depositAndRegister(ethers.utils.parseUnits(amount, 6), balanceIndex)
+  } else {
+    tx = await meson.deposit(ethers.utils.parseUnits(amount, 6), balanceIndex)
+  }
   console.log(tx)
 }
 
