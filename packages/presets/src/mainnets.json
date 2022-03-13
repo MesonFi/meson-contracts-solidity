@@ -12,7 +12,7 @@
     "addressFormat": "hex",
     "url": "https://mainnet.infura.io/v3/${INFURA_API_KEY}",
     "explorer": "https://etherscan.io",
-    "mesonAddress": "",
+    "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
     "tokens": [
       {
         "name": "USDT",
