@@ -72,12 +72,12 @@ describe('MesonPools', () => {
 
       const balanceIndex = pack(['uint8', 'uint40'], [2, 1])
       await expect(mesonInstance.depositAndRegister(1000, balanceIndex))
-        .to.be.revertedWith('function call to a non-contract account')
+        .to.be.revertedWith('Token not supported')
     })
     it('rejects if not approved', async () => {
       await token.approve(mesonInstance.address, ethers.utils.parseUnits('999', 6))
       await expect(mesonClientForProvider.depositAndRegister(token.address, amount, '1'))
-        .to.be.revertedWith('ERC20: transfer amount exceeds allowance')
+        .to.be.revertedWith('transferFrom failed')
     })
     it('accepts a valid depositAndRegister', async () => {
       await token.approve(mesonInstance.address, amount)
@@ -119,13 +119,13 @@ describe('MesonPools', () => {
 
       const balanceIndex = pack(['uint8', 'uint40'], [2, 1])
       await expect(mesonInstance.deposit(1000, balanceIndex))
-        .to.be.revertedWith('function call to a non-contract account')
+        .to.be.revertedWith('Token not supported')
     })
     it('rejects if not approved', async () => {
       await token.approve(mesonInstance.address, ethers.utils.parseUnits('1999', 6))
       await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
       await expect(mesonClientForProvider.deposit(token.address, amount))
-        .to.be.revertedWith('ERC20: transfer amount exceeds allowance')
+        .to.be.revertedWith('transferFrom failed')
     })
     it('accepts a valid deposit', async () => {
       const doubleAmount = ethers.utils.parseUnits('2000', 6)

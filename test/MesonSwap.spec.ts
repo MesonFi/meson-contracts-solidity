@@ -66,7 +66,7 @@ describe('MesonSwap', () => {
       const signedRequest = new SignedSwapRequest(signedRequestData)
 
       await expect(mesonClientForProvider.postSwap(signedRequest))
-        .to.be.revertedWith('function call to a non-contract account')
+        .to.be.revertedWith('Token not supported')
     })
     it('rejects if expireTs is too early', async () => {
       const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain, 3600 - 600)

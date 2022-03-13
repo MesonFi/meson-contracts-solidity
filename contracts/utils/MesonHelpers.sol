@@ -2,7 +2,6 @@
 pragma solidity 0.8.6;
 
 import "../MesonConfig.sol";
-import "../interfaces/IERC20Minimal.sol";
 
 /// @title MesonHelpers
 contract MesonHelpers is MesonConfig {
@@ -35,7 +34,7 @@ contract MesonHelpers is MesonConfig {
       recipient,
       amount
     ));
-    require(success && (data.length == 0 || abi.decode(data, (bool))), "Transfer failed");
+    require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
   }
 
   /// @notice Execute the token transfer transaction
@@ -44,8 +43,15 @@ contract MesonHelpers is MesonConfig {
     address sender,
     uint256 amount
   ) internal {
+    require(token != address(0), "Token not supported");
     require(amount > 0, "Amount must be greater than zero");
-    IERC20Minimal(token).transferFrom(sender, address(this), amount);
+    (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
+      bytes4(0x23b872dd), // bytes4(keccak256(bytes("transferFrom(address,address,uint256)")))
+      sender,
+      address(this),
+      amount
+    ));
+    require(success && (data.length == 0 || abi.decode(data, (bool))), "transferFrom failed");
   }
 
   function _getSwapId(uint256 encodedSwap, address initiator) internal pure returns (bytes32) {
