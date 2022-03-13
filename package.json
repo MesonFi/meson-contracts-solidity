@@ -34,13 +34,13 @@
     "testnet:ftm": "NETWORK_ID=ftm yarn testnet",
     "testnet:one": "NETWORK_ID=one yarn testnet",
 
-    "up": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/upgrade.js",
-    "up:eth": "NETWORK_ID=ropsten yarn up",
-    "up:bnb": "NETWORK_ID=bnb yarn up",
-    "up:avax": "NETWORK_ID=avax yarn up",
-    "up:poly": "NETWORK_ID=polygon yarn up",
-    "up:ftm": "NETWORK_ID=ftm yarn up",
-    "up:one": "NETWORK_ID=one yarn up",
+    "testnet-up": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/upgrade.js",
+    "testnet-up:eth": "NETWORK_ID=ropsten yarn testnet-up",
+    "testnet-up:bnb": "NETWORK_ID=bnb yarn testnet-up",
+    "testnet-up:avax": "NETWORK_ID=avax yarn testnet-up",
+    "testnet-up:poly": "NETWORK_ID=polygon yarn testnet-up",
+    "testnet-up:ftm": "NETWORK_ID=ftm yarn testnet-up",
+    "testnet-up:one": "NETWORK_ID=one yarn testnet-up",
 
     "deploy": "yarn chain && hardhat run scripts/mainnets/deploy-upgradable.js",
     "deploy:eth": "HARDHAT_NETWORK=mainnet yarn deploy",
@@ -48,6 +48,13 @@
     "deploy:avax": "HARDHAT_NETWORK=avax yarn deploy",
     "deploy:poly": "HARDHAT_NETWORK=polygon yarn deploy",
     "deploy:ftm": "HARDHAT_NETWORK=ftm yarn deploy",
+
+    "up": "yarn chain && hardhat run scripts/mainnets/upgrade.js",
+    "up:eth": "HARDHAT_NETWORK=mainnet yarn up",
+    "up:bnb": "HARDHAT_NETWORK=bnb yarn up",
+    "up:avax": "HARDHAT_NETWORK=avax yarn up",
+    "up:poly": "HARDHAT_NETWORK=polygon yarn up",
+    "up:ftm": "HARDHAT_NETWORK=ftm yarn up",
 
     "deposit": "yarn chain && hardhat run scripts/mainnets/deposit.js"
   },
