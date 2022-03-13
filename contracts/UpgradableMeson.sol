@@ -20,6 +20,12 @@ contract UpgradableMeson is UUPSUpgradeable, MesonSwap, MesonPools {
     }
   }
 
+  function addBscUsd() external {
+    require(SHORT_COIN_TYPE == 0x02ca, "This method is for bnb chain only");
+    address token = 0x55d398326f99059fF775485246999027B3197955;
+    _addSupportToken(token, 2);
+  }
+
   function _authorizeUpgrade(address newImplementation) internal view override {
     require(_msgSender() == _owner, "Unauthorized");
   }
