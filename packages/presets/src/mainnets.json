@@ -26,8 +26,8 @@
         "addr": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
       },
       {
-        "name": "BSC-USD",
-        "symbol": "BSC-USD",
+        "name": "USDT",
+        "symbol": "USDT",
         "decimals": 18,
         "addr": "0x55d398326f99059ff775485246999027b3197955"
       }
