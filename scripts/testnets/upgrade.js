@@ -12,7 +12,7 @@ async function main() {
 
   const UpgradableMeson = await ethers.getContractFactory('UpgradableMeson', wallet)
   console.log('Upgrading UpgradableMeson...')
-  await upgrades.upgradeProxy(network.mesonAddress, UpgradableMeson);
+  await upgrades.upgradeProxy(network.mesonAddress, UpgradableMeson)
   console.log('UpgradableMeson upgraded')
 }
 
