@@ -100,7 +100,7 @@ export class MesonPresets {
     return this._cache.get(network.id)
   }
 
-  async checkSwapStatus(encoded: string, initiator?: string, options?: any): Promise<[
+  async checkSwapStatus(encoded: string, initiator?: string, options: any = {}): Promise<[
     { status: PostedSwapStatus, initiator?: string, provider?: string },
     { status: LockedSwapStatus, initiator?: string, provider?: string, until?: number }?
   ]> {
