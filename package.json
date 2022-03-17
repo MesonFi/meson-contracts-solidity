@@ -63,12 +63,13 @@
 
     "deposit": "hardhat run scripts/mainnets/deposit.js",
     "deposit:eth": "HARDHAT_NETWORK=eth yarn deposit",
-    "deposit:bnb": "HARDHAT_NETWORK=bnb yarn deposit"
+    "deposit:bnb": "HARDHAT_NETWORK=bnb yarn deposit",
+    "deposit:cfx": "HARDHAT_NETWORK=cfx yarn deposit"
   },
   "devDependencies": {
     "@mesonfi/contract-abis": "^0.6.5",
     "@mesonfi/contract-types": "^0.6.5",
-    "@mesonfi/presets": "^0.6.5",
+    "@mesonfi/presets": "^0.6.6",
     "@mesonfi/sdk": "^0.6.5",
     "@nomiclabs/hardhat-ethers": "^2.0.3",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
