@@ -145,5 +145,33 @@
         "addr": "0x04068da6c83afcfa0e13ba15a6696662335d5b75"
       }
     ]
+  },
+  {
+    "id": "cfx",
+    "name": "Conflux eSpace",
+    "alias": "CFX",
+    "chainId": "0x406",
+    "slip44": "0x800001f7",
+    "shortSlip44": "0x01f7",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "hex",
+    "url": "https://evm.confluxrpc.com",
+    "explorer": "https://evm.confluxscan.net",
+    "nativeCurrency": {
+      "name": "Conflux",
+      "symbol": "CFX",
+      "decimals": 18
+    },
+    "mesonAddress": "0x6F9d8D815710d414ABAa0E0e05A33A10c4eC9725",
+    "tokens": [
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 18,
+        "addr": "0xfe97e85d13abd9c1c33384e796f10b73905637ce"
+      }
+    ]
   }
 ]

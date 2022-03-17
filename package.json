@@ -24,6 +24,7 @@
     "chain:avax": "NETWORK_ID=avax yarn chain",
     "chain:poly": "NETWORK_ID=polygon yarn chain",
     "chain:ftm": "NETWORK_ID=ftm yarn chain",
+    "chain:cfx": "NETWORK_ID=cfx yarn chain",
     "chain:one": "NETWORK_ID=one yarn chain",
 
     "testnet": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/deploy-upgradable.js",
@@ -32,6 +33,7 @@
     "testnet:avax": "NETWORK_ID=avax yarn testnet",
     "testnet:poly": "NETWORK_ID=polygon yarn testnet",
     "testnet:ftm": "NETWORK_ID=ftm yarn testnet",
+    "testnet:cfx": "NETWORK_ID=cfx yarn testnet",
     "testnet:one": "NETWORK_ID=one yarn testnet",
 
     "testnet-up": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/upgrade.js",
@@ -40,6 +42,7 @@
     "testnet-up:avax": "NETWORK_ID=avax yarn testnet-up",
     "testnet-up:poly": "NETWORK_ID=polygon yarn testnet-up",
     "testnet-up:ftm": "NETWORK_ID=ftm yarn testnet-up",
+    "testnet-up:cfx": "NETWORK_ID=cfx yarn testnet-up",
     "testnet-up:one": "NETWORK_ID=one yarn testnet-up",
 
     "deploy": "yarn chain && hardhat run scripts/mainnets/deploy-upgradable.js",
@@ -48,6 +51,7 @@
     "deploy:avax": "HARDHAT_NETWORK=avax yarn deploy",
     "deploy:poly": "HARDHAT_NETWORK=polygon yarn deploy",
     "deploy:ftm": "HARDHAT_NETWORK=ftm yarn deploy",
+    "deploy:cfx": "HARDHAT_NETWORK=cfx yarn deploy",
 
     "up": "yarn chain && hardhat run scripts/mainnets/upgrade.js",
     "up:eth": "HARDHAT_NETWORK=eth yarn up",
@@ -55,6 +59,7 @@
     "up:avax": "HARDHAT_NETWORK=avax yarn up",
     "up:poly": "HARDHAT_NETWORK=polygon yarn up",
     "up:ftm": "HARDHAT_NETWORK=ftm yarn up",
+    "up:cfx": "HARDHAT_NETWORK=cfx yarn up",
 
     "deposit": "hardhat run scripts/mainnets/deposit.js",
     "deposit:eth": "HARDHAT_NETWORK=eth yarn deposit",
