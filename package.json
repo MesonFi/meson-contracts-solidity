@@ -1,6 +1,6 @@
 {
   "name": "meson-contracts-solidity",
-  "version": "0.6.0",
+  "version": "0.6.5",
   "main": "index.js",
   "private": true,
   "engines": {
@@ -13,13 +13,13 @@
     "postbuild": "cp artifacts/contracts/Meson.sol/Meson.json packages/contract-abis/abis/Meson.json && cp artifacts/contracts/test/MockToken.sol/MockToken.json packages/contract-abis/abis/ERC20.json",
     "cleanbuild": "hardhat clean && yarn build",
     "docgen": "solidity-docgen --solc-module solc -t ./templates",
-    "test": "TESTNET_MODE=true NETWORK_ID=ropsten yarn chain && hardhat --network hardhat test",
+    "test": "TESTNET_MODE=true NETWORK_ID=eth yarn chain && hardhat --network hardhat test",
     "estimate": "hardhat --network hardhat run scripts/estimate-gas.js",
     "estimate2": "hardhat --network hardhat run scripts/estimate-gas-upgradable.js",
 
     "chain": "node scripts/set-chain-config.js",
     "chain:local": "NETWORK_ID=local yarn chain",
-    "chain:eth": "NETWORK_ID=ropsten yarn chain",
+    "chain:eth": "NETWORK_ID=eth yarn chain",
     "chain:bnb": "NETWORK_ID=bnb yarn chain",
     "chain:avax": "NETWORK_ID=avax yarn chain",
     "chain:poly": "NETWORK_ID=polygon yarn chain",
@@ -28,7 +28,7 @@
     "chain:one": "NETWORK_ID=one yarn chain",
 
     "testnet": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/deploy-upgradable.js",
-    "testnet:eth": "NETWORK_ID=ropsten yarn testnet",
+    "testnet:eth": "NETWORK_ID=eth yarn testnet",
     "testnet:bnb": "NETWORK_ID=bnb yarn testnet",
     "testnet:avax": "NETWORK_ID=avax yarn testnet",
     "testnet:poly": "NETWORK_ID=polygon yarn testnet",
@@ -37,7 +37,7 @@
     "testnet:one": "NETWORK_ID=one yarn testnet",
 
     "testnet-up": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/upgrade.js",
-    "testnet-up:eth": "NETWORK_ID=ropsten yarn testnet-up",
+    "testnet-up:eth": "NETWORK_ID=eth yarn testnet-up",
     "testnet-up:bnb": "NETWORK_ID=bnb yarn testnet-up",
     "testnet-up:avax": "NETWORK_ID=avax yarn testnet-up",
     "testnet-up:poly": "NETWORK_ID=polygon yarn testnet-up",
@@ -46,7 +46,7 @@
     "testnet-up:one": "NETWORK_ID=one yarn testnet-up",
 
     "deploy": "yarn chain && hardhat run scripts/mainnets/deploy-upgradable.js",
-    "deploy:eth": "HARDHAT_NETWORK=mainnet yarn deploy",
+    "deploy:eth": "HARDHAT_NETWORK=eth yarn deploy",
     "deploy:bnb": "HARDHAT_NETWORK=bnb yarn deploy",
     "deploy:avax": "HARDHAT_NETWORK=avax yarn deploy",
     "deploy:poly": "HARDHAT_NETWORK=polygon yarn deploy",
@@ -54,20 +54,22 @@
     "deploy:cfx": "HARDHAT_NETWORK=cfx yarn deploy",
 
     "up": "yarn chain && hardhat run scripts/mainnets/upgrade.js",
-    "up:eth": "HARDHAT_NETWORK=mainnet yarn up",
+    "up:eth": "HARDHAT_NETWORK=eth yarn up",
     "up:bnb": "HARDHAT_NETWORK=bnb yarn up",
     "up:avax": "HARDHAT_NETWORK=avax yarn up",
     "up:poly": "HARDHAT_NETWORK=polygon yarn up",
     "up:ftm": "HARDHAT_NETWORK=ftm yarn up",
     "up:cfx": "HARDHAT_NETWORK=cfx yarn up",
 
-    "deposit": "yarn chain && hardhat run scripts/mainnets/deposit.js"
+    "deposit": "hardhat run scripts/mainnets/deposit.js",
+    "deposit:eth": "HARDHAT_NETWORK=eth yarn deposit",
+    "deposit:bnb": "HARDHAT_NETWORK=bnb yarn deposit"
   },
   "devDependencies": {
-    "@mesonfi/contract-abis": "^0.6.0",
-    "@mesonfi/contract-types": "^0.6.0",
-    "@mesonfi/presets": "^0.6.3",
-    "@mesonfi/sdk": "^0.6.0",
+    "@mesonfi/contract-abis": "^0.6.5",
+    "@mesonfi/contract-types": "^0.6.5",
+    "@mesonfi/presets": "^0.6.5",
+    "@mesonfi/sdk": "^0.6.5",
     "@nomiclabs/hardhat-ethers": "^2.0.3",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "^4.4.1",

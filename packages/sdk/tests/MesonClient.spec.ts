@@ -42,7 +42,7 @@ describe('MesonClient', () => {
     const swapSigner = new EthersWalletSwapSigner(initiator)
 
     const tokenFactory = new ContractFactory(ERC20Abi.abi, ERC20Abi.bytecode, wallets[0])
-    token = await tokenFactory.deploy('MockToken', 'MT', parseUnits('10000', 6)) as MockToken
+    token = await tokenFactory.deploy('MockToken', 'MT', parseUnits('10000', 6), 6) as MockToken
     await token.transfer(initiator.address, parseUnits('3000', 6))
     await token.transfer(provider.address, parseUnits('5000', 6))
 

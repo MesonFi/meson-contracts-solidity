@@ -14,9 +14,7 @@ async function main() {
   ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
 
   const wallet = new ethers.Wallet(PRIVATE_KEY, ethers.provider)
-  const tokens = network.tokens
-    .filter(t => t.symbol.startsWith('USDC'))
-    .map(t => t.addr)
+  const tokens = network.tokens.map(t => t.addr)
 
   const Meson = await ethers.getContractFactory('Meson', wallet)
   console.log('Deploying Meson...')

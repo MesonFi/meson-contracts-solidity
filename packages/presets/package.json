@@ -1,6 +1,6 @@
 {
   "name": "@mesonfi/presets",
-  "version": "0.6.3",
+  "version": "0.6.5",
   "description": "",
   "license": "MIT",
   "repository": "https://github.com/MesonFi/meson-contracts-solidity",
@@ -20,8 +20,8 @@
   "dependencies": {
     "@ethersproject/contracts": "5.5.0",
     "@ethersproject/providers": "5.5.0",
-    "@mesonfi/contract-abis": "^0.6.0",
-    "@mesonfi/sdk": "^0.6.0"
+    "@mesonfi/contract-abis": "^0.6.5",
+    "@mesonfi/sdk": "^0.6.5"
   },
   "devDependencies": {
     "typescript": "^4.5.4"

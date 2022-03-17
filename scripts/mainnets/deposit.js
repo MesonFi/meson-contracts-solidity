@@ -7,6 +7,7 @@ require('dotenv').config()
 const { HARDHAT_NETWORK, LP_PRIVATE_KEY } = process.env
 
 const amount = '1000'
+const tokenIndex = 1
 
 async function main() {
   const mainnets = require('@mesonfi/presets/src/mainnets.json')
@@ -15,18 +16,19 @@ async function main() {
 
   const wallet = new ethers.Wallet(LP_PRIVATE_KEY, ethers.provider)
 
-  const token1 = new ethers.Contract(network.tokens[0].addr, ERC20.abi, wallet)
+  const token = new ethers.Contract(network.tokens[tokenIndex - 1].addr, ERC20.abi, wallet)
   const meson = new ethers.Contract(network.mesonAddress, Meson.abi, wallet)
 
   console.log(`lp address: ${wallet.address}`)
 
   console.log(`approving for ${amount}...`)
-  await (await token1.approve(network.mesonAddress, ethers.utils.parseUnits(amount, 18))).wait(1)
+  const decimals = await token.decimals()
+  await (await token.approve(network.mesonAddress, ethers.utils.parseUnits(amount, decimals))).wait(1)
 
   console.log(`depositing for ${amount}...`)
   const providerIndex = await meson.indexOfAddress(wallet.address)
   const needRegister = providerIndex == 0
-  const balanceIndex = 2**40 + (needRegister ? 1 : providerIndex)
+  const balanceIndex = tokenIndex * 2**40 + (needRegister ? 1 : providerIndex)
 
   let tx
   if (needRegister) {

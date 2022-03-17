@@ -29,6 +29,12 @@ async function setChainConfig(networkId) {
     .replace('CONFIG_BLOCKCHAIN_NAME', `${network.name}${testnetMode ? ' Testnet' : ''}`)
     .replace('CONFIG_COIN_TYPE', network.shortSlip44)
 
+  if (network.shortSlip44 === '0x003c') {
+    config = config.replace('CONFIG_LOCK_TIME', '40 minutes')
+  } else {
+    config = config.replace('CONFIG_LOCK_TIME', '20 minutes')
+  }
+
   if (testnetMode) {
     config = config
       .replace(/CONFIG_TESTNET_MODE/g, ' (Testnet)')

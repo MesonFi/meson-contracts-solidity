@@ -1,4 +1,5 @@
 import type { BigNumber, BigNumberish } from "@ethersproject/bignumber";
+import type { CallOverrides } from "@ethersproject/contracts";
 import type { Wallet } from '@ethersproject/wallet'
 import type { Meson } from '@mesonfi/contract-types'
 import { pack } from '@ethersproject/solidity'
@@ -195,7 +196,7 @@ export class MesonClient {
     return events.length > 0
   }
 
-  async getPostedSwap(encoded: string | BigNumber, initiatorToCheck?: string): Promise<{
+  async getPostedSwap(encoded: string | BigNumber, initiatorToCheck?: string, block?: number): Promise<{
     status: PostedSwapStatus,
     initiator?: string,
     provider?: string,
@@ -210,7 +211,16 @@ export class MesonClient {
       throw new Error('Invalid encoded. ' + err.message)
     }
 
-    const { initiator, provider, executed } = await this.mesonInstance.getPostedSwap(encoded)
+    const overrides: CallOverrides = {}
+    if (typeof block === 'number') {
+      if (block <= 0) {
+        const blockNumber = await this.mesonInstance.provider.getBlockNumber()
+        overrides.blockTag = blockNumber + block
+      } else {
+        overrides.blockTag = block
+      }
+    }
+    const { initiator, provider, executed } = await this.mesonInstance.getPostedSwap(encoded, overrides)
     if (executed) {
       return { status: PostedSwapStatus.Executed }
     } else if (initiator === AddressZero) {
@@ -232,12 +242,21 @@ export class MesonClient {
     }
   }
 
-  async getLockedSwap(encoded: string | BigNumber, initiator: string): Promise<{
+  async getLockedSwap(encoded: string | BigNumber, initiator: string, block?: number): Promise<{
     status: LockedSwapStatus,
     provider?: string,
     until?: number
   }> {
-    const { provider, until } = await this.mesonInstance.getLockedSwap(encoded, initiator)
+    const overrides: CallOverrides = {}
+    if (typeof block === 'number') {
+      if (block <= 0) {
+        const blockNumber = await this.mesonInstance.provider.getBlockNumber()
+        overrides.blockTag = blockNumber + block
+      } else {
+        overrides.blockTag = block
+      }
+    }
+    const { provider, until } = await this.mesonInstance.getLockedSwap(encoded, initiator, overrides)
     if (!until) {
       return { status: LockedSwapStatus.NoneOrAfterRunning }
     } else if (until * 1000 < Date.now()) {
