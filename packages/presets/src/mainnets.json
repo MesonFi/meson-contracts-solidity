@@ -30,7 +30,7 @@
   },
   {
     "id": "bnb",
-    "name": "BNB",
+    "name": "BNB Chain",
     "alias": "BNB",
     "chainId": "0x38",
     "slip44": "0x800002ca",
