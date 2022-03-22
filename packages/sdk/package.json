@@ -19,18 +19,19 @@
     "prepare": "yarn build"
   },
   "dependencies": {
-    "@ethersproject/bignumber": "5.5.0",
-    "@ethersproject/bytes": "5.5.0",
-    "@ethersproject/constants": "5.5.0",
-    "@ethersproject/keccak256": "5.5.0",
-    "@ethersproject/solidity": "5.5.0",
-    "@ethersproject/transactions": "5.5.0",
-    "@ethersproject/wallet": "5.5.0",
+    "@ethersproject/bignumber": "^5.6.0",
+    "@ethersproject/bytes": "^5.6.0",
+    "@ethersproject/constants": "^5.6.0",
+    "@ethersproject/keccak256": "^5.6.0",
+    "@ethersproject/providers": "^5.6.0",
+    "@ethersproject/solidity": "^5.6.0",
+    "@ethersproject/transactions": "^5.6.0",
+    "@ethersproject/wallet": "^5.6.0",
     "@mesonfi/contract-types": "^0.6.5"
   },
   "devDependencies": {
-    "@ethersproject/contracts": "5.5.0",
-    "@ethersproject/units": "5.5.0",
+    "@ethersproject/contracts": "^5.6.0",
+    "@ethersproject/units": "^5.6.0",
     "@mesonfi/contract-abis": "^0.6.5",
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.5",

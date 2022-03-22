@@ -2,6 +2,7 @@ import type { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import type { CallOverrides } from "@ethersproject/contracts";
 import type { Wallet } from '@ethersproject/wallet'
 import type { Meson } from '@mesonfi/contract-types'
+import { WebSocketProvider } from '@ethersproject/providers'
 import { pack } from '@ethersproject/solidity'
 import { AddressZero } from '@ethersproject/constants'
 
@@ -59,6 +60,14 @@ export class MesonClient {
   constructor(mesonInstance: any, shortCoinType: string) {
     this.mesonInstance = mesonInstance as Meson
     this.shortCoinType = shortCoinType
+  }
+
+  dispose() {
+    this.mesonInstance.removeAllListeners()
+    this.mesonInstance.provider.removeAllListeners()
+    if (this.mesonInstance.provider instanceof WebSocketProvider) {
+      this.mesonInstance.provider._websocket.removeAllListeners()
+    }
   }
 
   setSwapSigner(swapSigner: SwapSigner) {

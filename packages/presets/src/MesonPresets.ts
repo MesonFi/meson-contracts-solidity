@@ -1,4 +1,5 @@
 import type { Provider } from '@ethersproject/providers'
+import { JsonRpcProvider, WebSocketProvider } from '@ethersproject/providers'
 import { Contract as EthersContract } from '@ethersproject/contracts'
 import { MesonClient, Swap, PostedSwapStatus, LockedSwapStatus } from '@mesonfi/sdk'
 import { Meson } from '@mesonfi/contract-abis'
@@ -30,6 +31,12 @@ export interface PresetNetwork {
     decimals: number
   }
   tokens: PresetToken[]
+}
+
+class StaticJsonRpcProvider extends JsonRpcProvider {
+  async getNetwork() {
+    return this._network || super.getNetwork()
+  }
 }
 
 export class MesonPresets {
@@ -78,8 +85,7 @@ export class MesonPresets {
   getClient(id: string, provider: Provider, Contract = EthersContract): MesonClient {
     const network = this.getNetwork(id)
     if (!network) {
-      console.warn(`Unsupported network: ${id}`)
-      return
+      throw new Error(`Unsupported network: ${id}`)
     }
     if (!this._cache.get(id)) {
       const instance = new Contract(network.mesonAddress, Meson.abi, provider)
@@ -87,6 +93,36 @@ export class MesonPresets {
       this._cache.set(id, client)
     }
     return this._cache.get(id)
+  }
+
+  clientFromUrl({ id, url, ws }, Contract = EthersContract): MesonClient {
+    const network = this.getNetwork(id)
+    if (!network) {
+      throw new Error(`Unsupported network: ${id}`)
+    }
+    if (!this._cache.get(id)) {
+      let provider
+      const providerNetwork = { name: network.name, chainId: Number(network.chainId) }
+      if (ws) {
+        provider = new WebSocketProvider(ws, providerNetwork)
+      } else if (url.startsWith('ws')) {
+        provider = new WebSocketProvider(url, providerNetwork)
+      } else {
+        provider = new StaticJsonRpcProvider(url, providerNetwork)
+      }
+      const instance = new Contract(network.mesonAddress, Meson.abi, provider)
+      const client = new MesonClient(instance, network.shortSlip44)
+      this._cache.set(id, client)
+    }
+    return this._cache.get(id)
+  }
+
+  disposeClient(id: string) {
+    const client = this._cache.get(id)
+    if (client) {
+      client.dispose()
+      this._cache.delete(id)
+    }
   }
 
   getClientFromShortCoinType(shortCoinType: string) {
