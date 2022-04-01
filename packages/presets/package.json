@@ -21,7 +21,8 @@
     "@ethersproject/contracts": "^5.6.0",
     "@ethersproject/providers": "^5.6.0",
     "@mesonfi/contract-abis": "^0.6.5",
-    "@mesonfi/sdk": "^0.6.6"
+    "@mesonfi/sdk": "^0.6.6",
+    "tronweb": "^4.1.0"
   },
   "devDependencies": {
     "typescript": "^4.5.4"
