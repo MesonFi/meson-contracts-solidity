@@ -1,6 +1,6 @@
 {
   "name": "meson-contracts-solidity",
-  "version": "0.6.5",
+  "version": "0.7.0-rc.1",
   "main": "index.js",
   "private": true,
   "engines": {
@@ -70,10 +70,10 @@
     "deposit:tron": "hardhat run scripts/tron/deposit.js"
   },
   "devDependencies": {
-    "@mesonfi/contract-abis": "^0.6.5",
-    "@mesonfi/contract-types": "^0.6.5",
-    "@mesonfi/presets": "^0.6.8",
-    "@mesonfi/sdk": "^0.6.6",
+    "@mesonfi/contract-abis": "^0.7.0-rc.1",
+    "@mesonfi/contract-types": "^0.7.0-rc.1",
+    "@mesonfi/presets": "^0.7.0-rc.1",
+    "@mesonfi/sdk": "^0.7.0-rc.1",
     "@nomiclabs/hardhat-ethers": "^2.0.3",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "^4.4.1",
