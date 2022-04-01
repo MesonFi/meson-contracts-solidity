@@ -197,5 +197,36 @@
         "addr": "0xA4B19C7859b3d3b2FD81244817D875a7708Ba5f5"
       }
     ]
+  },
+  {
+    "id": "tron-testnet",
+    "name": "Tron Testnet",
+    "alias": "TRX",
+    "chainId": "tron-testnet",
+    "slip44": "0x800000c3",
+    "shortSlip44": "0x00c3",
+    "extensions": [
+      "tronlink"
+    ],
+    "addressFormat": "tron",
+    "url": "https://api.nileex.io",
+    "explorer": "https://nile.tronscan.org/#",
+    "mesonAddress": "TYtGRRt9ZcAtYEEVG4B5vGuxAWsrQ2WTFo",
+    "tokens": [
+      {
+        "name": "TRX USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t",
+        "link": "token20/TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t"
+      },
+      {
+        "name": "TRX USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5",
+        "link": "token20/TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5"
+      }
+    ]
   }
 ]
