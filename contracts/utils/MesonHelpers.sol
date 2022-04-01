@@ -142,6 +142,16 @@ contract MesonHelpers is MesonConfig {
     address signer
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
+
+    if (_inChainFrom(encodedSwap) == 0x00c3) {
+      bytes32 digest = keccak256(abi.encodePacked(
+        bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33320a), // HEX of "\x19TRON Signed Message:\n32\n"
+        encodedSwap
+      ));
+      require(signer == ecrecover(digest, v, r, s), "Invalid signature");
+      return;
+    }
+
     bytes32 typehash = REQUEST_TYPE_HASH;
     bytes32 digest;
     assembly {
@@ -162,6 +172,17 @@ contract MesonHelpers is MesonConfig {
     address signer
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
+
+    if (_inChainFrom(encodedSwap) == 0x00c3) {
+      bytes32 digest = keccak256(abi.encodePacked(
+        bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33320a), // HEX of "\x19TRON Signed Message:\n32\n"
+        encodedSwap,
+        recipient
+      ));
+      require(signer == ecrecover(digest, v, r, s), "Invalid signature");
+      return;
+    }
+
     bytes32 typehash = RELEASE_TYPE_HASH;
     bytes32 digest;
     assembly {
