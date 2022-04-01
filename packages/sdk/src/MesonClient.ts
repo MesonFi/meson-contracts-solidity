@@ -1,11 +1,14 @@
-import type { BigNumber, BigNumberish } from "@ethersproject/bignumber";
-import type { CallOverrides } from "@ethersproject/contracts";
+import type { BigNumber, BigNumberish } from '@ethersproject/bignumber'
+import type { CallOverrides } from '@ethersproject/contracts'
 import type { Wallet } from '@ethersproject/wallet'
 import type { Meson } from '@mesonfi/contract-types'
+import type { JsonRpcProvider, Listener } from '@ethersproject/providers'
+
 import { WebSocketProvider } from '@ethersproject/providers'
 import { pack } from '@ethersproject/solidity'
 import { AddressZero } from '@ethersproject/constants'
 
+import { AbstractChainApis, EthersChainApis } from './ChainApis'
 import { Swap } from './Swap'
 import { SwapWithSigner } from './SwapWithSigner'
 import { SwapSigner } from './SwapSigner'
@@ -42,10 +45,11 @@ export interface PartialSwapData {
 
 export class MesonClient {
   readonly mesonInstance: Meson
+  readonly chainApis: AbstractChainApis
   readonly shortCoinType: string
 
-  #signer: SwapSigner | null = null
-  #tokens: string[] = []
+  protected _signer: SwapSigner | null = null
+  protected _tokens: string[] = []
 
   static async Create(mesonInstance: Meson, swapSigner?: SwapSigner) {
     const shortCoinType = await mesonInstance.getShortCoinType()
@@ -60,6 +64,19 @@ export class MesonClient {
   constructor(mesonInstance: any, shortCoinType: string) {
     this.mesonInstance = mesonInstance as Meson
     this.shortCoinType = shortCoinType
+    this.chainApis = new EthersChainApis(this.mesonInstance.provider as JsonRpcProvider)
+  }
+
+  get address(): string {
+    return this.mesonInstance.address.toLowerCase()
+  }
+
+  parseTransaction(tx: { data: string, value?: BigNumberish}) {
+    return this.mesonInstance.interface.parseTransaction(tx)  
+  }
+
+  onEvent(listener: Listener) {
+    this.mesonInstance.on('*', listener)
   }
 
   dispose() {
@@ -71,23 +88,23 @@ export class MesonClient {
   }
 
   setSwapSigner(swapSigner: SwapSigner) {
-    this.#signer = swapSigner
+    this._signer = swapSigner
   }
 
   async _getSupportedTokens() {
     const tokens = await this.mesonInstance.supportedTokens()
-    this.#tokens = tokens.map(addr => addr.toLowerCase())
+    this._tokens = tokens.map(addr => addr.toLowerCase())
   }
 
   token(index: number) {
     if (!index) {
       throw new Error(`Token index cannot be zero`)
     }
-    return this.#tokens[index - 1] || ''
+    return this._tokens[index - 1] || ''
   }
 
   requestSwap(swap: PartialSwapData, outChain: string, lockPeriod: number = 5400) {
-    if (!this.#signer) {
+    if (!this._signer) {
       throw new Error('No swap signer assigned')
     }
     return new SwapWithSigner({
@@ -95,11 +112,11 @@ export class MesonClient {
       inChain: this.shortCoinType,
       outChain,
       expireTs: Math.floor(Date.now() / 1000) + lockPeriod,
-    }, this.#signer)
+    }, this._signer)
   }
 
   async depositAndRegister(token: string, amount: BigNumberish, providerIndex: string) {
-    const tokenIndex = 1 + this.#tokens.indexOf(token.toLowerCase())
+    const tokenIndex = 1 + this._tokens.indexOf(token.toLowerCase())
     if (!tokenIndex) {
       throw new Error(`Token not supported`)
     }
@@ -112,7 +129,7 @@ export class MesonClient {
   }
 
   async deposit(token: string, amount: BigNumberish) {
-    const tokenIndex = 1 + this.#tokens.indexOf(token.toLowerCase())
+    const tokenIndex = 1 + this._tokens.indexOf(token.toLowerCase())
     if (!tokenIndex) {
       throw new Error(`Token not supported`)
     }
@@ -203,6 +220,10 @@ export class MesonClient {
     const filter = this.mesonInstance.filters.SwapReleased(encoded)
     const events = await this.mesonInstance.queryFilter(filter)
     return events.length > 0
+  }
+
+  async _getPostedSwap(encoded: string | BigNumber, overrides: CallOverrides) {
+    return await this.mesonInstance.getPostedSwap(encoded, overrides)
   }
 
   async getPostedSwap(encoded: string | BigNumber, initiatorToCheck?: string, block?: number): Promise<{

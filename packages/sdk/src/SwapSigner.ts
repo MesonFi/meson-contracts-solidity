@@ -34,6 +34,11 @@ export class SwapSigner {
   }
 
   static hashRequest(encoded: string, testnet?: boolean): string {
+    if (encoded.substring(60, 64) === '00c3') {
+      // for Tron
+      const header = '\x19TRON Signed Message:\n32\n'
+      return keccak256(pack(['string', 'bytes32'], [header, encoded]))
+    }
     const notice = testnet ? NOTICE_TESTNET_SIGN_REQUEST : NOTICE_SIGN_REQUEST
     const typeHash = keccak256(pack(['string'], [`bytes32 ${notice}`]))
     return keccak256(pack(
@@ -43,6 +48,11 @@ export class SwapSigner {
   }
 
   static hashRelease(encoded: string, recipient: string, testnet?: boolean): string {
+    if (encoded.substring(60, 64) === '00c3') {
+      // for Tron
+      const header = '\x19TRON Signed Message:\n32\n'
+      return keccak256(pack(['string', 'bytes32', 'address'], [header, encoded, recipient]))
+    }
     const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
     const typeHash = keccak256(pack(
       ['string', 'string'],
@@ -86,6 +96,7 @@ export class EthersWalletSwapSigner extends SwapSigner {
 
 type RemoteSigner = {
   getAddress: () => string
+  signMessage: (data: any) => Promise<string>
   signTypedData: (data: any) => Promise<string>
 }
 
@@ -102,6 +113,10 @@ export class RemoteSwapSigner extends SwapSigner {
   }
 
   async signSwapRequest(encoded: string, testnet?: boolean): Promise<Signature> {
+    if (encoded.substring(60, 64) === '00c3') {
+      const signature = await this.remoteSigner.signMessage(encoded.replace('0x', '0x0a'))
+      return this._separateSignature(signature)
+    }
     const notice = testnet ? NOTICE_TESTNET_SIGN_REQUEST : NOTICE_SIGN_REQUEST
     const data = [{ type: 'bytes32', name: notice, value: encoded }]
     const signature = await this.remoteSigner.signTypedData(data)
@@ -109,6 +124,11 @@ export class RemoteSwapSigner extends SwapSigner {
   }
 
   async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<Signature> {
+    if (encoded.substring(60, 64) === '00c3') {
+      const message = pack(['bytes32', 'address'], [encoded, recipient])
+      const signature = await this.remoteSigner.signMessage(message.replace('0x', '0x0a'))
+      return this._separateSignature(signature)
+    }
     const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
     const data = [
       { type: 'bytes32', name: notice, value: encoded },
