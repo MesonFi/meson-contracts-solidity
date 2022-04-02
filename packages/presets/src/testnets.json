@@ -107,7 +107,7 @@
       "metamask"
     ],
     "addressFormat": "hex",
-    "url": "https://matic-mumbai.chainstacklabs.com",
+    "url": "https://rpc-mumbai.matic.today",
     "explorer": "https://mumbai.polygonscan.com",
     "nativeCurrency": {
       "name": "MATIC",
