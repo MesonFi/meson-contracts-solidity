@@ -2,6 +2,8 @@ import type { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 import type { Wallet } from '@ethersproject/wallet'
 
 import { Interface } from '@ethersproject/abi'
+import { ERC20 } from '@mesonfi/contract-abis'
+
 import { MesonClient, PostedSwapStatus, LockedSwapStatus } from './MesonClient'
 import { AbstractChainApis, TronChainApis } from './ChainApis'
 import { SwapSigner } from './SwapSigner'
@@ -33,20 +35,24 @@ export class TronContract {
     return itfc.decodeFunctionData(name, `0x${tx.data}`)
   }
 
-  connect(signer: Wallet) {
-
-  }
+  connect(signer: Wallet) {}
+  queryFilter() {}
 
   async getShortCoinType() {
     return await this.#instance.getShortCoinType().call()
   }
 
   async supportedTokens() {
-    return await this.#instance.supportedTokens().call()
+    const tokens = await this.#instance.supportedTokens().call()
+    return tokens.map(t => this.tronWeb.address.fromHex(t))
   }
 
-  async indexOfAddress(...args: any[]) {
-    return await this.#instance.supportedTokens(...args).call()
+  async indexOfAddress(addr) {
+    return await this.#instance.indexOfAddress(addr).call()
+  }
+
+  async balanceOf(token, addr) {
+    return await this.#instance.balanceOf(token, addr).call()
   }
 
   async depositAndRegister(...args: any[]) {
@@ -85,6 +91,7 @@ export class TronContract {
 export class MesonClientTron extends MesonClient {
   readonly chainApis: AbstractChainApis
   readonly mesonInstance: any
+  readonly tronWeb: any
 
   static async CreateForTron(mesonInstance: TronContract, swapSigner?: SwapSigner) {
     const shortCoinType = await mesonInstance.getShortCoinType()
@@ -99,7 +106,8 @@ export class MesonClientTron extends MesonClient {
   constructor(mesonInstance: TronContract, shortCoinType: string) {
     super(mesonInstance, shortCoinType)
     this.mesonInstance = mesonInstance
-    this.chainApis = new TronChainApis(mesonInstance.tronWeb)
+    this.tronWeb = mesonInstance.tronWeb
+    this.chainApis = new TronChainApis(this.tronWeb)
   }
 
   get address(): string {
@@ -116,6 +124,38 @@ export class MesonClientTron extends MesonClient {
 
   setSwapSigner(swapSigner: SwapSigner) {
     this._signer = swapSigner
+  }
+
+  async detectNetwork() {
+    return await this.tronWeb.fullNode.isConnected()
+  }
+
+  async _getSupportedTokens() {
+    this._tokens = await this.mesonInstance.supportedTokens()
+  }
+
+  getTokenIndex(addr: string) {
+    return 1 + this._tokens.indexOf(addr)
+  }
+
+  async getBalance(addr: string) {
+    const balance = await this.tronWeb.trx.getBalance(addr)
+    return balance
+  }
+
+  async balanceOfToken(token: string, addr: string) {
+    const contract = this.tronWeb.contract(ERC20.abi, token)
+    return await contract.balanceOf(addr).call()
+  }
+
+  async allowanceOfToken(token: string, addr: string) {
+    const contract = this.tronWeb.contract(ERC20.abi, token)
+    return await contract.allowance(addr, this.address).call()
+  }
+
+  async approveToken(token: string, value: BigNumberish) {
+    const contract = this.tronWeb.contract(ERC20.abi, token)
+    return await contract.approve(this.address, value).send()
   }
 
   async cancelSwap(encodedSwap: string, signer?: Wallet) {

@@ -28,12 +28,12 @@
     "@ethersproject/solidity": "^5.6.0",
     "@ethersproject/transactions": "^5.6.0",
     "@ethersproject/wallet": "^5.6.0",
+    "@mesonfi/contract-abis": "^0.7.0-rc.1",
     "@mesonfi/contract-types": "^0.7.0-rc.1"
   },
   "devDependencies": {
     "@ethersproject/contracts": "^5.6.0",
     "@ethersproject/units": "^5.6.0",
-    "@mesonfi/contract-abis": "^0.7.0-rc.1",
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^9.1.0",

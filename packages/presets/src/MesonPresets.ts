@@ -1,5 +1,6 @@
 import type { Provider } from '@ethersproject/providers'
-import { JsonRpcProvider, WebSocketProvider } from '@ethersproject/providers'
+import type { Signer } from '@ethersproject/abstract-signer'
+import { StaticJsonRpcProvider, WebSocketProvider } from '@ethersproject/providers'
 import { Contract } from '@ethersproject/contracts'
 
 import TronWeb from 'tronweb'
@@ -41,12 +42,6 @@ export interface PresetNetwork {
     decimals: number
   }
   tokens: PresetToken[]
-}
-
-class StaticJsonRpcProvider extends JsonRpcProvider {
-  async getNetwork() {
-    return this._network || super.getNetwork()
-  }
 }
 
 export class MesonPresets {
@@ -92,7 +87,7 @@ export class MesonPresets {
     return tokens[tokenIndex - 1]
   }
 
-  getClient(id: string, provider: Provider): MesonClient {
+  getClient(id: string, provider: Provider | Signer): MesonClient {
     const network = this.getNetwork(id)
     if (!network) {
       throw new Error(`Unsupported network: ${id}`)
@@ -111,7 +106,7 @@ export class MesonPresets {
     return this._cache.get(id)
   }
 
-  clientFromUrl({ id, url, ws }): MesonClient {
+  clientFromUrl({ id, url = '', ws = null }): MesonClient {
     const network = this.getNetwork(id)
     if (!network) {
       throw new Error(`Unsupported network: ${id}`)

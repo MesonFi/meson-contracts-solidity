@@ -1,12 +1,14 @@
 import type { BigNumber, BigNumberish } from '@ethersproject/bignumber'
-import type { CallOverrides } from '@ethersproject/contracts'
+import type { CallOverrides, ContractTransaction } from '@ethersproject/contracts'
 import type { Wallet } from '@ethersproject/wallet'
-import type { Meson } from '@mesonfi/contract-types'
 import type { JsonRpcProvider, Listener } from '@ethersproject/providers'
+import type { Meson } from '@mesonfi/contract-types'
 
+import { Contract } from '@ethersproject/contracts'
 import { WebSocketProvider } from '@ethersproject/providers'
 import { pack } from '@ethersproject/solidity'
 import { AddressZero } from '@ethersproject/constants'
+import { ERC20 } from '@mesonfi/contract-abis'
 
 import { AbstractChainApis, EthersChainApis } from './ChainApis'
 import { Swap } from './Swap'
@@ -64,11 +66,15 @@ export class MesonClient {
   constructor(mesonInstance: any, shortCoinType: string) {
     this.mesonInstance = mesonInstance as Meson
     this.shortCoinType = shortCoinType
-    this.chainApis = new EthersChainApis(this.mesonInstance.provider as JsonRpcProvider)
+    this.chainApis = new EthersChainApis(this.provider as JsonRpcProvider)
   }
 
   get address(): string {
     return this.mesonInstance.address.toLowerCase()
+  }
+
+  get provider(): JsonRpcProvider {
+    return this.mesonInstance.provider as JsonRpcProvider
   }
 
   parseTransaction(tx: { data: string, value?: BigNumberish}) {
@@ -96,11 +102,50 @@ export class MesonClient {
     this._tokens = tokens.map(addr => addr.toLowerCase())
   }
 
+  async detectNetwork() {
+    return await this.provider.detectNetwork()
+  }
+
   token(index: number) {
     if (!index) {
       throw new Error(`Token index cannot be zero`)
     }
     return this._tokens[index - 1] || ''
+  }
+
+  getTokenIndex(addr: string) {
+    return 1 + this._tokens.indexOf(addr.toLowerCase())
+  }
+
+  async getBalance(addr: string) {
+    return await this.provider.getBalance(addr)
+  }
+
+  async balanceOfToken(token: string, addr: string) {
+    const contract = new Contract(token, ERC20.abi, this.provider)
+    return await contract.balanceOf(addr)
+  }
+
+  async allowanceOfToken(token: string, addr: string) {
+    const contract = new Contract(token, ERC20.abi, this.provider)
+    return await contract.allowance(addr, this.address)
+  }
+
+  async approveToken(token: string, value: BigNumberish) {
+    const contract = new Contract(token, ERC20.abi, this.provider)
+    return await contract.approve(this.address, value)
+  }
+
+  async getShortCoinType() {
+    return await this.mesonInstance.getShortCoinType()
+  }
+
+  async indexOfAddress(providerAddress: string) {
+    return await this.mesonInstance.indexOfAddress(providerAddress)
+  }
+
+  async balanceOf(token: string, providerAddress: string) {
+    return await this.mesonInstance.balanceOf(token, providerAddress)
   }
 
   requestSwap(swap: PartialSwapData, outChain: string, lockPeriod: number = 5400) {
@@ -116,7 +161,7 @@ export class MesonClient {
   }
 
   async depositAndRegister(token: string, amount: BigNumberish, providerIndex: string) {
-    const tokenIndex = 1 + this._tokens.indexOf(token.toLowerCase())
+    const tokenIndex = this.getTokenIndex(token)
     if (!tokenIndex) {
       throw new Error(`Token not supported`)
     }
@@ -129,7 +174,7 @@ export class MesonClient {
   }
 
   async deposit(token: string, amount: BigNumberish) {
-    const tokenIndex = 1 + this._tokens.indexOf(token.toLowerCase())
+    const tokenIndex = this.getTokenIndex(token)
     if (!tokenIndex) {
       throw new Error(`Token not supported`)
     }
@@ -161,6 +206,15 @@ export class MesonClient {
     )
   }
 
+  async bondSwap(encoded: BigNumberish) {
+    const providerAddress = await this.mesonInstance.signer.getAddress()
+    const providerIndex = await this.mesonInstance.indexOfAddress(providerAddress)
+    if (!providerIndex) {
+      throw new Error(`Address ${providerAddress} not registered. Please call depositAndRegister first.`)
+    }
+    return this.mesonInstance.bondSwap(encoded, providerIndex)
+  }
+
   async lock(signedRequest: SignedSwapRequest) {
     return this.mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
   }
@@ -190,6 +244,27 @@ export class MesonClient {
       return await this.mesonInstance.connect(signer).cancelSwap(encodedSwap)
     }
     return await this.mesonInstance.cancelSwap(encodedSwap)
+  }
+
+  async send(promise: Promise<ContractTransaction>) {
+    let tx
+    try {
+      tx = await promise
+    } catch (error: unknown) {
+      const receipt = await this.getReceipt((error as any).transactionHash)
+      throw error
+    }
+  
+    let receipt
+    try {
+      receipt = await tx.wait()
+    } catch (error: unknown) {
+    }
+  }
+
+  async getReceipt(txHash: string) {
+    const receipt = await this.chainApis.getReceipt(txHash)
+    return receipt
   }
 
   async isSwapPosted(encoded: string | BigNumber) {
@@ -226,6 +301,10 @@ export class MesonClient {
     return await this.mesonInstance.getPostedSwap(encoded, overrides)
   }
 
+  async _getLockedSwap(encoded: string | BigNumber, initiator: string, overrides: CallOverrides) {
+    return await this.mesonInstance.getLockedSwap(encoded, initiator, overrides)
+  }
+
   async getPostedSwap(encoded: string | BigNumber, initiatorToCheck?: string, block?: number): Promise<{
     status: PostedSwapStatus,
     initiator?: string,
@@ -250,7 +329,7 @@ export class MesonClient {
         overrides.blockTag = block
       }
     }
-    const { initiator, provider, executed } = await this.mesonInstance.getPostedSwap(encoded, overrides)
+    const { initiator, provider, executed } = await this._getPostedSwap(encoded, overrides)
     if (executed) {
       return { status: PostedSwapStatus.Executed }
     } else if (initiator === AddressZero) {
@@ -286,7 +365,7 @@ export class MesonClient {
         overrides.blockTag = block
       }
     }
-    const { provider, until } = await this.mesonInstance.getLockedSwap(encoded, initiator, overrides)
+    const { provider, until } = await this._getLockedSwap(encoded, initiator, overrides)
     if (!until) {
       return { status: LockedSwapStatus.NoneOrAfterRunning }
     } else if (until * 1000 < Date.now()) {

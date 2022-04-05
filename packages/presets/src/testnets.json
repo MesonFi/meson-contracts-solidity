@@ -211,6 +211,11 @@
     "addressFormat": "tron",
     "url": "https://api.nileex.io",
     "explorer": "https://nile.tronscan.org/#",
+    "nativeCurrency": {
+      "name": "TRX",
+      "symbol": "TRX",
+      "decimals": 6
+    },
     "mesonAddress": "TYtGRRt9ZcAtYEEVG4B5vGuxAWsrQ2WTFo",
     "tokens": [
       {
