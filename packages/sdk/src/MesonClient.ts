@@ -10,7 +10,7 @@ import { pack } from '@ethersproject/solidity'
 import { AddressZero } from '@ethersproject/constants'
 import { ERC20 } from '@mesonfi/contract-abis'
 
-import { AbstractChainApis, EthersChainApis, Receipt, Transaction } from './ChainApis'
+import { AbstractChainApis, EthersChainApis, Receipt } from './ChainApis'
 import { Swap } from './Swap'
 import { SwapWithSigner } from './SwapWithSigner'
 import { SwapSigner } from './SwapSigner'

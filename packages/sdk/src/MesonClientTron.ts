@@ -5,7 +5,7 @@ import { Interface } from '@ethersproject/abi'
 import { ERC20 } from '@mesonfi/contract-abis'
 
 import { MesonClient, PostedSwapStatus, LockedSwapStatus } from './MesonClient'
-import { AbstractChainApis, TronChainApis, Transaction } from './ChainApis'
+import { AbstractChainApis, TronChainApis } from './ChainApis'
 import { SwapSigner } from './SwapSigner'
 
 const AddressZero = '410000000000000000000000000000000000000000'
