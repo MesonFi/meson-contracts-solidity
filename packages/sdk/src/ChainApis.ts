@@ -22,6 +22,7 @@ export type Transaction = {
 
 export type Receipt = {
   status: string
+  blockNumber: string
   [key: string]: any
 }
 

@@ -1,12 +1,14 @@
-import type { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 import type { Wallet } from '@ethersproject/wallet'
 
+import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 import { Interface } from '@ethersproject/abi'
 import { ERC20 } from '@mesonfi/contract-abis'
 
 import { MesonClient, PostedSwapStatus, LockedSwapStatus } from './MesonClient'
-import { AbstractChainApis, TronChainApis } from './ChainApis'
+import { AbstractChainApis, TronChainApis, Transaction } from './ChainApis'
 import { SwapSigner } from './SwapSigner'
+
+const AddressZero = '410000000000000000000000000000000000000000'
 
 export class TronContract {
   readonly tronWeb: any
@@ -25,14 +27,14 @@ export class TronContract {
     return this.#instance.address
   }
 
-  parseTransaction(tx: { data: string, value?: BigNumberish}) {
-    const method = tx.data.substring(0, 8)
+  parseTransaction(tx: Transaction) {
+    const method = tx.input.substring(0, 8)
     if (!this.#instance.methodInstances[method]) {
       throw new Error('Contract method ' + method + ' not found');
     }
     const name = this.#instance.methodInstances[method].name
     const itfc = new Interface(this.#instance.abi)
-    return itfc.decodeFunctionData(name, `0x${tx.data}`)
+    return itfc.decodeFunctionData(name, `0x${tx.input}`)
   }
 
   connect(signer: Wallet) {}
@@ -55,36 +57,61 @@ export class TronContract {
     return await this.#instance.balanceOf(token, addr).call()
   }
 
+  async getPostedSwap(encoded: string | BigNumber) {
+    const { initiator, provider, executed } = await this.#instance.getPostedSwap(encoded).call()
+    return {
+      executed,
+      initiator: initiator === AddressZero ? undefined : this.tronWeb.address.fromHex(initiator),
+      provider: provider === AddressZero ? undefined : this.tronWeb.address.fromHex(provider),
+    }
+  }
+
+  async getLockedSwap(encoded: string | BigNumber, initiator: string) {
+    const { provider, until } = await this.#instance.getLockedSwap(encoded, initiator).call()
+    return {
+      until,
+      provider: provider === AddressZero ? undefined : this.tronWeb.address.fromHex(provider),
+    }
+  }
+
   async depositAndRegister(...args: any[]) {
-    return await this.#instance.depositAndRegister(...args).send()
+    const hash = await this.#instance.depositAndRegister(...args).send()
+    return { hash }
   }
 
   async deposit(...args: any[]) {
-    return await this.#instance.deposit(...args).send()
+    const hash = await this.#instance.deposit(...args).send()
+    return { hash }
   }
 
   async postSwap(...args: any[]) {
-    return await this.#instance.postSwap(...args).send()
+    const hash = await this.#instance.postSwap(...args).send()
+    return { hash }
   }
 
   async lock(...args: any[]) {
-    return await this.#instance.lock(...args).send()
+    const hash = await this.#instance.lock(...args).send()
+    return { hash }
   }
 
   async unlock(...args: any[]) {
-    return await this.#instance.unlock(...args).send()
+    const hash = await this.#instance.unlock(...args).send()
+    return { hash }
   }
 
   async release(...args: any[]) {
-    return await this.#instance.release(...args).send()
+    const hash = await this.#instance.release(...args).send()
+    return { hash }
   }
 
   async executeSwap(...args: any[]) {
-    return await this.#instance.executeSwap(...args).send()
+    const hash = await this.#instance.executeSwap(...args).send()
+    return { hash }
   }
 
   async cancelSwap(...args: any[]) {
-    return await this.#instance.cancelSwap(...args).send()
+    const hash = await this.#instance.cancelSwap(...args).send()
+    return { hash }
   }
 }
 
@@ -114,7 +141,7 @@ export class MesonClientTron extends MesonClient {
     return this.mesonInstance.address
   }
 
-  parseTransaction(tx: { data: string, value?: BigNumberish}) {
+  parseTransaction(tx: Transaction) {
     return this.mesonInstance.parseTransaction(tx)  
   }
 
@@ -140,7 +167,7 @@ export class MesonClientTron extends MesonClient {
 
   async getBalance(addr: string) {
     const balance = await this.tronWeb.trx.getBalance(addr)
-    return balance
+    return BigNumber.from(balance)
   }
 
   async balanceOfToken(token: string, addr: string) {
@@ -164,6 +191,10 @@ export class MesonClientTron extends MesonClient {
       // return await this.mesonInstance.connect(signer).cancelSwap(encodedSwap)
     }
     return await this.mesonInstance.cancelSwap(encodedSwap)
+  }
+  async wait(txHash: string, confirmations: number = 1, ms: number = 60_000) {
+    // TODO
+    return await this.chainApis.getReceipt(txHash)
   }
 
   async isSwapPosted(encoded: string | BigNumber) {

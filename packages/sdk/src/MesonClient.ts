@@ -1,5 +1,5 @@
 import type { BigNumber, BigNumberish } from '@ethersproject/bignumber'
-import type { CallOverrides, ContractTransaction } from '@ethersproject/contracts'
+import type { CallOverrides } from '@ethersproject/contracts'
 import type { Wallet } from '@ethersproject/wallet'
 import type { JsonRpcProvider, Listener } from '@ethersproject/providers'
 import type { Meson } from '@mesonfi/contract-types'
@@ -10,11 +10,12 @@ import { pack } from '@ethersproject/solidity'
 import { AddressZero } from '@ethersproject/constants'
 import { ERC20 } from '@mesonfi/contract-abis'
 
-import { AbstractChainApis, EthersChainApis } from './ChainApis'
+import { AbstractChainApis, EthersChainApis, Receipt, Transaction } from './ChainApis'
 import { Swap } from './Swap'
 import { SwapWithSigner } from './SwapWithSigner'
 import { SwapSigner } from './SwapSigner'
 import { SignedSwapRequest, SignedSwapRelease } from './SignedSwap'
+import { timer } from './utils'
 
 export enum PostedSwapStatus {
   NoneOrAfterRunning = 0, // nothing found on chain
@@ -77,8 +78,8 @@ export class MesonClient {
     return this.mesonInstance.provider as JsonRpcProvider
   }
 
-  parseTransaction(tx: { data: string, value?: BigNumberish}) {
-    return this.mesonInstance.interface.parseTransaction(tx)  
+  parseTransaction(tx: Transaction) {
+    return this.mesonInstance.interface.parseTransaction({ data: tx.input, value: tx.value })  
   }
 
   onEvent(listener: Listener) {
@@ -246,25 +247,59 @@ export class MesonClient {
     return await this.mesonInstance.cancelSwap(encodedSwap)
   }
 
-  async send(promise: Promise<ContractTransaction>) {
-    let tx
-    try {
-      tx = await promise
-    } catch (error: unknown) {
-      const receipt = await this.getReceipt((error as any).transactionHash)
-      throw error
+  async wait(txHash: string, confirmations: number = 1, ms: number = 60_000) {
+    if (!txHash) {
+      throw new Error(`Invalid transaction hash: ${txHash}`)
+    } else if (!(confirmations >= 1)) {
+      throw new Error(`Invalid confirmations: ${confirmations}`)
     }
-  
+
     let receipt
-    try {
-      receipt = await tx.wait()
-    } catch (error: unknown) {
+    let txBlockNumber
+    const getTxBlockNumber = async () => {
+      try {
+        receipt = await this.getReceipt(txHash)
+        txBlockNumber = Number(receipt.blockNumber)
+      } catch {}
     }
+
+    return new Promise<Receipt>((resolve, reject) => {
+      const done = (error?) => {
+        this.provider.on('block', onBlock)
+
+        if (error) {
+          reject(error)
+        } else {
+          resolve(receipt)
+        }
+      }
+
+      const onBlock = async blockNumber => {
+        if (!txBlockNumber) {
+          await getTxBlockNumber()
+        }
+        if (!txBlockNumber) {
+          return
+        }
+        if (confirmations === 1) {
+          return done()
+        }
+        if (blockNumber - txBlockNumber + 1 >= confirmations) {
+          await getTxBlockNumber()
+          if (blockNumber - txBlockNumber + 1 >= confirmations) {
+            return done()
+          }
+        }
+      }
+
+      this.provider.on('block', onBlock)
+
+      timer(ms).then(() => done(new Error('Time out')))
+    })
   }
 
   async getReceipt(txHash: string) {
-    const receipt = await this.chainApis.getReceipt(txHash)
-    return receipt
+    return await this.chainApis.getReceipt(txHash)
   }
 
   async isSwapPosted(encoded: string | BigNumber) {
@@ -298,11 +333,20 @@ export class MesonClient {
   }
 
   async _getPostedSwap(encoded: string | BigNumber, overrides: CallOverrides) {
-    return await this.mesonInstance.getPostedSwap(encoded, overrides)
+    const { initiator, provider, executed } = await this.mesonInstance.getPostedSwap(encoded, overrides)
+    return {
+      executed,
+      initiator: initiator === AddressZero ? undefined : initiator,
+      provider: provider === AddressZero ? undefined : provider
+    }
   }
 
   async _getLockedSwap(encoded: string | BigNumber, initiator: string, overrides: CallOverrides) {
-    return await this.mesonInstance.getLockedSwap(encoded, initiator, overrides)
+    const { provider, until } = await this.mesonInstance.getLockedSwap(encoded, initiator, overrides)
+    return {
+      until,
+      provider: provider === AddressZero ? undefined : provider
+    }
   }
 
   async getPostedSwap(encoded: string | BigNumber, initiatorToCheck?: string, block?: number): Promise<{
@@ -332,11 +376,11 @@ export class MesonClient {
     const { initiator, provider, executed } = await this._getPostedSwap(encoded, overrides)
     if (executed) {
       return { status: PostedSwapStatus.Executed }
-    } else if (initiator === AddressZero) {
+    } else if (!initiator) {
       return { status: PostedSwapStatus.NoneOrAfterRunning }
     } else if (initiatorToCheck && initiatorToCheck.toLowerCase() !== initiator.toLowerCase()) {
       return { status: PostedSwapStatus.ErrorMadeByOtherInitiator }
-    } else if (provider === AddressZero) {
+    } else if (!provider) {
       if (expired) {
         return { status: PostedSwapStatus.ErrorExpired, initiator }
       } else {

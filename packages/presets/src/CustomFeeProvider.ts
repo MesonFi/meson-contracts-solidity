@@ -54,13 +54,11 @@ function extendProvider(Provider: Class<JsonRpcProvider>) {
       let block = await this.getBlockWithTransactions('latest')
       let retries = 3
       do {
-        const priorityFees = block.transactions
-          .map((tx) => tx.maxPriorityFeePerGas)
-          .filter((fee): fee is BigNumber => Boolean(fee))
-          .sort((a, b) => (a.eq(b) ? 0 : a.lt(b) ? -1 : 1))
-        if (priorityFees.length > 0) {
-          const index = Math.min(Math.ceil(priorityFees.length * 0.8), priorityFees.length - 1)
-          return priorityFees[index]
+        const fees = block.transactions.map((tx) => tx.maxPriorityFeePerGas).filter(Boolean)
+        const sorted = fees.sort((a, b) => (a.eq(b) ? 0 : a.lt(b) ? -1 : 1))
+        if (sorted.length > 0) {
+          const index = Math.min(Math.ceil(sorted.length * 0.8), sorted.length - 1)
+          return sorted[index]
         }
         block = await this.getBlockWithTransactions(block.number - 5)
       } while (--retries)
