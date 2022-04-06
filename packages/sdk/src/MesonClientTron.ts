@@ -27,7 +27,7 @@ export class TronContract {
     return this.#instance.address
   }
 
-  parseTransaction(tx: Transaction) {
+  parseTransaction(tx: { input: string, value?: BigNumberish }) {
     const method = tx.input.substring(0, 8)
     if (!this.#instance.methodInstances[method]) {
       throw new Error('Contract method ' + method + ' not found');
@@ -141,7 +141,7 @@ export class MesonClientTron extends MesonClient {
     return this.mesonInstance.address
   }
 
-  parseTransaction(tx: Transaction) {
+  parseTransaction(tx: { input: string, value?: BigNumberish }) {
     return this.mesonInstance.parseTransaction(tx)  
   }
 

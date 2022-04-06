@@ -78,7 +78,7 @@ export class MesonClient {
     return this.mesonInstance.provider as JsonRpcProvider
   }
 
-  parseTransaction(tx: Transaction) {
+  parseTransaction(tx: { input: string, value?: BigNumberish }) {
     return this.mesonInstance.interface.parseTransaction({ data: tx.input, value: tx.value })  
   }
 
