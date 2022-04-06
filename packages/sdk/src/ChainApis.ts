@@ -132,7 +132,7 @@ export class TronChainApis implements AbstractChainApis {
   }
 
   async getReceipt(hash: string) {
-    const receipt = await this.#tronWeb.trx.getTransactionInfo(hash)
+    const receipt = await this.#tronWeb.trx.getUnconfirmedTransactionInfo(hash)
     return this.formatReceipt(receipt)
   }
 }

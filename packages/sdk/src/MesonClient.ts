@@ -265,7 +265,7 @@ export class MesonClient {
 
     return new Promise<Receipt>((resolve, reject) => {
       const done = (error?) => {
-        this.provider.on('block', onBlock)
+        this.provider.off('block', onBlock)
 
         if (error) {
           reject(error)

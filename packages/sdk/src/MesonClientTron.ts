@@ -5,8 +5,9 @@ import { Interface } from '@ethersproject/abi'
 import { ERC20 } from '@mesonfi/contract-abis'
 
 import { MesonClient, PostedSwapStatus, LockedSwapStatus } from './MesonClient'
-import { AbstractChainApis, TronChainApis } from './ChainApis'
+import { AbstractChainApis, TronChainApis, Receipt } from './ChainApis'
 import { SwapSigner } from './SwapSigner'
+import { timer } from './utils'
 
 const AddressZero = '410000000000000000000000000000000000000000'
 
@@ -58,7 +59,7 @@ export class TronContract {
   }
 
   async getPostedSwap(encoded: string | BigNumber) {
-    const { initiator, provider, executed } = await this.#instance.getPostedSwap(encoded).call()
+    const { initiator, provider, executed } = await this.#instance.getPostedSwap(encoded).call({ from: this.address })
     return {
       executed,
       initiator: initiator === AddressZero ? undefined : this.tronWeb.address.fromHex(initiator),
@@ -67,7 +68,7 @@ export class TronContract {
   }
 
   async getLockedSwap(encoded: string | BigNumber, initiator: string) {
-    const { provider, until } = await this.#instance.getLockedSwap(encoded, initiator).call()
+    const { provider, until } = await this.#instance.getLockedSwap(encoded, initiator).call({ from: this.address })
     return {
       until,
       provider: provider === AddressZero ? undefined : this.tronWeb.address.fromHex(provider),
@@ -193,8 +194,57 @@ export class MesonClientTron extends MesonClient {
     return await this.mesonInstance.cancelSwap(encodedSwap)
   }
   async wait(txHash: string, confirmations: number = 1, ms: number = 60_000) {
-    // TODO
-    return await this.chainApis.getReceipt(txHash)
+    if (!txHash) {
+      throw new Error(`Invalid transaction hash: ${txHash}`)
+    } else if (!(confirmations >= 1)) {
+      throw new Error(`Invalid confirmations: ${confirmations}`)
+    }
+    
+    let receipt
+    let txBlockNumber
+    const getTxBlockNumber = async () => {
+      try {
+        receipt = await this.getReceipt(txHash)
+        txBlockNumber = Number(receipt.blockNumber)
+      } catch {}
+    }
+
+    return new Promise<Receipt>((resolve, reject) => {
+      const done = (error?) => {
+        clearInterval(h)
+
+        if (error) {
+          reject(error)
+        } else {
+          resolve(receipt)
+        }
+      }
+
+      const onBlock = async blockNumber => {
+        if (!txBlockNumber) {
+          await getTxBlockNumber()
+        }
+        if (!txBlockNumber) {
+          return
+        }
+        if (confirmations === 1) {
+          return done()
+        }
+        if (blockNumber - txBlockNumber + 1 >= confirmations) {
+          await getTxBlockNumber()
+          if (blockNumber - txBlockNumber + 1 >= confirmations) {
+            return done()
+          }
+        }
+      }
+
+      const h = setInterval(async () => {
+        const block = await this.chainApis.getLatestBlock()
+        onBlock(block.number)
+      }, 3_000)
+
+      timer(ms).then(() => done(new Error('Time out')))
+    })
   }
 
   async isSwapPosted(encoded: string | BigNumber) {
@@ -227,7 +277,7 @@ export class MesonClientTron extends MesonClient {
     initiator?: string,
     provider?: string,
   }> {
-    throw new Error('Unsupported')
+    return await super.getPostedSwap(encoded, initiatorToCheck)
   }
 
   async getLockedSwap(encoded: string | BigNumber, initiator: string, block?: number): Promise<{
@@ -235,6 +285,6 @@ export class MesonClientTron extends MesonClient {
     provider?: string,
     until?: number
   }> {
-    throw new Error('Unsupported')
+    return await super.getLockedSwap(encoded, initiator)
   }
 }

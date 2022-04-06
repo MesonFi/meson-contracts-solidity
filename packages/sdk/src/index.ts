@@ -1,6 +1,6 @@
 export { MesonClient, PartialSwapData, PostedSwapStatus, LockedSwapStatus } from './MesonClient'
 export { MesonClientTron, TronContract } from './MesonClientTron'
-export { Block, Transaction } from './ChainApis'
+export { Block, Transaction, Receipt } from './ChainApis'
 export { Swap, SwapData } from './Swap'
 export { SwapSigner, EthersWalletSwapSigner, RemoteSwapSigner } from './SwapSigner'
 export { SwapWithSigner } from './SwapWithSigner'
