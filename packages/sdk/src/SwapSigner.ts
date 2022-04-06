@@ -1,6 +1,7 @@
 import type { Wallet } from '@ethersproject/wallet'
 import { pack } from '@ethersproject/solidity'
 import { keccak256 } from '@ethersproject/keccak256'
+import { AddressZero } from '@ethersproject/constants'
 import { isAddress } from '@ethersproject/address'
 
 const NOTICE_SIGN_REQUEST = 'Sign to request a swap on Meson'
@@ -48,24 +49,28 @@ export class SwapSigner {
     ))
   }
 
+  static getReleaseTypeHash(recipient: string, testnet?: boolean) {
+    const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
+    const isHexAddress = isAddress(recipient)
+    return keccak256(pack(
+      ['string', 'string'],
+      [`bytes32 ${notice}`, `address ${isHexAddress ? 'Recipient' : `HEX of recipient ${recipient}`}`]
+    ))
+  }
+
   static hashRelease(encoded: string, recipient: string, testnet?: boolean): string {
     if (encoded.substring(60, 64) === '00c3') {
       // for Tron
       const header = '\x19TRON Signed Message:\n32\n'
       return keccak256(pack(['string', 'bytes32', 'address'], [header, encoded, recipient]))
     }
-    const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
-    const addressType = isAddress(recipient) ? 'address' : 'string'
-    const typeHash = keccak256(pack(
-      ['string', 'string'],
-      [`bytes32 ${notice}`, `${addressType} Recipient`]
-    ))
+    const isHexAddress = isAddress(recipient)
     return keccak256(pack(
       ['bytes32', 'bytes32'],
       [
-        typeHash,
-        keccak256(pack(['bytes32', addressType], [encoded, recipient])),
-      ],
+        SwapSigner.getReleaseTypeHash(recipient, testnet),
+        keccak256(pack(['bytes32', 'address'], [encoded, isHexAddress ? recipient : AddressZero])),
+      ]
     ))
   }
 }
@@ -138,7 +143,7 @@ export class RemoteSwapSigner extends SwapSigner {
     if (isAddress(recipient)) {
       data.push({ type: 'address', name: 'Recipient', value: recipient })
     } else {
-      data.push({ type: 'string', name: 'Recipient', value: recipient })
+      data.push({ type: 'address', name: `HEX of recipient ${recipient}`, value: AddressZero })
     }
     const signature = await this.remoteSigner.signTypedData(data)
     return this._separateSignature(signature)

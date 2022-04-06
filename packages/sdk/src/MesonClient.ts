@@ -8,6 +8,7 @@ import { Contract } from '@ethersproject/contracts'
 import { WebSocketProvider } from '@ethersproject/providers'
 import { pack } from '@ethersproject/solidity'
 import { AddressZero } from '@ethersproject/constants'
+import { isAddress } from '@ethersproject/address'
 import { ERC20 } from '@mesonfi/contract-abis'
 
 import { AbstractChainApis, EthersChainApis, Receipt } from './ChainApis'
@@ -219,15 +220,28 @@ export class MesonClient {
   async lock(signedRequest: SignedSwapRequest) {
     return this.mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
   }
+
   async unlock(signedRequest: SignedSwapRequest) {
     return this.mesonInstance.unlock(signedRequest.encoded, signedRequest.initiator)
   }
+
   async release(signedRelease: SignedSwapRelease) {
-    return this.mesonInstance.release(
+    if (isAddress(signedRelease.recipient)) {
+      return this.mesonInstance.release(
+        signedRelease.encoded,
+        ...signedRelease.signature,
+        signedRelease.initiator,
+        signedRelease.recipient
+      )
+    }
+
+    const typeHash = signedRelease.getTypeHash()
+    return this.mesonInstance.release2(
       signedRelease.encoded,
       ...signedRelease.signature,
       signedRelease.initiator,
-      signedRelease.recipient
+      signedRelease.recipient,
+      typeHash
     )
   }
 
