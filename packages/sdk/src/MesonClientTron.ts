@@ -34,7 +34,7 @@ export class TronContract {
     }
     const name = this.#instance.methodInstances[method].name
     const itfc = new Interface(this.#instance.abi)
-    return itfc.decodeFunctionData(name, `0x${tx.input}`)
+    return { name, args: itfc.decodeFunctionData(name, `0x${tx.input}`) }
   }
 
   connect(signer: Wallet) {}
