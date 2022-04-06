@@ -66,7 +66,7 @@ export class SignedSwapRelease extends SignedSwapRequest implements SignedSwapRe
     if (!data.recipient) {
       throw new Error('Missing recipient')
     }
-    this.recipient = data.recipient.toLowerCase()
+    this.recipient = data.recipient
   }
 
   getDigest (testnet: boolean) {
