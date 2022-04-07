@@ -8,8 +8,8 @@ import { Contract } from '@ethersproject/contracts'
 import { WebSocketProvider } from '@ethersproject/providers'
 import { pack } from '@ethersproject/solidity'
 import { AddressZero } from '@ethersproject/constants'
-import { isAddress } from '@ethersproject/address'
 import { ERC20 } from '@mesonfi/contract-abis'
+import TronWeb from 'tronweb'
 
 import { AbstractChainApis, EthersChainApis, Receipt } from './ChainApis'
 import { Swap } from './Swap'
@@ -73,6 +73,10 @@ export class MesonClient {
 
   get address(): string {
     return this.mesonInstance.address.toLowerCase()
+  }
+
+  getSigner(): Promise<string> {
+    return this.mesonInstance.signer.getAddress()
   }
 
   get provider(): JsonRpcProvider {
@@ -180,7 +184,7 @@ export class MesonClient {
     if (!tokenIndex) {
       throw new Error(`Token not supported`)
     }
-    const providerAddress = await this.mesonInstance.signer.getAddress()
+    const providerAddress = await this.getSigner()
     const providerIndex = await this.mesonInstance.indexOfAddress(providerAddress)
     if (!providerIndex) {
       throw new Error(`Address ${providerAddress} not registered. Please call depositAndRegister first.`)
@@ -194,7 +198,7 @@ export class MesonClient {
   }
 
   async postSwap(signedRequest: SignedSwapRequest) {
-    const providerAddress = await this.mesonInstance.signer.getAddress()
+    const providerAddress = await this.getSigner()
     const providerIndex = await this.mesonInstance.indexOfAddress(providerAddress)
     if (!providerIndex) {
       throw new Error(`Address ${providerAddress} not registered. Please call depositAndRegister first.`)
@@ -209,7 +213,7 @@ export class MesonClient {
   }
 
   async bondSwap(encoded: BigNumberish) {
-    const providerAddress = await this.mesonInstance.signer.getAddress()
+    const providerAddress = await this.getSigner()
     const providerIndex = await this.mesonInstance.indexOfAddress(providerAddress)
     if (!providerIndex) {
       throw new Error(`Address ${providerAddress} not registered. Please call depositAndRegister first.`)
@@ -226,32 +230,21 @@ export class MesonClient {
   }
 
   async release(signedRelease: SignedSwapRelease) {
-    if (isAddress(signedRelease.recipient)) {
-      return this.mesonInstance.release(
-        signedRelease.encoded,
-        ...signedRelease.signature,
-        signedRelease.initiator,
-        signedRelease.recipient
-      )
+    const { encoded, signature, initiator } = signedRelease
+    let recipient = signedRelease.recipient
+    if (encoded.substring(54, 58) === '00c3') {
+      recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
     }
-
-    const typeHash = signedRelease.getTypeHash()
-    return this.mesonInstance.release2(
-      signedRelease.encoded,
-      ...signedRelease.signature,
-      signedRelease.initiator,
-      signedRelease.recipient,
-      typeHash
-    )
+    return this.mesonInstance.release(encoded, ...signature, initiator, recipient)
   }
 
   async executeSwap(signedRelease: SignedSwapRelease, depositToPool: boolean = false) {
-    return this.mesonInstance.executeSwap(
-      signedRelease.encoded,
-      ...signedRelease.signature,
-      signedRelease.recipient,
-      depositToPool
-    )
+    const { encoded, signature } = signedRelease
+    let recipient = signedRelease.recipient
+    if (encoded.substring(54, 58) === '00c3') {
+      recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
+    }
+    return this.mesonInstance.executeSwap(encoded, ...signature, recipient, depositToPool)
   }
 
   async cancelSwap(encodedSwap: string, signer?: Wallet) {

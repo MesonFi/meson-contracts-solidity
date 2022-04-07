@@ -51,15 +51,9 @@ export class SwapSigner {
   static getReleaseTypeHash(encoded: string, testnet?: boolean) {
     const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
     if (encoded.substring(54, 58) === '00c3') {
-      return keccak256(pack(
-        ['string', 'string'],
-        [`bytes32 ${notice}`, 'bytes21 Recipient (tron address in hex format)']
-      ))
+      return keccak256(pack(['string', 'string'], [`bytes32 ${notice}`, 'bytes21 Recipient (tron address in hex format)']))
     } else {
-      return keccak256(pack(
-        ['string', 'string'],
-        [`bytes32 ${notice}`, 'address Recipient']
-      ))
+      return keccak256(pack(['string', 'string'], [`bytes32 ${notice}`, 'address Recipient']))
     }
   }
 
