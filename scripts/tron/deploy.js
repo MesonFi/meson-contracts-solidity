@@ -19,7 +19,7 @@ async function deploy_contract() {
       bytecode: UpgradableMeson.bytecode,
       feeLimit: 1000000000,
       callValue: 0,
-      parameters: [[usdt, usdc]]
+      parameters: []
     })
   } catch (e) {
     console.log(e)

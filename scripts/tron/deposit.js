@@ -15,7 +15,7 @@ const amount = ethers.utils.parseUnits('50000', 6)
 const lpIndex = 3
 
 async function deposit() {
-  const usdtContract = await tronWeb.contract(ERC20.abi, usdt)
+  const usdtContract = tronWeb.contract(ERC20.abi, usdt)
   const usdcContract = tronWeb.contract(ERC20.abi, usdc)
   const mesonContract = tronWeb.contract(Meson.abi, meson)
 

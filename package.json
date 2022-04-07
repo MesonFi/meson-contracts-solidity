@@ -46,6 +46,7 @@
     "testnet-up:ftm": "NETWORK_ID=ftm yarn testnet-up",
     "testnet-up:cfx": "NETWORK_ID=cfx yarn testnet-up",
     "testnet-up:one": "NETWORK_ID=one yarn testnet-up",
+    "testnet-up:tron": "NETWORK_ID=tron TESTNET_MODE=true yarn chain && hardhat run scripts/tron/update.js",
 
     "deploy": "yarn chain && hardhat run scripts/mainnets/deploy-upgradable.js",
     "deploy:eth": "HARDHAT_NETWORK=eth yarn deploy",
