@@ -4,14 +4,15 @@ const { ERC20, Meson } = require('@mesonfi/contract-abis')
 require('dotenv').config()
 
 const { NETWORK_ID, LP_PRIVATE_KEY } = process.env
+const networkId = NETWORK_ID === 'eth' ? 'ropsten' : NETWORK_ID
 
 const amount = '100000'
 
 async function main() {
   const testnets = require('@mesonfi/presets/src/testnets.json')
-  const index = testnets.findIndex(item => item.id.startsWith(NETWORK_ID))
+  const index = testnets.findIndex(item => item.id.startsWith(networkId))
   if (index === -1) {
-    throw new Error(`Invalid network: ${NETWORK_ID}`)
+    throw new Error(`Invalid network: ${networkId}`)
   }
 
   const testnet = testnets[index]

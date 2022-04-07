@@ -1,7 +1,18 @@
 import type { Provider } from '@ethersproject/providers'
-import { JsonRpcProvider, WebSocketProvider } from '@ethersproject/providers'
-import { Contract as EthersContract } from '@ethersproject/contracts'
-import { MesonClient, Swap, PostedSwapStatus, LockedSwapStatus } from '@mesonfi/sdk'
+import type { Signer } from '@ethersproject/abstract-signer'
+import { StaticJsonRpcProvider, WebSocketProvider } from '@ethersproject/providers'
+import { Contract } from '@ethersproject/contracts'
+
+import TronWeb from 'tronweb'
+
+import {
+  MesonClient,
+  MesonClientTron,
+  TronContract,
+  Swap,
+  PostedSwapStatus,
+  LockedSwapStatus
+} from '@mesonfi/sdk'
 import { Meson } from '@mesonfi/contract-abis'
 
 import testnets from './testnets.json'
@@ -31,12 +42,6 @@ export interface PresetNetwork {
     decimals: number
   }
   tokens: PresetToken[]
-}
-
-class StaticJsonRpcProvider extends JsonRpcProvider {
-  async getNetwork() {
-    return this._network || super.getNetwork()
-  }
 }
 
 export class MesonPresets {
@@ -82,20 +87,26 @@ export class MesonPresets {
     return tokens[tokenIndex - 1]
   }
 
-  getClient(id: string, provider: Provider, Contract = EthersContract): MesonClient {
+  getClient(id: string, provider: Provider | Signer): MesonClient {
     const network = this.getNetwork(id)
     if (!network) {
       throw new Error(`Unsupported network: ${id}`)
     }
     if (!this._cache.get(id)) {
-      const instance = new Contract(network.mesonAddress, Meson.abi, provider)
-      const client = new MesonClient(instance, network.shortSlip44)
+      let client
+      if (id.startsWith('tron')) {
+        const instance = new TronContract(network.mesonAddress, Meson.abi, provider)
+        client = new MesonClientTron(instance, network.shortSlip44)
+      } else {
+        const instance = new Contract(network.mesonAddress, Meson.abi, provider)
+        client = new MesonClient(instance, network.shortSlip44)
+      }
       this._cache.set(id, client)
     }
     return this._cache.get(id)
   }
 
-  clientFromUrl({ id, url, ws }, Contract = EthersContract): MesonClient {
+  clientFromUrl({ id, url = '', ws = null }): MesonClient {
     const network = this.getNetwork(id)
     if (!network) {
       throw new Error(`Unsupported network: ${id}`)
@@ -103,15 +114,24 @@ export class MesonPresets {
     if (!this._cache.get(id)) {
       let provider
       const providerNetwork = { name: network.name, chainId: Number(network.chainId) }
-      if (ws) {
+      
+      if (id.startsWith('tron')) {
+        provider = new TronWeb({ fullHost: url })
+      } else if (ws) {
         provider = new WebSocketProvider(ws, providerNetwork)
       } else if (url.startsWith('ws')) {
         provider = new WebSocketProvider(url, providerNetwork)
       } else {
         provider = new StaticJsonRpcProvider(url, providerNetwork)
       }
-      const instance = new Contract(network.mesonAddress, Meson.abi, provider)
-      const client = new MesonClient(instance, network.shortSlip44)
+      let client
+      if (id.startsWith('tron')) {
+        const instance = new TronContract(network.mesonAddress, Meson.abi, provider)
+        client = new MesonClientTron(instance, network.shortSlip44)
+      } else {
+        const instance = new Contract(network.mesonAddress, Meson.abi, provider)
+        client = new MesonClient(instance, network.shortSlip44)
+      }
       this._cache.set(id, client)
     }
     return this._cache.get(id)

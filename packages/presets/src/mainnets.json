@@ -173,5 +173,34 @@
         "addr": "0xfe97e85d13abd9c1c33384e796f10b73905637ce"
       }
     ]
+  },
+  {
+    "id": "tron",
+    "name": "Tron",
+    "alias": "TRX",
+    "chainId": "tron",
+    "slip44": "0x800000c3",
+    "shortSlip44": "0x00c3",
+    "extensions": [
+      "tronlink"
+    ],
+    "addressFormat": "tron",
+    "url": "https://api.trongrid.io",
+    "explorer": "https://tronscan.org/#",
+    "nativeCurrency": {
+      "name": "TRX",
+      "symbol": "TRX",
+      "decimals": 6
+    },
+    "mesonAddress": "TDGrxmzjXrYcKHkgEMm6xfoJecfbTwyJ3J",
+    "tokens": [
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+        "link": "token20/TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+      }
+    ]
   }
 ]

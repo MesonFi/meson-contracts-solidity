@@ -1,6 +1,6 @@
 {
   "name": "@mesonfi/sdk",
-  "version": "0.6.6",
+  "version": "0.7.0",
   "description": "",
   "license": "MIT",
   "repository": "https://github.com/MesonFi/meson-contracts-solidity",
@@ -19,6 +19,8 @@
     "prepare": "yarn build"
   },
   "dependencies": {
+    "@ethersproject/abi": "^5.6.0",
+    "@ethersproject/address": "^5.6.0",
     "@ethersproject/bignumber": "^5.6.0",
     "@ethersproject/bytes": "^5.6.0",
     "@ethersproject/constants": "^5.6.0",
@@ -27,12 +29,12 @@
     "@ethersproject/solidity": "^5.6.0",
     "@ethersproject/transactions": "^5.6.0",
     "@ethersproject/wallet": "^5.6.0",
-    "@mesonfi/contract-types": "^0.6.5"
+    "@mesonfi/contract-abis": "^0.7.0",
+    "@mesonfi/contract-types": "^0.7.0"
   },
   "devDependencies": {
     "@ethersproject/contracts": "^5.6.0",
     "@ethersproject/units": "^5.6.0",
-    "@mesonfi/contract-abis": "^0.6.5",
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^9.1.0",

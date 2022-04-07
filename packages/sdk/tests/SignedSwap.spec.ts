@@ -29,22 +29,24 @@ describe('SignedSwapRequest', () => {
 
   describe('#getDigest', () => {
     it('generates digest for testnet & mainnet', () => {
-      expect(signedRequest.getDigest(true)).to.equal(signedSwapRequestData.digest)
-      expect(signedRequest.getDigest(false)).to.equal(signedSwapRequestData.mainnetDigest)
+      const signedRequest2 = new SignedSwapRequest({ ...signedSwapRequestData, testnet: false })
+      expect(signedRequest.getDigest()).to.equal(signedSwapRequestData.digest)
+      expect(signedRequest2.getDigest()).to.equal(signedSwapRequestData.mainnetDigest)
     })
   })
 
   describe('#checkSignature', () => {
     it('validates the signature for testnet', () => {
-      expect(signedRequest.checkSignature(true)).to.be.undefined
+      expect(signedRequest.checkSignature()).to.be.undefined
     })
     it('rejects the same signature for mainnet', () => {
-      expect(() => signedRequest.checkSignature(false)).to.throw('Invalid signature')
+      const signedRequest = new SignedSwapRequest({ ...signedSwapRequestData, testnet: false })
+      expect(() => signedRequest.checkSignature()).to.throw('Invalid signature')
     })
     it('accepcts the mainnet signature for mainnet', () => {
-      const cloned = { ...signedSwapRequestData, signature: signedSwapRequestData.mainnetSignature }
+      const cloned = { ...signedSwapRequestData, signature: signedSwapRequestData.mainnetSignature, testnet: false }
       const signedRequest = new SignedSwapRequest(cloned)
-      expect(signedRequest.checkSignature(false)).to.be.undefined
+      expect(signedRequest.checkSignature()).to.be.undefined
     })
   })
 
@@ -71,28 +73,30 @@ describe('SignedSwapRelease', () => {
       expect(signedRelease.encoded).to.equal(signedSwapReleaseData.encoded)
       expect(signedRelease.initiator).to.equal(signedSwapReleaseData.initiator.toLowerCase())
       expect(signedRelease.signature).to.equal(signedSwapReleaseData.signature)
-      expect(signedRelease.recipient).to.equal(signedSwapReleaseData.recipient.toLowerCase())
+      expect(signedRelease.recipient).to.equal(signedSwapReleaseData.recipient)
     })
   })
 
   describe('#getDigest', () => {
     it('generates digest for testnet & mainnet', () => {
-      expect(signedRelease.getDigest(true)).to.equal(signedSwapReleaseData.digest)
-      expect(signedRelease.getDigest(false)).to.equal(signedSwapReleaseData.mainnetDigest)
+      expect(signedRelease.getDigest()).to.equal(signedSwapReleaseData.digest)
+      const signedRelease2 = new SignedSwapRelease({ ...signedSwapReleaseData, testnet: false })
+      expect(signedRelease2.getDigest()).to.equal(signedSwapReleaseData.mainnetDigest)
     })
   })
 
   describe('#checkSignature', () => {
     it('validates the signature for testnet', () => {
-      expect(signedRelease.checkSignature(true)).to.be.undefined
+      expect(signedRelease.checkSignature()).to.be.undefined
     })
     it('rejects the same signature for mainnet', () => {
-      expect(() => signedRelease.checkSignature(false)).to.throw('Invalid signature')
+      const signedRelease = new SignedSwapRequest({ ...signedSwapRequestData, testnet: false })
+      expect(() => signedRelease.checkSignature()).to.throw('Invalid signature')
     })
     it('accepcts the mainnet signature for mainnet', () => {
-      const cloned = { ...signedSwapReleaseData, signature: signedSwapReleaseData.mainnetSignature }
+      const cloned = { ...signedSwapReleaseData, signature: signedSwapReleaseData.mainnetSignature, testnet: false }
       const signedRelease = new SignedSwapRelease(cloned)
-      expect(signedRelease.checkSignature(false)).to.be.undefined
+      expect(signedRelease.checkSignature()).to.be.undefined
     })
   })
 

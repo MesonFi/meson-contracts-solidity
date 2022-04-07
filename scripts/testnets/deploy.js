@@ -5,12 +5,13 @@ const { MesonClient } = require('@mesonfi/sdk/src')
 require('dotenv').config()
 
 const { NETWORK_ID, PRIVATE_KEY, DEPOSIT_ON_DEPLOY } = process.env
+const networkId = NETWORK_ID === 'eth' ? 'ropsten' : NETWORK_ID
 
 async function main() {
   const testnets = require('@mesonfi/presets/src/testnets.json')
-  const index = testnets.findIndex(item => item.id.startsWith(NETWORK_ID))
+  const index = testnets.findIndex(item => item.id.startsWith(networkId))
   if (index === -1) {
-    throw new Error(`Invalid network: ${NETWORK_ID}`)
+    throw new Error(`Invalid network: ${networkId}`)
   }
 
   const testnet = testnets[index]
