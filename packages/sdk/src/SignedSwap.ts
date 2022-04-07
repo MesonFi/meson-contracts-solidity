@@ -5,6 +5,7 @@ import { Swap } from './Swap'
 import { SwapSigner } from './SwapSigner'
 
 export interface SignedSwapRequestData {
+  testnet?: boolean,
   encoded: string,
   initiator: string,
   signature: Signature,
@@ -15,6 +16,7 @@ export interface SignedSwapReleaseData extends SignedSwapRequestData {
 }
 
 export class SignedSwapRequest implements SignedSwapRequestData {
+  readonly testnet: boolean
   readonly swap: Swap
   readonly encoded: string
   readonly initiator: string
@@ -29,6 +31,7 @@ export class SignedSwapRequest implements SignedSwapRequestData {
       throw new Error('Missing signature')
     }
 
+    this.testnet = Boolean(data.testnet)
     this.swap = Swap.decode(data.encoded)
 
     this.encoded = data.encoded
@@ -36,24 +39,28 @@ export class SignedSwapRequest implements SignedSwapRequestData {
     this.signature = data.signature
   }
 
-  getDigest (testnet: boolean) {
-    return SwapSigner.hashRequest(this.encoded, testnet)
+  getDigest () {
+    return SwapSigner.hashRequest(this.encoded, this.testnet)
   }
 
-  checkSignature (testnet: boolean) {
+  checkSignature () {
     const [r, s, v] = this.signature
-    const recovered = recoverAddress(this.getDigest(testnet), { r, s, v }).toLowerCase()
+    const recovered = recoverAddress(this.getDigest(), { r, s, v }).toLowerCase()
     if (recovered !== this.initiator) {
       throw new Error('Invalid signature')
     }
   }
 
   toObject (): SignedSwapRequestData {
-    return {
+    const data: SignedSwapRequestData = {
       encoded: this.encoded,
       initiator: this.initiator,
       signature: this.signature,
     }
+    if (this.testnet) {
+      data.testnet = true
+    }
+    return data
   }
 }
 
@@ -66,11 +73,15 @@ export class SignedSwapRelease extends SignedSwapRequest implements SignedSwapRe
     if (!data.recipient) {
       throw new Error('Missing recipient')
     }
-    this.recipient = data.recipient.toLowerCase()
+    this.recipient = data.recipient
   }
 
-  getDigest (testnet: boolean) {
-    return SwapSigner.hashRelease(this.encoded, this.recipient, testnet)
+  getTypeHash () {
+    return SwapSigner.getReleaseTypeHash(this.encoded, this.testnet)
+  }
+
+  getDigest () {
+    return SwapSigner.hashRelease(this.encoded, this.recipient, this.testnet)
   }
 
   toObject (): SignedSwapReleaseData {

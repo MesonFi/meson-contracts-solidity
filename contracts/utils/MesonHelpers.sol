@@ -144,6 +144,16 @@ contract MesonHelpers is MesonConfig {
     address signer
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
+
+    if (_inChainFrom(encodedSwap) == 0x00c3) {
+      bytes32 digest = keccak256(abi.encodePacked(
+        bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33320a), // HEX of "\x19TRON Signed Message:\n32\n"
+        encodedSwap
+      ));
+      require(signer == ecrecover(digest, v, r, s), "Invalid signature");
+      return;
+    }
+
     bytes32 typehash = REQUEST_TYPE_HASH;
     bytes32 digest;
     assembly {
@@ -164,14 +174,37 @@ contract MesonHelpers is MesonConfig {
     address signer
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
-    bytes32 typehash = RELEASE_TYPE_HASH;
+
+    if (_inChainFrom(encodedSwap) == 0x00c3) {
+      bytes32 digest = keccak256(abi.encodePacked(
+        bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33320a), // HEX of "\x19TRON Signed Message:\n32\n"
+        encodedSwap,
+        recipient
+      ));
+      require(signer == ecrecover(digest, v, r, s), "Invalid signature");
+      return;
+    }
+
     bytes32 digest;
-    assembly {
-      mstore(20, recipient)
-      mstore(0, encodedSwap)
-      mstore(32, keccak256(0, 52))
-      mstore(0, typehash)
-      digest := keccak256(0, 64)
+    if (_outChainFrom(encodedSwap) == 0x00c3) {
+      assembly {
+        mstore(21, recipient)
+        mstore8(32, 0x41)
+        mstore(0, encodedSwap)
+        mstore(32, keccak256(0, 53))
+        mstore(0, 0xcdd10eb72226dc70c96479571183c7d98ddba64dcc287980e7f6deceaad47c1c) // testnet
+        // mstore(0, 0xf6ea10de668a877958d46ed7d53eaf47124fda9bee9423390a28c203556a2e55) // mainnet
+        digest := keccak256(0, 64)
+      }
+    } else {
+      bytes32 typehash = RELEASE_TYPE_HASH;
+      assembly {
+        mstore(20, recipient)
+        mstore(0, encodedSwap)
+        mstore(32, keccak256(0, 52))
+        mstore(0, typehash)
+        digest := keccak256(0, 64)
+      }
     }
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }

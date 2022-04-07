@@ -43,6 +43,10 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @param balanceIndex In format of`[tokenIndex:uint8][providerIndex:uint40]
   function deposit(uint256 amount, uint48 balanceIndex) external {
     require(amount > 0, 'Amount must be positive');
+
+    uint40 providerIndex = _providerIndexFromBalanceIndex(balanceIndex);
+    require(providerIndex != 0, "Cannot use 0 as provider index");
+    require(addressOfIndex[providerIndex] == _msgSender(), "Incorrect provider index");
     _tokenBalanceOf[balanceIndex] += amount;
     _unsafeDepositToken(_tokenList[_tokenIndexFromBalanceIndex(balanceIndex)], _msgSender(), amount);
   }
