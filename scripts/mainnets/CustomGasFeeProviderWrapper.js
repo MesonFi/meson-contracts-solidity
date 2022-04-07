@@ -6,12 +6,13 @@ module.exports = class CustomGasFeeProviderWrapper extends EthersProviderWrapper
     // For Polygon
     // result.maxFeePerGas = result.gasPrice.add(50)
     // result.maxPriorityFeePerGas = result.gasPrice
-    // console.log(result)
+    console.log(result)
     return result
   }
 
-  async getGasPrice() {
-    const estimated = await super.getGasPrice()
+  async estimateGas(transaction) {
+    const estimated = await super.estimateGas(transaction)
+    console.log(estimated)
     return estimated
   }
 }
