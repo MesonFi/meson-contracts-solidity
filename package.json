@@ -55,6 +55,7 @@
     "deploy:poly": "HARDHAT_NETWORK=polygon yarn deploy",
     "deploy:ftm": "HARDHAT_NETWORK=ftm yarn deploy",
     "deploy:cfx": "HARDHAT_NETWORK=cfx yarn deploy",
+    "deploy:tron": "NETWORK_ID=tron yarn chain && hardhat run scripts/tron/deploy.js",
 
     "up": "yarn chain && hardhat run scripts/mainnets/upgrade.js",
     "up:eth": "HARDHAT_NETWORK=eth yarn up",

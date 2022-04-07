@@ -2,8 +2,11 @@ const TronWeb = require('tronweb')
 const { ethers } = require('ethers')
 const { ERC20 } = require('@mesonfi/contract-abis')
 
+const testnetMode = process.env.TESTNET_MODE
+const fullHost = testnetMode ? 'https://api.nileex.io' : 'https://api.trongrid.io'
+
 const tronWeb = new TronWeb({
-  fullHost: 'https://api.nileex.io',
+  fullHost,
   privateKey: process.env.PRIVATE_KEY
 })
 
@@ -28,4 +31,6 @@ async function deploy_token() {
   console.log(tokenAddress)
 }
 
-deploy_token()
+if (testnetMode) {
+  deploy_token()
+}

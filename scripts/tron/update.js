@@ -1,14 +1,15 @@
 const TronWeb = require('tronweb')
-const { Meson } = require('@mesonfi/contract-abis')
 
 const UpgradableMeson = require('../../artifacts/contracts/UpgradableMeson.sol/UpgradableMeson.json')
 
+const testnetMode = process.env.TESTNET_MODE
+const fullHost = testnetMode ? 'https://api.nileex.io' : 'https://api.trongrid.io'
+const meson = testnetMode ? 'TYtGRRt9ZcAtYEEVG4B5vGuxAWsrQ2WTFo' : 'TSpVXBLbkx5bxox4bRg1Up2e58mzCezQgf'
+
 const tronWeb = new TronWeb({
-  fullHost: 'https://api.nileex.io',
+  fullHost,
   privateKey: process.env.PRIVATE_KEY
 })
-
-const meson = 'TYtGRRt9ZcAtYEEVG4B5vGuxAWsrQ2WTFo'
 
 async function deploy_contract() {
   let newImpl

@@ -3,13 +3,16 @@ const { ethers } = require('ethers')
 const UpgradableMeson = require('../../artifacts/contracts/UpgradableMeson.sol/UpgradableMeson.json')
 const ERC1967Proxy = require('@openzeppelin/upgrades-core/artifacts/@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol/ERC1967Proxy.json')
 
+const testnetMode = process.env.TESTNET_MODE
+const fullHost = testnetMode ? 'https://api.nileex.io' : 'https://api.trongrid.io'
+const tokens = testnetMode
+  ? ['TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t', 'TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5']
+  : ['TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t']
+
 const tronWeb = new TronWeb({
-  fullHost: 'https://api.nileex.io',
+  fullHost,
   privateKey: process.env.PRIVATE_KEY
 })
-
-const usdt = 'TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t'
-const usdc = 'TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5'
 
 async function deploy_contract() {
   let meson
@@ -27,10 +30,9 @@ async function deploy_contract() {
   const mesonAddress = tronWeb.address.fromHex(meson.address)
   console.log(mesonAddress)
 
-  const hexUsdt = tronWeb.address.toHex(usdt).replace(/^(41)/, '0x')
-  const hexUsdc = tronWeb.address.toHex(usdc).replace(/^(41)/, '0x')
+  const hexTokens = tokens.map(t => tronWeb.address.toHex(t).replace(/^(41)/, '0x'))
   const factory = new ethers.ContractFactory(UpgradableMeson.abi , UpgradableMeson.bytecode)
-  const data = factory.interface.encodeFunctionData('initialize', [[hexUsdt, hexUsdc]])
+  const data = factory.interface.encodeFunctionData('initialize', [hexTokens])
 
   let proxy
   try {
