@@ -1,6 +1,6 @@
 {
   "name": "@mesonfi/sdk",
-  "version": "0.7.0-rc.2",
+  "version": "0.7.0",
   "description": "",
   "license": "MIT",
   "repository": "https://github.com/MesonFi/meson-contracts-solidity",
@@ -29,8 +29,8 @@
     "@ethersproject/solidity": "^5.6.0",
     "@ethersproject/transactions": "^5.6.0",
     "@ethersproject/wallet": "^5.6.0",
-    "@mesonfi/contract-abis": "^0.7.0-rc.1",
-    "@mesonfi/contract-types": "^0.7.0-rc.1"
+    "@mesonfi/contract-abis": "^0.7.0",
+    "@mesonfi/contract-types": "^0.7.0"
   },
   "devDependencies": {
     "@ethersproject/contracts": "^5.6.0",
