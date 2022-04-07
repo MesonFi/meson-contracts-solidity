@@ -44,6 +44,7 @@ interface ExtendedSignedSwapRequestData extends SignedSwapRequestData {
 }
 
 export const signedSwapRequestData = {
+  testnet: true,
   encoded: '0x00003b9aca000000000000008140328700000f424000621d7ef8003c01003c01',
   initiator: '0x63FC2aD3d021a4D7e64323529a55a9442C444dA0',
   digest: '0x412a992ebcc7bc875222e7c69adf148b1fe145110d1fc9dc29f0a0268d7e54df',
@@ -67,6 +68,7 @@ interface ExtendedSignedSwapReleaseData extends SignedSwapReleaseData {
 }
 
 export const signedSwapReleaseData = {
+  testnet: true,
   encoded: '0x00003b9aca000000000000008140328700000f424000621d7ef8003c01003c01',
   initiator: '0x63FC2aD3d021a4D7e64323529a55a9442C444dA0',
   recipient: '0xD1D84F0e28D6fedF03c73151f98dF95139700aa7',
