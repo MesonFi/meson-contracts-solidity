@@ -1,8 +1,7 @@
 import type { Wallet } from '@ethersproject/wallet'
 import { pack } from '@ethersproject/solidity'
 import { keccak256 } from '@ethersproject/keccak256'
-import { AddressZero } from '@ethersproject/constants'
-import { isAddress } from '@ethersproject/address'
+import TronWeb from 'tronweb'
 
 const NOTICE_SIGN_REQUEST = 'Sign to request a swap on Meson'
 const NOTICE_SIGN_RELEASE = 'Sign to release a swap on Meson'
@@ -49,13 +48,28 @@ export class SwapSigner {
     ))
   }
 
-  static getReleaseTypeHash(recipient: string, testnet?: boolean) {
+  static getReleaseTypeHash(encoded: string, testnet?: boolean) {
     const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
-    const isHexAddress = isAddress(recipient)
-    return keccak256(pack(
-      ['string', 'string'],
-      [`bytes32 ${notice}`, `address ${isHexAddress ? 'Recipient' : `HEX of recipient ${recipient}`}`]
-    ))
+    if (encoded.substring(54, 58) === '00c3') {
+      return keccak256(pack(
+        ['string', 'string'],
+        [`bytes32 ${notice}`, 'bytes21 Recipient (tron address in hex format)']
+      ))
+    } else {
+      return keccak256(pack(
+        ['string', 'string'],
+        [`bytes32 ${notice}`, 'address Recipient']
+      ))
+    }
+  }
+
+  static getReleaseValueHash(encoded: string, recipient: string) {
+    if (encoded.substring(54, 58) === '00c3') {
+      const hexRecipient = TronWeb.address.toHex(recipient)
+      return keccak256(pack(['bytes32', 'bytes21'], [encoded, `0x${hexRecipient}`]))
+    } else {
+      return keccak256(pack(['bytes32', 'address'], [encoded, recipient]))
+    }
   }
 
   static hashRelease(encoded: string, recipient: string, testnet?: boolean): string {
@@ -64,14 +78,9 @@ export class SwapSigner {
       const header = '\x19TRON Signed Message:\n32\n'
       return keccak256(pack(['string', 'bytes32', 'address'], [header, encoded, recipient]))
     }
-    const isHexAddress = isAddress(recipient)
-    return keccak256(pack(
-      ['bytes32', 'bytes32'],
-      [
-        SwapSigner.getReleaseTypeHash(recipient, testnet),
-        keccak256(pack(['bytes32', 'address'], [encoded, isHexAddress ? recipient : AddressZero])),
-      ]
-    ))
+    const typeHash = SwapSigner.getReleaseTypeHash(encoded, testnet)
+    const valueHash = SwapSigner.getReleaseValueHash(encoded, recipient)
+    return keccak256(pack(['bytes32', 'bytes32'], [typeHash, valueHash]))
   }
 }
 
@@ -140,10 +149,11 @@ export class RemoteSwapSigner extends SwapSigner {
     const data = [
       { type: 'bytes32', name: notice, value: encoded },
     ]
-    if (isAddress(recipient)) {
-      data.push({ type: 'address', name: 'Recipient', value: recipient })
+    if (encoded.substring(54, 58) === '00c3') {
+      const hexRecipient = TronWeb.address.toHex(recipient)
+      data.push({ type: 'bytes21', name: 'Recipient (tron address in hex format)', value: `0x${hexRecipient}` })
     } else {
-      data.push({ type: 'address', name: `HEX of recipient ${recipient}`, value: AddressZero })
+      data.push({ type: 'address', name: 'Recipient', value: recipient })
     }
     const signature = await this.remoteSigner.signTypedData(data)
     return this._separateSignature(signature)
