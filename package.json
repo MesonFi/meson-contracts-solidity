@@ -64,6 +64,7 @@
     "up:poly": "HARDHAT_NETWORK=polygon yarn up",
     "up:ftm": "HARDHAT_NETWORK=ftm yarn up",
     "up:cfx": "HARDHAT_NETWORK=cfx yarn up",
+    "up:tron": "HARDHAT_NETWORK=tron yarn chain && hardhat run scripts/tron/update.js",
 
     "deposit": "hardhat run scripts/mainnets/deposit.js",
     "deposit:eth": "HARDHAT_NETWORK=eth yarn deposit",
