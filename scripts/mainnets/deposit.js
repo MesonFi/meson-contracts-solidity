@@ -6,7 +6,7 @@ require('dotenv').config()
 
 const { HARDHAT_NETWORK, LP_PRIVATE_KEY } = process.env
 
-const amount = '1000'
+const amount = '70000'
 const tokenIndex = 1
 
 async function main() {

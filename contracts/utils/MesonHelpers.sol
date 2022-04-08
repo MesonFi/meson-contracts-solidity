@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
+// import "./IERC20Minimal.sol";
 import "../MesonConfig.sol";
 
 /// @title MesonHelpers
@@ -29,6 +30,7 @@ contract MesonHelpers is MesonConfig {
     address recipient,
     uint256 amount
   ) internal {
+    // IERC20Minimal(token).transfer(recipient, amount);
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
       bytes4(0xa9059cbb), // bytes4(keccak256(bytes("transfer(address,uint256)")))
       recipient,
