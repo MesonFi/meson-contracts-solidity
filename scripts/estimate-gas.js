@@ -9,7 +9,7 @@ const { wallet } = require('../test/shared/wallet')
 const { getPartialSwap } = require('../test/shared/meson')
 
 const testnetMode = true
-
+const decimals=6
 async function main() {
   // const signer = await hre.ethers.getSigner()
   const swapSigner = new EthersWalletSwapSigner(wallet)
@@ -17,7 +17,7 @@ async function main() {
   //#####################---deploy contract ---#############################
   const MockToken = await ethers.getContractFactory('MockToken')
   const totalSupply = ethers.utils.parseUnits('10000', 6)
-  const tokenContract = await MockToken.deploy('Mock Token', 'MT', totalSupply)
+  const tokenContract = await MockToken.deploy('Mock Token', 'MT', totalSupply,decimals)
   console.log('MockToken deployed to:', tokenContract.address)
 
   const mesonFactory = await ethers.getContractFactory('Meson')
