@@ -27,6 +27,10 @@
     "chain:cfx": "NETWORK_ID=cfx yarn chain",
     "chain:one": "NETWORK_ID=one yarn chain",
     "chain:tron": "NETWORK_ID=tron yarn chain",
+    "chain:aurora": "NETWORK_ID=aurora yarn chain",
+    "chain:arbitrum": "NETWORK_ID=arbitrum yarn chain",
+    "chain:optimistic": "NETWORK_ID=optimistic yarn chain",
+    "chain:gnosis": "NETWORK_ID=gnosis yarn chain",
 
     "testnet": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/deploy-upgradable.js",
     "testnet:eth": "NETWORK_ID=eth yarn testnet",
@@ -37,7 +41,11 @@
     "testnet:cfx": "NETWORK_ID=cfx yarn testnet",
     "testnet:one": "NETWORK_ID=one yarn testnet",
     "testnet:tron": "NETWORK_ID=tron TESTNET_MODE=true yarn chain && hardhat run scripts/tron/deploy.js",
-
+    "testnet:aurora": "NETWORK_ID=aurora yarn testnet",
+    "testnet:arbitrum": "NETWORK_ID=arbitrum yarn testnet",
+    "testnet:optimistic": "NETWORK_ID=optimistic yarn testnet",
+    "testnet:gnosis":  "NETWORK_ID=gnosis yarn testnet",
+    
     "testnet-up": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/upgrade.js",
     "testnet-up:eth": "NETWORK_ID=eth yarn testnet-up",
     "testnet-up:bnb": "NETWORK_ID=bnb yarn testnet-up",
@@ -47,7 +55,7 @@
     "testnet-up:cfx": "NETWORK_ID=cfx yarn testnet-up",
     "testnet-up:one": "NETWORK_ID=one yarn testnet-up",
     "testnet-up:tron": "NETWORK_ID=tron TESTNET_MODE=true yarn chain && hardhat run scripts/tron/update.js",
-
+    
     "deploy": "yarn chain && hardhat run scripts/mainnets/deploy-upgradable.js",
     "deploy:eth": "HARDHAT_NETWORK=eth yarn deploy",
     "deploy:bnb": "HARDHAT_NETWORK=bnb yarn deploy",
@@ -56,7 +64,11 @@
     "deploy:ftm": "HARDHAT_NETWORK=ftm yarn deploy",
     "deploy:cfx": "HARDHAT_NETWORK=cfx yarn deploy",
     "deploy:tron": "NETWORK_ID=tron yarn chain && hardhat run scripts/tron/deploy.js",
-
+    "deploy:aurora": "NETWORK_ID=aurora yarn deploy",
+    "deploy:arbitrum": "NETWORK_ID=arbitrum yarn deploy",
+    "deploy:gnosis": "NETWORK_ID=gnosis yarn deploy",
+    "deploy:optimistic": "NETWORK_ID=optimistic yarn deploy",
+    
     "up": "yarn chain && hardhat run scripts/mainnets/upgrade.js",
     "up:eth": "HARDHAT_NETWORK=eth yarn up",
     "up:bnb": "HARDHAT_NETWORK=bnb yarn up",
@@ -65,7 +77,11 @@
     "up:ftm": "HARDHAT_NETWORK=ftm yarn up",
     "up:cfx": "HARDHAT_NETWORK=cfx yarn up",
     "up:tron": "HARDHAT_NETWORK=tron yarn chain && hardhat run scripts/tron/update.js",
-
+    "up:aurora": "HARDHAT_NETWORK=aurora yarn up",
+    "up:arbitrum": "HARDHAT_NETWORK=arbitrum yarn up",
+    "up:gnosis": "HARDHAT_NETWORK=gnosis yarn up",
+    "up:optimistic": "HARDHAT_NETWORK=optimistic yarn up",
+    
     "deposit": "hardhat run scripts/mainnets/deposit.js",
     "deposit:eth": "HARDHAT_NETWORK=eth yarn deposit",
     "deposit:avax": "HARDHAT_NETWORK=avax yarn deposit",
