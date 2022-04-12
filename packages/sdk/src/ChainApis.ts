@@ -27,10 +27,16 @@ export type Receipt = {
 }
 
 export interface AbstractChainApis {
+  getBlockNumber(): Promise<number>
+
   getLatestBlock(): Promise<Block>
+
   getBlockTransactions(blockHash: string): Promise<Block>
+
   getBlock(blockHash: string): Promise<Block>
+
   getTransaction(hash: string): Promise<Transaction>
+
   getReceipt(hash: string): Promise<Receipt>
 }
 
@@ -39,6 +45,10 @@ export class EthersChainApis implements AbstractChainApis {
 
   constructor(provider: JsonRpcProvider) {
     this.#provider = provider
+  }
+
+  async getBlockNumber() {
+    return await this.#provider.send('eth_blockNumber', [])
   }
 
   async getLatestBlock() {
@@ -109,6 +119,11 @@ export class TronChainApis implements AbstractChainApis {
       blockNumber: raw.blockNumber,
       timestamp: Math.floor(raw.blockTimeStamp / 1000).toString()
     }
+  }
+
+  async getBlockNumber() {
+    const block = await this.#tronWeb.trx.getCurrentBlock()
+    return block.block_header.raw_data.number
   }
 
   async getLatestBlock() {

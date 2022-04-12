@@ -7,7 +7,6 @@ import { ERC20 } from '@mesonfi/contract-abis'
 import { MesonClient, PostedSwapStatus, LockedSwapStatus } from './MesonClient'
 import { AbstractChainApis, TronChainApis, Receipt } from './ChainApis'
 import { SwapSigner } from './SwapSigner'
-import { timer } from './utils'
 
 const AddressZero = '410000000000000000000000000000000000000000'
 
@@ -42,8 +41,11 @@ export class TronContract {
     return { name, args: itfc.decodeFunctionData(name, `0x${tx.input}`) }
   }
 
-  connect(signer: Wallet) {}
-  queryFilter() {}
+  connect(signer: Wallet) {
+  }
+
+  queryFilter() {
+  }
 
   async getShortCoinType() {
     return await this.#instance.getShortCoinType().call({ from: this.signer })
@@ -151,12 +153,14 @@ export class MesonClientTron extends MesonClient {
   }
 
   override parseTransaction(tx: { input: string, value?: BigNumberish }) {
-    return this.mesonInstance.parseTransaction(tx)  
+    return this.mesonInstance.parseTransaction(tx)
   }
 
-  override onEvent() {}
+  override onEvent() {
+  }
 
-  override dispose() {}
+  override dispose() {
+  }
 
   override setSwapSigner(swapSigner: SwapSigner) {
     this._signer = swapSigner
@@ -201,59 +205,19 @@ export class MesonClientTron extends MesonClient {
     }
     return await this.mesonInstance.cancelSwap(encodedSwap)
   }
-  
-  override async wait(txHash: string, confirmations: number = 1, ms: number = 60_000) {
-    if (!txHash) {
-      throw new Error(`Invalid transaction hash: ${txHash}`)
-    } else if (!(confirmations >= 1)) {
-      throw new Error(`Invalid confirmations: ${confirmations}`)
-    }
-    
-    let receipt
-    let txBlockNumber
-    const getTxBlockNumber = async () => {
-      try {
-        receipt = await this.getReceipt(txHash)
-        txBlockNumber = Number(receipt.blockNumber)
-      } catch {}
-    }
 
-    return new Promise<Receipt>((resolve, reject) => {
-      const done = (error?) => {
-        clearInterval(h)
-
-        if (error) {
-          reject(error)
-        } else {
-          resolve(receipt)
+  override async wait(txHash: string, confirmations: number = 1, timeoutMs: number = 60_000) {
+    return this._waitForBlock(
+      txHash, confirmations, timeoutMs,
+      (onBlock) => {
+        const h = setInterval(async () => {
+          const blockNumber = await this.chainApis.getBlockNumber()
+          await onBlock(blockNumber)
+        }, 3_000)
+        return (onBlock) => {
+          clearInterval(h)
         }
-      }
-
-      const onBlock = async blockNumber => {
-        if (!txBlockNumber) {
-          await getTxBlockNumber()
-        }
-        if (!txBlockNumber) {
-          return
-        }
-        if (confirmations === 1) {
-          return done()
-        }
-        if (blockNumber - txBlockNumber + 1 >= confirmations) {
-          await getTxBlockNumber()
-          if (blockNumber - txBlockNumber + 1 >= confirmations) {
-            return done()
-          }
-        }
-      }
-
-      const h = setInterval(async () => {
-        const block = await this.chainApis.getLatestBlock()
-        onBlock(block.number)
-      }, 3_000)
-
-      timer(ms).then(() => done(new Error('Time out')))
-    })
+      })
   }
 
   override async isSwapPosted(encoded: string | BigNumber) {

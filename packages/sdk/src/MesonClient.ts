@@ -84,7 +84,7 @@ export class MesonClient {
   }
 
   parseTransaction(tx: { input: string, value?: BigNumberish }) {
-    return this.mesonInstance.interface.parseTransaction({ data: tx.input, value: tx.value })  
+    return this.mesonInstance.interface.parseTransaction({ data: tx.input, value: tx.value })
   }
 
   onEvent(listener: Listener) {
@@ -254,26 +254,53 @@ export class MesonClient {
     return await this.mesonInstance.cancelSwap(encodedSwap)
   }
 
-  async wait(txHash: string, confirmations: number = 1, ms: number = 60_000) {
+  async wait(txHash: string, confirmations: number = 1, timeoutMs: number = 60_000) {
+    return this._waitForBlock(
+      txHash, confirmations, timeoutMs,
+      (onBlock) => {
+        this.provider.on('block', onBlock)
+        return (onBlock) => {
+          this.provider.off('block', onBlock)
+        }
+      }
+    )
+  }
+
+  async _waitForBlock(
+    txHash: string, confirmations: number, timeoutMs: number,
+    startListening: (onBlock: (blockNumber: number) => void) => ((onBlock: (blockNumber: number) => void) => void)
+  ) {
     if (!txHash) {
       throw new Error(`Invalid transaction hash: ${txHash}`)
-    } else if (!(confirmations >= 1)) {
+    }
+    if (confirmations < 1) {
       throw new Error(`Invalid confirmations: ${confirmations}`)
     }
 
-    let receipt
-    let txBlockNumber
+    let receipt: Receipt | undefined
+    let txBlockNumber: number | undefined
     const getTxBlockNumber = async () => {
       try {
         receipt = await this.getReceipt(txHash)
         txBlockNumber = Number(receipt.blockNumber)
-      } catch {}
+      } catch {
+      }
+    }
+
+    // Try once before subscribing
+    await getTxBlockNumber()
+    if (txBlockNumber) {
+      const blockNumber = await this.chainApis.getBlockNumber()
+      if (blockNumber - txBlockNumber + 1 >= confirmations) {
+        return
+      }
     }
 
     return new Promise<Receipt>((resolve, reject) => {
-      const done = (error?) => {
-        this.provider.off('block', onBlock)
+      let onDone: (onBlock: (blockNumber: number) => void) => void
 
+      const done = (error?) => {
+        onDone(onBlock)
         if (error) {
           reject(error)
         } else {
@@ -281,7 +308,7 @@ export class MesonClient {
         }
       }
 
-      const onBlock = async blockNumber => {
+      const onBlock = async (blockNumber: number) => {
         if (!txBlockNumber) {
           await getTxBlockNumber()
         }
@@ -299,9 +326,9 @@ export class MesonClient {
         }
       }
 
-      this.provider.on('block', onBlock)
+      onDone = startListening(onBlock)
 
-      timer(ms).then(() => done(new Error('Time out')))
+      timer(timeoutMs).then(() => done(new Error('Time out')))
     })
   }
 
