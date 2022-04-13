@@ -17,7 +17,7 @@ async function main() {
   //#####################---deploy contract ---#############################
   const MockToken = await ethers.getContractFactory('MockToken')
   const totalSupply = ethers.utils.parseUnits('10000', 6)
-  const tokenContract = await MockToken.deploy('Mock Token', 'MT', totalSupply)
+  const tokenContract = await MockToken.deploy('Mock Token', 'MT', totalSupply, 6)
   console.log('MockToken deployed to:', tokenContract.address)
 
   const mesonFactory = await ethers.getContractFactory('UpgradableMeson')
