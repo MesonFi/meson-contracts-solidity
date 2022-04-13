@@ -193,14 +193,8 @@
       "symbol": "ETH",
       "decimals": 18
     },
-    "mesonAddress": "",
+    "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
     "tokens": [
-      {
-        "name": "USDC",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0xB12BFcA5A55806AaF64E99521918A4bf0fC40802"
-      },
       {
         "name": "Tether USD",
         "symbol": "USDT",
