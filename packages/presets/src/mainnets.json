@@ -176,6 +176,40 @@
     ]
   },
   {
+    "id": "aurora",
+    "name": "Aurora",
+    "alias": "Aurora",
+    "chainId": "0x4e454152",
+    "slip44": "0x80000a0a",
+    "shortSlip44": "0x0a0a",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "hex",
+    "url": "https://mainnet.aurora.dev",
+    "explorer": "https://aurorascan.dev",
+    "nativeCurrency": {
+      "name": "Aurora ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0xB12BFcA5A55806AaF64E99521918A4bf0fC40802"
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x4988a896b1227218e4A686fdE5EabdcAbd91571f"
+      }
+    ]
+  },
+  {
     "id": "cfx",
     "name": "Conflux eSpace",
     "alias": "CFX",
