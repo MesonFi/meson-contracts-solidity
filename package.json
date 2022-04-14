@@ -91,6 +91,7 @@
     "deposit:avax": "HARDHAT_NETWORK=avax yarn deposit",
     "deposit:bnb": "HARDHAT_NETWORK=bnb yarn deposit",
     "deposit:cfx": "HARDHAT_NETWORK=cfx yarn deposit",
+    "deposit:aurora": "HARDHAT_NETWORK=aurora yarn deposit",
     "deposit:tron": "hardhat run scripts/tron/deposit.js"
   },
   "devDependencies": {
