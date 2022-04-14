@@ -20,8 +20,10 @@ contract UpgradableMeson is UUPSUpgradeable, MesonSwap, MesonPools {
     }
   }
 
-  function _authorizeUpgrade(address newImplementation) internal view override {
+  function _authorizeUpgrade(address newImplementation) internal override {
     require(_msgSender() == _owner, "Unauthorized");
+    // _addSupportToken(, 255);
+    // _owner = 0x00C8B032c76BC8E669ce43b2bA03705Fd52A8edE;
   }
 
   modifier onlyOwner() {
