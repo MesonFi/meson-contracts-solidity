@@ -222,6 +222,7 @@
       "decimals": 18
     },
     "mesonAddress": "0xFD2236a956BEa85Ba619789Aaf72C789853d49C7",
+    "mesonToken": "0xF24B060bdF1cc97Ce104971553fb81A186e79Ee6",
     "tokens": [
       {
         "name": "USDT",
