@@ -79,7 +79,7 @@ export class TronChainApis implements AbstractChainApis {
       hash: raw.blockID,
       parentHash: raw.block_header.raw_data.parentHash,
       number: raw.block_header.raw_data.number,
-      timestamp: raw.block_header.raw_data.timestamp,
+      timestamp: Math.floor(raw.block_header.raw_data.timestamp / 1000).toString(),
       transactions: raw.transactions?.map((raw: any) => this.formatTx(raw)) || []
     }
   }

@@ -81,6 +81,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.UpgradableMeson__factory>;
     getContractFactory(
+      name: "IERC20Minimal",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC20Minimal__factory>;
+    getContractFactory(
       name: "MesonHelpers",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MesonHelpers__factory>;
@@ -178,6 +182,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.UpgradableMeson>;
+    getContractAt(
+      name: "IERC20Minimal",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC20Minimal>;
     getContractAt(
       name: "MesonHelpers",
       address: string,

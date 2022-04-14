@@ -63,6 +63,42 @@
     ]
   },
   {
+    "id": "tron-testnet",
+    "name": "Tron Testnet",
+    "alias": "TRX",
+    "chainId": "tron-testnet",
+    "slip44": "0x800000c3",
+    "shortSlip44": "0x00c3",
+    "extensions": [
+      "tronlink"
+    ],
+    "addressFormat": "tron",
+    "url": "https://api.nileex.io",
+    "explorer": "https://nile.tronscan.org/#",
+    "nativeCurrency": {
+      "name": "TRX",
+      "symbol": "TRX",
+      "decimals": 6
+    },
+    "mesonAddress": "TYtGRRt9ZcAtYEEVG4B5vGuxAWsrQ2WTFo",
+    "tokens": [
+      {
+        "name": "TRX USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t",
+        "link": "token20/TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t"
+      },
+      {
+        "name": "TRX USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5",
+        "link": "token20/TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5"
+      }
+    ]
+  },
+  {
     "id": "avax-testnet",
     "name": "Avalanche Testnet",
     "alias": "AVA",
@@ -199,38 +235,138 @@
     ]
   },
   {
-    "id": "tron-testnet",
-    "name": "Tron Testnet",
-    "alias": "TRX",
-    "chainId": "tron-testnet",
-    "slip44": "0x800000c3",
-    "shortSlip44": "0x00c3",
+    "id": "aurora-testnet",
+    "name": "Aurora Testnet",
+    "alias": "Aurora",
+    "chainId": "0x4e454153",
+    "slip44": "0x80000a0a",
+    "shortSlip44": "0x0a0a",
     "extensions": [
-      "tronlink"
+      "metamask"
     ],
-    "addressFormat": "tron",
-    "url": "https://api.nileex.io",
-    "explorer": "https://nile.tronscan.org/#",
+    "addressFormat": "hex",
+    "url": "https://testnet.aurora.dev",
+    "explorer": "https://explorer.testnet.aurora.dev",
     "nativeCurrency": {
-      "name": "TRX",
-      "symbol": "TRX",
-      "decimals": 6
+      "name": "Aurora",
+      "symbol": "AETH",
+      "decimals": 18
     },
-    "mesonAddress": "TYtGRRt9ZcAtYEEVG4B5vGuxAWsrQ2WTFo",
+    "mesonAddress": "0xCab92f20497802859da374F3B32F21c323f9000B",
     "tokens": [
       {
-        "name": "TRX USDT",
-        "symbol": "USDT",
+        "name": "Aurora USDT",
+        "symbol": "AUSDT",
         "decimals": 6,
-        "addr": "TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t",
-        "link": "token20/TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t"
+        "addr": "0x071243a63463322EC14Ce17D51F92A908bf34CDF"
       },
       {
-        "name": "TRX USDC",
-        "symbol": "USDC",
+        "name": "Aurora USDC",
+        "symbol": "AUSDC",
         "decimals": 6,
-        "addr": "TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5",
-        "link": "token20/TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5"
+        "addr": "0x72F08CC43A7F15E0b1B6ede3aBC1Ca40BAcc1C25"
+      }
+    ]
+  },
+  {
+    "id": "arbitrum-testnet",
+    "name": "Arbitrum Testnet",
+    "alias": "arbi",
+    "chainId": "0x66eeb",
+    "slip44": "0x80002329",
+    "shortSlip44": "0x2329",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "hex",
+    "url": "https://rinkeby.arbitrum.io/rpc",
+    "explorer": "https://testnet.arbiscan.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0xd3347F4f48b80a190591db7Abb3F1C44d23229fa",
+    "tokens": [
+      {
+        "name": "Arb USDT",
+        "symbol": "ArUSDT",
+        "decimals": 6,
+        "addr": "0x6EDB294e430A1d70cc65D5Deb326B76cDc2A7b9D"
+      },
+      {
+        "name": "Arb USDC",
+        "symbol": "ArUSDC",
+        "decimals": 6,
+        "addr": "0x6FEAd53b5A39EcCd0103Ba8cb83219EF896B5165"
+      }
+    ]
+  },
+  {
+    "id": "optimistic-testnet",
+    "name": "Optimistic Ethereum (Kovan)",
+    "alias": "Opt",
+    "chainId": "0x45",
+    "slip44": "0x80000266",
+    "shortSlip44": "0x0266",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "hex",
+    "url": "https://kovan.optimism.io",
+    "explorer": "https://kovan-optimistic.etherscan.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x6F2Db76519Ea809122a152Ae643cbC6f499CD5Da",
+    "tokens": [
+      {
+        "name": "Opt USDT",
+        "symbol": "OpUSDT",
+        "decimals": 6,
+        "addr": "0x21D828269A0A7EF69dC25d257299901f318fBbA8"
+      },
+      {
+        "name": "Opt USDC",
+        "symbol": "OpUSDC",
+        "decimals": 6,
+        "addr": "0xc24424C27Cf43e4403B42721C86dF782f7788B89"
+      }
+    ]
+  },
+  {
+    "id": "gnosis-testnet",
+    "name": "Gnosis Chain (formerly xDai)",
+    "alias": "xdai",
+    "chainId": "0x64",
+    "slip44": "0x800002bc",
+    "shortSlip44": "0x02bc",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "hex",
+    "url": "https://rpc.xdaichain.com",
+    "explorer": "https://blockscout.com/xdai/mainnet",
+    "nativeCurrency": {
+      "name": "xDAI",
+      "symbol": "xDAI",
+      "decimals": 18
+    },
+    "mesonAddress": "0xCF1511622929F4BA960dfA9b24Be84A8Fc620bd5",
+    "tokens": [
+      {
+        "name": "xDAI USDT",
+        "symbol": "xpUSDT",
+        "decimals": 6,
+        "addr": "0x751DE3875aeF8C18d7FE983c6DeeFe366bed438f"
+      },
+      {
+        "name": "xDAI USDC",
+        "symbol": "xpUSDC",
+        "decimals": 6,
+        "addr": "0x21D828269A0A7EF69dC25d257299901f318fBbA8"
       }
     ]
   }
