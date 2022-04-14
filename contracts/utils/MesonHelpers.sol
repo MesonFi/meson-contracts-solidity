@@ -30,11 +30,12 @@ contract MesonHelpers is MesonConfig {
     address recipient,
     uint256 amount
   ) internal {
-    // IERC20Minimal(token).transfer(recipient, amount);
+    require(amount < 1e60, "Amount overflow");
+    // IERC20Minimal(token).transfer(recipient, amount * 1e12);
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
       bytes4(0xa9059cbb), // bytes4(keccak256(bytes("transfer(address,uint256)")))
       recipient,
-      amount
+      amount * 1e12
     ));
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
   }
@@ -47,11 +48,12 @@ contract MesonHelpers is MesonConfig {
   ) internal {
     require(token != address(0), "Token not supported");
     require(amount > 0, "Amount must be greater than zero");
+    require(amount < 1e60, "Amount overflow");
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
       bytes4(0x23b872dd), // bytes4(keccak256(bytes("transferFrom(address,address,uint256)")))
       sender,
       address(this),
-      amount
+      amount * 1e12
     ));
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transferFrom failed");
   }
