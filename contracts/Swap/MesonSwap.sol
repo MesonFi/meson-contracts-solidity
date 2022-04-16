@@ -50,10 +50,12 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _checkRequestSignature(encodedSwap, r, s, v, initiator);
     _postedSwaps[encodedSwap] = postingValue;
 
+    uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
     _unsafeDepositToken(
-      _tokenList[_inTokenIndexFrom(encodedSwap)],
+      _tokenList[tokenIndex],
       initiator,
-      amount + _feeFrom(encodedSwap)
+      amount + _feeFrom(encodedSwap),
+      tokenIndex == 255
     );
 
     emit SwapPosted(encodedSwap);
@@ -85,10 +87,12 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
     _postedSwaps[encodedSwap] = 0; // Swap expired so the same one cannot be posted again
 
+    uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
     _safeTransfer(
-      _tokenList[_inTokenIndexFrom(encodedSwap)],
+      _tokenList[tokenIndex],
       _initiatorFromPosted(postedSwap),
-      _amountFrom(encodedSwap) + _feeFrom(encodedSwap)
+      _amountFrom(encodedSwap) + _feeFrom(encodedSwap),
+      tokenIndex == 255
     );
 
     emit SwapCancelled(encodedSwap);
@@ -142,7 +146,8 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
       uint48 balanceIndex = mesonBalanceIndex | _providerIndexFromPosted(postedSwap);
       _tokenBalanceOf[balanceIndex] += amountWithFee;
     } else {
-      _safeTransfer(_tokenList[_inTokenIndexFrom(encodedSwap)], addressOfIndex[_providerIndexFromPosted(postedSwap)], amountWithFee);
+      uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
+      _safeTransfer(_tokenList[tokenIndex], addressOfIndex[_providerIndexFromPosted(postedSwap)], amountWithFee, tokenIndex == 255);
     }
   }
 
