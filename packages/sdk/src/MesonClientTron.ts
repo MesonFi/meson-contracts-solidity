@@ -167,11 +167,12 @@ export class MesonClientTron extends MesonClient {
   }
 
   override async _getSupportedTokens() {
-    this._tokens = await this.mesonInstance.supportedTokens()
+    const tokens = await this.mesonInstance.supportedTokens()
+    this._tokens = tokens.map((addr, index) => ({ tokenIndex: index + 1, addr }))
   }
 
   override getTokenIndex(addr: string) {
-    return 1 + this._tokens.indexOf(addr)
+    return this._tokens.find(t => t.addr === addr)?.tokenIndex
   }
 
   override async getBalance(addr: string) {

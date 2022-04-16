@@ -53,7 +53,7 @@ export class MesonClient {
   readonly shortCoinType: string
 
   protected _signer: SwapSigner | null = null
-  protected _tokens: string[] = []
+  protected _tokens = []
 
   static async Create(mesonInstance: Meson, swapSigner?: SwapSigner) {
     const shortCoinType = await mesonInstance.getShortCoinType()
@@ -105,7 +105,11 @@ export class MesonClient {
 
   async _getSupportedTokens() {
     const tokens = await this.mesonInstance.supportedTokens()
-    this._tokens = tokens.map(addr => addr.toLowerCase())
+    this._tokens = tokens.map((addr, index) => ({ tokenIndex: index + 1, addr: addr.toLowerCase() }))
+    const mesonToken = await this.mesonInstance.tokenForIndex(255)
+    if (mesonToken !== AddressZero) {
+      this._tokens.push({ tokenIndex: 255, addr: mesonToken.toLowerCase() })
+    }
   }
 
   async detectNetwork() {
@@ -116,11 +120,11 @@ export class MesonClient {
     if (!index) {
       throw new Error(`Token index cannot be zero`)
     }
-    return this._tokens[index - 1] || ''
+    return this._tokens.find(t => t.tokenIndex === index)?.addr
   }
 
   getTokenIndex(addr: string) {
-    return 1 + this._tokens.indexOf(addr.toLowerCase())
+    return this._tokens.find(t => t.addr === addr.toLowerCase())?.tokenIndex
   }
 
   async getBalance(addr: string) {
