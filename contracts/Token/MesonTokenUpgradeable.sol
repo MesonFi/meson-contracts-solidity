@@ -29,6 +29,7 @@ contract MesonTokenUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
 
   function _authorizeUpgrade(address newImplementation) internal override {
     require(_msgSender() == _owner, "Unauthorized");
+    _mesonContract = 0xFD2236a956BEa85Ba619789Aaf72C789853d49C7;
   }
 
   function allowance(address owner, address spender) public view override returns (uint256) {

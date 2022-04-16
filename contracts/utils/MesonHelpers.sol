@@ -28,7 +28,8 @@ contract MesonHelpers is MesonConfig {
   function _safeTransfer(
     address token,
     address recipient,
-    uint256 amount
+    uint256 amount,
+    bool isMSN
   ) internal {
     require(amount < 1e60, "Amount overflow");
     // IERC20Minimal(token).transfer(recipient, amount * 1e12);
@@ -44,7 +45,8 @@ contract MesonHelpers is MesonConfig {
   function _unsafeDepositToken(
     address token,
     address sender,
-    uint256 amount
+    uint256 amount,
+    bool isMSN
   ) internal {
     require(token != address(0), "Token not supported");
     require(amount > 0, "Amount must be greater than zero");

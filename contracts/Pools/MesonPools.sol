@@ -31,7 +31,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     indexOfAddress[provider] = providerIndex;
 
     _tokenBalanceOf[balanceIndex] += amount;
-    _unsafeDepositToken(_tokenList[_tokenIndexFromBalanceIndex(balanceIndex)], provider, amount);
+    uint8 tokenIndex = _tokenIndexFromBalanceIndex(balanceIndex);
+    _unsafeDepositToken(_tokenList[tokenIndex], provider, amount, tokenIndex === 255);
   }
 
   /// @notice Deposit tokens into the liquidity pool.
@@ -48,7 +49,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(providerIndex != 0, "Cannot use 0 as provider index");
     require(addressOfIndex[providerIndex] == _msgSender(), "Incorrect provider index");
     _tokenBalanceOf[balanceIndex] += amount;
-    _unsafeDepositToken(_tokenList[_tokenIndexFromBalanceIndex(balanceIndex)], _msgSender(), amount);
+    uint8 tokenIndex = _tokenIndexFromBalanceIndex(balanceIndex);
+    _unsafeDepositToken(_tokenList[tokenIndex], _msgSender(), amount, tokenIndex === 255);
   }
 
   /// @notice Withdraw tokens from the liquidity pool.
@@ -61,7 +63,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(providerIndex != 0, 'Caller not registered. Call depositAndRegister');
 
     _tokenBalanceOf[_balanceIndexFrom(tokenIndex, providerIndex)] -= amount;
-    _safeTransfer(_tokenList[tokenIndex], provider, amount);
+    _safeTransfer(_tokenList[tokenIndex], provider, amount, tokenIndex === 255);
   }
 
   /// @notice Lock funds to match a swap request. This is step 2 in a swap.
@@ -137,8 +139,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _checkReleaseSignature(encodedSwap, recipient, r, s, v, initiator);
     _lockedSwaps[swapId] = 0;
 
-    address token = _tokenList[_outTokenIndexFrom(encodedSwap)];
-    _safeTransfer(token, recipient, _amountFrom(encodedSwap));
+    uint8 tokenIndex = _outTokenIndexFrom(encodedSwap);
+    _safeTransfer(_tokenList[tokenIndex], recipient, _amountFrom(encodedSwap), tokenIndex === 255);
 
     emit SwapReleased(encodedSwap);
   }
