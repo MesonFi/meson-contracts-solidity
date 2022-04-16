@@ -18,13 +18,15 @@
         "name": "ETH USDT",
         "symbol": "rUSDT",
         "decimals": 6,
-        "addr": "0x449055030B552591BF79A58C8441E4F9237b17Fd"
+        "addr": "0x449055030B552591BF79A58C8441E4F9237b17Fd",
+        "tokenIndex": 1
       },
       {
         "name": "ETH USDC",
         "symbol": "rUSDC",
         "decimals": 6,
-        "addr": "0x5348c5caC37fC6eB004A4825111c29770c52f6F2"
+        "addr": "0x5348c5caC37fC6eB004A4825111c29770c52f6F2",
+        "tokenIndex": 2
       }
     ]
   },
@@ -52,13 +54,15 @@
         "name": "BNB USDT",
         "symbol": "bUSDT",
         "decimals": 18,
-        "addr": "0x14c810CF6e357A600B6c12ca676818BA5367fdE6"
+        "addr": "0x14c810CF6e357A600B6c12ca676818BA5367fdE6",
+        "tokenIndex": 1
       },
       {
         "name": "BNB USDC",
         "symbol": "bUSDC",
         "decimals": 18,
-        "addr": "0xc3f1585228D02bb9A6Fb9E7E29b8890533048BD7"
+        "addr": "0xc3f1585228D02bb9A6Fb9E7E29b8890533048BD7",
+        "tokenIndex": 2
       }
     ]
   },
@@ -87,14 +91,16 @@
         "symbol": "USDT",
         "decimals": 6,
         "addr": "TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t",
-        "link": "token20/TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t"
+        "link": "token20/TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t",
+        "tokenIndex": 1
       },
       {
         "name": "TRX USDC",
         "symbol": "USDC",
         "decimals": 6,
         "addr": "TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5",
-        "link": "token20/TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5"
+        "link": "token20/TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5",
+        "tokenIndex": 2
       }
     ]
   },
@@ -122,13 +128,15 @@
         "name": "AVA USDT",
         "symbol": "aUSDT",
         "decimals": 6,
-        "addr": "0xa7D481F9e37813A31009cAB32b8D73748F7f8eCA"
+        "addr": "0xa7D481F9e37813A31009cAB32b8D73748F7f8eCA",
+        "tokenIndex": 1
       },
       {
         "name": "AVA USDC",
         "symbol": "aUSDC",
         "decimals": 6,
-        "addr": "0xDEC36F68b7Ce5EC27cDA7a8c6A764aE00293Fd20"
+        "addr": "0xDEC36F68b7Ce5EC27cDA7a8c6A764aE00293Fd20",
+        "tokenIndex": 2
       }
     ]
   },
@@ -156,13 +164,15 @@
         "name": "MATIC USDT",
         "symbol": "pUSDT",
         "decimals": 6,
-        "addr": "0xDA351ccb005D8b3f9303A25b75994aA40dD780e6"
+        "addr": "0xDA351ccb005D8b3f9303A25b75994aA40dD780e6",
+        "tokenIndex": 1
       },
       {
         "name": "MATIC USDC",
         "symbol": "pUSDC",
         "decimals": 6,
-        "addr": "0x2d53530A5fb37c482E853FF5a7C547CEf3b0230C"
+        "addr": "0x2d53530A5fb37c482E853FF5a7C547CEf3b0230C",
+        "tokenIndex": 2
       }
     ]
   },
@@ -190,13 +200,15 @@
         "name": "FTM USDT",
         "symbol": "fUSDT",
         "decimals": 6,
-        "addr": "0x0cB2E738A9eF1f1b21a5b41e5D27bb63EdB075cf"
+        "addr": "0x0cB2E738A9eF1f1b21a5b41e5D27bb63EdB075cf",
+        "tokenIndex": 1
       },
       {
         "name": "FTM USDC",
         "symbol": "fUSDC",
         "decimals": 6,
-        "addr": "0x1F5BD64EA32E64570c78893633A28B8cf27c8A9F"
+        "addr": "0x1F5BD64EA32E64570c78893633A28B8cf27c8A9F",
+        "tokenIndex": 2
       }
     ]
   },
@@ -224,13 +236,15 @@
         "name": "ONE USDT",
         "symbol": "oUSDT",
         "decimals": 6,
-        "addr": "0x26058C8fCF6Ee539738f651C2D555af4448FA91F"
+        "addr": "0x26058C8fCF6Ee539738f651C2D555af4448FA91F",
+        "tokenIndex": 1
       },
       {
         "name": "ONE USDC",
         "symbol": "oUSDC",
         "decimals": 6,
-        "addr": "0xA4B19C7859b3d3b2FD81244817D875a7708Ba5f5"
+        "addr": "0xA4B19C7859b3d3b2FD81244817D875a7708Ba5f5",
+        "tokenIndex": 2
       }
     ]
   },
@@ -258,13 +272,15 @@
         "name": "Aurora USDT",
         "symbol": "AUSDT",
         "decimals": 6,
-        "addr": "0x071243a63463322EC14Ce17D51F92A908bf34CDF"
+        "addr": "0x071243a63463322EC14Ce17D51F92A908bf34CDF",
+        "tokenIndex": 1
       },
       {
         "name": "Aurora USDC",
         "symbol": "AUSDC",
         "decimals": 6,
-        "addr": "0x72F08CC43A7F15E0b1B6ede3aBC1Ca40BAcc1C25"
+        "addr": "0x72F08CC43A7F15E0b1B6ede3aBC1Ca40BAcc1C25",
+        "tokenIndex": 2
       }
     ]
   },
@@ -292,13 +308,15 @@
         "name": "Arb USDT",
         "symbol": "ArUSDT",
         "decimals": 6,
-        "addr": "0x6EDB294e430A1d70cc65D5Deb326B76cDc2A7b9D"
+        "addr": "0x6EDB294e430A1d70cc65D5Deb326B76cDc2A7b9D",
+        "tokenIndex": 1
       },
       {
         "name": "Arb USDC",
         "symbol": "ArUSDC",
         "decimals": 6,
-        "addr": "0x6FEAd53b5A39EcCd0103Ba8cb83219EF896B5165"
+        "addr": "0x6FEAd53b5A39EcCd0103Ba8cb83219EF896B5165",
+        "tokenIndex": 2
       }
     ]
   },
@@ -326,13 +344,15 @@
         "name": "Opt USDT",
         "symbol": "OpUSDT",
         "decimals": 6,
-        "addr": "0x21D828269A0A7EF69dC25d257299901f318fBbA8"
+        "addr": "0x21D828269A0A7EF69dC25d257299901f318fBbA8",
+        "tokenIndex": 1
       },
       {
         "name": "Opt USDC",
         "symbol": "OpUSDC",
         "decimals": 6,
-        "addr": "0xc24424C27Cf43e4403B42721C86dF782f7788B89"
+        "addr": "0xc24424C27Cf43e4403B42721C86dF782f7788B89",
+        "tokenIndex": 2
       }
     ]
   },
@@ -360,13 +380,15 @@
         "name": "xDAI USDT",
         "symbol": "xpUSDT",
         "decimals": 6,
-        "addr": "0x751DE3875aeF8C18d7FE983c6DeeFe366bed438f"
+        "addr": "0x751DE3875aeF8C18d7FE983c6DeeFe366bed438f",
+        "tokenIndex": 1
       },
       {
         "name": "xDAI USDC",
         "symbol": "xpUSDC",
         "decimals": 6,
-        "addr": "0x21D828269A0A7EF69dC25d257299901f318fBbA8"
+        "addr": "0x21D828269A0A7EF69dC25d257299901f318fBbA8",
+        "tokenIndex": 2
       }
     ]
   }

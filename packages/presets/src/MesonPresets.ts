@@ -23,6 +23,7 @@ export interface PresetToken {
   name?: string
   symbol: string
   decimals: number
+  tokenIndex: number
 }
 
 export interface PresetNetwork {
@@ -36,6 +37,7 @@ export interface PresetNetwork {
   url?: string
   explorer?: string
   mesonAddress: string
+  mesonToken?: string
   nativeCurrency?: {
     name?: string
     symbol: string
@@ -79,12 +81,22 @@ export class MesonPresets {
   getTokensForNetwork(id: string): PresetToken[] {
     const networks = this.getAllNetworks()
     const match = networks.find(item => item.id === id)
-    return match?.tokens || []
+    const tokens = [...match?.tokens]
+    if (match?.mesonToken) {
+      tokens.push({
+        addr: match.mesonToken,
+        name: 'Meson Token',
+        symbol: 'MSN',
+        decimals: 4,
+        tokenIndex: 255,
+      })
+    }
+    return tokens
   }
 
   getToken(networkId: string, tokenIndex: number): PresetToken {
     const tokens = this.getTokensForNetwork(networkId)
-    return tokens[tokenIndex - 1]
+    return tokens.find(t => t.tokenIndex === tokenIndex)
   }
 
   getClient(id: string, provider: Provider | Signer): MesonClient {

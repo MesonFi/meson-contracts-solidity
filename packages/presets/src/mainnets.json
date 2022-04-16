@@ -18,13 +18,15 @@
         "name": "USDT",
         "symbol": "USDT",
         "decimals": 6,
-        "addr": "0xdac17f958d2ee523a2206206994597c13d831ec7"
+        "addr": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "tokenIndex": 1
       },
       {
         "name": "USDC",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+        "addr": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "tokenIndex": 2
       }
     ]
   },
@@ -49,16 +51,18 @@
     "mesonAddress": "0xFD2236a956BEa85Ba619789Aaf72C789853d49C7",
     "tokens": [
       {
-        "name": "USDC",
-        "symbol": "USDC",
-        "decimals": 18,
-        "addr": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
-      },
-      {
         "name": "USDT",
         "symbol": "USDT",
         "decimals": 18,
-        "addr": "0x55d398326f99059ff775485246999027b3197955"
+        "addr": "0x55d398326f99059ff775485246999027b3197955",
+        "tokenIndex": 2
+      },
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 18,
+        "addr": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+        "tokenIndex": 1
       }
     ]
   },
@@ -87,7 +91,8 @@
         "symbol": "USDT",
         "decimals": 6,
         "addr": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
-        "link": "token20/TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+        "link": "token20/TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+        "tokenIndex": 1
       }
     ]
   },
@@ -115,7 +120,8 @@
         "name": "USDC.e",
         "symbol": "USDC.e",
         "decimals": 6,
-        "addr": "0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664"
+        "addr": "0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664",
+        "tokenIndex": 1
       }
     ]
   },
@@ -143,7 +149,8 @@
         "name": "USDC",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+        "addr": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+        "tokenIndex": 1
       }
     ]
   },
@@ -171,7 +178,8 @@
         "name": "USDC",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "0x04068da6c83afcfa0e13ba15a6696662335d5b75"
+        "addr": "0x04068da6c83afcfa0e13ba15a6696662335d5b75",
+        "tokenIndex": 1
       }
     ]
   },
@@ -199,7 +207,8 @@
         "name": "Tether USD",
         "symbol": "USDT",
         "decimals": 6,
-        "addr": "0x4988a896b1227218e4A686fdE5EabdcAbd91571f"
+        "addr": "0x4988a896b1227218e4A686fdE5EabdcAbd91571f",
+        "tokenIndex": 1
       }
     ]
   },
@@ -222,12 +231,14 @@
       "decimals": 18
     },
     "mesonAddress": "0xFD2236a956BEa85Ba619789Aaf72C789853d49C7",
+    "mesonToken": "0xF24B060bdF1cc97Ce104971553fb81A186e79Ee6",
     "tokens": [
       {
         "name": "USDT",
         "symbol": "USDT",
         "decimals": 18,
-        "addr": "0xfe97e85d13abd9c1c33384e796f10b73905637ce"
+        "addr": "0xfe97e85d13abd9c1c33384e796f10b73905637ce",
+        "tokenIndex": 1
       }
     ]
   }
