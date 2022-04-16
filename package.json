@@ -86,7 +86,7 @@
     "up:optimistic": "HARDHAT_NETWORK=optimistic yarn up",
     "up:tron": "HARDHAT_NETWORK=tron yarn chain && hardhat run scripts/tron/update.js",
 
-    "token": "yarn chain && hardhat run scripts/mainnets/deploy-token.js",
+    "token": "yarn chain && hardhat run scripts/mainnets/token.js",
     "token:cfx": "HARDHAT_NETWORK=cfx yarn token",
     
     "deposit": "hardhat run scripts/mainnets/deposit.js",
