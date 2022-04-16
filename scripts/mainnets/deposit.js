@@ -16,7 +16,7 @@ async function main() {
 
   const wallet = new ethers.Wallet(LP_PRIVATE_KEY, ethers.provider)
 
-  const token = new ethers.Contract(network.tokens[tokenIndex - 1].addr, ERC20.abi, wallet)
+  const token = new ethers.Contract(network.tokens.find(t => t.tokenIndex === tokenIndex).addr, ERC20.abi, wallet)
   const meson = new ethers.Contract(network.mesonAddress, Meson.abi, wallet)
 
   console.log(`lp address: ${wallet.address}`)
@@ -36,6 +36,8 @@ async function main() {
   } else {
     tx = await meson.deposit(ethers.utils.parseUnits(amount, 6), balanceIndex)
   }
+  // tx = await meson.withdraw(ethers.utils.parseUnits(amount, 6), tokenIndex)
+  // tx = await token.transfer('', ethers.utils.parseUnits(amount, decimals))
   console.log(tx)
 }
 
