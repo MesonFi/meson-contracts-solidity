@@ -16,7 +16,8 @@ async function main() {
 
   const wallet = new ethers.Wallet(LP_PRIVATE_KEY, ethers.provider)
 
-  const token = new ethers.Contract(network.tokens.find(t => t.tokenIndex === tokenIndex).addr, ERC20.abi, wallet)
+  const tokenAddr = tokenIndex === 255 ? network.mesonToken : network.tokens.find(t => t.tokenIndex === tokenIndex).addr
+  const token = new ethers.Contract(tokenAddr, ERC20.abi, wallet)
   const meson = new ethers.Contract(network.mesonAddress, Meson.abi, wallet)
 
   console.log(`lp address: ${wallet.address}`)
