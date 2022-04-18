@@ -194,8 +194,8 @@ contract MesonHelpers is MesonConfig {
         mstore8(32, 0x41)
         mstore(0, encodedSwap)
         mstore(32, keccak256(0, 53))
-        mstore(0, 0xcdd10eb72226dc70c96479571183c7d98ddba64dcc287980e7f6deceaad47c1c) // testnet
-        // mstore(0, 0xf6ea10de668a877958d46ed7d53eaf47124fda9bee9423390a28c203556a2e55) // mainnet
+        // mstore(0, 0xcdd10eb72226dc70c96479571183c7d98ddba64dcc287980e7f6deceaad47c1c) // testnet
+        mstore(0, 0xf6ea10de668a877958d46ed7d53eaf47124fda9bee9423390a28c203556a2e55) // mainnet
         digest := keccak256(0, 64)
       }
     } else {
