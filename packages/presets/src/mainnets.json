@@ -7,7 +7,8 @@
     "slip44": "0x8000003c",
     "shortSlip44": "0x003c",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://mainnet.infura.io/v3/${INFURA_API_KEY}",
@@ -38,7 +39,8 @@
     "slip44": "0x800002ca",
     "shortSlip44": "0x02ca",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://bsc-dataseed1.binance.org",
@@ -104,7 +106,8 @@
     "slip44": "0x80002328",
     "shortSlip44": "0x2328",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://api.avax.network/ext/bc/C/rpc",
@@ -133,7 +136,8 @@
     "slip44": "0x800003c6",
     "shortSlip44": "0x03c6",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://polygon-rpc.com",
@@ -162,7 +166,8 @@
     "slip44": "0x800003ef",
     "shortSlip44": "0x03ef",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://rpc.ftm.tools",
@@ -191,7 +196,8 @@
     "slip44": "0x80000a0a",
     "shortSlip44": "0x0a0a",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://mainnet.aurora.dev",
@@ -220,7 +226,8 @@
     "slip44": "0x800001f7",
     "shortSlip44": "0x01f7",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://evm.confluxrpc.com",
@@ -239,6 +246,13 @@
         "decimals": 18,
         "addr": "0xfe97e85d13abd9c1c33384e796f10b73905637ce",
         "tokenIndex": 1
+      },
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 18,
+        "addr": "0x6963efed0ab40f6c3d7bda44a05dcf1437c44372",
+        "tokenIndex": 2
       }
     ]
   }

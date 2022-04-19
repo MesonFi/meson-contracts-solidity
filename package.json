@@ -75,11 +75,11 @@
     
     "up": "yarn chain && hardhat run scripts/mainnets/upgrade.js",
     "up:eth": "HARDHAT_NETWORK=eth yarn up",
-    "up:bnb": "HARDHAT_NETWORK=bnb yarn up",
+    "up:bnb-18": "HARDHAT_NETWORK=bnb yarn up",
     "up:avax": "HARDHAT_NETWORK=avax yarn up",
     "up:poly": "HARDHAT_NETWORK=polygon yarn up",
     "up:ftm": "HARDHAT_NETWORK=ftm yarn up",
-    "up:cfx": "HARDHAT_NETWORK=cfx yarn up",
+    "up:cfx-18": "HARDHAT_NETWORK=cfx yarn up",
     "up:aurora": "HARDHAT_NETWORK=aurora yarn up",
     "up:arbitrum": "HARDHAT_NETWORK=arbitrum yarn up",
     "up:gnosis": "HARDHAT_NETWORK=gnosis yarn up",
@@ -100,7 +100,7 @@
   "devDependencies": {
     "@mesonfi/contract-abis": "^0.7.0",
     "@mesonfi/contract-types": "^0.7.0",
-    "@mesonfi/presets": "^0.8.0-rc.1",
+    "@mesonfi/presets": "^0.8.0-rc.2",
     "@mesonfi/sdk": "^0.8.0-rc.1",
     "@nomiclabs/hardhat-ethers": "^2.0.3",
     "@nomiclabs/hardhat-waffle": "^2.0.1",

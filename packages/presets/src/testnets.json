@@ -7,7 +7,8 @@
     "slip44": "0x8000003c",
     "shortSlip44": "0x003c",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://ropsten.infura.io/v3/${INFURA_API_KEY}",
@@ -38,7 +39,8 @@
     "slip44": "0x800002ca",
     "shortSlip44": "0x02ca",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://data-seed-prebsc-1-s1.binance.org:8545",
@@ -112,7 +114,8 @@
     "slip44": "0x80002328",
     "shortSlip44": "0x2328",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://api.avax-test.network/ext/bc/C/rpc",
@@ -148,7 +151,8 @@
     "slip44": "0x800003c6",
     "shortSlip44": "0x03c6",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://rpc-mumbai.matic.today",
@@ -184,7 +188,8 @@
     "slip44": "0x800003ef",
     "shortSlip44": "0x03ef",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://rpc.testnet.fantom.network",
@@ -220,7 +225,8 @@
     "slip44": "0x800003ff",
     "shortSlip44": "0x03ff",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://api.s0.b.hmny.io",
@@ -256,7 +262,8 @@
     "slip44": "0x80000a0a",
     "shortSlip44": "0x0a0a",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://testnet.aurora.dev",
@@ -292,7 +299,8 @@
     "slip44": "0x80002329",
     "shortSlip44": "0x2329",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://rinkeby.arbitrum.io/rpc",
@@ -328,7 +336,8 @@
     "slip44": "0x80000266",
     "shortSlip44": "0x0266",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://kovan.optimism.io",
@@ -364,7 +373,8 @@
     "slip44": "0x800002bc",
     "shortSlip44": "0x02bc",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://rpc.xdaichain.com",

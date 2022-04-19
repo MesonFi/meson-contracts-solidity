@@ -32,7 +32,8 @@
     "chainId": "0x100",
     "slip44": "0x800003f2",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://http-testnet.hecochain.com",
@@ -65,7 +66,8 @@
     "chainId": "0x41",
     "slip44": "0x800003e4",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "hex",
     "url": "https://exchaintestrpc.okex.org",
