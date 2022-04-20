@@ -1,3 +1,4 @@
+const { ethers } = require('hardhat')
 const { EthersProviderWrapper } = require("@nomiclabs/hardhat-ethers/internal/ethers-provider-wrapper");
 
 module.exports = class CustomGasFeeProviderWrapper extends EthersProviderWrapper {

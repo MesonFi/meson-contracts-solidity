@@ -92,6 +92,7 @@
     "deposit": "hardhat run scripts/mainnets/deposit.js",
     "deposit:eth": "HARDHAT_NETWORK=eth yarn deposit",
     "deposit:avax": "HARDHAT_NETWORK=avax yarn deposit",
+    "deposit:poly": "HARDHAT_NETWORK=polygon yarn deposit",
     "deposit:bnb": "HARDHAT_NETWORK=bnb yarn deposit",
     "deposit:cfx": "HARDHAT_NETWORK=cfx yarn deposit",
     "deposit:aurora": "HARDHAT_NETWORK=aurora yarn deposit",

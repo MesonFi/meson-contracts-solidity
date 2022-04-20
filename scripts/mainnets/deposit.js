@@ -6,7 +6,7 @@ require('dotenv').config()
 
 const { HARDHAT_NETWORK, LP_PRIVATE_KEY } = process.env
 
-const amount = '70000'
+const amount = '10000'
 const tokenIndex = 1
 
 async function main() {
@@ -37,7 +37,7 @@ async function main() {
   } else {
     tx = await meson.deposit(ethers.utils.parseUnits(amount, 6), balanceIndex)
   }
-  // tx = await meson.withdraw(ethers.utils.parseUnits(amount, 6), tokenIndex)
+  // await (await meson.withdraw(ethers.utils.parseUnits(amount, 6), tokenIndex)).wait()
   // tx = await token.transfer('', ethers.utils.parseUnits(amount, decimals))
   console.log(tx)
 }
