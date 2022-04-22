@@ -25,7 +25,7 @@ async function main() {
   console.log(`lp address: ${wallet.address}`)
 
   const tx = await deposit(meson, token)
-  // const tx = await withdraw(meson, token)
+  // const tx = await withdraw(meson, token, '')
   console.log(tx)
 }
 
@@ -46,9 +46,11 @@ async function deposit (meson, token) {
   }
 }
 
-async function withdraw (meson, token) {
+async function withdraw (meson, token, recipient) {
   const decimals = await token.decimals()
   console.log(`withdrawing for ${amount}...`)
   await (await meson.withdraw(ethers.utils.parseUnits(amount, 6), tokenIndex)).wait()
-  return await token.transfer('', ethers.utils.parseUnits(amount, decimals))
+  if (recipient) {
+    return await token.transfer(recipient, ethers.utils.parseUnits(amount, decimals))
+  }
 }
