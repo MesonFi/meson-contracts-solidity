@@ -30,9 +30,14 @@ async function main() {
 }
 
 async function deposit (meson, token) {
-  console.log(`approving for ${amount}...`)
   const decimals = await token.decimals()
-  await (await token.approve(network.mesonAddress, ethers.utils.parseUnits(amount, decimals))).wait(1)
+  const value = ethers.utils.parseUnits(amount, decimals)
+  const allowance = await token.allowance(wallet.address, network.mesonAddress)
+  console.log(`allowance: ${ethers.utils.formatUnits(allowance, decimals)}`)
+  if (allowance.lt(value)) {
+    console.log(`approving...`)
+    await (await token.approve(network.mesonAddress, ethers.utils.parseUnits('1000000000000', decimals))).wait(1)
+  }
 
   console.log(`depositing for ${amount}...`)
   const providerIndex = await meson.indexOfAddress(wallet.address)
