@@ -119,7 +119,6 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   ) external {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     require(postedSwap > 1, "Swap does not exist");
-    require(_expireTsFrom(encodedSwap) > block.timestamp, "Cannot execute because expired");
 
     if (_expireTsFrom(encodedSwap) < block.timestamp + MIN_BOND_TIME_PERIOD) {
       // Swap expiredTs < current + MIN_BOND_TIME_PERIOD
