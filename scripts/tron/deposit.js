@@ -19,14 +19,14 @@ const tokenIndex = 1
 const lpIndex = 1
 
 async function deposit() {
-  const tokenContract = tronWeb.contract(ERC20.abi, tokens.find(t => t.tokenIndex === tokenIndex))
+  const tokenContract = tronWeb.contract(ERC20.abi, tokens[tokenIndex - 1])
   const mesonContract = tronWeb.contract(Meson.abi, meson)
 
   await tokenContract.approve(meson, amount).send()
   await new Promise(resolve => setInterval(resolve, 1000))
 
-  await mesonContract.depositAndRegister(amount, tokenIndex * 2**40 + lpIndex).send()
-  // await mesonContract.deposit(amount, tokenIndex * 2**40 + lpIndex).send()
+  // await mesonContract.depositAndRegister(amount, tokenIndex * 2**40 + lpIndex).send()
+  await mesonContract.deposit(amount, tokenIndex * 2**40 + lpIndex).send()
 
   // await mesonContract.withdraw(amount, tokenIndex).send()
 }
