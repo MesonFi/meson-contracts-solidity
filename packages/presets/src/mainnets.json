@@ -208,6 +208,7 @@
       "decimals": 18
     },
     "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
+    "mesonToken": "0x441ac25d296b1b679d2F35aa07f8B53119b0aBAe",
     "tokens": [
       {
         "name": "Tether USD",
