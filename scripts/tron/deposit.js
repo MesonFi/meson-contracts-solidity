@@ -14,7 +14,7 @@ const tronWeb = new TronWeb({
   privateKey: process.env.LP_PRIVATE_KEY
 })
 
-const amount = ethers.utils.parseUnits('9959.04', 6)
+const amount = ethers.utils.parseUnits('99999', 6)
 const tokenIndex = 1
 const lpIndex = 1
 
@@ -22,8 +22,13 @@ async function deposit() {
   const tokenContract = tronWeb.contract(ERC20.abi, tokens[tokenIndex - 1])
   const mesonContract = tronWeb.contract(Meson.abi, meson)
 
-  await tokenContract.approve(meson, amount).send()
-  await new Promise(resolve => setInterval(resolve, 1000))
+  const allowance = await tokenContract.allowance(tronWeb.defaultAddress.base58, meson).call()
+  console.log(`allowance: ${ethers.utils.formatUnits(allowance, 6)}`)
+  if (allowance.lt(amount)) {
+    console.log(`approving...`)
+    await tokenContract.approve(meson, ethers.utils.parseUnits('1000000000000', 6)).send()
+    await new Promise(resolve => setInterval(resolve, 1000))
+  }
 
   // await mesonContract.depositAndRegister(amount, tokenIndex * 2**40 + lpIndex).send()
   await mesonContract.deposit(amount, tokenIndex * 2**40 + lpIndex).send()
