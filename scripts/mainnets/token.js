@@ -4,7 +4,11 @@ const MesonToken = require('../../artifacts/contracts/Token/MesonTokenUpgradeabl
 
 require('dotenv').config()
 
-const { PRIVATE_KEY, MINTER, MINTER_PK } = process.env
+const { HARDHAT_NETWORK, PRIVATE_KEY, MINTER, MINTER_PK } = process.env
+
+const mainnets = require('@mesonfi/presets/src/mainnets.json')
+const index = mainnets.findIndex(item => item.id === HARDHAT_NETWORK)
+const network = mainnets[index]
 
 async function deploy() {
   ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
@@ -23,15 +27,17 @@ async function upgrade() {
 
   const MesonTokenUpgradeable = await ethers.getContractFactory('MesonTokenUpgradeable', wallet)
   console.log('Upgrading MesonTokenUpgradeable...')
-  await upgrades.upgradeProxy('0xF24B060bdF1cc97Ce104971553fb81A186e79Ee6', MesonTokenUpgradeable)
+  await upgrades.upgradeProxy(network.mesonToken, MesonTokenUpgradeable)
 }
 
 async function mint() {
+  const amount = '1000'
+
   ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
   const wallet = new ethers.Wallet(MINTER_PK, ethers.provider)
 
-  const mesonToken = new ethers.Contract('0xF24B060bdF1cc97Ce104971553fb81A186e79Ee6', MesonToken.abi, wallet)
-  await mesonToken.batchMint(['0x243f22fbd4C375581aaACFCfff5A43793eb8A74d'], '10000000')
+  const mesonToken = new ethers.Contract(network.mesonToken, MesonToken.abi, wallet)
+  await mesonToken.batchMint(['0x243f22fbd4C375581aaACFCfff5A43793eb8A74d'], ethers.utils.parseUnits(amount, 4))
 }
 
 mint()
