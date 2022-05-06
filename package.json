@@ -31,6 +31,7 @@
     "chain:optimistic": "NETWORK_ID=optimistic yarn chain",
     "chain:gnosis": "NETWORK_ID=gnosis yarn chain",
     "chain:tron": "NETWORK_ID=tron yarn chain",
+    "chain:evmos": "NETWORK_ID=evmos && yarn chain",
 
     "testnet": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/deploy-upgradable.js",
     "testnet:eth": "NETWORK_ID=eth yarn testnet",
@@ -45,7 +46,7 @@
     "testnet:optimistic": "NETWORK_ID=optimistic yarn testnet",
     "testnet:gnosis":  "NETWORK_ID=gnosis yarn testnet",
     "testnet:tron": "NETWORK_ID=tron TESTNET_MODE=true yarn chain && hardhat run scripts/tron/deploy.js",
-    
+    "testnet:evmos":  "NETWORK_ID=evmos yarn testnet",
     "testnet-up": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/upgrade.js",
     "testnet-up:eth": "NETWORK_ID=eth yarn testnet-up",
     "testnet-up:bnb": "NETWORK_ID=bnb yarn testnet-up",
