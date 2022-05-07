@@ -268,7 +268,7 @@
     "id": "evmos",
     "name": "Evmos Mainnet",
     "alias": "evmos",
-    "chainId": "9001",
+    "chainId": "0x2329",
     "slip44": "0x800011bc",
     "shortSlip44": "0x11bc",
     "extensions": [
@@ -283,13 +283,13 @@
       "symbol": "EVMOS",
       "decimals": 18
     },
-    "mesonAddress": "",
+    "mesonAddress": "0xd53e9530107a8d8856099d7d80126478d48e06dA",
     "mesonToken": "",
     "tokens": [
       {
         "name": "USDC",
         "symbol": "USDC",
-        "decimals": 6 ,
+        "decimals": 6,
         "addr": "0x51e44FfaD5C2B122C8b635671FCC8139dc636E82",
         "tokenIndex": 1
       }

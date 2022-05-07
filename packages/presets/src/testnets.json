@@ -406,7 +406,7 @@
     "id": "evmos-testnet",
     "name": "Evmos Testnet",
     "alias": "evmos",
-    "chainId": "9000",
+    "chainId": "0x2328",
     "slip44": "0x800011bc",
     "shortSlip44": "0x11bc",
     "extensions": [
