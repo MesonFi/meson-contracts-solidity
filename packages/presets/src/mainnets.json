@@ -263,5 +263,36 @@
         "tokenIndex": 2
       }
     ]
+  },
+  {
+    "id": "evmos",
+    "name": "Evmos Mainnet",
+    "alias": "evmos",
+    "chainId": "9001",
+    "slip44": "0x800011bc",
+    "shortSlip44": "0x11bc",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://eth.bd.evmos.org:8545",
+    "explorer": "https://evm.evmos.org",
+    "nativeCurrency": {
+      "name": "EVMOS",
+      "symbol": "EVMOS",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "mesonToken": "",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6 ,
+        "addr": "0x51e44FfaD5C2B122C8b635671FCC8139dc636E82",
+        "tokenIndex": 1
+      }
+    ]
   }
 ]

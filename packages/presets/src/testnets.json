@@ -401,5 +401,42 @@
         "tokenIndex": 2
       }
     ]
+  },
+  {
+    "id": "evmos-testnet",
+    "name": "Evmos Testnet",
+    "alias": "evmos",
+    "chainId": "9000",
+    "slip44": "0x800011bc",
+    "shortSlip44": "0x11bc",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://eth.bd.evmos.dev:8545",
+    "explorer": "https://evm.evmos.dev",
+    "nativeCurrency": {
+      "name": "tEVMOS",
+      "symbol": "tEVMOS",
+      "decimals": 18
+    },
+    "mesonAddress": "0x27228C05621d3dbe0d1E1cb2269a9a9117D80EB4",
+    "tokens": [
+      {
+        "name": "tEV USDT",
+        "symbol": "tEVUSDT",
+        "decimals": 6,
+        "addr": "0xF37eE9D96a307608AA65cfBd5D6BF9bd282098BE",
+        "tokenIndex": 1
+      },
+      {
+        "name": "tEV USDC",
+        "symbol": "tEVUSDC",
+        "decimals": 6,
+        "addr": "0x5cFB4E7d815c9B7e3bFd56D9B7117E0219cbA8cd",
+        "tokenIndex": 2
+      }
+    ]
   }
 ]
