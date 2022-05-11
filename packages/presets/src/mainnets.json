@@ -266,7 +266,7 @@
   },
   {
     "id": "evmos",
-    "name": "Evmos Mainnet",
+    "name": "Evmos",
     "alias": "evmos",
     "chainId": "0x2329",
     "slip44": "0x800011bc",
