@@ -7,6 +7,8 @@ module.exports = class CustomGasFeeProviderWrapper extends EthersProviderWrapper
     // For Polygon
     // result.maxFeePerGas = result.gasPrice.add(50)
     // result.maxPriorityFeePerGas = result.gasPrice
+
+    // For ftm
     // result.maxFeePerGas = null
     // result.maxPriorityFeePerGas = null
     // result.gasPrice = ethers.BigNumber.from(300_000_000_000)
