@@ -94,6 +94,7 @@
     "token": "yarn chain && hardhat run scripts/mainnets/token.js",
     "token:aurora": "HARDHAT_NETWORK=aurora yarn token",
     "token:cfx": "HARDHAT_NETWORK=cfx yarn token",
+    "token:evmos": "HARDHAT_NETWORK=evmos yarn token",
     
     "deposit": "hardhat run scripts/mainnets/deposit.js",
     "deposit:eth": "HARDHAT_NETWORK=eth yarn deposit",

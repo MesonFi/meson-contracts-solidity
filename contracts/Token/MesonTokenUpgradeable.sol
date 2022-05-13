@@ -13,7 +13,7 @@ contract MesonTokenUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
     __ERC20_init("Meson Token", "MSN");
     _owner = _msgSender();
     _minter = minter;
-    // _mesonContract = ;
+    _mesonContract = ;
   }
 
   function decimals() public pure override returns (uint8) {
