@@ -284,7 +284,7 @@
       "decimals": 18
     },
     "mesonAddress": "0xd53e9530107a8d8856099d7d80126478d48e06dA",
-    "mesonToken": "",
+    "mesonToken": "0xee7fa5Bf82EdAB83dE8A184399360c4E6148A23e",
     "tokens": [
       {
         "name": "USDC",
