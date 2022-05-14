@@ -94,6 +94,12 @@ describe('RemoteSwapSigner', () => {
   const initiator = new MockProvider().getWallets()[1]
   const remoteSigner = {
     getAddress: () => initiator.address,
+    signMessage: async msg => {
+      const header = '\x19Ethereum Signed Message:\n32'
+      const digest = keccak256(pack(['string', 'bytes32'], [header, msg]))
+      const { r, s, v } = initiator._signingKey().signDigest(digest)
+      return pack(['bytes32', 'bytes32', 'uint8'], [r, s, v])
+    },
     signTypedData: async data => {
       const typeHash = keccak256(pack(
         data.map(() => 'string'),

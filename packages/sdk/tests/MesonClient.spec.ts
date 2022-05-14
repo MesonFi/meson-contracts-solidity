@@ -68,7 +68,7 @@ describe('MesonClient', () => {
       expect(mesonClientForInitiator.token(1)).to.equal(token.address.toLowerCase())
     })
     it('returns undefined for out-of-range index', () => {
-      expect(mesonClientForInitiator.token(2)).to.equal('')
+      expect(mesonClientForInitiator.token(2)).to.equal(undefined)
     })
   })
 

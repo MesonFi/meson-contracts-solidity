@@ -23,6 +23,7 @@ export interface SwapData {
   inToken: number,
   outChain: string,
   outToken: number,
+  signNonTyped?: boolean,
 }
 
 export class Swap implements SwapData {
@@ -84,7 +85,7 @@ export class Swap implements SwapData {
       throw new Error('Invalid outToken')
     }
 
-    this.salt = data.salt || this._newRandomSalt()
+    this.salt = data.salt || this._newRandomSalt(data.signNonTyped)
     this.expireTs = data.expireTs
     this.inChain = data.inChain
     this.inToken = data.inToken
@@ -92,9 +93,13 @@ export class Swap implements SwapData {
     this.outToken = data.outToken
   }
 
-  private _newRandomSalt(): string {
+  private _newRandomSalt(signNonTyped: boolean): string {
     const rnd = BigNumber.from(Math.floor(Math.random() * 4294967296))
-    return hexZeroPad(rnd.toHexString(), 10)
+    let salt = hexZeroPad(rnd.toHexString(), 10)
+    if (signNonTyped) {
+      salt = salt.replace('0x00', '0xff')
+    }
+    return salt
   }
 
   get encoded(): string {
@@ -104,6 +109,10 @@ export class Swap implements SwapData {
       this._encoded = pack(types, values)
     }
     return this._encoded
+  }
+
+  get signNonTyped(): boolean {
+    return this.salt.startsWith('0xff')
   }
 
   toObject(): SwapData {
