@@ -62,6 +62,10 @@ contract MesonHelpers is MesonConfig {
     return keccak256(abi.encodePacked(encodedSwap, initiator));
   }
 
+  function _signNonTyped(uint256 encodedSwap) internal pure returns (bool) {
+    return uint8(encodedSwap >> 200) == 255;
+  }
+
   function _amountFrom(uint256 encodedSwap) internal pure returns (uint256) {
     return encodedSwap >> 208;
   }
@@ -156,6 +160,15 @@ contract MesonHelpers is MesonConfig {
       return;
     }
 
+    if (_signNonTyped(encodedSwap)) {
+      bytes32 digest = keccak256(abi.encodePacked(
+        bytes28(0x19457468657265756d205369676e6564204d6573736167653a0a3332), // HEX of "\x19Ethereum Signed Message:\n32"
+        encodedSwap
+      ));
+      require(signer == ecrecover(digest, v, r, s), "Invalid signature");
+      return;
+    }
+
     bytes32 typehash = REQUEST_TYPE_HASH;
     bytes32 digest;
     assembly {
@@ -198,6 +211,11 @@ contract MesonHelpers is MesonConfig {
         mstore(0, 0xf6ea10de668a877958d46ed7d53eaf47124fda9bee9423390a28c203556a2e55) // mainnet
         digest := keccak256(0, 64)
       }
+    } else if (_signNonTyped(encodedSwap)) {
+      digest = keccak256(abi.encodePacked(
+        bytes28(0x19457468657265756d205369676e6564204d6573736167653a0a3332), // HEX of "\x19Ethereum Signed Message:\n32"
+        keccak256(abi.encodePacked(encodedSwap, recipient))
+      ));
     } else {
       bytes32 typehash = RELEASE_TYPE_HASH;
       assembly {
