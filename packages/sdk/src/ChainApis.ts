@@ -50,7 +50,7 @@ export class EthersChainApis implements AbstractChainApis {
   }
 
   async getBlock(blockHash: string) {
-    return await this.#provider.send('eth_getBlockByHash', [blockHash])
+    return await this.#provider.send('eth_getBlockByHash', [blockHash, false])
   }
 
   async getTransaction(hash: string) {
