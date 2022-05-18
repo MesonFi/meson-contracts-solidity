@@ -15,7 +15,7 @@ import { AbstractChainApis, EthersChainApis, Receipt } from './ChainApis'
 import { Swap } from './Swap'
 import { SwapWithSigner } from './SwapWithSigner'
 import { SwapSigner } from './SwapSigner'
-import { SignedSwapRequest, SignedSwapRelease } from './SignedSwap'
+import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwap'
 import { timer } from './utils'
 
 export enum PostedSwapStatus {
@@ -201,7 +201,7 @@ export class MesonClient {
     return this.mesonInstance.deposit(amount, balanceIndex)
   }
 
-  async postSwap(signedRequest: SignedSwapRequest) {
+  async postSwap(signedRequest: SignedSwapRequestData) {
     const providerAddress = await this.getSigner()
     const providerIndex = await this.mesonInstance.indexOfAddress(providerAddress)
     if (!providerIndex) {
@@ -225,15 +225,15 @@ export class MesonClient {
     return this.mesonInstance.bondSwap(encoded, providerIndex)
   }
 
-  async lock(signedRequest: SignedSwapRequest) {
+  async lock(signedRequest: SignedSwapRequestData) {
     return this.mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
   }
 
-  async unlock(signedRequest: SignedSwapRequest) {
+  async unlock(signedRequest: SignedSwapRequestData) {
     return this.mesonInstance.unlock(signedRequest.encoded, signedRequest.initiator)
   }
 
-  async release(signedRelease: SignedSwapRelease) {
+  async release(signedRelease: SignedSwapReleaseData) {
     const { encoded, signature, initiator } = signedRelease
     let recipient = signedRelease.recipient
     if (encoded.substring(54, 58) === '00c3') {
@@ -242,7 +242,7 @@ export class MesonClient {
     return this.mesonInstance.release(encoded, ...signature, initiator, recipient)
   }
 
-  async executeSwap(signedRelease: SignedSwapRelease, depositToPool: boolean = false) {
+  async executeSwap(signedRelease: SignedSwapReleaseData, depositToPool: boolean = false) {
     const { encoded, signature } = signedRelease
     let recipient = signedRelease.recipient
     if (encoded.substring(54, 58) === '00c3') {
