@@ -81,17 +81,16 @@ export class MesonPresets {
   getTokensForNetwork(id: string): PresetToken[] {
     const networks = this.getAllNetworks()
     const match = networks.find(item => item.id === id)
-    const tokens = [...match?.tokens]
-    if (match?.mesonToken) {
-      tokens.push({
-        addr: match.mesonToken,
-        name: 'Meson Token',
-        symbol: 'MSN',
-        decimals: 4,
-        tokenIndex: 255,
-      })
+    if (!match) {
+      return []
     }
-    return tokens
+    return [...match.tokens, {
+      addr: match.mesonToken,
+      name: 'Meson Token',
+      symbol: 'MSN',
+      decimals: 4,
+      tokenIndex: 255,
+    }]
   }
 
   getToken(networkId: string, tokenIndex: number): PresetToken {
