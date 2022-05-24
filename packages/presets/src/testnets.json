@@ -292,9 +292,9 @@
     ]
   },
   {
-    "id": "arbitrum-testnet",
+    "id": "arb-testnet",
     "name": "Arbitrum Testnet",
-    "alias": "arbi",
+    "alias": "ARB",
     "chainId": "0x66eeb",
     "slip44": "0x80002329",
     "shortSlip44": "0x2329",
@@ -329,9 +329,9 @@
     ]
   },
   {
-    "id": "optimistic-testnet",
+    "id": "opt-testnet",
     "name": "Optimistic Ethereum (Kovan)",
-    "alias": "Opt",
+    "alias": "OPT",
     "chainId": "0x45",
     "slip44": "0x80000266",
     "shortSlip44": "0x0266",

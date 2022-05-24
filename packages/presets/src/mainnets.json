@@ -99,36 +99,6 @@
     ]
   },
   {
-    "id": "avax",
-    "name": "Avalanche",
-    "alias": "AVA",
-    "chainId": "0xa86a",
-    "slip44": "0x80002328",
-    "shortSlip44": "0x2328",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "hex",
-    "url": "https://api.avax.network/ext/bc/C/rpc",
-    "explorer": "https://snowtrace.io",
-    "nativeCurrency": {
-      "name": "Avalanche",
-      "symbol": "AVAX",
-      "decimals": 18
-    },
-    "mesonAddress": "0x40DbB93F63D69a5Da840F7092988317Cb4C55399",
-    "tokens": [
-      {
-        "name": "USDC.e",
-        "symbol": "USDC.e",
-        "decimals": 6,
-        "addr": "0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664",
-        "tokenIndex": 1
-      }
-    ]
-  },
-  {
     "id": "polygon",
     "name": "Polygon",
     "alias": "MATIC",
@@ -154,6 +124,36 @@
         "symbol": "USDC",
         "decimals": 6,
         "addr": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+        "tokenIndex": 1
+      }
+    ]
+  },
+  {
+    "id": "avax",
+    "name": "Avalanche",
+    "alias": "AVA",
+    "chainId": "0xa86a",
+    "slip44": "0x80002328",
+    "shortSlip44": "0x2328",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://api.avax.network/ext/bc/C/rpc",
+    "explorer": "https://snowtrace.io",
+    "nativeCurrency": {
+      "name": "Avalanche",
+      "symbol": "AVAX",
+      "decimals": 18
+    },
+    "mesonAddress": "0x40DbB93F63D69a5Da840F7092988317Cb4C55399",
+    "tokens": [
+      {
+        "name": "USDC.e",
+        "symbol": "USDC.e",
+        "decimals": 6,
+        "addr": "0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664",
         "tokenIndex": 1
       }
     ]
@@ -223,6 +223,99 @@
         "decimals": 6,
         "addr": "0xB12BFcA5A55806AaF64E99521918A4bf0fC40802",
         "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "arb",
+    "name": "Arbitrum",
+    "alias": "ARB",
+    "chainId": "0xa4b1",
+    "slip44": "0x80002329",
+    "shortSlip44": "0x2329",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://arb1.arbitrum.io/rpc",
+    "explorer": "https://arbiscan.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0xF7c86A5E1323E6EFB954B2e65ebba9c300c40f38",
+    "mesonToken": "",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
+        "tokenIndex": 1
+      }
+    ]
+  },
+  {
+    "id": "opt",
+    "name": "Optimism",
+    "alias": "OPT",
+    "chainId": "0xa",
+    "slip44": "0x80000266",
+    "shortSlip44": "0x0266",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://mainnet.optimism.io",
+    "explorer": "https://optimistic.etherscan.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0xF7c86A5E1323E6EFB954B2e65ebba9c300c40f38",
+    "mesonToken": "",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+        "tokenIndex": 1
+      }
+    ]
+  },
+  {
+    "id": "one",
+    "name": "Harmony",
+    "alias": "ONE",
+    "chainId": "0x63564c40",
+    "slip44": "0x800003ff",
+    "shortSlip44": "0x03ff",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://api.harmony.one",
+    "explorer": "https://explorer.harmony.one",
+    "nativeCurrency": {
+      "name": "ONE",
+      "symbol": "ONE",
+      "decimals": 18
+    },
+    "mesonAddress": "0xF7c86A5E1323E6EFB954B2e65ebba9c300c40f38",
+    "mesonToken": "",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x985458E523dB3d53125813eD68c274899e9DfAb4",
+        "tokenIndex": 1
       }
     ]
   },
