@@ -127,6 +127,9 @@ export class MesonPresets {
     if (!match) {
       return []
     }
+    if (!match.mesonToken) {
+      return match.tokens
+    }
     return [...match.tokens, {
       addr: match.mesonToken,
       name: 'Meson Token',
@@ -168,7 +171,7 @@ export class MesonPresets {
     if (!this._cache.get(id)) {
       let provider
       const providerNetwork = { name: network.name, chainId: Number(network.chainId) }
-      
+
       if (id.startsWith('tron')) {
         provider = new TronWeb({ fullHost: url })
       } else if (quorum) {
