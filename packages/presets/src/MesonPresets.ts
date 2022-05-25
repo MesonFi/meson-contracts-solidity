@@ -1,6 +1,11 @@
-import type { Provider } from '@ethersproject/providers'
 import type { Signer } from '@ethersproject/abstract-signer'
-import { StaticJsonRpcProvider, WebSocketProvider } from '@ethersproject/providers'
+import {
+  StaticJsonRpcProvider,
+  WebSocketProvider,
+  FallbackProvider,
+  type Provider
+} from '@ethersproject/providers'
+import { ErrorCode } from '@ethersproject/logger'
 import { Contract } from '@ethersproject/contracts'
 
 import TronWeb from 'tronweb'
@@ -17,6 +22,44 @@ import { Meson } from '@mesonfi/contract-abis'
 
 import testnets from './testnets.json'
 import mainnets from './mainnets.json'
+
+class RpcFallbackProvider extends FallbackProvider {
+  async send(method, params) {
+    for await (const c of this.providerConfigs) {
+      try {
+        return await (c.provider as StaticJsonRpcProvider).send(method, params)
+      } catch (e) {
+      }
+    }
+    throw new Error('Send rpc call failed for all providers')
+  }
+}
+
+class FailsafeStaticJsonRpcProvider extends StaticJsonRpcProvider {
+  async perform (method, params) {
+    try {
+      return await super.perform(method, params)
+    } catch (e) {
+      if (e.code === ErrorCode.CALL_EXCEPTION) {
+        e.code = ErrorCode.SERVER_ERROR
+      }
+      throw e
+    }
+  }
+}
+
+class FailsafeWebSocketProvider extends WebSocketProvider {
+  async perform (method, params) {
+    try {
+      return await super.perform(method, params)
+    } catch (e) {
+      if (e.code === ErrorCode.CALL_EXCEPTION) {
+        e.code = ErrorCode.SERVER_ERROR
+      }
+      throw e
+    }
+  }
+}
 
 export interface PresetToken {
   addr: string
@@ -117,7 +160,7 @@ export class MesonPresets {
     return this._cache.get(id)
   }
 
-  clientFromUrl({ id, url = '', ws = null }): MesonClient {
+  clientFromUrl({ id, url = '', ws = null, quorum }): MesonClient {
     const network = this.getNetwork(id)
     if (!network) {
       throw new Error(`Unsupported network: ${id}`)
@@ -128,6 +171,14 @@ export class MesonPresets {
       
       if (id.startsWith('tron')) {
         provider = new TronWeb({ fullHost: url })
+      } else if (quorum) {
+        const fallbacks = quorum.list.map(({ url, ws, priority, stallTimeout, weight }) => {
+          const provider = ws
+            ? new FailsafeWebSocketProvider(ws, providerNetwork)
+            : new FailsafeStaticJsonRpcProvider(url, providerNetwork)
+          return { provider, priority, stallTimeout, weight}
+        })
+        provider = new RpcFallbackProvider(fallbacks, quorum.threshold)
       } else if (ws) {
         provider = new WebSocketProvider(ws, providerNetwork)
       } else if (url.startsWith('ws')) {
