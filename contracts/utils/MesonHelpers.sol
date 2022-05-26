@@ -151,16 +151,20 @@ contract MesonHelpers is MesonConfig {
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
 
+    bool nonTyped = _signNonTyped(encodedSwap);
+
     if (_inChainFrom(encodedSwap) == 0x00c3) {
       bytes32 digest = keccak256(abi.encodePacked(
-        bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33320a), // HEX of "\x19TRON Signed Message:\n32\n"
+        nonTyped
+          ? bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33330a)  // HEX of "\x19TRON Signed Message:\n33\n"
+          : bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33320a), // HEX of "\x19TRON Signed Message:\n32\n"
         encodedSwap
       ));
       require(signer == ecrecover(digest, v, r, s), "Invalid signature");
       return;
     }
 
-    if (_signNonTyped(encodedSwap)) {
+    if (nonTyped) {
       bytes32 digest = keccak256(abi.encodePacked(
         bytes28(0x19457468657265756d205369676e6564204d6573736167653a0a3332), // HEX of "\x19Ethereum Signed Message:\n32"
         encodedSwap
@@ -190,9 +194,13 @@ contract MesonHelpers is MesonConfig {
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
 
+    bool nonTyped = _signNonTyped(encodedSwap);
+
     if (_inChainFrom(encodedSwap) == 0x00c3) {
       bytes32 digest = keccak256(abi.encodePacked(
-        bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33320a), // HEX of "\x19TRON Signed Message:\n32\n"
+        nonTyped
+          ? bytes25(0x1954524f4e205369676e6564204d6573736167653a0a35330a)  // HEX of "\x19TRON Signed Message:\n53\n"
+          : bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33320a), // HEX of "\x19TRON Signed Message:\n32\n"
         encodedSwap,
         recipient
       ));
@@ -211,7 +219,7 @@ contract MesonHelpers is MesonConfig {
         mstore(0, 0xf6ea10de668a877958d46ed7d53eaf47124fda9bee9423390a28c203556a2e55) // mainnet
         digest := keccak256(0, 64)
       }
-    } else if (_signNonTyped(encodedSwap)) {
+    } else if (nonTyped) {
       digest = keccak256(abi.encodePacked(
         bytes28(0x19457468657265756d205369676e6564204d6573736167653a0a3332), // HEX of "\x19Ethereum Signed Message:\n32"
         keccak256(abi.encodePacked(encodedSwap, recipient))

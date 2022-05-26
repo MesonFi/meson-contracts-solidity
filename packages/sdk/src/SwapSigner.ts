@@ -37,7 +37,9 @@ export class SwapSigner {
   static hashRequest(encoded: string, testnet?: boolean): string {
     if (encoded.substring(60, 64) === '00c3') {
       // for Tron
-      const header = '\x19TRON Signed Message:\n32\n'
+      const header = encoded.substring(14, 16) === 'ff'
+        ? '\x19TRON Signed Message:\n33\n'
+        : '\x19TRON Signed Message:\n32\n'
       return keccak256(pack(['string', 'bytes32'], [header, encoded]))
     }
     if (encoded.substring(14, 16) === 'ff') {
@@ -74,7 +76,9 @@ export class SwapSigner {
   static hashRelease(encoded: string, recipient: string, testnet?: boolean): string {
     if (encoded.substring(60, 64) === '00c3') {
       // for Tron
-      const header = '\x19TRON Signed Message:\n32\n'
+      const header = encoded.substring(14, 16) === 'ff'
+        ? '\x19TRON Signed Message:\n53\n'
+        : '\x19TRON Signed Message:\n32\n'
       return keccak256(pack(['string', 'bytes32', 'address'], [header, encoded, recipient]))
     }
     if (encoded.substring(14, 16) === 'ff') {
