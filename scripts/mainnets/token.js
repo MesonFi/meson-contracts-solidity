@@ -30,14 +30,27 @@ async function upgrade() {
   await upgrades.upgradeProxy(network.mesonToken, MesonTokenUpgradeable)
 }
 
-async function mint() {
-  const amount = '1000'
-
+async function mint(targets, amount) {
   ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
   const wallet = new ethers.Wallet(MINTER_PK, ethers.provider)
 
   const mesonToken = new ethers.Contract(network.mesonToken, MesonToken.abi, wallet)
-  await mesonToken.batchMint(['0x243f22fbd4C375581aaACFCfff5A43793eb8A74d'], ethers.utils.parseUnits(amount, 4))
+  const tx = await mesonToken.batchMint(targets, ethers.utils.parseUnits(amount, 4))
+  await tx.wait()
 }
 
-mint()
+async function batchMint(amount) {
+  for (i = 0; i < 1500; i += 500) {
+    const parts = targets.slice(i, i + 500)
+    if (!parts.length) {
+      return
+    }
+    console.log(`minting to ${i}-${i + 500}`)
+    await mint(parts, amount)
+    console.log(`minted`)
+  }
+}
+
+// const list = require('./list.json')
+// const targets = list.filter(addr => ethers.utils.isAddress(addr))
+mint([], '100')
