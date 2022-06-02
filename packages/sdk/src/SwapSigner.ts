@@ -82,9 +82,15 @@ export class SwapSigner {
       return keccak256(pack(['string', 'bytes32', 'address'], [header, encoded, recipient]))
     }
     if (encoded.substring(14, 16) === 'ff') {
+      let hash
+      if (encoded.substring(54, 58) === '00c3') {
+        const hexRecipient = TronWeb.address.toHex(recipient).substring(2)
+        hash = keccak256(pack(['bytes32', 'address'], [encoded, `0x${hexRecipient}`]))
+      } else {
+        hash = keccak256(pack(['bytes32', 'address'], [encoded, recipient]))
+      }
       // for Ethereum eth_sign
       const header = '\x19Ethereum Signed Message:\n32'
-      const hash = keccak256(pack(['bytes32', 'address'], [encoded, recipient]))
       return keccak256(pack(['string', 'bytes32'], [header, hash]))
     }
     const typeHash = SwapSigner.getReleaseTypeHash(encoded, testnet)
@@ -159,7 +165,13 @@ export class RemoteSwapSigner extends SwapSigner {
       return this._separateSignature(signature)
     }
     if (encoded.substring(14, 16) === 'ff') {
-      const hash = keccak256(pack(['bytes32', 'address'], [encoded, recipient]))
+      let hash
+      if (encoded.substring(54, 58) === '00c3') {
+        const hexRecipient = TronWeb.address.toHex(recipient).substring(2)
+        hash = keccak256(pack(['bytes32', 'address'], [encoded, `0x${hexRecipient}`]))
+      } else {
+        hash = keccak256(pack(['bytes32', 'address'], [encoded, recipient]))
+      }
       const signature = await this.remoteSigner.signMessage(hash)
       return this._separateSignature(signature)
     }

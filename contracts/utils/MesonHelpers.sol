@@ -209,7 +209,12 @@ contract MesonHelpers is MesonConfig {
     }
 
     bytes32 digest;
-    if (_outChainFrom(encodedSwap) == 0x00c3) {
+    if (nonTyped) {
+      digest = keccak256(abi.encodePacked(
+        bytes28(0x19457468657265756d205369676e6564204d6573736167653a0a3332), // HEX of "\x19Ethereum Signed Message:\n32"
+        keccak256(abi.encodePacked(encodedSwap, recipient))
+      ));
+    } else if (_outChainFrom(encodedSwap) == 0x00c3) {
       assembly {
         mstore(21, recipient)
         mstore8(32, 0x41)
@@ -219,11 +224,6 @@ contract MesonHelpers is MesonConfig {
         mstore(0, 0xf6ea10de668a877958d46ed7d53eaf47124fda9bee9423390a28c203556a2e55) // mainnet
         digest := keccak256(0, 64)
       }
-    } else if (nonTyped) {
-      digest = keccak256(abi.encodePacked(
-        bytes28(0x19457468657265756d205369676e6564204d6573736167653a0a3332), // HEX of "\x19Ethereum Signed Message:\n32"
-        keccak256(abi.encodePacked(encodedSwap, recipient))
-      ));
     } else {
       bytes32 typehash = RELEASE_TYPE_HASH;
       assembly {
