@@ -28,8 +28,8 @@ export type Receipt = {
 
 export interface AbstractChainApis {
   getLatestBlock(): Promise<Block>
-  getBlockTransactions(blockHash: string): Promise<Block>
-  getBlock(blockHash: string): Promise<Block>
+  getBlockTransactions(blockHashOrNumber: string | number): Promise<Block>
+  getBlock(blockHashOrNumber: string | number): Promise<Block>
   getTransaction(hash: string): Promise<Transaction>
   getReceipt(hash: string): Promise<Receipt>
 }
@@ -45,12 +45,20 @@ export class EthersChainApis implements AbstractChainApis {
     return await this.#provider.send('eth_getBlockByNumber', ['latest', true])
   }
 
-  async getBlockTransactions(blockHash: string) {
-    return await this.#provider.send('eth_getBlockByHash', [blockHash, true])
+  async getBlockTransactions(blockHashOrNumber: string | number) {
+    if (typeof blockHashOrNumber === 'string') {
+      return await this.#provider.send('eth_getBlockByHash', [blockHashOrNumber, true])
+    } else {
+      return await this.#provider.send('eth_getBlockByNumber', [blockHashOrNumber, true])
+    }
   }
 
-  async getBlock(blockHash: string) {
-    return await this.#provider.send('eth_getBlockByHash', [blockHash, false])
+  async getBlock(blockHashOrNumber: string | number) {
+    if (typeof blockHashOrNumber === 'string') {
+      return await this.#provider.send('eth_getBlockByHash', [blockHashOrNumber, false])
+    } else {
+      return await this.#provider.send('eth_getBlockByNumber', [blockHashOrNumber, false])
+    }
   }
 
   async getTransaction(hash: string) {
@@ -116,14 +124,18 @@ export class TronChainApis implements AbstractChainApis {
     return this.formatBlock(block)
   }
 
-  async getBlockTransactions(blockHash: string) {
-    const block = await this.#tronWeb.trx.getBlockByHash(blockHash)
-    return this.formatBlock(block)
+  async getBlockTransactions(blockHashOrNumber: string | number) {
+    if (typeof blockHashOrNumber === 'string') {
+      const block = await this.#tronWeb.trx.getBlockByHash(blockHashOrNumber)
+      return this.formatBlock(block)
+    }
   }
 
-  async getBlock(blockHash: string) {
-    const block = await this.#tronWeb.trx.getBlockByHash(blockHash)
-    return this.formatBlock(block)
+  async getBlock(blockHashOrNumber: string | number) {
+    if (typeof blockHashOrNumber === 'string') {
+      const block = await this.#tronWeb.trx.getBlockByHash(blockHashOrNumber)
+      return this.formatBlock(block)
+    }
   }
 
   async getTransaction(hash: string) {
