@@ -144,6 +144,8 @@ export class MesonPresets {
         decimals: 4,
         tokenIndex: 255,
       }]
+    } else {
+      return match.tokens
     }
   }
 
