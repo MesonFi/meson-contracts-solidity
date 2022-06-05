@@ -1,6 +1,6 @@
 const { ethers, upgrades } = require('hardhat')
 const CustomGasFeeProviderWrapper = require('./CustomGasFeeProviderWrapper')
-const MesonToken = require('../../artifacts/contracts/Token/MesonTokenUpgradeable.sol/MesonTokenUpgradeable.json')
+const UCTUpgradeable = require('../../artifacts/contracts/Token/UCTUpgradeable.sol/UCTUpgradeable.json')
 
 require('dotenv').config()
 
@@ -14,28 +14,28 @@ async function deploy() {
   ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
   const wallet = new ethers.Wallet(PRIVATE_KEY, ethers.provider)
 
-  const MesonTokenUpgradeable = await ethers.getContractFactory('MesonTokenUpgradeable', wallet)
-  console.log('Deploying MesonTokenUpgradeable...')
-  const mesonToken = await upgrades.deployProxy(MesonTokenUpgradeable, [MINTER], { kind: 'uups' })
-  await mesonToken.deployed()
-  console.log('UpgradableMeson deployed to:', mesonToken.address)
+  const UCT = await ethers.getContractFactory('UCTUpgradeable', wallet)
+  console.log('Deploying UCT...')
+  const uct = await upgrades.deployProxy(UCT, [MINTER], { kind: 'uups' })
+  await uct.deployed()
+  console.log('UCT deployed to:', uct.address)
 }
 
 async function upgrade() {
   ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
   const wallet = new ethers.Wallet(PRIVATE_KEY, ethers.provider)
 
-  const MesonTokenUpgradeable = await ethers.getContractFactory('MesonTokenUpgradeable', wallet)
-  console.log('Upgrading MesonTokenUpgradeable...')
-  await upgrades.upgradeProxy(network.mesonToken, MesonTokenUpgradeable)
+  const UCT = await ethers.getContractFactory('UCTUpgradeable', wallet)
+  console.log('Upgrading UCT...')
+  await upgrades.upgradeProxy(network.uctAddress, UCT)
 }
 
 async function mint(targets, amount) {
   ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
   const wallet = new ethers.Wallet(MINTER_PK, ethers.provider)
 
-  const mesonToken = new ethers.Contract(network.mesonToken, MesonToken.abi, wallet)
-  const tx = await mesonToken.batchMint(targets, ethers.utils.parseUnits(amount, 4))
+  const uct = new ethers.Contract(network.uctAddress, UCTUpgradeable.abi, wallet)
+  const tx = await uct.batchMint(targets, ethers.utils.parseUnits(amount, 4))
   await tx.wait()
 }
 

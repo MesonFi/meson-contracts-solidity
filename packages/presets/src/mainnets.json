@@ -149,7 +149,7 @@
       "decimals": 18
     },
     "mesonAddress": "0xF7c86A5E1323E6EFB954B2e65ebba9c300c40f38",
-    "mesonToken": "",
+    "uctAddress": "0xC9f76f581DE205A9E4aE25D127CA4344aC4A8Bf4",
     "tokens": [
       {
         "name": "USDC",
@@ -180,7 +180,6 @@
       "decimals": 18
     },
     "mesonAddress": "0xF7c86A5E1323E6EFB954B2e65ebba9c300c40f38",
-    "mesonToken": "",
     "tokens": [
       {
         "name": "USDC",
@@ -377,7 +376,6 @@
       "decimals": 18
     },
     "mesonAddress": "0xF7c86A5E1323E6EFB954B2e65ebba9c300c40f38",
-    "mesonToken": "",
     "tokens": [
       {
         "name": "USDC",
@@ -408,7 +406,6 @@
       "decimals": 18
     },
     "mesonAddress": "0xF7c86A5E1323E6EFB954B2e65ebba9c300c40f38",
-    "mesonToken": "",
     "tokens": [
       {
         "name": "USDC",

@@ -4,13 +4,13 @@ pragma solidity 0.8.6;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 
-contract MesonTokenUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
+contract UCTUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
   address private _owner;
   address private _minter;
   address private _mesonContract;
 
   function initialize(address minter) public initializer {
-    __ERC20_init("Meson Token", "MSN");
+    __ERC20_init("USD Coupon Token", "UCT");
     _owner = _msgSender();
     _minter = minter;
     _mesonContract = ;
