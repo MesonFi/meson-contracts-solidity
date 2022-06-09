@@ -95,6 +95,13 @@
         "decimals": 6,
         "addr": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
         "tokenIndex": 1
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+        "tokenIndex": 2
       }
     ]
   },
@@ -157,6 +164,13 @@
         "decimals": 6,
         "addr": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
         "tokenIndex": 1
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+        "tokenIndex": 2
       }
     ]
   },
@@ -187,6 +201,13 @@
         "decimals": 6,
         "addr": "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
         "tokenIndex": 1
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
+        "tokenIndex": 2
       }
     ]
   },
@@ -293,6 +314,13 @@
         "decimals": 6,
         "addr": "0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664",
         "tokenIndex": 1
+      },
+      {
+        "name": "USDT.e",
+        "symbol": "USDT.e",
+        "decimals": 6,
+        "addr": "0xc7198437980c041c805a1edcba50c1ce5db95118",
+        "tokenIndex": 2
       }
     ]
   },
