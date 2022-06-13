@@ -450,5 +450,35 @@
         "tokenIndex": 1
       }
     ]
+  },
+  {
+    "id": "beam",
+    "name": "Moonbeam",
+    "alias": "GLMR",
+    "chainId": "0x504",
+    "slip44": "0x80000504",
+    "shortSlip44": "0x0504",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://rpc.api.moonbeam.network",
+    "explorer": "https://moonbeam.moonscan.io",
+    "nativeCurrency": {
+      "name": "GLMR",
+      "symbol": "GLMR",
+      "decimals": 18
+    },
+    "mesonAddress": "0x18Fb44c778dBC53F706BF12D9fC40A07E93b7015",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x8f552a71EFE5eeFc207Bf75485b356A0b3f01eC9",
+        "tokenIndex": 1
+      }
+    ]
   }
 ]
