@@ -10,7 +10,7 @@ module.exports = class CustomGasFeeProviderWrapper extends EthersProviderWrapper
 
     // For ftm
     // result.maxFeePerGas = null
-    // result.maxPriorityFeePerGas = null
+    // result.maxPriorityFeePerGas = null // ethers.BigNumber.from(10_000_000_000)
     // result.gasPrice = ethers.BigNumber.from(300_000_000_000)
     console.log(result)
     return result
