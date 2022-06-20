@@ -9,7 +9,7 @@
   "scripts": {
     "build": "hardhat compile --config hardhat.config.ts",
     "build:packages": "yarn workspace @mesonfi/sdk build && yarn workspace @mesonfi/presets build",
-    "build:types": "TESTNET_MODE=true yarn chain:eth && yarn cleanbuild ",
+    "build:types": "TESTNET_MODE=true yarn chain:eth && yarn cleanbuild",
     "postbuild": "cp artifacts/contracts/Meson.sol/Meson.json packages/contract-abis/abis/Meson.json && cp artifacts/contracts/test/MockToken.sol/MockToken.json packages/contract-abis/abis/ERC20.json",
     "cleanbuild": "hardhat clean && yarn build",
     "docgen": "solidity-docgen --solc-module solc -t ./templates",

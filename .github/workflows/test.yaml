@@ -20,5 +20,5 @@ jobs:
       - name: Build packages
         run: yarn run build:packages
       - name: Check generated abis/types
-        run: build:types && git diff --exit-code
+        run: yarn build:types && git diff --exit-code
       - run: yarn test
