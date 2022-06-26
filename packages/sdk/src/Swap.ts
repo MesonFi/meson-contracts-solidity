@@ -1,5 +1,5 @@
 import { pack } from '@ethersproject/solidity'
-import { hexZeroPad } from '@ethersproject/bytes'
+import { hexZeroPad, isHexString } from '@ethersproject/bytes'
 import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 
 const swapStruct = [
@@ -23,7 +23,6 @@ export interface SwapData {
   inToken: number,
   outChain: string,
   outToken: number,
-  signNonTyped?: boolean,
 }
 
 export class Swap implements SwapData {
@@ -85,7 +84,7 @@ export class Swap implements SwapData {
       throw new Error('Invalid outToken')
     }
 
-    this.salt = data.salt || this._newRandomSalt(data.signNonTyped)
+    this.salt = this._makeFullSalt(data.salt)
     this.expireTs = data.expireTs
     this.inChain = data.inChain
     this.inToken = data.inToken
@@ -93,13 +92,24 @@ export class Swap implements SwapData {
     this.outToken = data.outToken
   }
 
-  private _newRandomSalt(signNonTyped: boolean): string {
-    const rnd = BigNumber.from(Math.floor(Math.random() * 4294967296))
-    let salt = hexZeroPad(rnd.toHexString(), 10)
-    if (signNonTyped) {
-      salt = salt.replace('0x00', '0xff')
+  private _makeFullSalt(salt?: string): string {
+    if (salt) {
+      if (!isHexString(salt) || salt.length > 22) {
+        throw new Error('The given salt is invalid')
+      }
+      return `${salt}${this._randomHex(22 - salt.length)}`
     }
-    return salt
+
+    return `0x0000${this._randomHex(16)}`
+  }
+
+  private _randomHex(strLength: number) {
+    if (strLength === 0) {
+      return ''
+    }
+    const max = 2 ** Math.min((strLength * 4), 32)
+    const rnd = BigNumber.from(Math.floor(Math.random() * max))
+    return hexZeroPad(rnd.toHexString(), strLength / 2).replace('0x', '')
   }
 
   get encoded(): string {
@@ -109,10 +119,6 @@ export class Swap implements SwapData {
       this._encoded = pack(types, values)
     }
     return this._encoded
-  }
-
-  get signNonTyped(): boolean {
-    return this.salt.startsWith('0xff')
   }
 
   toObject(): SwapData {
