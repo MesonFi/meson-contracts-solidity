@@ -106,9 +106,9 @@ export class MesonClient {
   async _getSupportedTokens() {
     const tokens = await this.mesonInstance.supportedTokens()
     this._tokens = tokens.map((addr, index) => ({ tokenIndex: index + 1, addr: addr.toLowerCase() }))
-    const mesonToken = await this.mesonInstance.tokenForIndex(255)
-    if (mesonToken !== AddressZero) {
-      this._tokens.push({ tokenIndex: 255, addr: mesonToken.toLowerCase() })
+    const uctAddress = await this.mesonInstance.tokenForIndex(255)
+    if (uctAddress !== AddressZero) {
+      this._tokens.push({ tokenIndex: 255, addr: uctAddress.toLowerCase() })
     }
   }
 

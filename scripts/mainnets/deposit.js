@@ -18,7 +18,7 @@ const wallet = new ethers.Wallet(LP_PRIVATE_KEY, ethers.provider)
 main()
 
 async function main() {
-  const tokenAddr = tokenIndex === 255 ? network.mesonToken : network.tokens.find(t => t.tokenIndex === tokenIndex).addr
+  const tokenAddr = tokenIndex === 255 ? network.uctAddress : network.tokens.find(t => t.tokenIndex === tokenIndex).addr
   const token = new ethers.Contract(tokenAddr, ERC20.abi, wallet)
   const meson = new ethers.Contract(network.mesonAddress, Meson.abi, wallet)
 

@@ -125,7 +125,6 @@
       "decimals": 18
     },
     "mesonAddress": "0xd53e9530107a8d8856099d7d80126478d48e06dA",
-    "mesonToken": "0xee7fa5Bf82EdAB83dE8A184399360c4E6148A23e",
     "tokens": [
       {
         "name": "USD Coin",
@@ -231,7 +230,6 @@
       "decimals": 18
     },
     "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
-    "mesonToken": "0x441ac25d296b1b679d2F35aa07f8B53119b0aBAe",
     "tokens": [
       {
         "name": "Tether USD",
@@ -269,7 +267,6 @@
       "decimals": 18
     },
     "mesonAddress": "0xFD2236a956BEa85Ba619789Aaf72C789853d49C7",
-    "mesonToken": "0xF24B060bdF1cc97Ce104971553fb81A186e79Ee6",
     "tokens": [
       {
         "name": "Tether USD",

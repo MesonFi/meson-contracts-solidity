@@ -80,7 +80,6 @@ export interface PresetNetwork {
   url?: string
   explorer?: string
   mesonAddress: string
-  mesonToken?: string
   uctAddress?: string
   nativeCurrency?: {
     name?: string
@@ -128,25 +127,13 @@ export class MesonPresets {
     if (!match) {
       return []
     }
-    if (match.mesonToken) {
-      return [...match.tokens, {
-        addr: match.mesonToken,
-        name: 'Meson Token',
-        symbol: 'MSN',
-        decimals: 4,
-        tokenIndex: 255,
-      }]
-    } else if (match.uctAddress) {
-      return [...match.tokens, {
-        addr: match.uctAddress,
-        name: 'USD Coupon Token',
-        symbol: 'UCT',
-        decimals: 4,
-        tokenIndex: 255,
-      }]
-    } else {
-      return match.tokens
-    }
+    return [...match.tokens, {
+      addr: match.uctAddress,
+      name: 'USD Coupon Token',
+      symbol: 'UCT',
+      decimals: 4,
+      tokenIndex: 255,
+    }]
   }
 
   getToken(networkId: string, tokenIndex: number): PresetToken {
