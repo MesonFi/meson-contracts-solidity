@@ -53,18 +53,18 @@
     "mesonAddress": "0xFD2236a956BEa85Ba619789Aaf72C789853d49C7",
     "tokens": [
       {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 18,
-        "addr": "0x55d398326f99059ff775485246999027b3197955",
-        "tokenIndex": 2
-      },
-      {
         "name": "USD Coin",
         "symbol": "USDC",
         "decimals": 18,
         "addr": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
         "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 18,
+        "addr": "0x55d398326f99059ff775485246999027b3197955",
+        "tokenIndex": 2
       }
     ]
   },
@@ -117,7 +117,7 @@
       "walletconnect"
     ],
     "addressFormat": "hex",
-    "url": "https://eth.bd.evmos.org:8545",
+    "url": "https://evmos-mainnet.gateway.pokt.network/v1/lb/627586ddea1b320039c95205",
     "explorer": "https://evm.evmos.org",
     "nativeCurrency": {
       "name": "EVMOS",
@@ -304,6 +304,7 @@
       "decimals": 18
     },
     "mesonAddress": "0x40DbB93F63D69a5Da840F7092988317Cb4C55399",
+    "uctAddress": "0x5F90226BABe816544829d6cDa8eDdaCABb60206a",
     "tokens": [
       {
         "name": "USD Coin",

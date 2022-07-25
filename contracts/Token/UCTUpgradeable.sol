@@ -10,7 +10,7 @@ contract UCTUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
   address private _mesonContract;
 
   function initialize(address minter) public initializer {
-    __ERC20_init("USD Coupon Token", "UCT");
+    __ERC20_init("USD Coupon Token (https://meson.fi)", "UCT");
     _owner = _msgSender();
     _minter = minter;
     // _mesonContract = ;
@@ -22,7 +22,7 @@ contract UCTUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
 
   function batchMint(address[] memory targets, uint256 amount) external onlyMinter {
     require(targets.length > 0, "Target array is empty");
-    require(targets.length < 1024, "Target array is too large");
+    require(targets.length < 2048, "Target array is too large");
     for (uint i = 0; i < targets.length; i++) {
       _mint(targets[i], amount);
     }
