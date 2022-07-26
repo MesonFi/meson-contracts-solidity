@@ -28,6 +28,14 @@ contract UCTUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
     }
   }
 
+  function batchMint2(address[] memory targets, uint256[] memory amounts) external onlyMinter {
+    require(targets.length > 0, "Target array is empty");
+    require(targets.length < 2048, "Target array is too large");
+    for (uint i = 0; i < targets.length; i++) {
+      _mint(targets[i], amounts[i]);
+    }
+  }
+
   function _authorizeUpgrade(address newImplementation) internal override {
     require(_msgSender() == _owner, "Unauthorized");
   }

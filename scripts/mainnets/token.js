@@ -39,6 +39,15 @@ async function mint(targets, amount) {
   await tx.wait()
 }
 
+async function mint2(targets, amounts) {
+  ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
+  const wallet = new ethers.Wallet(MINTER_PK, ethers.provider)
+
+  const uct = new ethers.Contract(network.uctAddress, UCTUpgradeable.abi, wallet)
+  const tx = await uct.batchMint2(targets, amounts)
+  await tx.wait()
+}
+
 async function batchMint(amount) {
   for (i = 0; i < 1500; i += 500) {
     const parts = targets.slice(i, i + 500)
@@ -51,6 +60,8 @@ async function batchMint(amount) {
   }
 }
 
-// const list = require('./list.json')
+// const core = require('./core.json')
+const list = require('./cashback.json')
 // const targets = list.filter(addr => ethers.utils.isAddress(addr))
 mint([], '100')
+// mint2(list.map(i => i.address), list.map(i => i.cashback))
