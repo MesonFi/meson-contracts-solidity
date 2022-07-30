@@ -59,7 +59,8 @@ async function deposit (meson, token) {
 async function withdraw (meson, token, recipient) {
   const decimals = await token.decimals()
   console.log(`withdrawing for ${amount}...`)
-  await (await meson.withdraw(ethers.utils.parseUnits(amount, 6), tokenIndex)).wait()
+  const gasLimit = await meson.estimateGas.withdraw(ethers.utils.parseUnits(amount, 6), tokenIndex)
+  await (await meson.withdraw(ethers.utils.parseUnits(amount, 6), tokenIndex, { gasLimit })).wait()
   if (recipient) {
     return await token.transfer(recipient, ethers.utils.parseUnits(amount, decimals))
   }

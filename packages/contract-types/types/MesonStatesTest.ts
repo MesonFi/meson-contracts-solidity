@@ -295,15 +295,15 @@ export interface MesonStatesTest extends BaseContract {
         string
       ] & {
         amount: BigNumber;
-        fee: BigNumber;
-        feeToMeson: BigNumber;
+        feeForLp: BigNumber;
+        baseFee: BigNumber;
         salt: BigNumber;
         expireTs: BigNumber;
         inChain: string;
         inTokenIndex: number;
         outChain: string;
         outTokenIndex: number;
-        balanceIndexForMeson: string;
+        balanceIndexForNoProvider: string;
         outTokenBalanceIndex: string;
       }
     >;
@@ -423,15 +423,15 @@ export interface MesonStatesTest extends BaseContract {
       string
     ] & {
       amount: BigNumber;
-      fee: BigNumber;
-      feeToMeson: BigNumber;
+      feeForLp: BigNumber;
+      baseFee: BigNumber;
       salt: BigNumber;
       expireTs: BigNumber;
       inChain: string;
       inTokenIndex: number;
       outChain: string;
       outTokenIndex: number;
-      balanceIndexForMeson: string;
+      balanceIndexForNoProvider: string;
       outTokenBalanceIndex: string;
     }
   >;
@@ -553,15 +553,15 @@ export interface MesonStatesTest extends BaseContract {
         string
       ] & {
         amount: BigNumber;
-        fee: BigNumber;
-        feeToMeson: BigNumber;
+        feeForLp: BigNumber;
+        baseFee: BigNumber;
         salt: BigNumber;
         expireTs: BigNumber;
         inChain: string;
         inTokenIndex: number;
         outChain: string;
         outTokenIndex: number;
-        balanceIndexForMeson: string;
+        balanceIndexForNoProvider: string;
         outTokenBalanceIndex: string;
       }
     >;

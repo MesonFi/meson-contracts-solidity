@@ -94,7 +94,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(until < _expireTsFrom(encodedSwap), "Cannot lock because expireTs is soon.");
 
     uint48 balanceIndex = _outTokenBalanceIndexFrom(encodedSwap, providerIndex);
-    _tokenBalanceOf[balanceIndex] -= _amountFrom(encodedSwap);
+    _tokenBalanceOf[balanceIndex] -= (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
     
     _lockedSwaps[swapId] = _lockedSwapFrom(until, providerIndex);
 
@@ -110,7 +110,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(_untilFromLocked(lockedSwap) < block.timestamp, "Swap still in lock");
 
     uint48 balanceIndex = _outTokenBalanceIndexFrom(encodedSwap, _providerIndexFromLocked(lockedSwap));
-    _tokenBalanceOf[balanceIndex] += _amountFrom(encodedSwap);
+    _tokenBalanceOf[balanceIndex] += (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
     _lockedSwaps[swapId] = 0;
   }
 
@@ -123,6 +123,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @param r Part of the release signature (same as in the `executeSwap` call)
   /// @param s Part of the release signature (same as in the `executeSwap` call)
   /// @param v Part of the release signature (same as in the `executeSwap` call)
+  /// @param initiator The initiator of the swap
   /// @param recipient The recipient address of the swap
   function release(
     uint256 encodedSwap,
@@ -132,6 +133,11 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     address initiator,
     address recipient
   ) external {
+    bool feeWaived = _feeWaived(encodedSwap);
+    if (feeWaived) {
+      _onlyPremiumManager();
+    }
+
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     uint80 lockedSwap = _lockedSwaps[swapId];
     require(lockedSwap != 0, "Swap does not exist");
@@ -141,10 +147,19 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _lockedSwaps[swapId] = 0;
 
     uint8 tokenIndex = _outTokenIndexFrom(encodedSwap);
-    _safeTransfer(_tokenList[tokenIndex], recipient, _amountFrom(encodedSwap), tokenIndex == 255);
+    uint256 releaseAmount = _amountFrom(encodedSwap) - _feeForLp(encodedSwap);
+    if (!feeWaived) {
+      uint256 baseFee = _baseFee(encodedSwap);
+      releaseAmount -= baseFee;
+      _tokenBalanceOf[_outTokenBalanceIndexFrom(encodedSwap, 0)] += baseFee; // base fee pool
+    }
+
+    _safeTransfer(_tokenList[tokenIndex], recipient, releaseAmount, tokenIndex == 255);
 
     emit SwapReleased(encodedSwap);
   }
+
+  function _onlyPremiumManager() internal view virtual {}
 
   /// @notice Read information for a locked swap
   function getLockedSwap(uint256 encodedSwap, address initiator) external view

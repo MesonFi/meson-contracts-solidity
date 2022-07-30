@@ -37,12 +37,12 @@ export class SwapSigner {
   static hashRequest(encoded: string, testnet?: boolean): string {
     if (encoded.substring(60, 64) === '00c3') {
       // for Tron
-      const header = encoded.substring(14, 16) === 'ff'
+      const header = parseInt(encoded[15], 16) >= 8
         ? '\x19TRON Signed Message:\n33\n'
         : '\x19TRON Signed Message:\n32\n'
       return keccak256(pack(['string', 'bytes32'], [header, encoded]))
     }
-    if (encoded.substring(14, 16) === 'ff') {
+    if (parseInt(encoded[15], 16) >= 8) {
       // for Ethereum eth_sign
       const header = '\x19Ethereum Signed Message:\n32'
       return keccak256(pack(['string', 'bytes32'], [header, encoded]))
@@ -76,12 +76,12 @@ export class SwapSigner {
   static hashRelease(encoded: string, recipient: string, testnet?: boolean): string {
     if (encoded.substring(60, 64) === '00c3') {
       // for Tron
-      const header = encoded.substring(14, 16) === 'ff'
+      const header = parseInt(encoded[15], 16) >= 8
         ? '\x19TRON Signed Message:\n53\n'
         : '\x19TRON Signed Message:\n32\n'
       return keccak256(pack(['string', 'bytes32', 'address'], [header, encoded, recipient]))
     }
-    if (encoded.substring(14, 16) === 'ff') {
+    if (parseInt(encoded[15], 16) >= 8) {
       let hash
       if (encoded.substring(54, 58) === '00c3') {
         const hexRecipient = TronWeb.address.toHex(recipient).substring(2)
@@ -148,7 +148,7 @@ export class RemoteSwapSigner extends SwapSigner {
       const signature = await this.remoteSigner.signMessage(encoded.replace('0x', '0x0a'))
       return this._separateSignature(signature)
     }
-    if (encoded.substring(14, 16) === 'ff') {
+    if (parseInt(encoded[15], 16) >= 8) {
       const signature = await this.remoteSigner.signMessage(encoded)
       return this._separateSignature(signature)
     }
@@ -164,7 +164,7 @@ export class RemoteSwapSigner extends SwapSigner {
       const signature = await this.remoteSigner.signMessage(message.replace('0x', '0x0a'))
       return this._separateSignature(signature)
     }
-    if (encoded.substring(14, 16) === 'ff') {
+    if (parseInt(encoded[15], 16) >= 8) {
       let hash
       if (encoded.substring(54, 58) === '00c3') {
         const hexRecipient = TronWeb.address.toHex(recipient).substring(2)

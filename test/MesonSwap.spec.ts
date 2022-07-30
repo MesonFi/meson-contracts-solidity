@@ -93,7 +93,7 @@ describe('MesonSwap', () => {
         .to.be.revertedWith('For security reason, amount cannot be greater than 100k')
     })
 
-    const amount = ethers.utils.parseUnits('1001', 6)
+    const amount = ethers.utils.parseUnits('1000', 6)
     it('posts a valid swap', async () => {
       await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonClientForProvider.postSwap(signedRequest)
@@ -120,7 +120,7 @@ describe('MesonSwap', () => {
         .to.be.revertedWith('Swap does not exist')
     })
 
-    const amount = ethers.utils.parseUnits('1001', 6)
+    const amount = ethers.utils.parseUnits('1000', 6)
     it('rejects if swap bonded to others', async () => {
       await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonClientForProvider.postSwap(signedRequest)
@@ -159,7 +159,7 @@ describe('MesonSwap', () => {
         .to.be.revertedWith('Swap does not exist')
     })
 
-    const amount = ethers.utils.parseUnits('1001', 6)
+    const amount = ethers.utils.parseUnits('1000', 6)
     it('rejects if swap does not expire', async () => {
       await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonClientForProvider.postSwap(signedRequest)
@@ -193,7 +193,7 @@ describe('MesonSwap', () => {
         .to.be.revertedWith('Swap does not exist')
     })
 
-    const amount = ethers.utils.parseUnits('1001', 6)
+    const amount = ethers.utils.parseUnits('1000', 6)
     it('executes a valid swap and deposit to pool', async () => {
       await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonClientForProvider.postSwap(signedRequest)
@@ -238,7 +238,7 @@ describe('MesonSwap', () => {
   })
 
   describe('#getPostedSwap', () => {
-    const amount = ethers.utils.parseUnits('1001', 6)
+    const amount = ethers.utils.parseUnits('1000', 6)
     it('returns the posted swap', async () => {
       await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonClientForProvider.postSwap(signedRequest)

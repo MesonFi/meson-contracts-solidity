@@ -24,6 +24,7 @@ export interface UCTUpgradeableInterface extends utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "batchMint(address[],uint256)": FunctionFragment;
+    "batchMint2(address[],uint256[])": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
@@ -49,6 +50,10 @@ export interface UCTUpgradeableInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "batchMint",
     values: [string[], BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "batchMint2",
+    values: [string[], BigNumberish[]]
   ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
@@ -84,6 +89,7 @@ export interface UCTUpgradeableInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "batchMint", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "batchMint2", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "decreaseAllowance",
@@ -202,6 +208,12 @@ export interface UCTUpgradeable extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    batchMint2(
+      targets: string[],
+      amounts: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
     decreaseAllowance(
@@ -272,6 +284,12 @@ export interface UCTUpgradeable extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  batchMint2(
+    targets: string[],
+    amounts: BigNumberish[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   decimals(overrides?: CallOverrides): Promise<number>;
 
   decreaseAllowance(
@@ -339,6 +357,12 @@ export interface UCTUpgradeable extends BaseContract {
     batchMint(
       targets: string[],
       amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    batchMint2(
+      targets: string[],
+      amounts: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -451,6 +475,12 @@ export interface UCTUpgradeable extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    batchMint2(
+      targets: string[],
+      amounts: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
     decreaseAllowance(
@@ -522,6 +552,12 @@ export interface UCTUpgradeable extends BaseContract {
     batchMint(
       targets: string[],
       amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    batchMint2(
+      targets: string[],
+      amounts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

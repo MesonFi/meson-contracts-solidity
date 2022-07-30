@@ -175,7 +175,7 @@ describe('MesonPools', () => {
       await ethers.provider.send('evm_increaseTime', [-4200])
     })
     it('rejects if deposit is not enough', async () => {
-      const amount = ethers.utils.parseUnits('999', 6)
+      const amount = ethers.utils.parseUnits('998', 6)
       await token.approve(mesonInstance.address, amount)
       await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
@@ -189,7 +189,8 @@ describe('MesonPools', () => {
 
       await mesonClientForProvider.lock(signedRequest)
       
-      expect(await mesonInstance.balanceOf(mesonClientForProvider.token(1), provider.address)).to.equal(swap.amount)
+      const poolBalance = amount.sub(swap.amount.sub(swap.fee))
+      expect(await mesonInstance.balanceOf(mesonClientForProvider.token(1), provider.address)).to.equal(poolBalance)
       const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
       expect(locked.status).to.equal(LockedSwapStatus.Locked)
       expect(locked.provider).to.equal(provider.address)
@@ -247,7 +248,8 @@ describe('MesonPools', () => {
       await mesonClientForProvider.lock(signedRequest)
       await mesonClientForProvider.release(signedRelease)
 
-      expect(await token.balanceOf(TestAddress)).to.equal(swap.amount)
+      const releaseAmount = swap.amount.sub(swap.amount.div(1000)).sub(swap.fee)
+      expect(await token.balanceOf(TestAddress)).to.equal(releaseAmount)
       const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
       expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
       expect(locked.provider).to.be.undefined

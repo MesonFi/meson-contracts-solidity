@@ -63,19 +63,23 @@ contract MesonHelpers is MesonConfig {
   }
 
   function _signNonTyped(uint256 encodedSwap) internal pure returns (bool) {
-    return uint8(encodedSwap >> 200) == 255;
+    return (encodedSwap & 0x0800000000000000000000000000000000000000000000000000) > 0;
+  }
+
+  function _feeWaived(uint256 encodedSwap) internal pure returns (bool) {
+    return (encodedSwap & 0x4000000000000000000000000000000000000000000000000000) > 0;
   }
 
   function _amountFrom(uint256 encodedSwap) internal pure returns (uint256) {
     return encodedSwap >> 208;
   }
 
-  function _feeFrom(uint256 encodedSwap) internal pure returns (uint256) {
-    return (encodedSwap >> 88) & 0xFFFFFFFFFF;
+  function _baseFee(uint256 encodedSwap) internal pure returns (uint256) {
+    return (encodedSwap >> 208) / 1000; // 0.1% of amount
   }
 
-  function _feeToMesonFrom(uint256 encodedSwap) internal pure returns (uint256) {
-    return ((encodedSwap >> 90) & 0x3FFFFFFFFF); // 25% fee to meson
+  function _feeForLp(uint256 encodedSwap) internal pure returns (uint256) {
+    return (encodedSwap >> 88) & 0xFFFFFFFFFF;
   }
 
   function _saltFrom(uint256 encodedSwap) internal pure returns (uint80) {
@@ -102,7 +106,7 @@ contract MesonHelpers is MesonConfig {
     return uint8(encodedSwap >> 24);
   }
 
-  function _balanceIndexForMesonFrom(uint256 encodedSwap) internal pure returns (uint48) {
+  function _balanceIndexForNoProviderFrom(uint256 encodedSwap) internal pure returns (uint48) {
     return uint48(encodedSwap << 40);
   }
 

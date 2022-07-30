@@ -20,6 +20,7 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface UpgradableMesonInterface extends utils.Interface {
   functions: {
+    "_updatePosted(uint256,address,uint40)": FunctionFragment;
     "addressOfIndex(uint40)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "bondSwap(uint256,uint40)": FunctionFragment;
@@ -45,6 +46,10 @@ export interface UpgradableMesonInterface extends utils.Interface {
     "withdraw(uint256,uint8)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "_updatePosted",
+    values: [BigNumberish, string, BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "addressOfIndex",
     values: [BigNumberish]
@@ -135,6 +140,10 @@ export interface UpgradableMesonInterface extends utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "_updatePosted",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "addressOfIndex",
     data: BytesLike
@@ -293,6 +302,13 @@ export interface UpgradableMeson extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    _updatePosted(
+      encodedSwap: BigNumberish,
+      initiator: string,
+      providerIndex: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     addressOfIndex(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -431,6 +447,13 @@ export interface UpgradableMeson extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
+  _updatePosted(
+    encodedSwap: BigNumberish,
+    initiator: string,
+    providerIndex: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   addressOfIndex(
     arg0: BigNumberish,
     overrides?: CallOverrides
@@ -567,6 +590,13 @@ export interface UpgradableMeson extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    _updatePosted(
+      encodedSwap: BigNumberish,
+      initiator: string,
+      providerIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     addressOfIndex(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -748,6 +778,13 @@ export interface UpgradableMeson extends BaseContract {
   };
 
   estimateGas: {
+    _updatePosted(
+      encodedSwap: BigNumberish,
+      initiator: string,
+      providerIndex: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     addressOfIndex(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -879,6 +916,13 @@ export interface UpgradableMeson extends BaseContract {
   };
 
   populateTransaction: {
+    _updatePosted(
+      encodedSwap: BigNumberish,
+      initiator: string,
+      providerIndex: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     addressOfIndex(
       arg0: BigNumberish,
       overrides?: CallOverrides

@@ -54,7 +54,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _unsafeDepositToken(
       _tokenList[tokenIndex],
       initiator,
-      amount + _feeFrom(encodedSwap),
+      amount,
       tokenIndex == 255
     );
 
@@ -91,7 +91,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _safeTransfer(
       _tokenList[tokenIndex],
       _initiatorFromPosted(postedSwap),
-      _amountFrom(encodedSwap) + _feeFrom(encodedSwap),
+      _amountFrom(encodedSwap),
       tokenIndex == 255
     );
 
@@ -132,22 +132,12 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
     _checkReleaseSignature(encodedSwap, recipient, r, s, v, _initiatorFromPosted(postedSwap));
 
-    uint48 mesonBalanceIndex = _balanceIndexForMesonFrom(encodedSwap);
-    uint256 amountWithFee = _amountFrom(encodedSwap) + _feeFrom(encodedSwap);
-    if ((_inChainFrom(encodedSwap) != 0x003c) && (_outChainFrom(encodedSwap) != 0x003c)) { // no meson fee for eth
-      uint256 feeToMeson = _feeToMesonFrom(encodedSwap);
-      if (feeToMeson > 0) {
-        _tokenBalanceOf[mesonBalanceIndex] += feeToMeson;
-        amountWithFee -= feeToMeson;
-      }
-    }
-
     if (depositToPool) {
-      uint48 balanceIndex = mesonBalanceIndex | _providerIndexFromPosted(postedSwap);
-      _tokenBalanceOf[balanceIndex] += amountWithFee;
+      uint48 balanceIndex = _balanceIndexForNoProviderFrom(encodedSwap) | _providerIndexFromPosted(postedSwap);
+      _tokenBalanceOf[balanceIndex] += _amountFrom(encodedSwap);
     } else {
       uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-      _safeTransfer(_tokenList[tokenIndex], addressOfIndex[_providerIndexFromPosted(postedSwap)], amountWithFee, tokenIndex == 255);
+      _safeTransfer(_tokenList[tokenIndex], addressOfIndex[_providerIndexFromPosted(postedSwap)], _amountFrom(encodedSwap), tokenIndex == 255);
     }
   }
 
