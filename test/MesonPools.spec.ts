@@ -256,6 +256,36 @@ describe('MesonPools', () => {
     })
   })
 
+  describe('#release for fee waived swap', async () => {
+    it('reject fee waived swap for non-premium signer', async () => {
+      const swap = mesonClientForInitiator.requestSwap({ ...getPartialSwap(), salt: '0x40' }, outChain)
+      const signedReleaseData = await swap.signForRelease(TestAddress, true)
+      const signedRelease = new SignedSwapRelease(signedReleaseData)
+      await expect(mesonClientForInitiator.release(signedRelease)).to.be.revertedWith('Caller is not the premium manager')
+    })
+
+    it('releases a fee waived swap', async () => {
+      const swap = mesonClientForInitiator.requestSwap({ ...getPartialSwap(), salt: '0x40' }, outChain)
+      const signedRequestData = await swap.signForRequest(true)
+      const signedRequest = new SignedSwapRequest(signedRequestData)
+      const signedReleaseData = await swap.signForRelease(TestAddress, true)
+      const signedRelease = new SignedSwapRelease(signedReleaseData)
+      const amount = ethers.utils.parseUnits('2000', 6)
+
+      await token.approve(mesonInstance.address, amount)
+      await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
+
+      await mesonClientForProvider.lock(signedRequest)
+      await mesonClientForProvider.release(signedRelease)
+
+      const releaseAmount = swap.amount.sub(swap.fee)
+      expect(await token.balanceOf(TestAddress)).to.equal(releaseAmount)
+      const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
+      expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
+      expect(locked.provider).to.be.undefined
+    })
+  })
+
   describe('#getLockSwap', async () => {
     it('returns the locked swap', async () => {
       const amount = ethers.utils.parseUnits('2000', 6)

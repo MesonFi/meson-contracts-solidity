@@ -23,7 +23,7 @@ export async function fixtures (accounts: string[] | undefined) {
   }
 
   const poolsFactory = await ethers.getContractFactory('MesonPoolsTest')
-  const pools = await poolsFactory.deploy(token1.address) as MesonPoolsTest
+  const pools = await poolsFactory.deploy(token1.address, accounts && accounts[1] || ethers.constants.AddressZero) as MesonPoolsTest
 
   const swapFactory = await ethers.getContractFactory('MesonSwapTest')
   const swap = await swapFactory.deploy(token1.address) as MesonSwapTest
