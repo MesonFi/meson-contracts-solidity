@@ -121,6 +121,14 @@ export class Swap implements SwapData {
     return this._encoded
   }
 
+  get willWaiveFee(): boolean {
+    return (parseInt(this.salt[2], 16) % 8) >= 4
+  }
+
+  get baseFee(): BigNumber {
+    return this.willWaiveFee ? BigNumber.from(0) : this.amount.div(1000)
+  }
+
   toObject(): SwapData {
     return {
       encoded: this.encoded,
