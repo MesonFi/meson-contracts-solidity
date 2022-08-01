@@ -121,12 +121,23 @@ export class Swap implements SwapData {
     return this._encoded
   }
 
+  get deprecatedEncoding() : boolean {
+    return this.salt.startsWith('0x00') || this.salt.startsWith('0xff')
+  }
+
   get willWaiveFee(): boolean {
     return (parseInt(this.salt[2], 16) % 8) >= 4
   }
 
-  get baseFee(): BigNumber {
+  get platformFee(): BigNumber {
+    if (this.deprecatedEncoding) {
+      return BigNumber.from(0)
+    }
     return this.willWaiveFee ? BigNumber.from(0) : this.amount.div(1000)
+  }
+
+  get totalFee(): BigNumber {
+    return this.platformFee.add(this.fee)
   }
 
   toObject(): SwapData {
