@@ -17,20 +17,16 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface MesonStatesInterface extends utils.Interface {
   functions: {
-    "addressOfIndex(uint40)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "getShortCoinType()": FunctionFragment;
-    "indexOfAddress(address)": FunctionFragment;
     "indexOfToken(address)": FunctionFragment;
-    "mesonFeeCollected(uint8)": FunctionFragment;
+    "ownerOfPool(uint40)": FunctionFragment;
+    "platformFeeCollected(uint8)": FunctionFragment;
+    "poolOfPermissionedAddr(address)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "addressOfIndex",
-    values: [BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [string, string]
@@ -40,16 +36,20 @@ export interface MesonStatesInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "indexOfAddress",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "indexOfToken",
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "mesonFeeCollected",
+    functionFragment: "ownerOfPool",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "platformFeeCollected",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "poolOfPermissionedAddr",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "supportedTokens",
@@ -60,17 +60,9 @@ export interface MesonStatesInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "addressOfIndex",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getShortCoinType",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "indexOfAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -78,7 +70,15 @@ export interface MesonStatesInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "mesonFeeCollected",
+    functionFragment: "ownerOfPool",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "platformFeeCollected",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "poolOfPermissionedAddr",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -120,11 +120,6 @@ export interface MesonStates extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    addressOfIndex(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
     balanceOf(
       token: string,
       addr: string,
@@ -133,14 +128,22 @@ export interface MesonStates extends BaseContract {
 
     getShortCoinType(overrides?: CallOverrides): Promise<[string]>;
 
-    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<[number]>;
-
     indexOfToken(token: string, overrides?: CallOverrides): Promise<[number]>;
 
-    mesonFeeCollected(
+    ownerOfPool(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    platformFeeCollected(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    poolOfPermissionedAddr(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[number]>;
 
     supportedTokens(
       overrides?: CallOverrides
@@ -152,11 +155,6 @@ export interface MesonStates extends BaseContract {
     ): Promise<[string]>;
   };
 
-  addressOfIndex(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
   balanceOf(
     token: string,
     addr: string,
@@ -165,14 +163,19 @@ export interface MesonStates extends BaseContract {
 
   getShortCoinType(overrides?: CallOverrides): Promise<string>;
 
-  indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
-
   indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
 
-  mesonFeeCollected(
+  ownerOfPool(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+  platformFeeCollected(
     tokenIndex: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  poolOfPermissionedAddr(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<number>;
 
   supportedTokens(overrides?: CallOverrides): Promise<string[]>;
 
@@ -182,11 +185,6 @@ export interface MesonStates extends BaseContract {
   ): Promise<string>;
 
   callStatic: {
-    addressOfIndex(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     balanceOf(
       token: string,
       addr: string,
@@ -195,14 +193,19 @@ export interface MesonStates extends BaseContract {
 
     getShortCoinType(overrides?: CallOverrides): Promise<string>;
 
-    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
-
     indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
 
-    mesonFeeCollected(
+    ownerOfPool(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    platformFeeCollected(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    poolOfPermissionedAddr(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<number>;
 
     supportedTokens(overrides?: CallOverrides): Promise<string[]>;
 
@@ -215,11 +218,6 @@ export interface MesonStates extends BaseContract {
   filters: {};
 
   estimateGas: {
-    addressOfIndex(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     balanceOf(
       token: string,
       addr: string,
@@ -228,12 +226,20 @@ export interface MesonStates extends BaseContract {
 
     getShortCoinType(overrides?: CallOverrides): Promise<BigNumber>;
 
-    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
     indexOfToken(token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    mesonFeeCollected(
+    ownerOfPool(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    platformFeeCollected(
       tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    poolOfPermissionedAddr(
+      arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -246,11 +252,6 @@ export interface MesonStates extends BaseContract {
   };
 
   populateTransaction: {
-    addressOfIndex(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     balanceOf(
       token: string,
       addr: string,
@@ -259,18 +260,23 @@ export interface MesonStates extends BaseContract {
 
     getShortCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    indexOfAddress(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     indexOfToken(
       token: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    mesonFeeCollected(
+    ownerOfPool(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    platformFeeCollected(
       tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    poolOfPermissionedAddr(
+      arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

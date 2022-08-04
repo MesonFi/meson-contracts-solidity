@@ -128,7 +128,7 @@ describe('MesonSwap', () => {
       await expect(mesonInstance.bondSwap(swap.encoded, 2))
         .to.be.revertedWith('Swap bonded to another provider')
     })
-    it('rejects if providerIndex is not for signer', async () => {
+    it('rejects if poolIndex is not for signer', async () => {
       await token.connect(initiator).approve(mesonInstance.address, amount)
       await mesonInstance.postSwap(
         signedRequest.encoded,

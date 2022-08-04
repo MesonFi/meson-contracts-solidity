@@ -45,14 +45,14 @@ async function deposit (meson, token) {
   }
 
   console.log(`depositing for ${amount}...`)
-  const providerIndex = await meson.indexOfAddress(wallet.address)
-  const needRegister = providerIndex == 0
-  const balanceIndex = tokenIndex * 2**40 + (needRegister ? 1 : providerIndex)
+  const poolIndex = await meson.poolOfPermissionedAddr(wallet.address)
+  const needRegister = poolIndex == 0
+  const poolTokenIndex = tokenIndex * 2**40 + (needRegister ? 1 : poolIndex)
 
   if (needRegister) {
-    return await meson.depositAndRegister(ethers.utils.parseUnits(amount, 6), balanceIndex)
+    return await meson.depositAndRegister(ethers.utils.parseUnits(amount, 6), poolTokenIndex)
   } else {
-    return await meson.deposit(ethers.utils.parseUnits(amount, 6), balanceIndex)
+    return await meson.deposit(ethers.utils.parseUnits(amount, 6), poolTokenIndex)
   }
 }
 

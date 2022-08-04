@@ -86,7 +86,7 @@ describe('MesonStates', () => {
     it('returns decoded swap data', async () => {
       const decoded = await mesonInstance.decodeSwap(swap.encoded, 1)
       expect(decoded.amount).to.equal(swap.amount)
-      expect(decoded.baseFee).to.equal(swap.amount.div(1000))
+      expect(decoded.platformFee).to.equal(swap.amount.div(1000))
       expect(decoded.feeForLp).to.equal(swap.fee)
       expect(decoded.salt).to.equal(swap.salt)
       expect(decoded.expireTs).to.equal(swap.expireTs)
@@ -94,8 +94,8 @@ describe('MesonStates', () => {
       expect(decoded.inTokenIndex).to.equal(swap.inToken)
       expect(decoded.outChain).to.equal(swap.outChain)
       expect(decoded.outTokenIndex).to.equal(swap.outToken)
-      expect(decoded.balanceIndexForNoProvider).to.equal(pack(['uint8', 'uint40'], [swap.inToken, 0]))
-      expect(decoded.outTokenBalanceIndex).to.equal(pack(['uint8', 'uint40'], [swap.outToken, 1]))
+      expect(decoded.poolTokenIndexForPool0).to.equal(pack(['uint8', 'uint40'], [swap.inToken, 0]))
+      expect(decoded.poolTokenIndexForOutToken).to.equal(pack(['uint8', 'uint40'], [swap.outToken, 1]))
     })
   })
 
@@ -104,7 +104,7 @@ describe('MesonStates', () => {
       const postedSwap = pack(['address', 'uint40'], [TestAddress, 1])
       const decodedPosted = await mesonInstance.decodePostedSwap(postedSwap)
       expect(decodedPosted.initiator).to.equal(TestAddress)
-      expect(decodedPosted.providerIndex).to.equal(1)
+      expect(decodedPosted.poolIndex).to.equal(1)
     })
   })
 
@@ -121,24 +121,24 @@ describe('MesonStates', () => {
       const ts = Math.floor(Date.now() / 1000)
       const lockedSwap = pack(['uint40', 'uint40'], [ts, 1])
       const decodedLocked = await mesonInstance.decodeLockedSwap(lockedSwap)
-      expect(decodedLocked.providerIndex).to.equal(1)
+      expect(decodedLocked.poolIndex).to.equal(1)
       expect(decodedLocked.until).to.equal(ts)
     })
   })
 
-  describe('#balanceIndexFrom', () => {
+  describe('#poolTokenIndexFrom', () => {
     it('returns same result as js function', async () => {
-      const balanceIndex = pack(['uint8', 'uint40'], [1, 2])
-      expect(await mesonInstance.balanceIndexFrom(1, 2)).to.equal(balanceIndex)
+      const poolTokenIndex = pack(['uint8', 'uint40'], [1, 2])
+      expect(await mesonInstance.poolTokenIndexFrom(1, 2)).to.equal(poolTokenIndex)
     })
   })
 
-  describe('#decodeBalanceIndex', () => {
+  describe('#decodePoolTokenIndex', () => {
     it('returns decoded balance index data', async () => {
-      const balanceIndex = pack(['uint8', 'uint40'], [1, 2])
-      const decodedBalanceIndex = await mesonInstance.decodeBalanceIndex(balanceIndex)
-      expect(decodedBalanceIndex.tokenIndex).to.equal(1)
-      expect(decodedBalanceIndex.providerIndex).to.equal(2)
+      const poolTokenIndex = pack(['uint8', 'uint40'], [1, 2])
+      const decoded = await mesonInstance.decodePoolTokenIndex(poolTokenIndex)
+      expect(decoded.tokenIndex).to.equal(1)
+      expect(decoded.poolIndex).to.equal(2)
     })
   })
 

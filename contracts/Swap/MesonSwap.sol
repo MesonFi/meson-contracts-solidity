@@ -11,16 +11,16 @@ import "../utils/MesonStates.sol";
 contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @notice Posted Swaps
   /// key: encodedSwap in format of `amount:uint48|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
-  /// value: in format of initiator:uint160|providerIndex:uint40; =1 maybe means executed (to prevent replay attack)
+  /// value: in format of initiator:uint160|poolIndex:uint40; =1 maybe means executed (to prevent replay attack)
   mapping(uint256 => uint200) internal _postedSwaps;
 
   /// @notice Anyone can call this method to post a swap request. This is step 1️⃣  in a swap.
   /// The r,s,v signature must be signed by the swap initiator. The initiator can call
-  /// this method directly, in which case `providerIndex` should be zero and wait for LPs
+  /// this method directly, in which case `poolIndex` should be zero and wait for LPs
   /// to call `bondSwap`. Initiators can also send the swap requests offchain (through the
   /// meson relayer service). An liquidity provider who receives requests through the relayer
   /// can call this method to post and bond the swap in a single contract execution,
-  /// in which case he should give his own `providerIndex`.
+  /// in which case he should give his own `poolIndex`.
   ///
   /// The swap will last until `expireTs` and at most one LP can bond to it.
   /// After the swap expires, the initiator can cancel the swap ande withdraw funds.
@@ -32,7 +32,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @param r Part of the signature
   /// @param s Part of the signature
   /// @param v Part of the signature
-  /// @param postingValue In format of `initiator:address|providerIndex:uint40` to save gas
+  /// @param postingValue In format of `initiator:address|poolIndex:uint40` to save gas
   function postSwap(uint256 encodedSwap, bytes32 r, bytes32 s, uint8 v, uint200 postingValue)
     external forInitialChain(encodedSwap)
   {
@@ -61,18 +61,18 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     emit SwapPosted(encodedSwap);
   }
 
-  /// @notice If `postSwap` is called by the initiator of the swap and `providerIndex`
+  /// @notice If `postSwap` is called by the initiator of the swap and `poolIndex`
   /// is zero, an LP can call this to bond the swap to himself.
   /// @dev Designed to be used by LPs
   /// @param encodedSwap Encoded swap information; also used as the key of `_postedSwaps`
-  /// @param providerIndex An index for the LP; call `depositAndRegister` to get an index
-  function bondSwap(uint256 encodedSwap, uint40 providerIndex) external {
+  /// @param poolIndex An index for the LP; call `depositAndRegister` to get an index
+  function bondSwap(uint256 encodedSwap, uint40 poolIndex) external {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     require(postedSwap > 1, "Swap does not exist");
-    require(_providerIndexFromPosted(postedSwap) == 0, "Swap bonded to another provider");
-    require(indexOfAddress[msg.sender] == providerIndex, "Can only bound to signer");
+    require(_poolIndexFromPosted(postedSwap) == 0, "Swap bonded to another provider");
+    require(poolOfPermissionedAddr[msg.sender] == poolIndex, "Can only bound to signer");
 
-    _postedSwaps[encodedSwap] = postedSwap | providerIndex;
+    _postedSwaps[encodedSwap] = postedSwap | poolIndex;
     emit SwapBonded(encodedSwap);
   }
 
@@ -133,11 +133,11 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _checkReleaseSignature(encodedSwap, recipient, r, s, v, _initiatorFromPosted(postedSwap));
 
     if (depositToPool) {
-      uint48 balanceIndex = _balanceIndexForNoProviderFrom(encodedSwap) | _providerIndexFromPosted(postedSwap);
-      _tokenBalanceOf[balanceIndex] += _amountFrom(encodedSwap);
+      uint48 poolTokenIndex = _poolTokenIndexForPool0From(encodedSwap) | _poolIndexFromPosted(postedSwap);
+      _balanceOfPoolToken[poolTokenIndex] += _amountFrom(encodedSwap);
     } else {
       uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-      _safeTransfer(_tokenList[tokenIndex], addressOfIndex[_providerIndexFromPosted(postedSwap)], _amountFrom(encodedSwap), tokenIndex == 255);
+      _safeTransfer(_tokenList[tokenIndex], ownerOfPool[_poolIndexFromPosted(postedSwap)], _amountFrom(encodedSwap), tokenIndex == 255);
     }
   }
 
@@ -151,7 +151,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     if (initiator == address(0)) {
       provider = address(0);
     } else {
-      provider = addressOfIndex[_providerIndexFromPosted(postedSwap)];
+      provider = ownerOfPool[_poolIndexFromPosted(postedSwap)];
     }
   }
 

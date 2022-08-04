@@ -31,21 +31,21 @@ async function main() {
   await (await token2.approve(testnet.mesonAddress, ethers.utils.parseUnits(amount, 18))).wait(1)
 
   console.log(`depositing for ${amount}...`)
-  const providerIndex = await meson.indexOfAddress(wallet.address)
-  const needRegister = providerIndex == 0
-  const balanceIndex = 2**40 + (needRegister ? 1 : providerIndex)
+  const poolIndex = await meson.poolOfPermissionedAddr(wallet.address)
+  const needRegister = poolIndex == 0
+  const poolTokenIndex = 2**40 + (needRegister ? 1 : poolIndex)
 
   let tx
   if (needRegister) {
-    tx = await meson.depositAndRegister(ethers.utils.parseUnits(amount, 6), balanceIndex)
+    tx = await meson.depositAndRegister(ethers.utils.parseUnits(amount, 6), poolTokenIndex)
   } else {
-    tx = await meson.deposit(ethers.utils.parseUnits(amount, 6), balanceIndex)
+    tx = await meson.deposit(ethers.utils.parseUnits(amount, 6), poolTokenIndex)
   }
   console.log(tx)
   await tx.wait(1)
 
-  const balanceIndex2 = 2 * 2**40 + providerIndex
-  const tx2 = await meson.deposit(ethers.utils.parseUnits(amount, 6), balanceIndex2)
+  const poolTokenIndex2 = 2 * 2**40 + poolIndex
+  const tx2 = await meson.deposit(ethers.utils.parseUnits(amount, 6), poolTokenIndex2)
   console.log(tx2)
 }
 

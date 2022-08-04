@@ -151,7 +151,7 @@ export class MesonClient {
   }
 
   async indexOfAddress(providerAddress: string) {
-    return await this.mesonInstance.indexOfAddress(providerAddress)
+    return await this.mesonInstance.poolOfPermissionedAddr(providerAddress)
   }
 
   async balanceOf(token: string, providerAddress: string) {
@@ -170,17 +170,17 @@ export class MesonClient {
     }, this._signer)
   }
 
-  async depositAndRegister(token: string, amount: BigNumberish, providerIndex: string) {
+  async depositAndRegister(token: string, amount: BigNumberish, poolIndex: string) {
     const tokenIndex = this.getTokenIndex(token)
     if (!tokenIndex) {
       throw new Error(`Token not supported`)
     }
-    return this._depositAndRegister(amount, tokenIndex, providerIndex)
+    return this._depositAndRegister(amount, tokenIndex, poolIndex)
   }
 
-  async _depositAndRegister(amount: BigNumberish, tokenIndex: number, providerIndex: string) {
-    const balanceIndex = pack(['uint8', 'uint40'], [tokenIndex, providerIndex])
-    return this.mesonInstance.depositAndRegister(amount, balanceIndex)
+  async _depositAndRegister(amount: BigNumberish, tokenIndex: number, poolIndex: string) {
+    const poolTokenIndex = pack(['uint8', 'uint40'], [tokenIndex, poolIndex])
+    return this.mesonInstance.depositAndRegister(amount, poolTokenIndex)
   }
 
   async deposit(token: string, amount: BigNumberish) {
@@ -189,22 +189,22 @@ export class MesonClient {
       throw new Error(`Token not supported`)
     }
     const providerAddress = await this.getSigner()
-    const providerIndex = await this.mesonInstance.indexOfAddress(providerAddress)
-    if (!providerIndex) {
+    const poolIndex = await this.mesonInstance.poolOfPermissionedAddr(providerAddress)
+    if (!poolIndex) {
       throw new Error(`Address ${providerAddress} not registered. Please call depositAndRegister first.`)
     }
-    return this._deposit(amount, tokenIndex, providerIndex)
+    return this._deposit(amount, tokenIndex, poolIndex)
   }
 
-  async _deposit(amount: BigNumberish, tokenIndex: number, providerIndex: number) {
-    const balanceIndex = pack(['uint8', 'uint40'], [tokenIndex, providerIndex])
-    return this.mesonInstance.deposit(amount, balanceIndex)
+  async _deposit(amount: BigNumberish, tokenIndex: number, poolIndex: number) {
+    const poolTokenIndex = pack(['uint8', 'uint40'], [tokenIndex, poolIndex])
+    return this.mesonInstance.deposit(amount, poolTokenIndex)
   }
 
   async postSwap(signedRequest: SignedSwapRequestData) {
     const providerAddress = await this.getSigner()
-    const providerIndex = await this.mesonInstance.indexOfAddress(providerAddress)
-    if (!providerIndex) {
+    const poolIndex = await this.mesonInstance.poolOfPermissionedAddr(providerAddress)
+    if (!poolIndex) {
       throw new Error(`Address ${providerAddress} not registered. Please call depositAndRegister first.`)
     }
     return this.mesonInstance.postSwap(
@@ -212,17 +212,17 @@ export class MesonClient {
       signedRequest.signature[0],
       signedRequest.signature[1],
       signedRequest.signature[2],
-      pack(['address', 'uint40'], [signedRequest.initiator, providerIndex])
+      pack(['address', 'uint40'], [signedRequest.initiator, poolIndex])
     )
   }
 
   async bondSwap(encoded: BigNumberish) {
     const providerAddress = await this.getSigner()
-    const providerIndex = await this.mesonInstance.indexOfAddress(providerAddress)
-    if (!providerIndex) {
+    const poolIndex = await this.mesonInstance.poolOfPermissionedAddr(providerAddress)
+    if (!poolIndex) {
       throw new Error(`Address ${providerAddress} not registered. Please call depositAndRegister first.`)
     }
-    return this.mesonInstance.bondSwap(encoded, providerIndex)
+    return this.mesonInstance.bondSwap(encoded, poolIndex)
   }
 
   async lock(signedRequest: SignedSwapRequestData) {

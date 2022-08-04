@@ -55,7 +55,7 @@ export class TronContract {
   }
 
   async indexOfAddress(addr) {
-    return await this.#instance.indexOfAddress(addr).call({ from: this.signer })
+    return await this.#instance.poolOfPermissionedAddr(addr).call({ from: this.signer })
   }
 
   async balanceOf(token, addr) {

@@ -74,7 +74,7 @@ contract MesonHelpers is MesonConfig {
     return encodedSwap >> 208;
   }
 
-  function _baseFee(uint256 encodedSwap) internal pure returns (uint256) {
+  function _platformFee(uint256 encodedSwap) internal pure returns (uint256) {
     return (encodedSwap >> 208) / 1000; // 0.1% of amount
   }
 
@@ -106,27 +106,27 @@ contract MesonHelpers is MesonConfig {
     return uint8(encodedSwap >> 24);
   }
 
-  function _balanceIndexForNoProviderFrom(uint256 encodedSwap) internal pure returns (uint48) {
+  function _poolTokenIndexForPool0From(uint256 encodedSwap) internal pure returns (uint48) {
     return uint48(encodedSwap << 40);
   }
 
-  function _outTokenBalanceIndexFrom(uint256 encodedSwap, uint40 providerIndex) internal pure returns (uint48) {
-    return uint48((encodedSwap & 0xFF000000) << 16) | providerIndex;
+  function _poolTokenIndexForOutToken(uint256 encodedSwap, uint40 poolIndex) internal pure returns (uint48) {
+    return uint48((encodedSwap & 0xFF000000) << 16) | poolIndex;
   }
 
   function _initiatorFromPosted(uint200 postedSwap) internal pure returns (address) {
     return address(uint160(postedSwap >> 40));
   }
 
-  function _providerIndexFromPosted(uint200 postedSwap) internal pure returns (uint40) {
+  function _poolIndexFromPosted(uint200 postedSwap) internal pure returns (uint40) {
     return uint40(postedSwap);
   }
 
-  function _lockedSwapFrom(uint256 until, uint40 providerIndex) internal pure returns (uint80) {
-    return (uint80(until) << 40) | providerIndex;
+  function _lockedSwapFrom(uint256 until, uint40 poolIndex) internal pure returns (uint80) {
+    return (uint80(until) << 40) | poolIndex;
   }
 
-  function _providerIndexFromLocked(uint80 lockedSwap) internal pure returns (uint40) {
+  function _poolIndexFromLocked(uint80 lockedSwap) internal pure returns (uint40) {
     return uint40(lockedSwap);
   }
 
@@ -134,16 +134,16 @@ contract MesonHelpers is MesonConfig {
     return uint256(lockedSwap >> 40);
   }
 
-  function _balanceIndexFrom(uint8 tokenIndex, uint40 providerIndex) internal pure returns (uint48) {
-    return (uint48(tokenIndex) << 40) | providerIndex;
+  function _poolTokenIndexFrom(uint8 tokenIndex, uint40 poolIndex) internal pure returns (uint48) {
+    return (uint48(tokenIndex) << 40) | poolIndex;
   }
 
-  function _tokenIndexFromBalanceIndex(uint48 balanceIndex) internal pure returns (uint8) {
-    return uint8(balanceIndex >> 40);
+  function _tokenIndexFrom(uint48 poolTokenIndex) internal pure returns (uint8) {
+    return uint8(poolTokenIndex >> 40);
   }
 
-  function _providerIndexFromBalanceIndex(uint48 balanceIndex) internal pure returns (uint40) {
-    return uint40(balanceIndex);
+  function _poolIndexFrom(uint48 poolTokenIndex) internal pure returns (uint40) {
+    return uint40(poolTokenIndex);
   }
 
   function _checkRequestSignature(

@@ -11,59 +11,60 @@ import "../utils/MesonStates.sol";
 contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @notice Locked Swaps
   /// key: encodedSwap in format of `amount:uint48|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
-  /// value: in format of until:uint40|providerIndex:uint40
+  /// value: in format of until:uint40|poolIndex:uint40
   mapping(bytes32 => uint80) internal _lockedSwaps;
 
-  /// @notice Deposit tokens into the liquidity pool and register an index 
-  /// for future use (will save gas).
-  /// This is the prerequisite for LPs if they want to participate in swap trades.
-  /// @param amount The amount to be added to the pool
-  /// @param balanceIndex In format of `tokenIndex:uint8|providerIndex:uint40` to save gas
-  function depositAndRegister(uint256 amount, uint48 balanceIndex) external {
+  /// @notice Initially deposit tokens into an LP pool and register a pool index.
+  /// This is the prerequisite for LPs if they want to participate in Meson swaps.
+  /// @param amount The amount of tokens to be added to the pool
+  /// @param poolTokenIndex In format of `tokenIndex:uint8|poolIndex:uint40` to save gas
+  function depositAndRegister(uint256 amount, uint48 poolTokenIndex) external {
     require(amount > 0, 'Amount must be positive');
 
     address provider = _msgSender();
-    uint40 providerIndex = _providerIndexFromBalanceIndex(balanceIndex);
-    require(providerIndex != 0, "Cannot use 0 as provider index");
-    require(addressOfIndex[providerIndex] == address(0), "Index already registered");
-    require(indexOfAddress[provider] == 0, "Address already registered");
-    addressOfIndex[providerIndex] = provider;
-    indexOfAddress[provider] = providerIndex;
+    uint40 poolIndex = _poolIndexFrom(poolTokenIndex);
+    require(poolIndex != 0, "Cannot use 0 as pool index");
+    require(ownerOfPool[poolIndex] == address(0), "Pool index already registered");
+    require(poolOfPermissionedAddr[provider] == 0, "Signer address already registered");
+    ownerOfPool[poolIndex] = provider;
+    poolOfPermissionedAddr[provider] = poolIndex;
 
-    _tokenBalanceOf[balanceIndex] += amount;
-    uint8 tokenIndex = _tokenIndexFromBalanceIndex(balanceIndex);
+    _balanceOfPoolToken[poolTokenIndex] += amount;
+    uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
     _unsafeDepositToken(_tokenList[tokenIndex], provider, amount, tokenIndex == 255);
   }
 
   /// @notice Deposit tokens into the liquidity pool.
-  /// The LP should be careful to make sure the `balanceIndex` is correct.
-  /// Make sure to call `depositAndRegister` first and register a provider index.
+  /// The LP should be careful to make sure the `poolTokenIndex` is correct.
+  /// Make sure to call `depositAndRegister` first and register a pool index.
   /// Otherwise, token may be deposited to others.
   /// @dev Designed to be used by liquidity providers
-  /// @param amount The amount to be added to the pool
-  /// @param balanceIndex In format of`[tokenIndex:uint8][providerIndex:uint40]
-  function deposit(uint256 amount, uint48 balanceIndex) external {
+  /// @param amount The amount of tokens to be added to the pool
+  /// @param poolTokenIndex In format of `tokenIndex:uint8|poolIndex:uint40`
+  function deposit(uint256 amount, uint48 poolTokenIndex) external {
     require(amount > 0, 'Amount must be positive');
 
-    uint40 providerIndex = _providerIndexFromBalanceIndex(balanceIndex);
-    require(providerIndex != 0, "Cannot use 0 as provider index");
-    require(addressOfIndex[providerIndex] == _msgSender(), "Incorrect provider index");
-    _tokenBalanceOf[balanceIndex] += amount;
-    uint8 tokenIndex = _tokenIndexFromBalanceIndex(balanceIndex);
+    uint40 poolIndex = _poolIndexFrom(poolTokenIndex);
+    require(poolIndex != 0, "Cannot use 0 as pool index");
+    require(ownerOfPool[poolIndex] == _msgSender(), "Need the pool owner as the signer");
+    _balanceOfPoolToken[poolTokenIndex] += amount;
+    uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
     _unsafeDepositToken(_tokenList[tokenIndex], _msgSender(), amount, tokenIndex == 255);
   }
 
   /// @notice Withdraw tokens from the liquidity pool.
   /// @dev Designed to be used by liquidity providers
   /// @param amount The amount to be removed from the pool
-  /// @param tokenIndex The index of the withdrawing token
-  function withdraw(uint256 amount, uint8 tokenIndex) external {
-    address provider = _msgSender();
-    uint40 providerIndex = indexOfAddress[provider];
-    require(providerIndex != 0, 'Caller not registered. Call depositAndRegister');
+  /// @param poolTokenIndex In format of`[tokenIndex:uint8][poolIndex:uint40]
+  function withdraw(uint256 amount, uint48 poolTokenIndex) external {
+    require(amount > 0, 'Amount must be positive');
 
-    _tokenBalanceOf[_balanceIndexFrom(tokenIndex, providerIndex)] -= amount;
-    _safeTransfer(_tokenList[tokenIndex], provider, amount, tokenIndex == 255);
+    uint40 poolIndex = _poolIndexFrom(poolTokenIndex);
+    require(poolIndex != 0, "Cannot use 0 as pool index");
+    require(ownerOfPool[poolIndex] == _msgSender(), "Need the pool owner as the signer");
+    _balanceOfPoolToken[poolTokenIndex] -= amount;
+    uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
+    _safeTransfer(_tokenList[tokenIndex], _msgSender(), amount, tokenIndex == 255);
   }
 
   /// @notice Lock funds to match a swap request. This is step 2 in a swap.
@@ -87,16 +88,16 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(_lockedSwaps[swapId] == 0, "Swap already exists");
     _checkRequestSignature(encodedSwap, r, s, v, initiator);
 
-    uint40 providerIndex = indexOfAddress[_msgSender()];
-    require(providerIndex != 0, "Caller not registered. Call depositAndRegister.");
+    uint40 poolIndex = poolOfPermissionedAddr[_msgSender()];
+    require(poolIndex != 0, "Caller not registered. Call depositAndRegister.");
 
     uint256 until = block.timestamp + LOCK_TIME_PERIOD;
     require(until < _expireTsFrom(encodedSwap), "Cannot lock because expireTs is soon.");
 
-    uint48 balanceIndex = _outTokenBalanceIndexFrom(encodedSwap, providerIndex);
-    _tokenBalanceOf[balanceIndex] -= (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
+    uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, poolIndex);
+    _balanceOfPoolToken[poolTokenIndex] -= (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
     
-    _lockedSwaps[swapId] = _lockedSwapFrom(until, providerIndex);
+    _lockedSwaps[swapId] = _lockedSwapFrom(until, poolIndex);
 
     emit SwapLocked(encodedSwap);
   }
@@ -109,8 +110,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(lockedSwap != 0, "Swap does not exist");
     require(_untilFromLocked(lockedSwap) < block.timestamp, "Swap still in lock");
 
-    uint48 balanceIndex = _outTokenBalanceIndexFrom(encodedSwap, _providerIndexFromLocked(lockedSwap));
-    _tokenBalanceOf[balanceIndex] += (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
+    uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, _poolIndexFromLocked(lockedSwap));
+    _balanceOfPoolToken[poolTokenIndex] += (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
     _lockedSwaps[swapId] = 0;
   }
 
@@ -149,9 +150,9 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint8 tokenIndex = _outTokenIndexFrom(encodedSwap);
     uint256 releaseAmount = _amountFrom(encodedSwap) - _feeForLp(encodedSwap);
     if (!feeWaived) {
-      uint256 baseFee = _baseFee(encodedSwap);
-      releaseAmount -= baseFee;
-      _tokenBalanceOf[_outTokenBalanceIndexFrom(encodedSwap, 0)] += baseFee; // base fee pool
+      uint256 platformFee = _platformFee(encodedSwap);
+      releaseAmount -= platformFee;
+      _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += platformFee; // platform fee pool
     }
 
     _safeTransfer(_tokenList[tokenIndex], recipient, releaseAmount, tokenIndex == 255);
@@ -167,7 +168,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   {
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     uint80 lockedSwap = _lockedSwaps[swapId];
-    provider = addressOfIndex[_providerIndexFromLocked(lockedSwap)];
+    provider = ownerOfPool[_poolIndexFromLocked(lockedSwap)];
     until = uint40(_untilFromLocked(lockedSwap));
   }
 

@@ -31,59 +31,59 @@ contract MesonStatesTest is MesonStates {
       );
   }
 
-  function decodeSwap(uint256 encodedSwap, uint40 providerIndex) external pure returns (
+  function decodeSwap(uint256 encodedSwap, uint40 poolIndex) external pure returns (
     uint256 amount,
     uint256 feeForLp,
-    uint256 baseFee,
+    uint256 platformFee,
     uint80 salt,
     uint256 expireTs,
     bytes2 inChain,
     uint8 inTokenIndex,
     bytes2 outChain,
     uint8 outTokenIndex,
-    bytes6 balanceIndexForNoProvider,
-    bytes6 outTokenBalanceIndex
+    bytes6 poolTokenIndexForPool0,
+    bytes6 poolTokenIndexForOutToken
   ) {
     amount = _amountFrom(encodedSwap);
     feeForLp = _feeForLp(encodedSwap);
-    baseFee = _baseFee(encodedSwap);
+    platformFee = _platformFee(encodedSwap);
     salt = _saltFrom(encodedSwap);
     expireTs = _expireTsFrom(encodedSwap);
     inChain = bytes2(_inChainFrom(encodedSwap));
     inTokenIndex = _inTokenIndexFrom(encodedSwap);
     outChain = bytes2(_outChainFrom(encodedSwap));
     outTokenIndex = _outTokenIndexFrom(encodedSwap);
-    balanceIndexForNoProvider = bytes6(_balanceIndexForNoProviderFrom(encodedSwap));
-    outTokenBalanceIndex = bytes6(_outTokenBalanceIndexFrom(encodedSwap, providerIndex));
+    poolTokenIndexForPool0 = bytes6(_poolTokenIndexForPool0From(encodedSwap));
+    poolTokenIndexForOutToken = bytes6(_poolTokenIndexForOutToken(encodedSwap, poolIndex));
   }
 
   function decodePostedSwap(uint200 postedSwap) external pure returns (
     address initiator,
-    uint40 providerIndex
+    uint40 poolIndex
   ) {
     initiator = _initiatorFromPosted(postedSwap);
-    providerIndex = _providerIndexFromPosted(postedSwap);
+    poolIndex = _poolIndexFromPosted(postedSwap);
   }
 
-  function lockedSwapFrom(uint256 until, uint40 providerIndex) external pure returns (uint80) {
-    return _lockedSwapFrom(until, providerIndex);
+  function lockedSwapFrom(uint256 until, uint40 poolIndex) external pure returns (uint80) {
+    return _lockedSwapFrom(until, poolIndex);
   }
 
-  function decodeLockedSwap(uint80 lockedSwap) external pure returns (uint40 providerIndex, uint256 until) {
-    providerIndex = _providerIndexFromLocked(lockedSwap);
+  function decodeLockedSwap(uint80 lockedSwap) external pure returns (uint40 poolIndex, uint256 until) {
+    poolIndex = _poolIndexFromLocked(lockedSwap);
     until = _untilFromLocked(lockedSwap);
   }
 
-  function balanceIndexFrom(uint8 tokenIndex, uint40 providerIndex) external pure returns (bytes6) {
-    return bytes6(_balanceIndexFrom(tokenIndex, providerIndex));
+  function poolTokenIndexFrom(uint8 tokenIndex, uint40 poolIndex) external pure returns (bytes6) {
+    return bytes6(_poolTokenIndexFrom(tokenIndex, poolIndex));
   }
 
-  function decodeBalanceIndex(uint48 balanceIndex) external pure returns (
+  function decodePoolTokenIndex(uint48 poolTokenIndex) external pure returns (
     uint8 tokenIndex,
-    uint40 providerIndex
+    uint40 poolIndex
   ) {
-    tokenIndex = _tokenIndexFromBalanceIndex(balanceIndex);
-    providerIndex = _providerIndexFromBalanceIndex(balanceIndex);
+    tokenIndex = _tokenIndexFrom(poolTokenIndex);
+    poolIndex = _poolIndexFrom(poolTokenIndex);
   }
 
   function checkRequestSignature(

@@ -20,8 +20,6 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface UpgradableMesonInterface extends utils.Interface {
   functions: {
-    "_updatePosted(uint256,address,uint40)": FunctionFragment;
-    "addressOfIndex(uint40)": FunctionFragment;
     "balanceOf(address,address)": FunctionFragment;
     "bondSwap(uint256,uint40)": FunctionFragment;
     "cancelSwap(uint256)": FunctionFragment;
@@ -31,11 +29,12 @@ export interface UpgradableMesonInterface extends utils.Interface {
     "getLockedSwap(uint256,address)": FunctionFragment;
     "getPostedSwap(uint256)": FunctionFragment;
     "getShortCoinType()": FunctionFragment;
-    "indexOfAddress(address)": FunctionFragment;
     "indexOfToken(address)": FunctionFragment;
     "initialize(address[])": FunctionFragment;
     "lock(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
-    "mesonFeeCollected(uint8)": FunctionFragment;
+    "ownerOfPool(uint40)": FunctionFragment;
+    "platformFeeCollected(uint8)": FunctionFragment;
+    "poolOfPermissionedAddr(address)": FunctionFragment;
     "postSwap(uint256,bytes32,bytes32,uint8,uint200)": FunctionFragment;
     "release(uint256,bytes32,bytes32,uint8,address,address)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
@@ -43,17 +42,9 @@ export interface UpgradableMesonInterface extends utils.Interface {
     "unlock(uint256,address)": FunctionFragment;
     "upgradeTo(address)": FunctionFragment;
     "upgradeToAndCall(address,bytes)": FunctionFragment;
-    "withdraw(uint256,uint8)": FunctionFragment;
+    "withdraw(uint256,uint48)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "_updatePosted",
-    values: [BigNumberish, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "addressOfIndex",
-    values: [BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [string, string]
@@ -91,10 +82,6 @@ export interface UpgradableMesonInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "indexOfAddress",
-    values: [string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "indexOfToken",
     values: [string]
   ): string;
@@ -107,8 +94,16 @@ export interface UpgradableMesonInterface extends utils.Interface {
     values: [BigNumberish, BytesLike, BytesLike, BigNumberish, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "mesonFeeCollected",
+    functionFragment: "ownerOfPool",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "platformFeeCollected",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "poolOfPermissionedAddr",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "postSwap",
@@ -140,14 +135,6 @@ export interface UpgradableMesonInterface extends utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "_updatePosted",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "addressOfIndex",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bondSwap", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "cancelSwap", data: BytesLike): Result;
@@ -173,17 +160,21 @@ export interface UpgradableMesonInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "indexOfAddress",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "indexOfToken",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "lock", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "mesonFeeCollected",
+    functionFragment: "ownerOfPool",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "platformFeeCollected",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "poolOfPermissionedAddr",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "postSwap", data: BytesLike): Result;
@@ -302,18 +293,6 @@ export interface UpgradableMeson extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    _updatePosted(
-      encodedSwap: BigNumberish,
-      initiator: string,
-      providerIndex: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    addressOfIndex(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
     balanceOf(
       token: string,
       addr: string,
@@ -322,7 +301,7 @@ export interface UpgradableMeson extends BaseContract {
 
     bondSwap(
       encodedSwap: BigNumberish,
-      providerIndex: BigNumberish,
+      poolIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -333,13 +312,13 @@ export interface UpgradableMeson extends BaseContract {
 
     deposit(
       amount: BigNumberish,
-      balanceIndex: BigNumberish,
+      poolTokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     depositAndRegister(
       amount: BigNumberish,
-      balanceIndex: BigNumberish,
+      poolTokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -372,8 +351,6 @@ export interface UpgradableMeson extends BaseContract {
 
     getShortCoinType(overrides?: CallOverrides): Promise<[string]>;
 
-    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<[number]>;
-
     indexOfToken(token: string, overrides?: CallOverrides): Promise<[number]>;
 
     initialize(
@@ -390,10 +367,20 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    mesonFeeCollected(
+    ownerOfPool(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    platformFeeCollected(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    poolOfPermissionedAddr(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[number]>;
 
     postSwap(
       encodedSwap: BigNumberish,
@@ -442,22 +429,10 @@ export interface UpgradableMeson extends BaseContract {
 
     withdraw(
       amount: BigNumberish,
-      tokenIndex: BigNumberish,
+      poolTokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
-
-  _updatePosted(
-    encodedSwap: BigNumberish,
-    initiator: string,
-    providerIndex: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  addressOfIndex(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
 
   balanceOf(
     token: string,
@@ -467,7 +442,7 @@ export interface UpgradableMeson extends BaseContract {
 
   bondSwap(
     encodedSwap: BigNumberish,
-    providerIndex: BigNumberish,
+    poolIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -478,13 +453,13 @@ export interface UpgradableMeson extends BaseContract {
 
   deposit(
     amount: BigNumberish,
-    balanceIndex: BigNumberish,
+    poolTokenIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   depositAndRegister(
     amount: BigNumberish,
-    balanceIndex: BigNumberish,
+    poolTokenIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -517,8 +492,6 @@ export interface UpgradableMeson extends BaseContract {
 
   getShortCoinType(overrides?: CallOverrides): Promise<string>;
 
-  indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
-
   indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
 
   initialize(
@@ -535,10 +508,17 @@ export interface UpgradableMeson extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  mesonFeeCollected(
+  ownerOfPool(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+  platformFeeCollected(
     tokenIndex: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  poolOfPermissionedAddr(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<number>;
 
   postSwap(
     encodedSwap: BigNumberish,
@@ -585,23 +565,11 @@ export interface UpgradableMeson extends BaseContract {
 
   withdraw(
     amount: BigNumberish,
-    tokenIndex: BigNumberish,
+    poolTokenIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    _updatePosted(
-      encodedSwap: BigNumberish,
-      initiator: string,
-      providerIndex: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    addressOfIndex(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     balanceOf(
       token: string,
       addr: string,
@@ -610,7 +578,7 @@ export interface UpgradableMeson extends BaseContract {
 
     bondSwap(
       encodedSwap: BigNumberish,
-      providerIndex: BigNumberish,
+      poolIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -621,13 +589,13 @@ export interface UpgradableMeson extends BaseContract {
 
     deposit(
       amount: BigNumberish,
-      balanceIndex: BigNumberish,
+      poolTokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     depositAndRegister(
       amount: BigNumberish,
-      balanceIndex: BigNumberish,
+      poolTokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -660,8 +628,6 @@ export interface UpgradableMeson extends BaseContract {
 
     getShortCoinType(overrides?: CallOverrides): Promise<string>;
 
-    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<number>;
-
     indexOfToken(token: string, overrides?: CallOverrides): Promise<number>;
 
     initialize(
@@ -678,10 +644,17 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    mesonFeeCollected(
+    ownerOfPool(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    platformFeeCollected(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    poolOfPermissionedAddr(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<number>;
 
     postSwap(
       encodedSwap: BigNumberish,
@@ -728,7 +701,7 @@ export interface UpgradableMeson extends BaseContract {
 
     withdraw(
       amount: BigNumberish,
-      tokenIndex: BigNumberish,
+      poolTokenIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -778,18 +751,6 @@ export interface UpgradableMeson extends BaseContract {
   };
 
   estimateGas: {
-    _updatePosted(
-      encodedSwap: BigNumberish,
-      initiator: string,
-      providerIndex: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    addressOfIndex(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     balanceOf(
       token: string,
       addr: string,
@@ -798,7 +759,7 @@ export interface UpgradableMeson extends BaseContract {
 
     bondSwap(
       encodedSwap: BigNumberish,
-      providerIndex: BigNumberish,
+      poolIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -809,13 +770,13 @@ export interface UpgradableMeson extends BaseContract {
 
     deposit(
       amount: BigNumberish,
-      balanceIndex: BigNumberish,
+      poolTokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     depositAndRegister(
       amount: BigNumberish,
-      balanceIndex: BigNumberish,
+      poolTokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -842,8 +803,6 @@ export interface UpgradableMeson extends BaseContract {
 
     getShortCoinType(overrides?: CallOverrides): Promise<BigNumber>;
 
-    indexOfAddress(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
     indexOfToken(token: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     initialize(
@@ -860,8 +819,18 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    mesonFeeCollected(
+    ownerOfPool(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    platformFeeCollected(
       tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    poolOfPermissionedAddr(
+      arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -910,24 +879,12 @@ export interface UpgradableMeson extends BaseContract {
 
     withdraw(
       amount: BigNumberish,
-      tokenIndex: BigNumberish,
+      poolTokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    _updatePosted(
-      encodedSwap: BigNumberish,
-      initiator: string,
-      providerIndex: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    addressOfIndex(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     balanceOf(
       token: string,
       addr: string,
@@ -936,7 +893,7 @@ export interface UpgradableMeson extends BaseContract {
 
     bondSwap(
       encodedSwap: BigNumberish,
-      providerIndex: BigNumberish,
+      poolIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -947,13 +904,13 @@ export interface UpgradableMeson extends BaseContract {
 
     deposit(
       amount: BigNumberish,
-      balanceIndex: BigNumberish,
+      poolTokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     depositAndRegister(
       amount: BigNumberish,
-      balanceIndex: BigNumberish,
+      poolTokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -980,11 +937,6 @@ export interface UpgradableMeson extends BaseContract {
 
     getShortCoinType(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    indexOfAddress(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     indexOfToken(
       token: string,
       overrides?: CallOverrides
@@ -1004,8 +956,18 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    mesonFeeCollected(
+    ownerOfPool(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    platformFeeCollected(
       tokenIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    poolOfPermissionedAddr(
+      arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1054,7 +1016,7 @@ export interface UpgradableMeson extends BaseContract {
 
     withdraw(
       amount: BigNumberish,
-      tokenIndex: BigNumberish,
+      poolTokenIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

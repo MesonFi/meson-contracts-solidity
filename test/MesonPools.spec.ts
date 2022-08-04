@@ -58,9 +58,9 @@ describe('MesonPools', () => {
 
   describe('#depositAndRegister', () => {
       const amount = ethers.utils.parseUnits('1000', 6)
-      it('rejects zero provider index', async () => {
+      it('rejects zero pool index', async () => {
       await expect(mesonClientForProvider.depositAndRegister(token.address, amount, '0'))
-        .to.be.revertedWith('Cannot use 0 as provider index')
+        .to.be.revertedWith('Cannot use 0 as pool index')
     })
     it('rejects zero amount', async () => {
       await expect(mesonClientForProvider.depositAndRegister(token.address, '0', '1'))
@@ -70,8 +70,8 @@ describe('MesonPools', () => {
       await expect(mesonClientForProvider.depositAndRegister(TestAddress, amount, '1'))
         .to.be.rejectedWith('Token not supported')
 
-      const balanceIndex = pack(['uint8', 'uint40'], [2, 1])
-      await expect(mesonInstance.depositAndRegister(1000, balanceIndex))
+      const poolTokenIndex = pack(['uint8', 'uint40'], [2, 1])
+      await expect(mesonInstance.depositAndRegister(1000, poolTokenIndex))
         .to.be.revertedWith('Token not supported')
     })
     it('rejects if not approved', async () => {
@@ -88,13 +88,13 @@ describe('MesonPools', () => {
       await token.approve(mesonInstance.address, amount)
       await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
       await expect(mesonClientForInitiator.depositAndRegister(token.address, amount, '1'))
-        .to.be.revertedWith('Index already registered')
+        .to.be.revertedWith('Pool index already registered')
     })
     it('rejects if provider is already registered', async () => {
       await token.approve(mesonInstance.address, amount)
       await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
       await expect(mesonClientForProvider.depositAndRegister(token.address, amount, '2'))
-        .to.be.revertedWith('Address already registered')
+        .to.be.revertedWith('Signer address already registered')
     })
   })
 
@@ -117,8 +117,8 @@ describe('MesonPools', () => {
       await expect(mesonClientForProvider.deposit(TestAddress, amount))
         .to.be.rejectedWith('Token not supported')
 
-      const balanceIndex = pack(['uint8', 'uint40'], [2, 1])
-      await expect(mesonInstance.deposit(1000, balanceIndex))
+      const poolTokenIndex = pack(['uint8', 'uint40'], [2, 1])
+      await expect(mesonInstance.deposit(1000, poolTokenIndex))
         .to.be.revertedWith('Token not supported')
     })
     it('rejects if not approved', async () => {
@@ -138,15 +138,18 @@ describe('MesonPools', () => {
 
   describe('#withdraw', () => {
     const amount = ethers.utils.parseUnits('1000', 6)
-    it('rejects if not registered', async () => {
-      await expect(mesonInstance.withdraw(amount, 1))
-        .to.be.revertedWith('Caller not registered. Call depositAndRegister')
+    it('rejects if pool not registered', async () => {
+      const poolTokenIndex = pack(['uint8', 'uint40'], [1, 1])
+      await expect(mesonInstance.withdraw(amount, poolTokenIndex))
+        .to.be.revertedWith('Need the pool owner as the signer')
     })
     it('rejects if overdrawn', async () => {
       await token.approve(mesonInstance.address, amount)
       await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
-      await expect(mesonInstance.withdraw(ethers.utils.parseUnits('1001', 6), 1))
+      const withdrawAmount = ethers.utils.parseUnits('1001', 6)
+      const poolTokenIndex = pack(['uint8', 'uint40'], [1, 1])
+      await expect(mesonInstance.withdraw(withdrawAmount, poolTokenIndex))
         .to.be.revertedWith('reverted with panic code 0x11')
     })
     it('accepts a valid withdraw', async () => {
@@ -154,7 +157,8 @@ describe('MesonPools', () => {
       await mesonClientForProvider.depositAndRegister(token.address, amount, '1')
 
       const withdrawAmount = ethers.utils.parseUnits('1', 6)
-      await mesonInstance.withdraw(withdrawAmount, 1)
+      const poolTokenIndex = pack(['uint8', 'uint40'], [1, 1])
+      await mesonInstance.withdraw(withdrawAmount, poolTokenIndex)
       expect(await mesonInstance.balanceOf(token.address, provider.address)).to.equal(amount.sub(withdrawAmount))
     })
   })
