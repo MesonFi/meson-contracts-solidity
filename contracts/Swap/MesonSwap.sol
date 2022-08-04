@@ -18,7 +18,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// The r,s,v signature must be signed by the swap initiator. The initiator can call
   /// this method directly, in which case `poolIndex` should be zero and wait for LPs
   /// to call `bondSwap`. Initiators can also send the swap requests offchain (through the
-  /// meson relayer service). An liquidity provider who receives requests through the relayer
+  /// meson relayer service). An LP who receives requests through the relayer
   /// can call this method to post and bond the swap in a single contract execution,
   /// in which case he should give his own `poolIndex`.
   ///
@@ -69,7 +69,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   function bondSwap(uint256 encodedSwap, uint40 poolIndex) external {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     require(postedSwap > 1, "Swap does not exist");
-    require(_poolIndexFromPosted(postedSwap) == 0, "Swap bonded to another provider");
+    require(_poolIndexFromPosted(postedSwap) == 0, "Swap bonded to another pool");
     require(poolOfPermissionedAddr[msg.sender] == poolIndex, "Can only bound to signer");
 
     _postedSwaps[encodedSwap] = postedSwap | poolIndex;
@@ -100,7 +100,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
   /// @notice Execute the swap by providing a release signature.
   /// This is step 4️⃣  in a swap.
-  /// Once the signature is verified, the current bonding LP (provider)
+  /// Once the signature is verified, the current bonding LP pool
   /// will receive funds deposited by the swap initiator.
   /// @dev Designed to be used by the current bonding LP
   /// @param encodedSwap Encoded swap information; also used as the key of `_postedSwaps`
@@ -143,15 +143,15 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
   /// @notice Read information for a posted swap
   function getPostedSwap(uint256 encodedSwap) external view
-    returns (address initiator, address provider, bool executed)
+    returns (address initiator, address poolOwner, bool executed)
   {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     initiator = _initiatorFromPosted(postedSwap);
     executed = postedSwap == 1;
     if (initiator == address(0)) {
-      provider = address(0);
+      poolOwner = address(0);
     } else {
-      provider = ownerOfPool[_poolIndexFromPosted(postedSwap)];
+      poolOwner = ownerOfPool[_poolIndexFromPosted(postedSwap)];
     }
   }
 

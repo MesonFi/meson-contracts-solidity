@@ -20,7 +20,6 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface MesonStatesTestInterface extends utils.Interface {
   functions: {
     "addSupportToken(address,uint8)": FunctionFragment;
-    "balanceOf(address,address)": FunctionFragment;
     "checkReleaseSignature(uint256,address,bytes32,bytes32,uint8,address)": FunctionFragment;
     "checkRequestSignature(uint256,bytes32,bytes32,uint8,address)": FunctionFragment;
     "decodeLockedSwap(uint80)": FunctionFragment;
@@ -34,6 +33,7 @@ export interface MesonStatesTestInterface extends utils.Interface {
     "ownerOfPool(uint40)": FunctionFragment;
     "platformFeeCollected(uint8)": FunctionFragment;
     "poolOfPermissionedAddr(address)": FunctionFragment;
+    "poolTokenBalance(address,address)": FunctionFragment;
     "poolTokenIndexFrom(uint8,uint40)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
@@ -42,10 +42,6 @@ export interface MesonStatesTestInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "addSupportToken",
     values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "balanceOf",
-    values: [string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "checkReleaseSignature",
@@ -109,6 +105,10 @@ export interface MesonStatesTestInterface extends utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "poolTokenBalance",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "poolTokenIndexFrom",
     values: [BigNumberish, BigNumberish]
   ): string;
@@ -125,7 +125,6 @@ export interface MesonStatesTestInterface extends utils.Interface {
     functionFragment: "addSupportToken",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "checkReleaseSignature",
     data: BytesLike
@@ -170,6 +169,10 @@ export interface MesonStatesTestInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "poolOfPermissionedAddr",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "poolTokenBalance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -220,12 +223,6 @@ export interface MesonStatesTest extends BaseContract {
       index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    balanceOf(
-      token: string,
-      addr: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
 
     checkReleaseSignature(
       encodedSwap: BigNumberish,
@@ -330,6 +327,12 @@ export interface MesonStatesTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[number]>;
 
+    poolTokenBalance(
+      token: string,
+      addr: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     poolTokenIndexFrom(
       tokenIndex: BigNumberish,
       poolIndex: BigNumberish,
@@ -351,12 +354,6 @@ export interface MesonStatesTest extends BaseContract {
     index: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  balanceOf(
-    token: string,
-    addr: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   checkReleaseSignature(
     encodedSwap: BigNumberish,
@@ -458,6 +455,12 @@ export interface MesonStatesTest extends BaseContract {
     overrides?: CallOverrides
   ): Promise<number>;
 
+  poolTokenBalance(
+    token: string,
+    addr: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   poolTokenIndexFrom(
     tokenIndex: BigNumberish,
     poolIndex: BigNumberish,
@@ -477,12 +480,6 @@ export interface MesonStatesTest extends BaseContract {
       index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    balanceOf(
-      token: string,
-      addr: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     checkReleaseSignature(
       encodedSwap: BigNumberish,
@@ -584,6 +581,12 @@ export interface MesonStatesTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<number>;
 
+    poolTokenBalance(
+      token: string,
+      addr: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     poolTokenIndexFrom(
       tokenIndex: BigNumberish,
       poolIndex: BigNumberish,
@@ -605,12 +608,6 @@ export interface MesonStatesTest extends BaseContract {
       token: string,
       index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    balanceOf(
-      token: string,
-      addr: string,
-      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     checkReleaseSignature(
@@ -690,6 +687,12 @@ export interface MesonStatesTest extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    poolTokenBalance(
+      token: string,
+      addr: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     poolTokenIndexFrom(
       tokenIndex: BigNumberish,
       poolIndex: BigNumberish,
@@ -709,12 +712,6 @@ export interface MesonStatesTest extends BaseContract {
       token: string,
       index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    balanceOf(
-      token: string,
-      addr: string,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     checkReleaseSignature(
@@ -794,6 +791,12 @@ export interface MesonStatesTest extends BaseContract {
 
     poolOfPermissionedAddr(
       arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    poolTokenBalance(
+      token: string,
+      addr: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

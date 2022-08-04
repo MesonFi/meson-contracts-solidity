@@ -5,7 +5,7 @@ import "./IMesonPoolsEvents.sol";
 import "../utils/MesonStates.sol";
 
 /// @title MesonPools
-/// @notice The class to manage liquidity pools for providers.
+/// @notice The class to manage pools for LPs.
 /// Methods in this class will be executed when a swap initiator wants to
 /// swap into this chain.
 contract MesonPools is IMesonPoolsEvents, MesonStates {
@@ -21,24 +21,24 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   function depositAndRegister(uint256 amount, uint48 poolTokenIndex) external {
     require(amount > 0, 'Amount must be positive');
 
-    address provider = _msgSender();
+    address poolOwner = _msgSender();
     uint40 poolIndex = _poolIndexFrom(poolTokenIndex);
     require(poolIndex != 0, "Cannot use 0 as pool index");
     require(ownerOfPool[poolIndex] == address(0), "Pool index already registered");
-    require(poolOfPermissionedAddr[provider] == 0, "Signer address already registered");
-    ownerOfPool[poolIndex] = provider;
-    poolOfPermissionedAddr[provider] = poolIndex;
+    require(poolOfPermissionedAddr[poolOwner] == 0, "Signer address already registered");
+    ownerOfPool[poolIndex] = poolOwner;
+    poolOfPermissionedAddr[poolOwner] = poolIndex;
 
     _balanceOfPoolToken[poolTokenIndex] += amount;
     uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
-    _unsafeDepositToken(_tokenList[tokenIndex], provider, amount, tokenIndex == 255);
+    _unsafeDepositToken(_tokenList[tokenIndex], poolOwner, amount, tokenIndex == 255);
   }
 
   /// @notice Deposit tokens into the liquidity pool.
   /// The LP should be careful to make sure the `poolTokenIndex` is correct.
   /// Make sure to call `depositAndRegister` first and register a pool index.
   /// Otherwise, token may be deposited to others.
-  /// @dev Designed to be used by liquidity providers
+  /// @dev Designed to be used by LPs
   /// @param amount The amount of tokens to be added to the pool
   /// @param poolTokenIndex In format of `tokenIndex:uint8|poolIndex:uint40`
   function deposit(uint256 amount, uint48 poolTokenIndex) external {
@@ -53,7 +53,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   }
 
   /// @notice Withdraw tokens from the liquidity pool.
-  /// @dev Designed to be used by liquidity providers
+  /// @dev Designed to be used by LPs
   /// @param amount The amount to be removed from the pool
   /// @param poolTokenIndex In format of`[tokenIndex:uint8][poolIndex:uint40]
   function withdraw(uint256 amount, uint48 poolTokenIndex) external {
@@ -71,7 +71,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// The bonding LP should call this method with the same signature given
   /// by `postSwap`. This method will lock swapping fund on the target chain
   /// for `LOCK_TIME_PERIOD` and wait for fund release and execution.
-  /// @dev Designed to be used by liquidity providers
+  /// @dev Designed to be used by LPs
   /// @param encodedSwap Encoded swap information
   /// @param r Part of the signature (the one given by `postSwap` call)
   /// @param s Part of the signature (the one given by `postSwap` call)
@@ -164,11 +164,11 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
   /// @notice Read information for a locked swap
   function getLockedSwap(uint256 encodedSwap, address initiator) external view
-    returns (address provider, uint40 until)
+    returns (address poolOwner, uint40 until)
   {
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     uint80 lockedSwap = _lockedSwaps[swapId];
-    provider = ownerOfPool[_poolIndexFromLocked(lockedSwap)];
+    poolOwner = ownerOfPool[_poolIndexFromLocked(lockedSwap)];
     until = uint40(_untilFromLocked(lockedSwap));
   }
 

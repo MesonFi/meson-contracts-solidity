@@ -59,23 +59,23 @@ export class TronContract {
   }
 
   async balanceOf(token, addr) {
-    return await this.#instance.balanceOf(token, addr).call({ from: this.signer })
+    return await this.#instance.poolTokenBalance(token, addr).call({ from: this.signer })
   }
 
   async getPostedSwap(encoded: string | BigNumber) {
-    const { initiator, provider, executed } = await this.#instance.getPostedSwap(encoded).call({ from: this.signer })
+    const { initiator, poolOwner, executed } = await this.#instance.getPostedSwap(encoded).call({ from: this.signer })
     return {
       executed,
       initiator: initiator === AddressZero ? undefined : initiator.replace(/^41/, '0x'),
-      provider: provider === AddressZero ? undefined : this.tronWeb.address.fromHex(provider),
+      poolOwner: poolOwner === AddressZero ? undefined : this.tronWeb.address.fromHex(poolOwner),
     }
   }
 
   async getLockedSwap(encoded: string | BigNumber, initiator: string) {
-    const { provider, until } = await this.#instance.getLockedSwap(encoded, initiator).call({ from: this.signer })
+    const { poolOwner, until } = await this.#instance.getLockedSwap(encoded, initiator).call({ from: this.signer })
     return {
       until,
-      provider: provider === AddressZero ? undefined : this.tronWeb.address.fromHex(provider),
+      poolOwner: poolOwner === AddressZero ? undefined : this.tronWeb.address.fromHex(poolOwner),
     }
   }
 

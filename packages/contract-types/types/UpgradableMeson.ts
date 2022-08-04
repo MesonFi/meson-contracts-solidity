@@ -20,7 +20,6 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface UpgradableMesonInterface extends utils.Interface {
   functions: {
-    "balanceOf(address,address)": FunctionFragment;
     "bondSwap(uint256,uint40)": FunctionFragment;
     "cancelSwap(uint256)": FunctionFragment;
     "deposit(uint256,uint48)": FunctionFragment;
@@ -35,6 +34,7 @@ export interface UpgradableMesonInterface extends utils.Interface {
     "ownerOfPool(uint40)": FunctionFragment;
     "platformFeeCollected(uint8)": FunctionFragment;
     "poolOfPermissionedAddr(address)": FunctionFragment;
+    "poolTokenBalance(address,address)": FunctionFragment;
     "postSwap(uint256,bytes32,bytes32,uint8,uint200)": FunctionFragment;
     "release(uint256,bytes32,bytes32,uint8,address,address)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
@@ -45,10 +45,6 @@ export interface UpgradableMesonInterface extends utils.Interface {
     "withdraw(uint256,uint48)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "balanceOf",
-    values: [string, string]
-  ): string;
   encodeFunctionData(
     functionFragment: "bondSwap",
     values: [BigNumberish, BigNumberish]
@@ -106,6 +102,10 @@ export interface UpgradableMesonInterface extends utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "poolTokenBalance",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "postSwap",
     values: [BigNumberish, BytesLike, BytesLike, BigNumberish, BigNumberish]
   ): string;
@@ -135,7 +135,6 @@ export interface UpgradableMesonInterface extends utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
 
-  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bondSwap", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "cancelSwap", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
@@ -175,6 +174,10 @@ export interface UpgradableMesonInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "poolOfPermissionedAddr",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "poolTokenBalance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "postSwap", data: BytesLike): Result;
@@ -293,12 +296,6 @@ export interface UpgradableMeson extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    balanceOf(
-      token: string,
-      addr: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
     bondSwap(
       encodedSwap: BigNumberish,
       poolIndex: BigNumberish,
@@ -336,7 +333,7 @@ export interface UpgradableMeson extends BaseContract {
       encodedSwap: BigNumberish,
       initiator: string,
       overrides?: CallOverrides
-    ): Promise<[string, number] & { provider: string; until: number }>;
+    ): Promise<[string, number] & { poolOwner: string; until: number }>;
 
     getPostedSwap(
       encodedSwap: BigNumberish,
@@ -344,7 +341,7 @@ export interface UpgradableMeson extends BaseContract {
     ): Promise<
       [string, string, boolean] & {
         initiator: string;
-        provider: string;
+        poolOwner: string;
         executed: boolean;
       }
     >;
@@ -381,6 +378,12 @@ export interface UpgradableMeson extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<[number]>;
+
+    poolTokenBalance(
+      token: string,
+      addr: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     postSwap(
       encodedSwap: BigNumberish,
@@ -434,12 +437,6 @@ export interface UpgradableMeson extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  balanceOf(
-    token: string,
-    addr: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
   bondSwap(
     encodedSwap: BigNumberish,
     poolIndex: BigNumberish,
@@ -477,7 +474,7 @@ export interface UpgradableMeson extends BaseContract {
     encodedSwap: BigNumberish,
     initiator: string,
     overrides?: CallOverrides
-  ): Promise<[string, number] & { provider: string; until: number }>;
+  ): Promise<[string, number] & { poolOwner: string; until: number }>;
 
   getPostedSwap(
     encodedSwap: BigNumberish,
@@ -485,7 +482,7 @@ export interface UpgradableMeson extends BaseContract {
   ): Promise<
     [string, string, boolean] & {
       initiator: string;
-      provider: string;
+      poolOwner: string;
       executed: boolean;
     }
   >;
@@ -519,6 +516,12 @@ export interface UpgradableMeson extends BaseContract {
     arg0: string,
     overrides?: CallOverrides
   ): Promise<number>;
+
+  poolTokenBalance(
+    token: string,
+    addr: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   postSwap(
     encodedSwap: BigNumberish,
@@ -570,12 +573,6 @@ export interface UpgradableMeson extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    balanceOf(
-      token: string,
-      addr: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     bondSwap(
       encodedSwap: BigNumberish,
       poolIndex: BigNumberish,
@@ -613,7 +610,7 @@ export interface UpgradableMeson extends BaseContract {
       encodedSwap: BigNumberish,
       initiator: string,
       overrides?: CallOverrides
-    ): Promise<[string, number] & { provider: string; until: number }>;
+    ): Promise<[string, number] & { poolOwner: string; until: number }>;
 
     getPostedSwap(
       encodedSwap: BigNumberish,
@@ -621,7 +618,7 @@ export interface UpgradableMeson extends BaseContract {
     ): Promise<
       [string, string, boolean] & {
         initiator: string;
-        provider: string;
+        poolOwner: string;
         executed: boolean;
       }
     >;
@@ -655,6 +652,12 @@ export interface UpgradableMeson extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<number>;
+
+    poolTokenBalance(
+      token: string,
+      addr: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     postSwap(
       encodedSwap: BigNumberish,
@@ -751,12 +754,6 @@ export interface UpgradableMeson extends BaseContract {
   };
 
   estimateGas: {
-    balanceOf(
-      token: string,
-      addr: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     bondSwap(
       encodedSwap: BigNumberish,
       poolIndex: BigNumberish,
@@ -834,6 +831,12 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    poolTokenBalance(
+      token: string,
+      addr: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     postSwap(
       encodedSwap: BigNumberish,
       r: BytesLike,
@@ -885,12 +888,6 @@ export interface UpgradableMeson extends BaseContract {
   };
 
   populateTransaction: {
-    balanceOf(
-      token: string,
-      addr: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     bondSwap(
       encodedSwap: BigNumberish,
       poolIndex: BigNumberish,
@@ -968,6 +965,12 @@ export interface UpgradableMeson extends BaseContract {
 
     poolOfPermissionedAddr(
       arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    poolTokenBalance(
+      token: string,
+      addr: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

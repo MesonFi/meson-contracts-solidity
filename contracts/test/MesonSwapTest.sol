@@ -9,11 +9,11 @@ contract MesonSwapTest is MesonSwap {
   }
 
   function register(uint40 poolIndex) external {
-    address provider = _msgSender();
+    address poolOwner = _msgSender();
     require(poolIndex != 0, "Cannot use index 0");
     require(ownerOfPool[poolIndex] == address(0), "Pool index already registered");
-    require(poolOfPermissionedAddr[provider] == 0, "Signer address already registered");
-    ownerOfPool[poolIndex] = provider;
-    poolOfPermissionedAddr[provider] = poolIndex;
+    require(poolOfPermissionedAddr[poolOwner] == 0, "Signer address already registered");
+    ownerOfPool[poolIndex] = poolOwner;
+    poolOfPermissionedAddr[poolOwner] = poolIndex;
   }
 }

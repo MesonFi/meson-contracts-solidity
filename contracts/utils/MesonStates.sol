@@ -43,7 +43,7 @@ contract MesonStates is MesonTokens, MesonHelpers {
   /// The pool index 0 is reserved for use by Meson
   mapping(uint48 => uint256) internal _balanceOfPoolToken;
 
-  function balanceOf(address token, address addr) external view returns (uint256) {
+  function poolTokenBalance(address token, address addr) external view returns (uint256) {
     uint8 tokenIndex = _indexOfToken[token];
     uint40 poolIndex = poolOfPermissionedAddr[addr];
     if (poolIndex == 0 || tokenIndex == 0) {

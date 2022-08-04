@@ -150,12 +150,12 @@ export class MesonClient {
     return await this.mesonInstance.getShortCoinType()
   }
 
-  async indexOfAddress(providerAddress: string) {
-    return await this.mesonInstance.poolOfPermissionedAddr(providerAddress)
+  async indexOfAddress(addr: string) {
+    return await this.mesonInstance.poolOfPermissionedAddr(addr)
   }
 
-  async balanceOf(token: string, providerAddress: string) {
-    return await this.mesonInstance.balanceOf(token, providerAddress)
+  async balanceOf(token: string, addr: string) {
+    return await this.mesonInstance.poolTokenBalance(token, addr)
   }
 
   requestSwap(swap: PartialSwapData, outChain: string, lockPeriod: number = 5400) {
@@ -188,10 +188,14 @@ export class MesonClient {
     if (!tokenIndex) {
       throw new Error(`Token not supported`)
     }
-    const providerAddress = await this.getSigner()
-    const poolIndex = await this.mesonInstance.poolOfPermissionedAddr(providerAddress)
+    const signer = await this.getSigner()
+    const poolIndex = await this.mesonInstance.poolOfPermissionedAddr(signer)
     if (!poolIndex) {
-      throw new Error(`Address ${providerAddress} not registered. Please call depositAndRegister first.`)
+      throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
+    }
+    const owner = await this.mesonInstance.ownerOfPool(poolIndex)
+    if (owner !== signer) {
+      throw new Error(`The signer is not the owner of the LP pool.`)
     }
     return this._deposit(amount, tokenIndex, poolIndex)
   }
@@ -202,10 +206,10 @@ export class MesonClient {
   }
 
   async postSwap(signedRequest: SignedSwapRequestData) {
-    const providerAddress = await this.getSigner()
-    const poolIndex = await this.mesonInstance.poolOfPermissionedAddr(providerAddress)
+    const signer = await this.getSigner()
+    const poolIndex = await this.mesonInstance.poolOfPermissionedAddr(signer)
     if (!poolIndex) {
-      throw new Error(`Address ${providerAddress} not registered. Please call depositAndRegister first.`)
+      throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
     }
     return this.mesonInstance.postSwap(
       signedRequest.encoded,
@@ -217,10 +221,10 @@ export class MesonClient {
   }
 
   async bondSwap(encoded: BigNumberish) {
-    const providerAddress = await this.getSigner()
-    const poolIndex = await this.mesonInstance.poolOfPermissionedAddr(providerAddress)
+    const signer = await this.getSigner()
+    const poolIndex = await this.mesonInstance.poolOfPermissionedAddr(signer)
     if (!poolIndex) {
-      throw new Error(`Address ${providerAddress} not registered. Please call depositAndRegister first.`)
+      throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
     }
     return this.mesonInstance.bondSwap(encoded, poolIndex)
   }
@@ -344,26 +348,26 @@ export class MesonClient {
   }
 
   async _getPostedSwap(encoded: string | BigNumber, overrides: CallOverrides) {
-    const { initiator, provider, executed } = await this.mesonInstance.getPostedSwap(encoded, overrides)
+    const { initiator, poolOwner, executed } = await this.mesonInstance.getPostedSwap(encoded, overrides)
     return {
       executed,
       initiator: initiator === AddressZero ? undefined : initiator,
-      provider: provider === AddressZero ? undefined : provider
+      poolOwner: poolOwner === AddressZero ? undefined : poolOwner
     }
   }
 
   async _getLockedSwap(encoded: string | BigNumber, initiator: string, overrides: CallOverrides) {
-    const { provider, until } = await this.mesonInstance.getLockedSwap(encoded, initiator, overrides)
+    const { poolOwner, until } = await this.mesonInstance.getLockedSwap(encoded, initiator, overrides)
     return {
       until,
-      provider: provider === AddressZero ? undefined : provider
+      poolOwner: poolOwner === AddressZero ? undefined : poolOwner
     }
   }
 
   async getPostedSwap(encoded: string | BigNumber, initiatorToCheck?: string, block?: number): Promise<{
     status: PostedSwapStatus,
     initiator?: string,
-    provider?: string,
+    poolOwner?: string,
   }> {
     let expired
     try {
@@ -384,14 +388,14 @@ export class MesonClient {
         overrides.blockTag = block
       }
     }
-    const { initiator, provider, executed } = await this._getPostedSwap(encoded, overrides)
+    const { initiator, poolOwner, executed } = await this._getPostedSwap(encoded, overrides)
     if (executed) {
       return { status: PostedSwapStatus.Executed }
     } else if (!initiator) {
       return { status: PostedSwapStatus.NoneOrAfterRunning }
     } else if (initiatorToCheck && initiatorToCheck.toLowerCase() !== initiator.toLowerCase()) {
       return { status: PostedSwapStatus.ErrorMadeByOtherInitiator }
-    } else if (!provider) {
+    } else if (!poolOwner) {
       if (expired) {
         return { status: PostedSwapStatus.ErrorExpired, initiator }
       } else {
@@ -399,16 +403,16 @@ export class MesonClient {
       }
     } else {
       if (expired) {
-        return { status: PostedSwapStatus.ErrorExpiredButBonded, initiator, provider }
+        return { status: PostedSwapStatus.ErrorExpiredButBonded, initiator, poolOwner }
       } else {
-        return { status: PostedSwapStatus.Bonded, initiator, provider }
+        return { status: PostedSwapStatus.Bonded, initiator, poolOwner }
       }
     }
   }
 
   async getLockedSwap(encoded: string | BigNumber, initiator: string, block?: number): Promise<{
     status: LockedSwapStatus,
-    provider?: string,
+    poolOwner?: string,
     until?: number
   }> {
     const overrides: CallOverrides = {}
@@ -420,13 +424,13 @@ export class MesonClient {
         overrides.blockTag = block
       }
     }
-    const { provider, until } = await this._getLockedSwap(encoded, initiator, overrides)
+    const { poolOwner, until } = await this._getLockedSwap(encoded, initiator, overrides)
     if (!until) {
       return { status: LockedSwapStatus.NoneOrAfterRunning }
     } else if (until * 1000 < Date.now()) {
-      return { status: LockedSwapStatus.ErrorExpired, provider, until }
+      return { status: LockedSwapStatus.ErrorExpired, poolOwner, until }
     } else {
-      return { status: LockedSwapStatus.Locked, provider, until }
+      return { status: LockedSwapStatus.Locked, poolOwner, until }
     }
   }
 }
