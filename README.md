@@ -24,3 +24,7 @@ Run `yarn docgen` to generate docs for Meson smart contracts, which are extracte
 This project provides two scripts to estimate gas consumptions for crucial methos of Meson. Run `yarn estimate` to estimate the normal deployed Meson contracts, and run `yarn estiamte-upgradable` to estimate in the case Meson is deployed as an upgradable contract.
 
 ## Deployment
+
+Meson smart contracts can be deployed to multiple blockchains, either for their testsnets or mainnets. You can see many scripts of `yarn testnet:[id]` and `yarn deploy:[id]` with different values of id (which specifies the deploying chain) in `packages.json`. They are deployment scripts for Meson supported testnets and mainnets, respectively. These scripts will switch the current chain for the project, compile the smart contract, and run the actual script to deploy the upgradable version of Meson smart contract.
+
+The actual deploy scripts locate in `scripts/testnets/deploy-upgradable.js` and `scripts/mainnets/deploy-upgradable.js`. The connection config to different blockchains are given by the `@mesonfi/presets` sdk in the `packages/presets/testnets.json` and `packages/presets/mainnets.json` files.
