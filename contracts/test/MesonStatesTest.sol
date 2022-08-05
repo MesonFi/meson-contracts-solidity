@@ -41,7 +41,6 @@ contract MesonStatesTest is MesonStates {
     uint8 inTokenIndex,
     bytes2 outChain,
     uint8 outTokenIndex,
-    bytes6 poolTokenIndexForPool0,
     bytes6 poolTokenIndexForOutToken
   ) {
     amount = _amountFrom(encodedSwap);
@@ -53,7 +52,6 @@ contract MesonStatesTest is MesonStates {
     inTokenIndex = _inTokenIndexFrom(encodedSwap);
     outChain = bytes2(_outChainFrom(encodedSwap));
     outTokenIndex = _outTokenIndexFrom(encodedSwap);
-    poolTokenIndexForPool0 = bytes6(_poolTokenIndexForPool0From(encodedSwap));
     poolTokenIndexForOutToken = bytes6(_poolTokenIndexForOutToken(encodedSwap, poolIndex));
   }
 

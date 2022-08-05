@@ -94,7 +94,6 @@ describe('MesonStates', () => {
       expect(decoded.inTokenIndex).to.equal(swap.inToken)
       expect(decoded.outChain).to.equal(swap.outChain)
       expect(decoded.outTokenIndex).to.equal(swap.outToken)
-      expect(decoded.poolTokenIndexForPool0).to.equal(pack(['uint8', 'uint40'], [swap.inToken, 0]))
       expect(decoded.poolTokenIndexForOutToken).to.equal(pack(['uint8', 'uint40'], [swap.outToken, 1]))
     })
   })

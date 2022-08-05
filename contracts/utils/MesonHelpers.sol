@@ -106,10 +106,6 @@ contract MesonHelpers is MesonConfig {
     return uint8(encodedSwap >> 24);
   }
 
-  function _poolTokenIndexForPool0From(uint256 encodedSwap) internal pure returns (uint48) {
-    return uint48(encodedSwap << 40);
-  }
-
   function _poolTokenIndexForOutToken(uint256 encodedSwap, uint40 poolIndex) internal pure returns (uint48) {
     return uint48((encodedSwap & 0xFF000000) << 16) | poolIndex;
   }

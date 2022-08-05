@@ -273,7 +273,6 @@ export interface MesonStatesTest extends BaseContract {
         number,
         string,
         number,
-        string,
         string
       ] & {
         amount: BigNumber;
@@ -285,7 +284,6 @@ export interface MesonStatesTest extends BaseContract {
         inTokenIndex: number;
         outChain: string;
         outTokenIndex: number;
-        poolTokenIndexForPool0: string;
         poolTokenIndexForOutToken: string;
       }
     >;
@@ -404,7 +402,6 @@ export interface MesonStatesTest extends BaseContract {
       number,
       string,
       number,
-      string,
       string
     ] & {
       amount: BigNumber;
@@ -416,7 +413,6 @@ export interface MesonStatesTest extends BaseContract {
       inTokenIndex: number;
       outChain: string;
       outTokenIndex: number;
-      poolTokenIndexForPool0: string;
       poolTokenIndexForOutToken: string;
     }
   >;
@@ -530,7 +526,6 @@ export interface MesonStatesTest extends BaseContract {
         number,
         string,
         number,
-        string,
         string
       ] & {
         amount: BigNumber;
@@ -542,7 +537,6 @@ export interface MesonStatesTest extends BaseContract {
         inTokenIndex: number;
         outChain: string;
         outTokenIndex: number;
-        poolTokenIndexForPool0: string;
         poolTokenIndexForOutToken: string;
       }
     >;
