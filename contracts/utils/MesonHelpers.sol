@@ -74,7 +74,7 @@ contract MesonHelpers is MesonConfig {
     return encodedSwap >> 208;
   }
 
-  function _platformFee(uint256 encodedSwap) internal pure returns (uint256) {
+  function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
     return (encodedSwap >> 208) / 1000; // 0.1% of amount
   }
 

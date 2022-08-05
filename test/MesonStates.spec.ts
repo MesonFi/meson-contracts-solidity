@@ -86,7 +86,7 @@ describe('MesonStates', () => {
     it('returns decoded swap data', async () => {
       const decoded = await mesonInstance.decodeSwap(swap.encoded, 1)
       expect(decoded.amount).to.equal(swap.amount)
-      expect(decoded.platformFee).to.equal(swap.amount.div(1000))
+      expect(decoded.serviceFee).to.equal(swap.amount.div(1000))
       expect(decoded.feeForLp).to.equal(swap.fee)
       expect(decoded.salt).to.equal(swap.salt)
       expect(decoded.expireTs).to.equal(swap.expireTs)

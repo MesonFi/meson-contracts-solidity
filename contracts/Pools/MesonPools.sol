@@ -12,6 +12,11 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @notice Locked Swaps
   /// key: encodedSwap in format of `amount:uint48|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
   /// value: in format of until:uint40|poolIndex:uint40
+  /// TODO: define all variables
+  /// salt 0x__________
+  ///   salt & 0x4000000000 == true => will waive service fee
+  ///   salt & 0x0800000000 == true => use non-typed signing (some wallet such as hardware wallet don't support EIP-712v1)
+  ///   fee means the fee for liquidity provider. An extra service fee maybe charged
   mapping(bytes32 => uint80) internal _lockedSwaps;
 
   /// @notice Initially deposit tokens into an LP pool and register a pool index.
@@ -25,9 +30,9 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint40 poolIndex = _poolIndexFrom(poolTokenIndex);
     require(poolIndex != 0, "Cannot use 0 as pool index");
     require(ownerOfPool[poolIndex] == address(0), "Pool index already registered");
-    require(poolOfPermissionedAddr[poolOwner] == 0, "Signer address already registered");
+    require(poolOfAuthorizedAddr[poolOwner] == 0, "Signer address already registered");
     ownerOfPool[poolIndex] = poolOwner;
-    poolOfPermissionedAddr[poolOwner] = poolIndex;
+    poolOfAuthorizedAddr[poolOwner] = poolIndex;
 
     _balanceOfPoolToken[poolTokenIndex] += amount;
     uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
@@ -88,13 +93,14 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(_lockedSwaps[swapId] == 0, "Swap already exists");
     _checkRequestSignature(encodedSwap, r, s, v, initiator);
 
-    uint40 poolIndex = poolOfPermissionedAddr[_msgSender()];
+    uint40 poolIndex = poolOfAuthorizedAddr[_msgSender()];
     require(poolIndex != 0, "Caller not registered. Call depositAndRegister.");
 
     uint256 until = block.timestamp + LOCK_TIME_PERIOD;
     require(until < _expireTsFrom(encodedSwap), "Cannot lock because expireTs is soon.");
 
     uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, poolIndex);
+    // TODO only (amount-fee) is locked
     _balanceOfPoolToken[poolTokenIndex] -= (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
     
     _lockedSwaps[swapId] = _lockedSwapFrom(until, poolIndex);
@@ -111,6 +117,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(_untilFromLocked(lockedSwap) < block.timestamp, "Swap still in lock");
 
     uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, _poolIndexFromLocked(lockedSwap));
+    // TODO only (amount-fee) is locked
     _balanceOfPoolToken[poolTokenIndex] += (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
     _lockedSwaps[swapId] = 0;
   }
@@ -136,8 +143,10 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   ) external {
     bool feeWaived = _feeWaived(encodedSwap);
     if (feeWaived) {
+      // TODO: for swaps that service fee is waived, only the premium manager can....
       _onlyPremiumManager();
     }
+    // TODO: for normal swaps, anyone can call
 
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     uint80 lockedSwap = _lockedSwaps[swapId];
@@ -148,11 +157,13 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _lockedSwaps[swapId] = 0;
 
     uint8 tokenIndex = _outTokenIndexFrom(encodedSwap);
+    // TODO
     uint256 releaseAmount = _amountFrom(encodedSwap) - _feeForLp(encodedSwap);
     if (!feeWaived) {
-      uint256 platformFee = _platformFee(encodedSwap);
-      releaseAmount -= platformFee;
-      _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += platformFee; // platform fee pool
+      uint256 serviceFee = _serviceFee(encodedSwap); // TODO: serviceFee = 0.1% * amount
+      // TODO: 
+      releaseAmount -= serviceFee;
+      _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee; // TODO: the pool for service fees
     }
 
     _safeTransfer(_tokenList[tokenIndex], recipient, releaseAmount, tokenIndex == 255);

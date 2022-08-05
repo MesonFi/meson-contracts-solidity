@@ -31,7 +31,7 @@ async function main() {
   await (await token2.approve(testnet.mesonAddress, ethers.utils.parseUnits(amount, 18))).wait(1)
 
   console.log(`depositing for ${amount}...`)
-  const poolIndex = await meson.poolOfPermissionedAddr(wallet.address)
+  const poolIndex = await meson.poolOfAuthorizedAddr(wallet.address)
   const needRegister = poolIndex == 0
   const poolTokenIndex = 2**40 + (needRegister ? 1 : poolIndex)
 

@@ -12,8 +12,8 @@ contract MesonSwapTest is MesonSwap {
     address poolOwner = _msgSender();
     require(poolIndex != 0, "Cannot use index 0");
     require(ownerOfPool[poolIndex] == address(0), "Pool index already registered");
-    require(poolOfPermissionedAddr[poolOwner] == 0, "Signer address already registered");
+    require(poolOfAuthorizedAddr[poolOwner] == 0, "Signer address already registered");
     ownerOfPool[poolIndex] = poolOwner;
-    poolOfPermissionedAddr[poolOwner] = poolIndex;
+    poolOfAuthorizedAddr[poolOwner] = poolIndex;
   }
 }

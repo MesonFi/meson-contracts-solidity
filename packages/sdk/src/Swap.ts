@@ -129,15 +129,20 @@ export class Swap implements SwapData {
     return (parseInt(this.salt[2], 16) % 8) >= 4
   }
 
-  get platformFee(): BigNumber {
+  get serviceFee(): BigNumber {
     if (this.deprecatedEncoding) {
       return BigNumber.from(0)
     }
     return this.willWaiveFee ? BigNumber.from(0) : this.amount.div(1000)
   }
 
+  get platformFee(): BigNumber {
+    // deprecated
+    return this.serviceFee
+  }
+
   get totalFee(): BigNumber {
-    return this.platformFee.add(this.fee)
+    return this.serviceFee.add(this.fee)
   }
 
   toObject(): SwapData {

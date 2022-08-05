@@ -45,7 +45,7 @@ async function deposit (meson, token) {
   }
 
   console.log(`depositing for ${amount}...`)
-  const poolIndex = await meson.poolOfPermissionedAddr(wallet.address)
+  const poolIndex = await meson.poolOfAuthorizedAddr(wallet.address)
   const needRegister = poolIndex == 0
   const poolTokenIndex = tokenIndex * 2**40 + (needRegister ? 1 : poolIndex)
 

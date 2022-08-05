@@ -12,6 +12,10 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @notice Posted Swaps
   /// key: encodedSwap in format of `amount:uint48|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
   /// value: in format of initiator:uint160|poolIndex:uint40; =1 maybe means executed (to prevent replay attack)
+
+  /// TODO define variables, same as MesonPools.sol
+  /// uint160 = address
+  /// poolIndex: see xxx for definition
   mapping(uint256 => uint200) internal _postedSwaps;
 
   /// @notice Anyone can call this method to post a swap request. This is step 1️⃣  in a swap.
@@ -70,7 +74,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     require(postedSwap > 1, "Swap does not exist");
     require(_poolIndexFromPosted(postedSwap) == 0, "Swap bonded to another pool");
-    require(poolOfPermissionedAddr[msg.sender] == poolIndex, "Can only bound to signer");
+    require(poolOfAuthorizedAddr[msg.sender] == poolIndex, "Can only bound to signer");
 
     _postedSwaps[encodedSwap] = postedSwap | poolIndex;
     emit SwapBonded(encodedSwap);

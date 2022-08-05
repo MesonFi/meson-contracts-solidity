@@ -34,7 +34,7 @@ contract MesonStatesTest is MesonStates {
   function decodeSwap(uint256 encodedSwap, uint40 poolIndex) external pure returns (
     uint256 amount,
     uint256 feeForLp,
-    uint256 platformFee,
+    uint256 serviceFee,
     uint80 salt,
     uint256 expireTs,
     bytes2 inChain,
@@ -46,7 +46,7 @@ contract MesonStatesTest is MesonStates {
   ) {
     amount = _amountFrom(encodedSwap);
     feeForLp = _feeForLp(encodedSwap);
-    platformFee = _platformFee(encodedSwap);
+    serviceFee = _serviceFee(encodedSwap);
     salt = _saltFrom(encodedSwap);
     expireTs = _expireTsFrom(encodedSwap);
     inChain = bytes2(_inChainFrom(encodedSwap));
