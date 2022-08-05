@@ -142,7 +142,7 @@ export class MesonClient {
   }
 
   async approveToken(token: string, value: BigNumberish) {
-    const contract = new Contract(token, ERC20.abi, this.provider)
+    const contract = new Contract(token, ERC20.abi, this.mesonInstance.signer)
     return await contract.approve(this.address, value)
   }
 
