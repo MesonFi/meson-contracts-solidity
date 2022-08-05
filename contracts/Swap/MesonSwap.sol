@@ -146,12 +146,12 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
     _checkReleaseSignature(encodedSwap, recipient, r, s, v, _initiatorFromPosted(postedSwap));
 
+    uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
+    uint40 poolIndex = _poolIndexFromPosted(postedSwap);
     if (depositToPool) {
-      uint48 poolTokenIndex = _poolTokenIndexForPool0From(encodedSwap) | _poolIndexFromPosted(postedSwap);
-      _balanceOfPoolToken[poolTokenIndex] += _amountFrom(encodedSwap);
+      _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, poolIndex)] += _amountFrom(encodedSwap);
     } else {
-      uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-      _safeTransfer(_tokenList[tokenIndex], ownerOfPool[_poolIndexFromPosted(postedSwap)], _amountFrom(encodedSwap), tokenIndex == 255);
+      _safeTransfer(_tokenList[tokenIndex], ownerOfPool[poolIndex], _amountFrom(encodedSwap), tokenIndex == 255);
     }
   }
 
