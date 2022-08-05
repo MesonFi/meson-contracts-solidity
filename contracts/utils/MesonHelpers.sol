@@ -58,10 +58,11 @@ contract MesonHelpers is MesonConfig {
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transferFrom failed");
   }
 
+  /// @notice `swapId` is the mapping key of `_lockedSwaps` in '../Pools/MesonPools.sol'.
   function _getSwapId(uint256 encodedSwap, address initiator) internal pure returns (bytes32) {
     return keccak256(abi.encodePacked(encodedSwap, initiator));
   }
-
+  
   function _signNonTyped(uint256 encodedSwap) internal pure returns (bool) {
     return (encodedSwap & 0x0800000000000000000000000000000000000000000000000000) > 0;
   }
@@ -77,6 +78,13 @@ contract MesonHelpers is MesonConfig {
   function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
     return (encodedSwap >> 208) / 1000; // 0.1% of amount
   }
+  /// [Suggestion]: mutable service fee points rate
+    // uint public feePointsRate = 10;
+    // modifier onlyOwner() {...}
+    // function setFeePoints(uint newFeePoints) onlyOwner external {...}
+    // function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
+    //   return uint256(encodedSwap >> 208) * feePointsRate / 10000;
+    // }
 
   function _feeForLp(uint256 encodedSwap) internal pure returns (uint256) {
     return (encodedSwap >> 88) & 0xFFFFFFFFFF;
@@ -88,6 +96,7 @@ contract MesonHelpers is MesonConfig {
 
   function _expireTsFrom(uint256 encodedSwap) internal pure returns (uint256) {
     return (encodedSwap >> 48) & 0xFFFFFFFFFF;
+    // [Suggestion]: return uint40(encodedSwap >> 48);
   }
 
   function _inChainFrom(uint256 encodedSwap) internal pure returns (uint16) {
@@ -106,6 +115,7 @@ contract MesonHelpers is MesonConfig {
     return uint8(encodedSwap >> 24);
   }
 
+  /// [TODO ?] Why not _poolTokenIndexForInToken?
   function _poolTokenIndexForPool0From(uint256 encodedSwap) internal pure returns (uint48) {
     return uint48(encodedSwap << 40);
   }
@@ -114,6 +124,10 @@ contract MesonHelpers is MesonConfig {
     return uint48((encodedSwap & 0xFF000000) << 16) | poolIndex;
   }
 
+  /// @notice [The following 2 functions] Decode the variable below:
+  ///   `postedSwap:uint200` -> `initiator:uint160|poolIndex:uint40`
+  ///   `postedSwap` is the mapping value of `_postedSwaps` in '../Swap/MesonSwap.sol'.
+
   function _initiatorFromPosted(uint200 postedSwap) internal pure returns (address) {
     return address(uint160(postedSwap >> 40));
   }
@@ -121,6 +135,10 @@ contract MesonHelpers is MesonConfig {
   function _poolIndexFromPosted(uint200 postedSwap) internal pure returns (uint40) {
     return uint40(postedSwap);
   }
+  
+  /// @notice [The following 3 functions] Encode and Decode the variable below:
+  ///   `lockedSwap:uint80` <-> `until:uint40|poolIndex:uint40`
+  ///   `lockedSwap` is the mapping value of `_lockedSwaps` in '../Pools/MesonPools.sol'.
 
   function _lockedSwapFrom(uint256 until, uint40 poolIndex) internal pure returns (uint80) {
     return (uint80(until) << 40) | poolIndex;
@@ -133,6 +151,9 @@ contract MesonHelpers is MesonConfig {
   function _untilFromLocked(uint80 lockedSwap) internal pure returns (uint256) {
     return uint256(lockedSwap >> 40);
   }
+
+  /// @notice [The following 3 functions] Encode and Decode the variable below:
+  ///   `poolTokenIndex:uint48` <-> `tokenIndeex:uint8|poolIndex:uint40`
 
   function _poolTokenIndexFrom(uint8 tokenIndex, uint40 poolIndex) internal pure returns (uint48) {
     return (uint48(tokenIndex) << 40) | poolIndex;

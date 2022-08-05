@@ -10,15 +10,25 @@ import "../utils/MesonStates.sol";
 /// on the initial chain of swaps.
 contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @notice Posted Swaps
-  /// key: encodedSwap in format of `amount:uint48|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
-  /// value: in format of initiator:uint160|poolIndex:uint40; =1 maybe means executed (to prevent replay attack)
+  ///  [TODO ?] value: in format of initiator:uint160|poolIndex:uint40; =1 maybe means executed (to prevent replay attack)
 
-  /// TODO define variables, same as MesonPools.sol
-  /// uint160 = address
-  /// poolIndex: see xxx for definition
+  /// key: `encodedSwap` in format of `amount:uint48|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
+  ///   amount: The amount of tokens of this swap
+  ///   salt: The salt value of this swap, carrying some information below:
+  ///     salt & 0x4000000000 == true => will waive service fee
+  ///     salt & 0x0800000000 == true => use non-typed signing (some wallet such as hardware wallet don't support EIP-712v1)
+  ///   fee: The fee for liquidity provider. An extra service fee maybe charged afterwards
+  ///   expireTs: The expiration time of this swap [TODO ?] 
+  ///   outChain: The index of the target chain (also called the out chain)
+  ///   outToken: The index of the token in the target chain
+  ///   inChain: The index of the source chain (also called the in chain)
+  ///   inToken: The index of the token in the source chain
+  /// value: `postedSwap` in format of `initiator:address|poolIndex:uint40`
+  ///   initiator: The user address who posted the swap request
+  //    poolIndex: The index of a specific liquidity provider's address. See `poolOfAuthorizedAddr` in '../utils/MesonStates.sol' for more information [TODO ?]
   mapping(uint256 => uint200) internal _postedSwaps;
 
-  /// @notice Anyone can call this method to post a swap request. This is step 1️⃣  in a swap.
+  /// @notice Anyone can call this method to post a swap request. This is step 1️⃣ in a swap.
   /// The r,s,v signature must be signed by the swap initiator. The initiator can call
   /// this method directly, in which case `poolIndex` should be zero and wait for LPs
   /// to call `bondSwap`. Initiators can also send the swap requests offchain (through the
@@ -59,7 +69,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
       _tokenList[tokenIndex],
       initiator,
       amount,
-      tokenIndex == 255
+      tokenIndex == 255   // tokenIndex == 255 means the token is MSN, which is [TODO]
     );
 
     emit SwapPosted(encodedSwap);
@@ -73,7 +83,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   function bondSwap(uint256 encodedSwap, uint40 poolIndex) external {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     require(postedSwap > 1, "Swap does not exist");
-    require(_poolIndexFromPosted(postedSwap) == 0, "Swap bonded to another pool");
+    require(_poolIndexFromPosted(postedSwap) == 0, "Swap bonded to another pool");  /// [TODO ?]
     require(poolOfAuthorizedAddr[msg.sender] == poolIndex, "Can only bound to signer");
 
     _postedSwaps[encodedSwap] = postedSwap | poolIndex;
@@ -103,7 +113,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   }
 
   /// @notice Execute the swap by providing a release signature.
-  /// This is step 4️⃣  in a swap.
+  /// This is step 4️⃣ in a swap.
   /// Once the signature is verified, the current bonding LP pool
   /// will receive funds deposited by the swap initiator.
   /// @dev Designed to be used by the current bonding LP

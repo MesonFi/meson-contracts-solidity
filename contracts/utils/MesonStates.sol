@@ -52,7 +52,8 @@ contract MesonStates is MesonTokens, MesonHelpers {
     return _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, poolIndex)];
   }
   
-  // TODO
+  /// @notice The collected service fee of a specific token.
+  /// @param tokenIndex the index of the supported tokens
   function serviceFeeCollected(uint8 tokenIndex) external view returns (uint256) {
     return _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, 0)];
   }

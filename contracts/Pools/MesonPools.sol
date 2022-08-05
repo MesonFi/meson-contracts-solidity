@@ -10,13 +10,12 @@ import "../utils/MesonStates.sol";
 /// swap into this chain.
 contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @notice Locked Swaps
-  /// key: encodedSwap in format of `amount:uint48|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
-  /// value: in format of until:uint40|poolIndex:uint40
-  /// TODO: define all variables
-  /// salt 0x__________
-  ///   salt & 0x4000000000 == true => will waive service fee
-  ///   salt & 0x0800000000 == true => use non-typed signing (some wallet such as hardware wallet don't support EIP-712v1)
-  ///   fee means the fee for liquidity provider. An extra service fee maybe charged
+  /// key: `swapId` is the value of keccak256(`encodedSwap:uint256`, `initiator:address`)
+  ///   encodedSwap: see '../Swap/MesonSwap.sol' for defination
+  ///   initiator: The user address who posted the swap request
+  /// value: `lockedSwap` in format of `until:uint40|poolIndex:uint40`
+  ///   until: [TODO ?]
+  ///   poolIndex: The index of a specific liquidity provider's address. See `poolOfAuthorizedAddr` in '../utils/MesonStates.sol' for more information
   mapping(bytes32 => uint80) internal _lockedSwaps;
 
   /// @notice Initially deposit tokens into an LP pool and register a pool index.
@@ -72,7 +71,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _safeTransfer(_tokenList[tokenIndex], _msgSender(), amount, tokenIndex == 255);
   }
 
-  /// @notice Lock funds to match a swap request. This is step 2 in a swap.
+  /// @notice Lock funds to match a swap request. This is step 2️⃣ in a swap.
   /// The bonding LP should call this method with the same signature given
   /// by `postSwap`. This method will lock swapping fund on the target chain
   /// for `LOCK_TIME_PERIOD` and wait for fund release and execution.
@@ -100,7 +99,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(until < _expireTsFrom(encodedSwap), "Cannot lock because expireTs is soon.");
 
     uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, poolIndex);
-    // TODO only (amount-fee) is locked
+    // Only (amount - service fee) is locked from liqudity provider's token pool on the in chain. 
+    //   The service fee are charged by Meson protocol itself
     _balanceOfPoolToken[poolTokenIndex] -= (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
     
     _lockedSwaps[swapId] = _lockedSwapFrom(until, poolIndex);
@@ -117,12 +117,13 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(_untilFromLocked(lockedSwap) < block.timestamp, "Swap still in lock");
 
     uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, _poolIndexFromLocked(lockedSwap));
-    // TODO only (amount-fee) is locked
+    // Only (amount - service fee) is added to the liqudity provider's token pool on the out chain. 
+    //   The service fee are charged by Meson protocol itself
     _balanceOfPoolToken[poolTokenIndex] += (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
     _lockedSwaps[swapId] = 0;
   }
 
-  /// @notice Release tokens to satisfy a locked swap. This is step 3️⃣  in a swap.
+  /// @notice Release tokens to satisfy a locked swap. This is step 3️⃣ in a swap.
   /// This method requires a release signature from the swap initiator,
   /// but anyone (initiator herself, the LP, and other people) with the signature 
   /// can call it to make sure the swapping fund is guaranteed to be released.
@@ -157,13 +158,15 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _lockedSwaps[swapId] = 0;
 
     uint8 tokenIndex = _outTokenIndexFrom(encodedSwap);
-    // TODO
+    
+    // The first part of swap fees are charged by liquidity providers
     uint256 releaseAmount = _amountFrom(encodedSwap) - _feeForLp(encodedSwap);
     if (!feeWaived) {
+      // The second part of swap fees are charged by Meson protocol itself, also called service fee
       uint256 serviceFee = _serviceFee(encodedSwap); // TODO: serviceFee = 0.1% * amount
-      // TODO: 
       releaseAmount -= serviceFee;
-      _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee; // TODO: the pool for service fees
+      // The collected service fee is recorded in _balanceOfPoolToken[tokenIndex, poolIndex=0]
+      _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
     }
 
     _safeTransfer(_tokenList[tokenIndex], recipient, releaseAmount, tokenIndex == 255);
