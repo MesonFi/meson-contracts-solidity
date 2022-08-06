@@ -28,3 +28,13 @@ This project provides two scripts to estimate gas consumptions for crucial metho
 Meson smart contracts can be deployed to multiple blockchains, either for their testsnets or mainnets. You can see many scripts of `yarn testnet:[id]` and `yarn deploy:[id]` with different values of id (which specifies the deploying chain) in `packages.json`. They are deployment scripts for Meson supported testnets and mainnets, respectively. These scripts will switch the current chain for the project, compile the smart contract, and run the actual script to deploy the upgradable version of Meson smart contract.
 
 The actual deploy scripts locate in `scripts/testnets/deploy-upgradable.js` and `scripts/mainnets/deploy-upgradable.js`. The connection config to different blockchains are given by the `@mesonfi/presets` sdk in the `packages/presets/testnets.json` and `packages/presets/mainnets.json` files.
+
+
+
+### Constructor parameters
+
+Meson use a whitelist for supported stablecoins (`address[] supportedTokens`), which are specified on first deployment as constructor parameter. The deploy script will read tokens from `@mesonfi/presets` and set them for each chain.
+
+## Become a Liquidity Provider
+
+Any user who wishes to become Meson's liquidity provider needs to first register a pool index (by calling contract method `depositAndRegister`) and transfer supported stablecoins into the Meson contract. Related operations are provided in `scripts/testnets/pool.js`, `scripts/mainnets/pool.js`. Open the corresponding file and edit the parameters include token index, deposit amount, pool index, and run `yarn pool:[id]` to execute the deposit operation. The `pool.js` files also provide withdraw scripts and please use them as needed.
