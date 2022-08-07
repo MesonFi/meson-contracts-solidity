@@ -10,22 +10,20 @@ import "../utils/MesonStates.sol";
 /// on the initial chain of swaps.
 contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @notice Posted Swaps
-  ///  [TODO ?] value: in format of initiator:uint160|poolIndex:uint40; =1 maybe means executed (to prevent replay attack)
-
   /// key: `encodedSwap` in format of `amount:uint48|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
   ///   amount: The amount of tokens of this swap
   ///   salt: The salt value of this swap, carrying some information below:
   ///     salt & 0x4000000000 == true => will waive service fee
   ///     salt & 0x0800000000 == true => use non-typed signing (some wallet such as hardware wallet don't support EIP-712v1)
-  ///   fee: The fee for liquidity provider. An extra service fee maybe charged afterwards
-  ///   expireTs: The expiration time of this swap [TODO ?] 
-  ///   outChain: The index of the target chain (also called the out chain)
-  ///   outToken: The index of the token in the target chain
-  ///   inChain: The index of the source chain (also called the in chain)
-  ///   inToken: The index of the token in the source chain
+  ///   fee: The fee for LPs(liquidity providers). An extra service fee maybe charged afterwards
+  ///   expireTs: The expiration time of this swap on the in-chain. The LP should `executeSwap` and receive his funds before `expireTs` on the in-chain
+  ///   outChain: The index of the out-chain (also called the target chain)
+  ///   outToken: The index of the token in the out-chain
+  ///   inChain: The index of the in-chain (also called the source chain)
+  ///   inToken: The index of the token in the in-chain
   /// value: `postedSwap` in format of `initiator:address|poolIndex:uint40`
   ///   initiator: The user address who posted the swap request
-  //    poolIndex: The index of a specific liquidity provider's address. See `poolOfAuthorizedAddr` in '../utils/MesonStates.sol' for more information [TODO ?]
+  //    poolIndex: The index of a specific LP's address. See `poolOfAuthorizedAddr` in '../utils/MesonStates.sol' for more information
   mapping(uint256 => uint200) internal _postedSwaps;
 
   /// @notice Anyone can call this method to post a swap request. This is step 1️⃣ in a swap.
@@ -37,7 +35,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// in which case he should give his own `poolIndex`.
   ///
   /// The swap will last until `expireTs` and at most one LP can bond to it.
-  /// After the swap expires, the initiator can cancel the swap ande withdraw funds.
+  /// After the swap expires, the initiator can cancel the swap and withdraw funds.
   ///
   /// Once a swap is posted and bonded, the bonding LP should call `lock` on the target chain.
   ///
@@ -69,7 +67,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
       _tokenList[tokenIndex],
       initiator,
       amount,
-      tokenIndex == 255   // tokenIndex == 255 means the token is MSN, which is [TODO]
+      tokenIndex == 255   // tokenIndex == 255 means the token is MSN, which is minted by Meson Protocol and can be swapped to USDC or USDT at 100:1 ratio. [TO-CHECK]
     );
 
     emit SwapPosted(encodedSwap);
@@ -112,8 +110,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     emit SwapCancelled(encodedSwap);
   }
 
-  /// @notice Execute the swap by providing a release signature.
-  /// This is step 4️⃣ in a swap.
+  /// @notice Execute the swap by providing a release signature. This is step 4️⃣ in a swap.
   /// Once the signature is verified, the current bonding LP pool
   /// will receive funds deposited by the swap initiator.
   /// @dev Designed to be used by the current bonding LP

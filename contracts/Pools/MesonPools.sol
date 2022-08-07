@@ -14,7 +14,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   ///   encodedSwap: see '../Swap/MesonSwap.sol' for defination
   ///   initiator: The user address who posted the swap request
   /// value: `lockedSwap` in format of `until:uint40|poolIndex:uint40`
-  ///   until: [TODO ?]
+  ///   until: The expiration time of this swap on the out-chain. The initiator should `release` and receive his funds before `until` on the out-chain
   ///   poolIndex: The index of a specific liquidity provider's address. See `poolOfAuthorizedAddr` in '../utils/MesonStates.sol' for more information
   mapping(bytes32 => uint80) internal _lockedSwaps;
 
@@ -163,7 +163,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint256 releaseAmount = _amountFrom(encodedSwap) - _feeForLp(encodedSwap);
     if (!feeWaived) {
       // The second part of swap fees are charged by Meson protocol itself, also called service fee
-      uint256 serviceFee = _serviceFee(encodedSwap); // TODO: serviceFee = 0.1% * amount
+      uint256 serviceFee = _serviceFee(encodedSwap); // The default service fee is 'serviceFee = 0.1% * amount'
       releaseAmount -= serviceFee;
       // The collected service fee is recorded in _balanceOfPoolToken[tokenIndex, poolIndex=0]
       _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;

@@ -119,45 +119,44 @@ contract MesonHelpers is MesonConfig {
     return uint48((encodedSwap & 0xFF000000) << 16) | poolIndex;
   }
 
-  /// @notice [The following 2 functions] Decode the variable below:
-  ///   `postedSwap:uint200` -> `initiator:uint160|poolIndex:uint40`
+  /// @notice Decode the variable: `postedSwap:uint200` -> `initiator:uint160|poolIndex:uint40`
   ///   `postedSwap` is the mapping value of `_postedSwaps` in '../Swap/MesonSwap.sol'.
-
   function _initiatorFromPosted(uint200 postedSwap) internal pure returns (address) {
     return address(uint160(postedSwap >> 40));
   }
 
+  /// @notice Decode the variable: `postedSwap:uint200` -> `initiator:uint160|poolIndex:uint40`
   function _poolIndexFromPosted(uint200 postedSwap) internal pure returns (uint40) {
     return uint40(postedSwap);
   }
   
-  /// @notice [The following 3 functions] Encode and Decode the variable below:
-  ///   `lockedSwap:uint80` <-> `until:uint40|poolIndex:uint40`
+  /// @notice Encode the variable: `lockedSwap:uint80` <- `until:uint40|poolIndex:uint40`
   ///   `lockedSwap` is the mapping value of `_lockedSwaps` in '../Pools/MesonPools.sol'.
-
   function _lockedSwapFrom(uint256 until, uint40 poolIndex) internal pure returns (uint80) {
     return (uint80(until) << 40) | poolIndex;
   }
 
+  /// @notice Decode the variable: `lockedSwap:uint80` -> `until:uint40|poolIndex:uint40`
   function _poolIndexFromLocked(uint80 lockedSwap) internal pure returns (uint40) {
     return uint40(lockedSwap);
   }
 
+  /// @notice Decode the variable: `lockedSwap:uint80` -> `until:uint40|poolIndex:uint40`
   function _untilFromLocked(uint80 lockedSwap) internal pure returns (uint256) {
     return uint256(lockedSwap >> 40);
   }
 
-  /// @notice [The following 3 functions] Encode and Decode the variable below:
-  ///   `poolTokenIndex:uint48` <-> `tokenIndeex:uint8|poolIndex:uint40`
-
+  /// @notice Encode the variable: `poolTokenIndex:uint48` <- `tokenIndeex:uint8|poolIndex:uint40`
   function _poolTokenIndexFrom(uint8 tokenIndex, uint40 poolIndex) internal pure returns (uint48) {
     return (uint48(tokenIndex) << 40) | poolIndex;
   }
 
+  /// @notice Decode the variable: `poolTokenIndex:uint48` -> `tokenIndeex:uint8|poolIndex:uint40`
   function _tokenIndexFrom(uint48 poolTokenIndex) internal pure returns (uint8) {
     return uint8(poolTokenIndex >> 40);
   }
 
+  /// @notice Decode the variable: `poolTokenIndex:uint48` -> `tokenIndeex:uint8|poolIndex:uint40`
   function _poolIndexFrom(uint48 poolTokenIndex) internal pure returns (uint40) {
     return uint40(poolTokenIndex);
   }
@@ -200,7 +199,7 @@ contract MesonHelpers is MesonConfig {
       mstore(32, keccak256(0, 32))
       mstore(0, typehash)
       digest := keccak256(0, 64)
-    }
+    } // [TODO]
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }
 
