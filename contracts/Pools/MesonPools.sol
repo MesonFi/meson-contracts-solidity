@@ -71,7 +71,9 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _safeTransfer(_tokenList[tokenIndex], _msgSender(), amount, tokenIndex == 255);
   }
 
-  /// TODO: @wyf describe this method
+  /// @notice Add an another authorized address to the pool
+  /// @dev Designed to be used by LPs who have already registered
+  /// @param addr The address to be added
   function addAuthorizedAddr(address addr) external {
     require(poolOfAuthorizedAddr[addr] == 0, "Addr is authorized for another pool");
     address poolOwner = _msgSender();
@@ -80,8 +82,10 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(poolOwner == ownerOfPool[poolIndex], "Need the pool owner as the signer");
     poolOfAuthorizedAddr[addr] = poolIndex;
   }
-
-  /// TODO: @wyf describe this method
+  
+  /// @notice Remove an authorized address from the pool
+  /// @dev Designed to be used by LPs who have already registered
+  /// @param addr The address to be removed
   function removeAuthorizedAddr(address addr) external {
     address poolOwner = _msgSender();
     uint40 poolIndex = poolOfAuthorizedAddr[poolOwner];
