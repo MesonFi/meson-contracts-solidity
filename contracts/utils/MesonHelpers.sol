@@ -77,7 +77,7 @@ contract MesonHelpers is MesonConfig {
   }
 
   function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
-    return (encodedSwap >> 208) / 1000; // 0.1% of amount
+    return _amountFrom(encodedSwap) / 1000; // Default to `serviceFee` = 0.1% * `amount`
   }
   /// [Suggestion]: mutable service fee points rate
     // uint public feePointsRate = 10;

@@ -126,8 +126,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(until < _expireTsFrom(encodedSwap), "Cannot lock because expireTs is soon.");
 
     uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, poolIndex);
-    // Only (amount - service fee) is locked from liqudity provider's token pool on the in chain. 
-    //   The service fee are charged by Meson protocol itself
+    // Only (amount - service fee) is locked from the LP pool. The service fee will be charged on release
     _balanceOfPoolToken[poolTokenIndex] -= (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
     
     _lockedSwaps[swapId] = _lockedSwapFrom(until, poolIndex);
@@ -147,8 +146,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(_untilFromLocked(lockedSwap) < block.timestamp, "Swap still in lock");
 
     uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, _poolIndexFromLocked(lockedSwap));
-    // Only (amount - service fee) is added to the liqudity provider's token pool on the out chain. 
-    //   The service fee are charged by Meson protocol itself
+    // (amount - service fee) will be returned because only that amount was locked
     _balanceOfPoolToken[poolTokenIndex] += (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
     _lockedSwaps[swapId] = 0;
   }
@@ -189,13 +187,13 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     uint8 tokenIndex = _outTokenIndexFrom(encodedSwap);
     
-    // The first part of swap fees are charged by liquidity providers
+    // LP fee will be subtracted from the swap amount
     uint256 releaseAmount = _amountFrom(encodedSwap) - _feeForLp(encodedSwap);
-    if (!feeWaived) {
-      // The second part of swap fees are charged by Meson protocol itself, also called service fee
-      uint256 serviceFee = _serviceFee(encodedSwap); // The default service fee is 'serviceFee = 0.1% * amount'
+    if (!feeWaived) { // If the swap should pay service fee (charged by Meson protocol)
+      uint256 serviceFee = _serviceFee(encodedSwap);
+      // Subtract service fee from the release amount
       releaseAmount -= serviceFee;
-      // The collected service fee is recorded in _balanceOfPoolToken[tokenIndex, poolIndex=0]
+      // The collected service fee will be stored in `_balanceOfPoolToken` with `poolIndex = 0`
       _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
     }
 

@@ -40,7 +40,7 @@ contract MesonStates is MesonTokens, MesonHelpers {
   /// the `poolTokenIndex` is in format of `tokenIndex:uint8|poolIndex:uint40`. `tokenIndex`
   /// is the index of supported tokens given by `_tokenList` (see definition in `MesonTokens.sol`).
   ///
-  /// The pool index 0 is reserved for use by Meson
+  /// The pool index 0 is reserved for use by Meson to store service fees
   mapping(uint48 => uint256) internal _balanceOfPoolToken;
 
   function poolTokenBalance(address token, address addr) external view returns (uint256) {
