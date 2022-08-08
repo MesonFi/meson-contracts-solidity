@@ -36,6 +36,7 @@ contract MesonHelpers is MesonConfig {
       bytes4(0xa9059cbb), // bytes4(keccak256(bytes("transfer(address,uint256)")))
       recipient,
       amount
+      // isUCT ? amount : amount * 1e12 // need to switch to this line if deploying to BNB Chain or Conflux
     ));
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
   }
@@ -55,6 +56,7 @@ contract MesonHelpers is MesonConfig {
       sender,
       address(this),
       amount
+      // isUCT ? amount : amount * 1e12 // need to switch to this line if deploying to BNB Chain or Conflux
     ));
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transferFrom failed");
   }
