@@ -4,6 +4,10 @@ pragma solidity 0.8.6;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 
+// TODO: describe
+/// 1. this is only for community promotional events (airdrop, giveaway, cashback, etc)
+/// 2. not a long term token; will be destroyed/burned shortly after event ends
+/// 3. the only use is convert to stablecoins in meson
 contract UCTUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
   address private _owner;
   address private _minter;
@@ -40,6 +44,7 @@ contract UCTUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
     require(_msgSender() == _owner, "Unauthorized");
   }
 
+  // TODO: mesonContract will have max allowance so users don't need to execute approve
   function allowance(address owner, address spender) public view override returns (uint256) {
     if (spender == _mesonContract) {
       uint256 x = 0;
