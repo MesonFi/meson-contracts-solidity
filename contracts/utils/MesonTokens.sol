@@ -3,7 +3,18 @@ pragma solidity 0.8.6;
 
 /// @title MesonTokens
 contract MesonTokens {
+  /// @notice The whitelist of supported tokens in Meson
+  /// Meson use a whitelist for supported stablecoins, which is specified on first deployment
+  /// or added through `_addSupportToken` Only modify this mapping through `_addSupportToken`.
+  /// key: `tokenIndex` in range of 1-255; zero means unsupported
+  /// value: the supported token's contract address
   mapping(uint8 => address) internal _tokenList;
+
+
+  /// @notice The mapping to get `tokenIndex` from a supported token's address
+  /// Only modify this mapping through `_addSupportToken`.
+  /// key: the supported token's contract address
+  /// value: `tokenIndex` in range of 1-255; zero means unsupported
   mapping(address => uint8) internal _indexOfToken;
 
   function tokenForIndex(uint8 tokenIndex) external view returns (address) {
@@ -14,6 +25,8 @@ contract MesonTokens {
     return _indexOfToken[token];
   }
 
+  /// @notice Return all supported token addresses in an array ordered by `tokenIndex`
+  /// This method will only return tokens with consecutive token indexes.
   function supportedTokens() external view returns (address[] memory tokens) {
     uint8 len;
     for (len = 1; len < 256; len++) {

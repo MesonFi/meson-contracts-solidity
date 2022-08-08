@@ -38,8 +38,7 @@ contract MesonStates is MesonTokens, MesonHelpers {
   ///
   /// The balance of a token in an LP pool is `_balanceOfPoolToken[poolTokenIndex]` in which
   /// the `poolTokenIndex` is in format of `tokenIndex:uint8|poolIndex:uint40`. `tokenIndex`
-  /// is the index of supported tokens given by `_tokenList` (in `MesonTokens.sol`), starting from
-  /// index 1.
+  /// is the index of supported tokens given by `_tokenList` (see definition in `MesonTokens.sol`).
   ///
   /// The pool index 0 is reserved for use by Meson
   mapping(uint48 => uint256) internal _balanceOfPoolToken;
@@ -54,7 +53,7 @@ contract MesonStates is MesonTokens, MesonHelpers {
   }
   
   /// @notice The collected service fee of a specific token.
-  /// @param tokenIndex the index of the supported tokens
+  /// @param tokenIndex The index of a supported token. See `_tokenList` in `MesonTokens.sol`
   function serviceFeeCollected(uint8 tokenIndex) external view returns (uint256) {
     return _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, 0)];
   }
