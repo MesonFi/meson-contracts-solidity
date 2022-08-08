@@ -24,11 +24,6 @@ async function main() {
 
   console.log(`lp address: ${wallet.address}`)
 
-  // const tx = await wallet.sendTransaction({
-  //   value: ethers.utils.parseEther('0.1'),
-  //   to: ''
-  // })
-
   const tx = await deposit(meson, token)
   // const tx = await withdraw(meson, token, '')
   console.log(tx)

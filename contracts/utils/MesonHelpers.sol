@@ -29,7 +29,7 @@ contract MesonHelpers is MesonConfig {
     address token,
     address recipient,
     uint256 amount,
-    bool isMSN
+    bool isUCT
   ) internal {
     // IERC20Minimal(token).transfer(recipient, amount);
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
@@ -41,11 +41,12 @@ contract MesonHelpers is MesonConfig {
   }
 
   /// @notice Execute the token transfer transaction
+  /// @param amount Means the token is UCT which is minted by Meson and can be swapped to USDC or USDT at 100:1 ratio.
   function _unsafeDepositToken(
     address token,
     address sender,
     uint256 amount,
-    bool isMSN
+    bool isUCT
   ) internal {
     require(token != address(0), "Token not supported");
     require(amount > 0, "Amount must be greater than zero");
@@ -58,10 +59,11 @@ contract MesonHelpers is MesonConfig {
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transferFrom failed");
   }
 
+  /// @notice `swapId` is the mapping key of `_lockedSwaps` in '../Pools/MesonPools.sol'.
   function _getSwapId(uint256 encodedSwap, address initiator) internal pure returns (bytes32) {
     return keccak256(abi.encodePacked(encodedSwap, initiator));
   }
-
+  
   function _signNonTyped(uint256 encodedSwap) internal pure returns (bool) {
     return (encodedSwap & 0x0800000000000000000000000000000000000000000000000000) > 0;
   }
@@ -75,8 +77,15 @@ contract MesonHelpers is MesonConfig {
   }
 
   function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
-    return (encodedSwap >> 208) / 1000; // 0.1% of amount
+    return _amountFrom(encodedSwap) / 1000; // Default to `serviceFee` = 0.1% * `amount`
   }
+  /// [Suggestion]: mutable service fee points rate
+    // uint public feePointsRate = 10;
+    // modifier onlyOwner() {...}
+    // function setFeePoints(uint newFeePoints) onlyOwner external {...}
+    // function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
+    //   return uint256(encodedSwap >> 208) * feePointsRate / 10000;
+    // }
 
   function _feeForLp(uint256 encodedSwap) internal pure returns (uint256) {
     return (encodedSwap >> 88) & 0xFFFFFFFFFF;
@@ -88,6 +97,7 @@ contract MesonHelpers is MesonConfig {
 
   function _expireTsFrom(uint256 encodedSwap) internal pure returns (uint256) {
     return (encodedSwap >> 48) & 0xFFFFFFFFFF;
+    // [Suggestion]: return uint40(encodedSwap >> 48);
   }
 
   function _inChainFrom(uint256 encodedSwap) internal pure returns (uint16) {
@@ -110,34 +120,44 @@ contract MesonHelpers is MesonConfig {
     return uint48((encodedSwap & 0xFF000000) << 16) | poolIndex;
   }
 
+  /// @notice Decode the variable: `postedSwap:uint200` -> `initiator:uint160|poolIndex:uint40`
+  ///   `postedSwap` is the mapping value of `_postedSwaps` in '../Swap/MesonSwap.sol'.
   function _initiatorFromPosted(uint200 postedSwap) internal pure returns (address) {
     return address(uint160(postedSwap >> 40));
   }
 
+  /// @notice Decode the variable: `postedSwap:uint200` -> `initiator:uint160|poolIndex:uint40`
   function _poolIndexFromPosted(uint200 postedSwap) internal pure returns (uint40) {
     return uint40(postedSwap);
   }
-
+  
+  /// @notice Encode the variable: `lockedSwap:uint80` <- `until:uint40|poolIndex:uint40`
+  ///   `lockedSwap` is the mapping value of `_lockedSwaps` in '../Pools/MesonPools.sol'.
   function _lockedSwapFrom(uint256 until, uint40 poolIndex) internal pure returns (uint80) {
     return (uint80(until) << 40) | poolIndex;
   }
 
+  /// @notice Decode the variable: `lockedSwap:uint80` -> `until:uint40|poolIndex:uint40`
   function _poolIndexFromLocked(uint80 lockedSwap) internal pure returns (uint40) {
     return uint40(lockedSwap);
   }
 
+  /// @notice Decode the variable: `lockedSwap:uint80` -> `until:uint40|poolIndex:uint40`
   function _untilFromLocked(uint80 lockedSwap) internal pure returns (uint256) {
     return uint256(lockedSwap >> 40);
   }
 
+  /// @notice Encode the variable: `poolTokenIndex:uint48` <- `tokenIndex:uint8|poolIndex:uint40`
   function _poolTokenIndexFrom(uint8 tokenIndex, uint40 poolIndex) internal pure returns (uint48) {
     return (uint48(tokenIndex) << 40) | poolIndex;
   }
 
+  /// @notice Decode the variable: `poolTokenIndex:uint48` -> `tokenIndex:uint8|poolIndex:uint40`
   function _tokenIndexFrom(uint48 poolTokenIndex) internal pure returns (uint8) {
     return uint8(poolTokenIndex >> 40);
   }
 
+  /// @notice Decode the variable: `poolTokenIndex:uint48` -> `tokenIndex:uint8|poolIndex:uint40`
   function _poolIndexFrom(uint48 poolTokenIndex) internal pure returns (uint40) {
     return uint40(poolTokenIndex);
   }
@@ -180,7 +200,7 @@ contract MesonHelpers is MesonConfig {
       mstore(32, keccak256(0, 32))
       mstore(0, typehash)
       digest := keccak256(0, 64)
-    }
+    } // [TODO]
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }
 
