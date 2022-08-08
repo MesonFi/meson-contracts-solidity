@@ -5,46 +5,46 @@ import "./IMesonSwapEvents.sol";
 import "../utils/MesonStates.sol";
 
 /// @title MesonSwap
-/// @notice The class to receive and process swap requests.
+/// @notice The class to receive and process swap requests on the initial chain side.
 /// Methods in this class will be executed by swap initiators or LPs
 /// on the initial chain of swaps.
 contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @notice Posted Swaps
   /// key: `encodedSwap` in format of `amount:uint48|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
-  ///   amount: The amount of tokens of this swap
+  ///   amount: The amount of tokens of this swap, always in decimal 6;
   ///   salt: The salt value of this swap, carrying some information below:
-  ///     salt & 0x4000000000 == true => will waive service fee
-  ///     salt & 0x0800000000 == true => use non-typed signing (some wallet such as hardware wallet don't support EIP-712v1)
-  ///   fee: The fee for LPs(liquidity providers). An extra service fee maybe charged afterwards
-  ///   expireTs: The expiration time of this swap on the in-chain. The LP should `executeSwap` and receive his funds before `expireTs` on the in-chain
-  ///   outChain: The index of the out-chain (also called the target chain)
-  ///   outToken: The index of the token in the out-chain
-  ///   inChain: The index of the in-chain (also called the source chain)
-  ///   inToken: The index of the token in the in-chain
+  ///     salt & 0x4000000000 == true => will waive *service fee*;
+  ///     salt & 0x0800000000 == true => use *non-typed signing* (some wallets such as hardware wallets don't support EIP-712v1);
+  ///   fee: The fee given to LPs (liquidity providers). An extra service fee maybe charged afterwards;
+  ///   expireTs: The expiration time of this swap on the initial chain. The LP should `executeSwap` and receive his funds before `expireTs`;
+  ///   outChain: The target chain of a cross-chain swap (given by the last 2 bytes of SLIP-44);
+  ///   outToken: The index of the token on the target chain. See `_tokenList` in `MesonToken.sol`;
+  ///   inChain: The initial chain of a cross-chain swap (given by the last 2 bytes of SLIP-44);
+  ///   inToken: The index of the token on the initial chain. See `_tokenList` in `MesonToken.sol`.
   /// value: `postedSwap` in format of `initiator:address|poolIndex:uint40`
-  ///   initiator: The user address who posted the swap request
-  //    poolIndex: The index of a specific LP's address. See `poolOfAuthorizedAddr` in '../utils/MesonStates.sol' for more information
+  ///   initiator: The swap initiator who created and signed the swap request (not necessarily the one who posted the swap);
+  //    poolIndex: The index of an LP pool. See `ownerOfPool` in `MesonStates.sol` for more information.
   mapping(uint256 => uint200) internal _postedSwaps;
 
   /// @notice Anyone can call this method to post a swap request. This is step 1️⃣ in a swap.
   /// The r,s,v signature must be signed by the swap initiator. The initiator can call
   /// this method directly, in which case `poolIndex` should be zero and wait for LPs
   /// to call `bondSwap`. Initiators can also send the swap requests offchain (through the
-  /// meson relayer service). An LP who receives requests through the relayer
-  /// can call this method to post and bond the swap in a single contract execution,
+  /// meson relayer service). An LP (pool owner or authorized addresses) who receives requests through
+  /// the relayer can call this method to post and bond the swap in a single contract execution,
   /// in which case he should give his own `poolIndex`.
   ///
-  /// The swap will last until `expireTs` and at most one LP can bond to it.
+  /// The swap will last until `expireTs` and at most one LP pool can bond to it.
   /// After the swap expires, the initiator can cancel the swap and withdraw funds.
   ///
   /// Once a swap is posted and bonded, the bonding LP should call `lock` on the target chain.
   ///
-  /// @dev Designed to be used by both swap initiators and LPs
+  /// @dev Designed to be used by both swap initiators, pool owner, or authorized addresses
   /// @param encodedSwap Encoded swap information; also used as the key of `_postedSwaps`
   /// @param r Part of the signature
   /// @param s Part of the signature
   /// @param v Part of the signature
-  /// @param postingValue In format of `initiator:address|poolIndex:uint40` to save gas
+  /// @param postingValue The value to be written to `_postedSwaps`. See `_postedSwaps` for encoding format
   function postSwap(uint256 encodedSwap, bytes32 r, bytes32 s, uint8 v, uint200 postingValue)
     external forInitialChain(encodedSwap)
   {
@@ -67,17 +67,17 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
       _tokenList[tokenIndex],
       initiator,
       amount,
-      tokenIndex == 255   // tokenIndex == 255 means the token is MSN, which is minted by Meson Protocol and can be swapped to USDC or USDT at 100:1 ratio. [TO-CHECK]
+      tokenIndex == 255
     );
 
     emit SwapPosted(encodedSwap);
   }
 
   /// @notice If `postSwap` is called by the initiator of the swap and `poolIndex`
-  /// is zero, an LP can call this to bond the swap to himself.
-  /// @dev Designed to be used by LPs
+  /// is zero, an LP (pool owner or authorized addresses) can call this to bond the swap to himself.
+  /// @dev Designed to be used by pool owner or authorized addresses
   /// @param encodedSwap Encoded swap information; also used as the key of `_postedSwaps`
-  /// @param poolIndex An index for the LP; call `depositAndRegister` to get an index
+  /// @param poolIndex The index of an LP pool. See `ownerOfPool` in `MesonStates.sol` for more information.
   function bondSwap(uint256 encodedSwap, uint40 poolIndex) external {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     require(postedSwap > 1, "Swap does not exist");
@@ -111,15 +111,15 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   }
 
   /// @notice Execute the swap by providing a release signature. This is step 4️⃣ in a swap.
-  /// Once the signature is verified, the current bonding LP pool
-  /// will receive funds deposited by the swap initiator.
-  /// @dev Designed to be used by the current bonding LP
+  /// Once the signature is verified, the current bonding pool will receive funds deposited 
+  /// by the swap initiator.
+  /// @dev Designed to be used by pool owner or authorized addresses of the current bonding pool
   /// @param encodedSwap Encoded swap information; also used as the key of `_postedSwaps`
   /// @param r Part of the release signature (same as in the `release` call)
   /// @param s Part of the release signature (same as in the `release` call)
   /// @param v Part of the release signature (same as in the `release` call)
   /// @param recipient The recipient address of the swap
-  /// @param depositToPool Choose to deposit funds to the pool (will save gas)
+  /// @param depositToPool Whether to deposit funds to the pool (will save gas)
   function executeSwap(
     uint256 encodedSwap,
     bytes32 r,
@@ -131,13 +131,13 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     require(postedSwap > 1, "Swap does not exist");
 
+    // Swap expiredTs < current + MIN_BOND_TIME_PERIOD
     if (_expireTsFrom(encodedSwap) < block.timestamp + MIN_BOND_TIME_PERIOD) {
-      // Swap expiredTs < current + MIN_BOND_TIME_PERIOD
-      // The swap cannot be posted again and therefore safe to remove it
-      // LPs who execute in this mode can save ~5000 gas
+      // The swap cannot be posted again and therefore safe to remove it.
+      // LPs who execute in this mode can save ~5000 gas.
       _postedSwaps[encodedSwap] = 0;
     } else {
-      // 1 will prevent the same swap to be posted again
+      // The same swap information can be posted again, so set `_postedSwaps` value to 1 to prevent that.
       _postedSwaps[encodedSwap] = 1;
     }
 

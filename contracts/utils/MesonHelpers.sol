@@ -29,7 +29,7 @@ contract MesonHelpers is MesonConfig {
     address token,
     address recipient,
     uint256 amount,
-    bool isMSN
+    bool isUCT
   ) internal {
     // IERC20Minimal(token).transfer(recipient, amount);
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
@@ -41,11 +41,12 @@ contract MesonHelpers is MesonConfig {
   }
 
   /// @notice Execute the token transfer transaction
+  /// @param amount Means the token is UCT which is minted by Meson and can be swapped to USDC or USDT at 100:1 ratio.
   function _unsafeDepositToken(
     address token,
     address sender,
     uint256 amount,
-    bool isMSN
+    bool isUCT
   ) internal {
     require(token != address(0), "Token not supported");
     require(amount > 0, "Amount must be greater than zero");
@@ -146,17 +147,17 @@ contract MesonHelpers is MesonConfig {
     return uint256(lockedSwap >> 40);
   }
 
-  /// @notice Encode the variable: `poolTokenIndex:uint48` <- `tokenIndeex:uint8|poolIndex:uint40`
+  /// @notice Encode the variable: `poolTokenIndex:uint48` <- `tokenIndex:uint8|poolIndex:uint40`
   function _poolTokenIndexFrom(uint8 tokenIndex, uint40 poolIndex) internal pure returns (uint48) {
     return (uint48(tokenIndex) << 40) | poolIndex;
   }
 
-  /// @notice Decode the variable: `poolTokenIndex:uint48` -> `tokenIndeex:uint8|poolIndex:uint40`
+  /// @notice Decode the variable: `poolTokenIndex:uint48` -> `tokenIndex:uint8|poolIndex:uint40`
   function _tokenIndexFrom(uint48 poolTokenIndex) internal pure returns (uint8) {
     return uint8(poolTokenIndex >> 40);
   }
 
-  /// @notice Decode the variable: `poolTokenIndex:uint48` -> `tokenIndeex:uint8|poolIndex:uint40`
+  /// @notice Decode the variable: `poolTokenIndex:uint48` -> `tokenIndex:uint8|poolIndex:uint40`
   function _poolIndexFrom(uint48 poolTokenIndex) internal pure returns (uint40) {
     return uint40(poolTokenIndex);
   }

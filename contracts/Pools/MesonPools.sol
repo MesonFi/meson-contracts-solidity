@@ -5,23 +5,25 @@ import "./IMesonPoolsEvents.sol";
 import "../utils/MesonStates.sol";
 
 /// @title MesonPools
-/// @notice The class to manage pools for LPs.
-/// Methods in this class will be executed when a swap initiator wants to
-/// swap into this chain.
+/// @notice The class to manage pools for LPs, and perform swap operations on the target 
+/// chain side.
+/// Methods in this class will be executed when a user wants to swap into this chain.
+/// LP pool operations are also provided in this class.
 contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @notice Locked Swaps
   /// key: `swapId` is the value of keccak256(`encodedSwap:uint256`, `initiator:address`)
-  ///   encodedSwap: see '../Swap/MesonSwap.sol' for defination
-  ///   initiator: The user address who posted the swap request
+  ///   encodedSwap: see `MesonSwap.sol` for defination;
+  ///   initiator: The user address who created and signed the swap request.
   /// value: `lockedSwap` in format of `until:uint40|poolIndex:uint40`
-  ///   until: The expiration time of this swap on the out-chain. The initiator should `release` and receive his funds before `until` on the out-chain
-  ///   poolIndex: The index of a specific liquidity provider's address. See `poolOfAuthorizedAddr` in '../utils/MesonStates.sol' for more information
+  ///   until: The expiration time of this swap on the target chain. Need to `release` the swap fund before `until`;
+  ///   poolIndex: The index of an LP pool. See `ownerOfPool` in `MesonStates.sol` for more information.
   mapping(bytes32 => uint80) internal _lockedSwaps;
 
   /// @notice Initially deposit tokens into an LP pool and register a pool index.
   /// This is the prerequisite for LPs if they want to participate in Meson swaps.
+  /// @dev Designed to be used by a new address who wants to be an LP and register a pool index
   /// @param amount The amount of tokens to be added to the pool
-  /// @param poolTokenIndex In format of `tokenIndex:uint8|poolIndex:uint40` to save gas
+  /// @param poolTokenIndex In format of `tokenIndex:uint8|poolIndex:uint40`. See `_balanceOfPoolToken` in `MesonStates.sol` for more information.
   function depositAndRegister(uint256 amount, uint48 poolTokenIndex) external {
     require(amount > 0, 'Amount must be positive');
 
@@ -42,9 +44,9 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// The LP should be careful to make sure the `poolTokenIndex` is correct.
   /// Make sure to call `depositAndRegister` first and register a pool index.
   /// Otherwise, token may be deposited to others.
-  /// @dev Designed to be used by LPs
+  /// @dev Designed to be used by LPs (pool owners) who have already registered a pool index
   /// @param amount The amount of tokens to be added to the pool
-  /// @param poolTokenIndex In format of `tokenIndex:uint8|poolIndex:uint40`
+  /// @param poolTokenIndex In format of `tokenIndex:uint8|poolIndex:uint40`. See `_balanceOfPoolToken` in `MesonStates.sol` for more information.
   function deposit(uint256 amount, uint48 poolTokenIndex) external {
     require(amount > 0, 'Amount must be positive');
 
@@ -57,9 +59,9 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   }
 
   /// @notice Withdraw tokens from the liquidity pool.
-  /// @dev Designed to be used by LPs
+  /// @dev Designed to be used by LPs (pool owners) who have already registered a pool index
   /// @param amount The amount to be removed from the pool
-  /// @param poolTokenIndex In format of`[tokenIndex:uint8][poolIndex:uint40]
+  /// @param poolTokenIndex In format of `tokenIndex:uint8|poolIndex:uint40. See `_balanceOfPoolToken` in `MesonStates.sol` for more information.
   function withdraw(uint256 amount, uint48 poolTokenIndex) external {
     require(amount > 0, 'Amount must be positive');
 
@@ -71,8 +73,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _safeTransfer(_tokenList[tokenIndex], _msgSender(), amount, tokenIndex == 255);
   }
 
-  /// @notice Add an another authorized address to the pool
-  /// @dev Designed to be used by LPs who have already registered
+  /// @notice Add an authorized address to the pool
+  /// @dev Designed to be used by LPs (pool owners)
   /// @param addr The address to be added
   function addAuthorizedAddr(address addr) external {
     require(poolOfAuthorizedAddr[addr] == 0, "Addr is authorized for another pool");
@@ -84,7 +86,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   }
   
   /// @notice Remove an authorized address from the pool
-  /// @dev Designed to be used by LPs who have already registered
+  /// @dev Designed to be used by LPs (pool owners)
   /// @param addr The address to be removed
   function removeAuthorizedAddr(address addr) external {
     address poolOwner = _msgSender();
@@ -96,15 +98,16 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   }
 
   /// @notice Lock funds to match a swap request. This is step 2️⃣ in a swap.
-  /// The bonding LP should call this method with the same signature given
-  /// by `postSwap`. This method will lock swapping fund on the target chain
-  /// for `LOCK_TIME_PERIOD` and wait for fund release and execution.
-  /// @dev Designed to be used by LPs
+  /// The authorized address of the bonding pool should call this method with
+  /// the same signature given by `postSwap`. This method will lock swapping fund 
+  /// on the target chain for `LOCK_TIME_PERIOD` and wait for fund release and 
+  /// execution.
+  /// @dev Designed to be used by authorized addresses or pool owners
   /// @param encodedSwap Encoded swap information
   /// @param r Part of the signature (the one given by `postSwap` call)
   /// @param s Part of the signature (the one given by `postSwap` call)
   /// @param v Part of the signature (the one given by `postSwap` call)
-  /// @param initiator Swap initiator
+  /// @param initiator The swap initiator who created and signed the swap request
   function lock(
     uint256 encodedSwap,
     bytes32 r,
@@ -133,7 +136,10 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   }
 
   /// @notice If the locked swap is not released after `LOCK_TIME_PERIOD`,
-  /// the LP can call this method to unlock the swapping fund.
+  /// the authorized address can call this method to unlock the swapping fund.
+  /// @dev Designed to be used by authorized addresses or pool owners
+  /// @param encodedSwap Encoded swap information
+  /// @param initiator The swap initiator who created and signed the swap request
   function unlock(uint256 encodedSwap, address initiator) external {
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     uint80 lockedSwap = _lockedSwaps[swapId];
@@ -150,13 +156,13 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @notice Release tokens to satisfy a locked swap. This is step 3️⃣ in a swap.
   /// This method requires a release signature from the swap initiator,
   /// but anyone (initiator herself, the LP, and other people) with the signature 
-  /// can call it to make sure the swapping fund is guaranteed to be released.
+  /// can call this method to make sure the swapping fund is guaranteed to be released.
   /// @dev Designed to be used by anyone
   /// @param encodedSwap Encoded swap information
   /// @param r Part of the release signature (same as in the `executeSwap` call)
   /// @param s Part of the release signature (same as in the `executeSwap` call)
   /// @param v Part of the release signature (same as in the `executeSwap` call)
-  /// @param initiator The initiator of the swap
+  /// @param initiator The swap initiator who created and signed the swap request
   /// @param recipient The recipient address of the swap
   function release(
     uint256 encodedSwap,
@@ -168,10 +174,10 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   ) external {
     bool feeWaived = _feeWaived(encodedSwap);
     if (feeWaived) {
-      // TODO: for swaps that service fee is waived, only the premium manager can....
+      // For swaps that service fee is waived, need the premium manager as the signer
       _onlyPremiumManager();
     }
-    // TODO: for normal swaps, anyone can call
+    // For swaps that charge service fee, anyone can call
 
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     uint80 lockedSwap = _lockedSwaps[swapId];
