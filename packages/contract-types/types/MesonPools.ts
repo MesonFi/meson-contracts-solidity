@@ -19,6 +19,7 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface MesonPoolsInterface extends utils.Interface {
   functions: {
+    "addAuthorizedAddr(address)": FunctionFragment;
     "deposit(uint256,uint48)": FunctionFragment;
     "depositAndRegister(uint256,uint48)": FunctionFragment;
     "getLockedSwap(uint256,address)": FunctionFragment;
@@ -29,6 +30,7 @@ export interface MesonPoolsInterface extends utils.Interface {
     "poolOfAuthorizedAddr(address)": FunctionFragment;
     "poolTokenBalance(address,address)": FunctionFragment;
     "release(uint256,bytes32,bytes32,uint8,address,address)": FunctionFragment;
+    "removeAuthorizedAddr(address)": FunctionFragment;
     "serviceFeeCollected(uint8)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
@@ -36,6 +38,10 @@ export interface MesonPoolsInterface extends utils.Interface {
     "withdraw(uint256,uint48)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "addAuthorizedAddr",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "deposit",
     values: [BigNumberish, BigNumberish]
@@ -77,6 +83,10 @@ export interface MesonPoolsInterface extends utils.Interface {
     values: [BigNumberish, BytesLike, BytesLike, BigNumberish, string, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "removeAuthorizedAddr",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "serviceFeeCollected",
     values: [BigNumberish]
   ): string;
@@ -97,6 +107,10 @@ export interface MesonPoolsInterface extends utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "addAuthorizedAddr",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "depositAndRegister",
@@ -128,6 +142,10 @@ export interface MesonPoolsInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "removeAuthorizedAddr",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "serviceFeeCollected",
     data: BytesLike
@@ -193,6 +211,11 @@ export interface MesonPools extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    addAuthorizedAddr(
+      addr: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     deposit(
       amount: BigNumberish,
       poolTokenIndex: BigNumberish,
@@ -250,6 +273,11 @@ export interface MesonPools extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    removeAuthorizedAddr(
+      addr: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     serviceFeeCollected(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
@@ -276,6 +304,11 @@ export interface MesonPools extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
+
+  addAuthorizedAddr(
+    addr: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   deposit(
     amount: BigNumberish,
@@ -331,6 +364,11 @@ export interface MesonPools extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  removeAuthorizedAddr(
+    addr: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   serviceFeeCollected(
     tokenIndex: BigNumberish,
     overrides?: CallOverrides
@@ -356,6 +394,8 @@ export interface MesonPools extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    addAuthorizedAddr(addr: string, overrides?: CallOverrides): Promise<void>;
+
     deposit(
       amount: BigNumberish,
       poolTokenIndex: BigNumberish,
@@ -410,6 +450,11 @@ export interface MesonPools extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    removeAuthorizedAddr(
+      addr: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     serviceFeeCollected(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
@@ -448,6 +493,11 @@ export interface MesonPools extends BaseContract {
   };
 
   estimateGas: {
+    addAuthorizedAddr(
+      addr: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     deposit(
       amount: BigNumberish,
       poolTokenIndex: BigNumberish,
@@ -505,6 +555,11 @@ export interface MesonPools extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    removeAuthorizedAddr(
+      addr: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     serviceFeeCollected(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
@@ -531,6 +586,11 @@ export interface MesonPools extends BaseContract {
   };
 
   populateTransaction: {
+    addAuthorizedAddr(
+      addr: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     deposit(
       amount: BigNumberish,
       poolTokenIndex: BigNumberish,
@@ -588,6 +648,11 @@ export interface MesonPools extends BaseContract {
       v: BigNumberish,
       initiator: string,
       recipient: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    removeAuthorizedAddr(
+      addr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

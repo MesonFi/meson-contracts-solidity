@@ -20,6 +20,7 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface UpgradableMesonInterface extends utils.Interface {
   functions: {
+    "addAuthorizedAddr(address)": FunctionFragment;
     "bondSwap(uint256,uint40)": FunctionFragment;
     "cancelSwap(uint256)": FunctionFragment;
     "deposit(uint256,uint48)": FunctionFragment;
@@ -36,6 +37,7 @@ export interface UpgradableMesonInterface extends utils.Interface {
     "poolTokenBalance(address,address)": FunctionFragment;
     "postSwap(uint256,bytes32,bytes32,uint8,uint200)": FunctionFragment;
     "release(uint256,bytes32,bytes32,uint8,address,address)": FunctionFragment;
+    "removeAuthorizedAddr(address)": FunctionFragment;
     "serviceFeeCollected(uint8)": FunctionFragment;
     "supportedTokens()": FunctionFragment;
     "tokenForIndex(uint8)": FunctionFragment;
@@ -45,6 +47,10 @@ export interface UpgradableMesonInterface extends utils.Interface {
     "withdraw(uint256,uint48)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "addAuthorizedAddr",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "bondSwap",
     values: [BigNumberish, BigNumberish]
@@ -110,6 +116,10 @@ export interface UpgradableMesonInterface extends utils.Interface {
     values: [BigNumberish, BytesLike, BytesLike, BigNumberish, string, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "removeAuthorizedAddr",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "serviceFeeCollected",
     values: [BigNumberish]
   ): string;
@@ -135,6 +145,10 @@ export interface UpgradableMesonInterface extends utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "addAuthorizedAddr",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "bondSwap", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "cancelSwap", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
@@ -178,6 +192,10 @@ export interface UpgradableMesonInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "postSwap", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "removeAuthorizedAddr",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "serviceFeeCollected",
     data: BytesLike
@@ -296,6 +314,11 @@ export interface UpgradableMeson extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    addAuthorizedAddr(
+      addr: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     bondSwap(
       encodedSwap: BigNumberish,
       poolIndex: BigNumberish,
@@ -399,6 +422,11 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    removeAuthorizedAddr(
+      addr: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     serviceFeeCollected(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
@@ -436,6 +464,11 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
+
+  addAuthorizedAddr(
+    addr: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   bondSwap(
     encodedSwap: BigNumberish,
@@ -537,6 +570,11 @@ export interface UpgradableMeson extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  removeAuthorizedAddr(
+    addr: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   serviceFeeCollected(
     tokenIndex: BigNumberish,
     overrides?: CallOverrides
@@ -573,6 +611,8 @@ export interface UpgradableMeson extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    addAuthorizedAddr(addr: string, overrides?: CallOverrides): Promise<void>;
+
     bondSwap(
       encodedSwap: BigNumberish,
       poolIndex: BigNumberish,
@@ -673,6 +713,11 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    removeAuthorizedAddr(
+      addr: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     serviceFeeCollected(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
@@ -754,6 +799,11 @@ export interface UpgradableMeson extends BaseContract {
   };
 
   estimateGas: {
+    addAuthorizedAddr(
+      addr: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     bondSwap(
       encodedSwap: BigNumberish,
       poolIndex: BigNumberish,
@@ -851,6 +901,11 @@ export interface UpgradableMeson extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    removeAuthorizedAddr(
+      addr: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     serviceFeeCollected(
       tokenIndex: BigNumberish,
       overrides?: CallOverrides
@@ -888,6 +943,11 @@ export interface UpgradableMeson extends BaseContract {
   };
 
   populateTransaction: {
+    addAuthorizedAddr(
+      addr: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     bondSwap(
       encodedSwap: BigNumberish,
       poolIndex: BigNumberish,
@@ -985,6 +1045,11 @@ export interface UpgradableMeson extends BaseContract {
       v: BigNumberish,
       initiator: string,
       recipient: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    removeAuthorizedAddr(
+      addr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
