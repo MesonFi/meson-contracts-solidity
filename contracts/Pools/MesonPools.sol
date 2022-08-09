@@ -11,7 +11,7 @@ import "../utils/MesonStates.sol";
 /// LP pool operations are also provided in this class.
 contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @notice Locked Swaps
-  /// key: `swapId` is the value of keccak256(`encodedSwap:uint256`, `initiator:address`)
+  /// key: `swapId` is calculated from `encodedSwap` and `initiator`. See `_getSwapId` in `MesonHelpers.sol`
   ///   encodedSwap: see `MesonSwap.sol` for defination;
   ///   initiator: The user address who created and signed the swap request.
   /// value: `lockedSwap` in format of `until:uint40|poolIndex:uint40`

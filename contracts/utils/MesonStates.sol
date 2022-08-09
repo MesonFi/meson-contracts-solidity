@@ -5,7 +5,7 @@ import "./MesonTokens.sol";
 import "./MesonHelpers.sol";
 
 /// @title MesonStates
-/// @notice The class that keeps track of states
+/// @notice The class that keeps track of LP pool states
 contract MesonStates is MesonTokens, MesonHelpers {
   /// @notice The mapping from *authorized addresses* to LP pool indexes.
   /// See `ownerOfPool` to understand how pool index is defined and used.
