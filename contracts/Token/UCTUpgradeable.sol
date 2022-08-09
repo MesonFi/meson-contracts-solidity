@@ -4,10 +4,14 @@ pragma solidity 0.8.6;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 
-// TODO: describe
-/// 1. this is only for community promotional events (airdrop, giveaway, cashback, etc)
-/// 2. not a long term token; will be destroyed/burned shortly after event ends
-/// 3. the only use is convert to stablecoins in meson
+/// @title UCTUpgradeable
+/// @notice The contract of UCT, a token minted by Meson for promotional events
+/// UCT (USD Coupon Token) is issued by Meson team to mark participants for 
+/// community events (such as airdrops, cashbacks, etc). UCT is not an asset 
+/// and it has no value. UCT obtained directly from Meson during the event period 
+/// can be redeemed for the actual USDT/USDC rewards on https://meson.fi/ at 
+/// a ratio of 100:1. UCT has no usage other than redemption for USDT/USDC, 
+/// and all UCTs will be destroyed at the end of the event.
 contract UCTUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
   address private _owner;
   address private _minter;
@@ -44,7 +48,8 @@ contract UCTUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
     require(_msgSender() == _owner, "Unauthorized");
   }
 
-  // TODO: mesonContract will have max allowance so users don't need to execute approve
+  /// @notice Override the default ERC20 allowance method
+  /// mesonContract will have max allowance so users don't need to execute approve
   function allowance(address owner, address spender) public view override returns (uint256) {
     if (spender == _mesonContract) {
       uint256 x = 0;
