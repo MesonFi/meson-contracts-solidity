@@ -203,7 +203,7 @@ contract MesonHelpers is MesonConfig {
   }
 
   /// @notice Check the initiator's signature for a swap request
-  /// Signatures are constructed with the package `@mesonfi/sdk`. Go to `packages/sdk/src/SwapSigner.ts` and 
+  /// Signatures are constructed with the package `mesonfi/sdk`. Go to `packages/sdk/src/SwapSigner.ts` and 
   /// see how to generate a signautre in class `EthersWalletSwapSigner` method `signSwapRequest`
   /// @param encodedSwap Encoded swap information. See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   /// @param r Part of the signature
@@ -253,7 +253,7 @@ contract MesonHelpers is MesonConfig {
   }
 
   /// @notice Check the initiator's signature for the release request
-  /// Signatures are constructed with the package `@mesonfi/sdk`. Go to `packages/sdk/src/SwapSigner.ts` and 
+  /// Signatures are constructed with the package `mesonfi/sdk`. Go to `packages/sdk/src/SwapSigner.ts` and 
   /// see how to generate a signautre in class `EthersWalletSwapSigner` method `signSwapRelease`
   /// @param encodedSwap Encoded swap information. See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   /// @param recipient The recipient address of the swap
