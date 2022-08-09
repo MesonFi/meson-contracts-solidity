@@ -81,7 +81,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   function bondSwap(uint256 encodedSwap, uint40 poolIndex) external {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     require(postedSwap > 1, "Swap does not exist");
-    require(_poolIndexFromPosted(postedSwap) == 0, "Swap bonded to another pool");  /// [TODO ?]
+    require(_poolIndexFromPosted(postedSwap) == 0, "Swap bonded to another pool");
     require(poolOfAuthorizedAddr[msg.sender] == poolIndex, "Can only bound to signer");
 
     _postedSwaps[encodedSwap] = postedSwap | poolIndex;
