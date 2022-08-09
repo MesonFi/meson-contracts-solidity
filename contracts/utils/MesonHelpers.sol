@@ -5,6 +5,7 @@ pragma solidity 0.8.6;
 import "../MesonConfig.sol";
 
 /// @title MesonHelpers
+/// @notice The class that provides helper functions for Meson protocol
 contract MesonHelpers is MesonConfig {
   bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
 

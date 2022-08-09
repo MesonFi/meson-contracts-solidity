@@ -2,6 +2,7 @@
 pragma solidity 0.8.6;
 
 /// @title MesonTokens
+/// @notice The class that stores the information of Meson's supported tokens
 contract MesonTokens {
   /// @notice The whitelist of supported tokens in Meson
   /// Meson use a whitelist for supported stablecoins, which is specified on first deployment
