@@ -20,13 +20,12 @@ contract MesonHelpers is MesonConfig {
     return bytes2(SHORT_COIN_TYPE);
   }
 
-  /// @notice Safe transfers tokens from msg.sender to a recipient
+  /// @notice Safe transfers tokens from Meson contract to a recipient
   /// for interacting with ERC20 tokens that do not consistently return true/false
   /// @param token The contract address of the token which will be transferred
   /// @param recipient The recipient of the transfer
-  /// @param amount The value of the transfer
-  /// @param isUCT Whether the transferred token is UCT, which is a 
-  /// token minted by Meson and can be swapped to USDC or USDT at 100:1 ratio.
+  /// @param amount The value of the transfer (always in decimal 6)
+  /// @param isUCT Whether the transferred token is UCT (minted by Meson, see `UCTUpgradeable.sol`)
   function _safeTransfer(
     address token,
     address recipient,
@@ -44,12 +43,11 @@ contract MesonHelpers is MesonConfig {
     // IERC20Minimal(token).transfer(recipient, amount);
   }
 
-  /// @notice Help the senders to transfer their assets to this contract address
+  /// @notice Help the senders to transfer their assets to the Meson contract
   /// @param token The contract address of the token which will be transferred
   /// @param sender The sender of the transfer
-  /// @param amount The value of the transfer
-  /// @param isUCT Whether the transferred token is UCT, which is a 
-  /// token minted by Meson and can be swapped to USDC or USDT at 100:1 ratio.
+  /// @param amount The value of the transfer (always in decimal 6)
+  /// @param isUCT Whether the transferred token is UCT (minted by Meson, see `UCTUpgradeable.sol`)
   function _unsafeDepositToken(
     address token,
     address sender,
@@ -68,142 +66,147 @@ contract MesonHelpers is MesonConfig {
   }
 
   /// @notice Calculate `swapId` from `encodedSwap`, `initiator`
-  /// See `contracts/Swap/MesonSwap.sol`, contract `MesonSwap`, variable `_postedSwaps`
-  ///   for the defination of `encodedSwap`
-  /// See `contracts/Pools/MesonPools.sol`, contract `MesonPools`, variable `_lockedSwaps`
-  ///   for the defination of `swapId`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _getSwapId(uint256 encodedSwap, address initiator) internal pure returns (bytes32) {
     return keccak256(abi.encodePacked(encodedSwap, initiator));
   }
-  
-  /// TODO: describe non-typed signing
-  function _signNonTyped(uint256 encodedSwap) internal pure returns (bool) {
-    return (encodedSwap & 0x0800000000000000000000000000000000000000000000000000) > 0;
-  }
-
-  /// @notice If true, this swap doesn't need to pay service fee
-  /// See `contracts/Pools/MesonPools.sol`, contract `MesonPools`, function `release`
-  ///   for more details about the service fee
-  function _feeWaived(uint256 encodedSwap) internal pure returns (bool) {
-    return (encodedSwap & 0x4000000000000000000000000000000000000000000000000000) > 0;
-  }
 
   /// @notice Decode `amount` from `encodedSwap`
-  /// See `contracts/Swap/MesonSwap.sol`, contract `MesonSwap`, variable `_postedSwaps`
-  ///   for the defination of `encodedSwap`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _amountFrom(uint256 encodedSwap) internal pure returns (uint256) {
     return encodedSwap >> 208;
   }
 
   /// @notice Calculate the service fee from `encodedSwap`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
     return _amountFrom(encodedSwap) / 1000; // Default to `serviceFee` = 0.1% * `amount`
   }
-  /// [Suggestion]: mutable service fee points rate
-    // uint public feePointsRate = 10;
-    // modifier onlyOwner() {...}
-    // function setFeePoints(uint newFeePoints) onlyOwner external {...}
-    // function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
-    //   return uint256(encodedSwap >> 208) * feePointsRate / 10000;
-    // }
 
-  /// @notice Decode `fee` (the fee for LP) from `encodedSwap`
+  /// [Suggestion]: mutable service fee points rate
+  // uint public feePointsRate = 10;
+  // modifier onlyOwner() {...}
+  // function setFeePoints(uint newFeePoints) onlyOwner external {...}
+  // function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
+  //   return uint256(encodedSwap >> 208) * feePointsRate / 10000;
+  // }
+
+  /// @notice Decode `fee` (the fee for LPs) from `encodedSwap`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _feeForLp(uint256 encodedSwap) internal pure returns (uint256) {
     return (encodedSwap >> 88) & 0xFFFFFFFFFF;
   }
 
   /// @notice Decode `salt` from `encodedSwap`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _saltFrom(uint256 encodedSwap) internal pure returns (uint80) {
     return uint80(encodedSwap >> 128);
   }
+  
+  /// @notice Whether the swap was signed in the non-typed manner (usually by hardware wallets)
+  function _signNonTyped(uint256 encodedSwap) internal pure returns (bool) {
+    return (encodedSwap & 0x0800000000000000000000000000000000000000000000000000) > 0;
+  }
+
+  /// @notice Whether the swap needs to pay service fee
+  /// See method `release` in `MesonPools.sol` for more details about the service fee
+  function _feeWaived(uint256 encodedSwap) internal pure returns (bool) {
+    return (encodedSwap & 0x4000000000000000000000000000000000000000000000000000) > 0;
+  }
 
   /// @notice Decode `expireTs` from `encodedSwap`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _expireTsFrom(uint256 encodedSwap) internal pure returns (uint256) {
     return (encodedSwap >> 48) & 0xFFFFFFFFFF;
     // [Suggestion]: return uint40(encodedSwap >> 48);
   }
 
-  /// @notice Decode `inChain` from `encodedSwap`
+  /// @notice Decode the initial chain (`inChain`) from `encodedSwap`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _inChainFrom(uint256 encodedSwap) internal pure returns (uint16) {
     return uint16(encodedSwap >> 8);
   }
 
-  /// @notice Decode `inToken` from `encodedSwap`
+  /// @notice Decode the token index of initial chain (`inToken`) from `encodedSwap`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _inTokenIndexFrom(uint256 encodedSwap) internal pure returns (uint8) {
     return uint8(encodedSwap);
   }
 
-  /// @notice Decode `outChain` from `encodedSwap`
+  /// @notice Decode the target chain (`outChain`) from `encodedSwap`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _outChainFrom(uint256 encodedSwap) internal pure returns (uint16) {
     return uint16(encodedSwap >> 32);
   }
 
-  /// @notice Decode `outToken` from `encodedSwap`
+  /// @notice Decode the token index of target chain (`outToken`) from `encodedSwap`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _outTokenIndexFrom(uint256 encodedSwap) internal pure returns (uint8) {
     return uint8(encodedSwap >> 24);
   }
 
   /// @notice Decode `outToken` from `encodedSwap`, and encode it with `poolIndex` to `poolTokenIndex`.
-  /// See `contracts/utils/MesonStates.sol`, contract `MesonStates`, variable `_balanceOfPoolToken`
-  ///   for the defination of `poolTokenIndex`
+  /// See variable `_balanceOfPoolToken` in `MesonStates.sol` for the defination of `poolTokenIndex`
   function _poolTokenIndexForOutToken(uint256 encodedSwap, uint40 poolIndex) internal pure returns (uint48) {
     return uint48((encodedSwap & 0xFF000000) << 16) | poolIndex;
   }
 
   /// @notice Decode `initiator` from `postedSwap`
-  /// See `contracts/Swap/MesonSwap.sol`, contract `MesonSwap`, variable `_postedSwaps`
-  ///   for the defination of `postedSwap`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `postedSwap`
   function _initiatorFromPosted(uint200 postedSwap) internal pure returns (address) {
     return address(uint160(postedSwap >> 40));
   }
 
   /// @notice Decode `poolIndex` from `postedSwap`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `postedSwap`
   function _poolIndexFromPosted(uint200 postedSwap) internal pure returns (uint40) {
     return uint40(postedSwap);
   }
   
-  /// @notice Encode `until`,`poolIndex` to `lockedSwap`
-  /// See `contracts/Pools/MesonPools.sol`, contract `MesonPools`, variable `_lockedSwaps`
-  ///   for the defination of `lockedSwap`
+  /// @notice Encode `lockedSwap` from `until` and `poolIndex`
+  /// See variable `_lockedSwaps` in `MesonPools.sol` for the defination of `lockedSwap`
   function _lockedSwapFrom(uint256 until, uint40 poolIndex) internal pure returns (uint80) {
     return (uint80(until) << 40) | poolIndex;
   }
 
   /// @notice Decode `poolIndex` from `lockedSwap`
+  /// See variable `_lockedSwaps` in `MesonPools.sol` for the defination of `lockedSwap`
   function _poolIndexFromLocked(uint80 lockedSwap) internal pure returns (uint40) {
     return uint40(lockedSwap);
   }
 
   /// @notice Decode `until` from `lockedSwap`
+  /// See variable `_lockedSwaps` in `MesonPools.sol` for the defination of `lockedSwap`
   function _untilFromLocked(uint80 lockedSwap) internal pure returns (uint256) {
     return uint256(lockedSwap >> 40);
   }
 
-  /// @notice Encode `tokenIndex`, `poolIndex` to `poolTokenIndex`
-  /// See `contracts/utils/MesonStates.sol`, contract `MesonStates`, variable `_balanceOfPoolToken`
-  ///   for the defination of `poolTokenIndex`
+  /// @notice Encode `poolTokenIndex` from `tokenIndex` and `poolIndex`
+  /// See variable `_balanceOfPoolToken` in `MesonStates.sol` for the defination of `poolTokenIndex`
   function _poolTokenIndexFrom(uint8 tokenIndex, uint40 poolIndex) internal pure returns (uint48) {
     return (uint48(tokenIndex) << 40) | poolIndex;
   }
 
   /// @notice Decode `tokenIndex` from `poolTokenIndex`
+  /// See variable `_balanceOfPoolToken` in `MesonStates.sol` for the defination of `poolTokenIndex`
   function _tokenIndexFrom(uint48 poolTokenIndex) internal pure returns (uint8) {
     return uint8(poolTokenIndex >> 40);
   }
 
   /// @notice Decode `poolIndex` from `poolTokenIndex`
+  /// See variable `_balanceOfPoolToken` in `MesonStates.sol` for the defination of `poolTokenIndex`
   function _poolIndexFrom(uint48 poolTokenIndex) internal pure returns (uint40) {
     return uint40(poolTokenIndex);
   }
 
-  /// @notice Check the initiator's signature for the swap request
-  /// @param encodedSwap Encoded swap information. See `contracts/Swap/MesonSwap.sol`, 
-  ///   contract `MesonSwap`, variable `_postedSwaps` for the defination in detail
+  /// @notice Check the initiator's signature for a swap request
+  /// Signatures are constructed with the package `@mesonfi/sdk`. Go to `packages/sdk/src/SwapSigner.ts` and 
+  /// see how to generate a signautre in class `EthersWalletSwapSigner` method `signSwapRequest`
+  /// @param encodedSwap Encoded swap information. See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   /// @param r Part of the signature
   /// @param s Part of the signature
   /// @param v Part of the signature
-  /// @param signer The signer for the swap request, also called `initiator`
-  // [TODO?] 3. refer to SDK for how signature is contructed. See `packages/sdk/src/SwapSigner.ts`, class `EthersWalletSwapSigner` method `signSwapRequest`
+  /// @param signer The signer for the swap request which is the `initiator`
   function _checkRequestSignature(
     uint256 encodedSwap,
     bytes32 r,
@@ -247,14 +250,14 @@ contract MesonHelpers is MesonConfig {
   }
 
   /// @notice Check the initiator's signature for the release request
-  /// @param encodedSwap Encoded swap information. See `contracts/Swap/MesonSwap.sol`, 
-  ///   contract `MesonSwap`, variable `_postedSwaps` for the defination in detail
+  /// Signatures are constructed with the package `@mesonfi/sdk`. Go to `packages/sdk/src/SwapSigner.ts` and 
+  /// see how to generate a signautre in class `EthersWalletSwapSigner` method `signSwapRelease`
+  /// @param encodedSwap Encoded swap information. See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   /// @param recipient The recipient address of the swap
   /// @param r Part of the signature
   /// @param s Part of the signature
   /// @param v Part of the signature
-  /// @param signer The signer for the release request, also called `initiator`
-  // [TODO?] 3. refer to SDK for how signature is contructed. See `packages/sdk/src/SwapSigner.ts`, class `EthersWalletSwapSigner` method `signSwapRelease`
+  /// @param signer The signer for the swap request which is the `initiator`
   function _checkReleaseSignature(
     uint256 encodedSwap,
     address recipient,
