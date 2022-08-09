@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-// import "./IERC20Minimal.sol";
+// import "./IERC20Minimal.sol"; // This is needed if deploying to Tron
 import "../MesonConfig.sol";
 
 /// @title MesonHelpers
@@ -33,13 +33,15 @@ contract MesonHelpers is MesonConfig {
     uint256 amount,
     bool isUCT
   ) internal {
-    // IERC20Minimal(token).transfer(recipient, amount);
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
       bytes4(0xa9059cbb), // bytes4(keccak256(bytes("transfer(address,uint256)")))
       recipient,
       amount
     ));
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
+
+    // The above do not support Tron, so need to switch to the next line if deploying to Tron
+    // IERC20Minimal(token).transfer(recipient, amount);
   }
 
   /// @notice Help the senders to transfer their assets to this contract address
