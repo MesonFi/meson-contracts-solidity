@@ -194,10 +194,14 @@ contract MesonHelpers is MesonConfig {
     return uint40(poolTokenIndex);
   }
 
-  // TODO: add comments
-  // 1. this is to check the signature for swap request
-  // 2. define params
-  // 3. refer to SDK for how signature is contructed. See `packages/sdk/src/SwapSigner.ts`, class `EthersWalletSwapSigner` method `signSwapRequest`
+  /// @notice Check the initiator's signature for the swap request
+  /// @param encodedSwap Encoded swap information. See `contracts/Swap/MesonSwap.sol`, 
+  ///   contract `MesonSwap`, variable `_postedSwaps` for the defination in detail
+  /// @param r Part of the signature
+  /// @param s Part of the signature
+  /// @param v Part of the signature
+  /// @param signer The signer for the swap request, also called `initiator`
+  // [TODO?] 3. refer to SDK for how signature is contructed. See `packages/sdk/src/SwapSigner.ts`, class `EthersWalletSwapSigner` method `signSwapRequest`
   function _checkRequestSignature(
     uint256 encodedSwap,
     bytes32 r,
@@ -240,10 +244,15 @@ contract MesonHelpers is MesonConfig {
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }
 
-  // TODO: add comments
-  // 1. this is to check the signature for swap release
-  // 2. define params
-  // 3. refer to SDK for how signature is contructed. See `packages/sdk/src/SwapSigner.ts`, class `EthersWalletSwapSigner` method `signSwapRelease`
+  /// @notice Check the initiator's signature for the release request
+  /// @param encodedSwap Encoded swap information. See `contracts/Swap/MesonSwap.sol`, 
+  ///   contract `MesonSwap`, variable `_postedSwaps` for the defination in detail
+  /// @param recipient The recipient address of the swap
+  /// @param r Part of the signature
+  /// @param s Part of the signature
+  /// @param v Part of the signature
+  /// @param signer The signer for the release request, also called `initiator`
+  // [TODO?] 3. refer to SDK for how signature is contructed. See `packages/sdk/src/SwapSigner.ts`, class `EthersWalletSwapSigner` method `signSwapRelease`
   function _checkReleaseSignature(
     uint256 encodedSwap,
     address recipient,
