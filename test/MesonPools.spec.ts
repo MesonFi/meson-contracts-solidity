@@ -150,7 +150,7 @@ describe('MesonPools', () => {
       const withdrawAmount = ethers.utils.parseUnits('1001', 6)
       const poolTokenIndex = pack(['uint8', 'uint40'], [1, 1])
       await expect(mesonInstance.withdraw(withdrawAmount, poolTokenIndex))
-        .to.be.revertedWith('reverted with panic code 0x11')
+        .to.be.revertedWith('panic code 0x11')
     })
     it('accepts a valid withdraw', async () => {
       await token.approve(mesonInstance.address, amount)
@@ -184,7 +184,7 @@ describe('MesonPools', () => {
       await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
 
       await expect(mesonClientForPoolOwner.lock(signedRequest))
-        .to.be.revertedWith('reverted with panic code 0x11')
+        .to.be.revertedWith('panic code 0x11')
     })
     it('lockes a valid swap', async () => {
       const amount = ethers.utils.parseUnits('2000', 6)
