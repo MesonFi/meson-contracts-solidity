@@ -11,7 +11,7 @@ import "../utils/MesonStates.sol";
 contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @notice Posted Swaps
   /// key: `encodedSwap` in format of `amount:uint48|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
-  ///   amount: The amount of tokens of this swap, always in decimal 6;
+  ///   amount: The amount of tokens of this swap, always in decimal 6. The amount of a swap is capped at $100k so it can be safely encoded in uint48;
   ///   salt: The salt value of this swap, carrying some information below:
   ///     salt & 0x4000000000 == true => will waive *service fee*;
   ///     salt & 0x0800000000 == true => use *non-typed signing* (some wallets such as hardware wallets don't support EIP-712v1);
