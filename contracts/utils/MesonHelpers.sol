@@ -218,6 +218,8 @@ contract MesonHelpers is MesonConfig {
     address signer
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
+    require(v == 27 || v == 28, "Invalid signature");
+    require(uint256(s) <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, "Invalid signature");
 
     bool nonTyped = _signNonTyped(encodedSwap);
 
@@ -270,6 +272,8 @@ contract MesonHelpers is MesonConfig {
     address signer
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
+    require(v == 27 || v == 28, "Invalid signature");
+    require(uint256(s) <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, "Invalid signature");
 
     bool nonTyped = _signNonTyped(encodedSwap);
 
