@@ -117,7 +117,7 @@
       "walletconnect"
     ],
     "addressFormat": "hex",
-    "url": "https://evmos-mainnet.gateway.pokt.network/v1/lb/627586ddea1b320039c95205",
+    "url": "https://eth.bd.evmos.org:8545",
     "explorer": "https://evm.evmos.org",
     "nativeCurrency": {
       "name": "EVMOS",
@@ -230,6 +230,7 @@
       "decimals": 18
     },
     "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
+    "uctAddress": "0xb82Ca5670719a1c6EC7e90dFcB330fF851263563",
     "tokens": [
       {
         "name": "Tether USD",
