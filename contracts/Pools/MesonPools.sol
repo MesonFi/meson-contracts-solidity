@@ -185,6 +185,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     uint80 lockedSwap = _lockedSwaps[swapId];
     require(lockedSwap != 0, "Swap does not exist");
+    require(recipient != address(0), "Recipient cannot be zero address");
     require(_expireTsFrom(encodedSwap) > block.timestamp, "Cannot release because expired");
 
     _checkReleaseSignature(encodedSwap, recipient, r, s, v, initiator);

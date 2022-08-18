@@ -39,6 +39,7 @@ contract UCTUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
   function batchMint2(address[] memory targets, uint256[] memory amounts) external onlyMinter {
     require(targets.length > 0, "Target array is empty");
     require(targets.length < 2048, "Target array is too large");
+    require(targets.length == amounts.length, "targets and amounts should have the same length");
     for (uint i = 0; i < targets.length; i++) {
       _mint(targets[i], amounts[i]);
     }

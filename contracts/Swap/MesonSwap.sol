@@ -58,6 +58,12 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     require(delta > MIN_BOND_TIME_PERIOD, "Expire ts too early");
     require(delta < MAX_BOND_TIME_PERIOD, "Expire ts too late");
 
+    uint40 poolIndex = _poolIndexFromPosted(postingValue);
+    if (poolIndex > 0) {
+      // In pool index is given, the signer should be an authorized address
+      require(poolOfAuthorizedAddr[_msgSender()] == poolIndex, "Signer should be an authorized address of the given pool");
+    } // Otherwise, this is posted without bonding to a specific pool. Need to execute `bondSwap` later
+
     address initiator = _initiatorFromPosted(postingValue);
     _checkRequestSignature(encodedSwap, r, s, v, initiator);
     _postedSwaps[encodedSwap] = postingValue;
@@ -82,7 +88,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     require(postedSwap > 1, "Swap does not exist");
     require(_poolIndexFromPosted(postedSwap) == 0, "Swap bonded to another pool");
-    require(poolOfAuthorizedAddr[msg.sender] == poolIndex, "Can only bound to signer");
+    require(poolOfAuthorizedAddr[_msgSender()] == poolIndex, "Signer should be an authorized address of the given pool");
 
     _postedSwaps[encodedSwap] = postedSwap | poolIndex;
     emit SwapBonded(encodedSwap);

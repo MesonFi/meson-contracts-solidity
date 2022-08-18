@@ -138,7 +138,7 @@ describe('MesonSwap', () => {
         pack(['address', 'uint40'], [signedRequest.initiator, 0])
       )
       await expect(mesonInstance.bondSwap(swap.encoded, 1))
-        .to.be.revertedWith('Can only bound to signer')
+        .to.be.revertedWith('Signer should be an authorized address of the given pool')
     })
     it('bonds a valid swap', async () => {
       await token.connect(initiator).approve(mesonInstance.address, amount)
