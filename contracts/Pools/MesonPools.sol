@@ -128,7 +128,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(poolIndex != 0, "Caller not registered. Call depositAndRegister.");
 
     uint256 until = block.timestamp + LOCK_TIME_PERIOD;
-    require(until < _expireTsFrom(encodedSwap), "Cannot lock because expireTs is soon.");
+    require(until < _expireTsFrom(encodedSwap) - 5 minutes, "Cannot lock because expireTs is soon.");
 
     uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, poolIndex);
     // Only (amount - service fee) is locked from the LP pool. The service fee will be charged on release
