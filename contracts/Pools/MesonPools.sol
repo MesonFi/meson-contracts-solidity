@@ -13,7 +13,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @notice The manager to authorized fee waived swaps
   /// Only the premium manager can authorize the execution to release for fee waived swaps.
   /// This address is managed by Meson team.
-  address private _premiumManager;
+  address internal _premiumManager;
 
   /// @notice Locked Swaps
   /// key: `swapId` is calculated from `encodedSwap` and `initiator`. See `_getSwapId` in `MesonHelpers.sol`
@@ -223,7 +223,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _;
   }
 
-  function _onlyPremiumManager() internal view override {
+  function _onlyPremiumManager() internal view {
     require(_premiumManager == _msgSender(), "Caller is not the premium manager");
   }
 }
