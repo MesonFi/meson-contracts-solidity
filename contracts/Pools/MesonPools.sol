@@ -30,7 +30,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @param amount The amount of tokens to be added to the pool
   /// @param poolTokenIndex In format of `tokenIndex:uint8|poolIndex:uint40`. See `_balanceOfPoolToken` in `MesonStates.sol` for more information.
   function depositAndRegister(uint256 amount, uint48 poolTokenIndex) external {
-    require(amount > 0, 'Amount must be positive');
+    require(amount > 0, "Amount must be positive");
 
     address poolOwner = _msgSender();
     uint40 poolIndex = _poolIndexFrom(poolTokenIndex);
@@ -53,7 +53,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @param amount The amount of tokens to be added to the pool
   /// @param poolTokenIndex In format of `tokenIndex:uint8|poolIndex:uint40`. See `_balanceOfPoolToken` in `MesonStates.sol` for more information.
   function deposit(uint256 amount, uint48 poolTokenIndex) external {
-    require(amount > 0, 'Amount must be positive');
+    require(amount > 0, "Amount must be positive");
 
     uint40 poolIndex = _poolIndexFrom(poolTokenIndex);
     require(poolIndex != 0, "Cannot use 0 as pool index");
@@ -68,7 +68,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @param amount The amount to be removed from the pool
   /// @param poolTokenIndex In format of `tokenIndex:uint8|poolIndex:uint40. See `_balanceOfPoolToken` in `MesonStates.sol` for more information.
   function withdraw(uint256 amount, uint48 poolTokenIndex) external {
-    require(amount > 0, 'Amount must be positive');
+    require(amount > 0, "Amount must be positive");
 
     uint40 poolIndex = _poolIndexFrom(poolTokenIndex);
     require(poolIndex != 0, "Cannot use 0 as pool index");
