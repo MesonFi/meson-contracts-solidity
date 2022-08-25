@@ -438,5 +438,27 @@
         "tokenIndex": 2
       }
     ]
+  },
+  {
+    "id": "eos-testnet",
+    "name": "Trust EVM Testnet",
+    "alias": "eos",
+    "chainId": "0x3cc3",
+    "slip44": "",
+    "shortSlip44": "",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://api.testnet-dev.trust.one",
+    "explorer": "https://trustscan.one",
+    "nativeCurrency": {
+      "name": "EVM",
+      "symbol": "EVM",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "tokens": []
   }
 ]
