@@ -444,8 +444,8 @@
     "name": "Trust EVM Testnet",
     "alias": "eos",
     "chainId": "0x3cc3",
-    "slip44": "",
-    "shortSlip44": "",
+    "slip44": "0x800000c2",
+    "shortSlip44": "0x00c2",
     "extensions": [
       "metamask",
       "walletconnect"
