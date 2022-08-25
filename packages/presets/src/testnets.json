@@ -458,7 +458,22 @@
       "symbol": "EVM",
       "decimals": 18
     },
-    "mesonAddress": "0x21D828269A0A7EF69dC25d257299901f318fBbA8",
-    "tokens": []
+    "mesonAddress": "0x6F2Db76519Ea809122a152Ae643cbC6f499CD5Da",
+    "tokens": [
+      {
+        "name": "EOS USDT",
+        "symbol": "eUSDT",
+        "decimals": 6,
+        "tokenIndex": 1,
+        "addr": "0xc24424C27Cf43e4403B42721C86dF782f7788B89"
+      },
+      {
+        "name": "EOS USDC",
+        "symbol": "eUSDC",
+        "decimals": 6,
+        "tokenIndex": 2,
+        "addr": "0xCF1511622929F4BA960dfA9b24Be84A8Fc620bd5"
+      }
+    ]
   }
 ]
