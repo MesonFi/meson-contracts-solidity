@@ -193,6 +193,7 @@
       "decimals": 18
     },
     "mesonAddress": "0xF7c86A5E1323E6EFB954B2e65ebba9c300c40f38",
+    "uctAddress": "0x3ac50C59efE204D79B586207B47F95CBF45C242B",
     "tokens": [
       {
         "name": "USD Coin",
@@ -485,6 +486,29 @@
         "addr": "0x8e70cD5B4Ff3f62659049e74b6649c6603A0E594",
         "tokenIndex": 2
       }
+    ]
+  },
+  {
+    "id": "eos",
+    "name": "Trust EVM",
+    "alias": "EOS",
+    "chainId": "0x3cc3",
+    "slip44": "0x800000c2",
+    "shortSlip44": "0x00c2",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "",
+    "explorer": "",
+    "nativeCurrency": {
+      "name": "EVM",
+      "symbol": "EVM",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "tokens": [
     ]
   }
 ]

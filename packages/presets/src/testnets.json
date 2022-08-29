@@ -438,5 +438,42 @@
         "tokenIndex": 2
       }
     ]
+  },
+  {
+    "id": "eos-testnet",
+    "name": "Trust EVM Testnet",
+    "alias": "EOS",
+    "chainId": "0x3cc3",
+    "slip44": "0x800000c2",
+    "shortSlip44": "0x00c2",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://api.testnet-dev.trust.one",
+    "explorer": "https://trustscan.one",
+    "nativeCurrency": {
+      "name": "EVM",
+      "symbol": "EVM",
+      "decimals": 18
+    },
+    "mesonAddress": "0x6F2Db76519Ea809122a152Ae643cbC6f499CD5Da",
+    "tokens": [
+      {
+        "name": "EOS USDT",
+        "symbol": "eUSDT",
+        "decimals": 6,
+        "tokenIndex": 1,
+        "addr": "0xc24424C27Cf43e4403B42721C86dF782f7788B89"
+      },
+      {
+        "name": "EOS USDC",
+        "symbol": "eUSDC",
+        "decimals": 6,
+        "tokenIndex": 2,
+        "addr": "0xCF1511622929F4BA960dfA9b24Be84A8Fc620bd5"
+      }
+    ]
   }
 ]

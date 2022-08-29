@@ -32,6 +32,7 @@
     "chain:optimistic": "NETWORK_ID=optimistic yarn chain",
     "chain:gnosis": "NETWORK_ID=gnosis yarn chain",
     "chain:tron": "NETWORK_ID=tron yarn chain",
+    "chain:eos": "NETWORK_ID=eos yarn chain",
 
     "testnet": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/deploy-upgradable.js",
     "testnet:eth": "NETWORK_ID=eth yarn testnet",
@@ -44,6 +45,7 @@
     "testnet:aurora": "NETWORK_ID=aurora yarn testnet",
     "testnet:evmos":  "NETWORK_ID=evmos yarn testnet",
     "testnet:gnosis":  "NETWORK_ID=gnosis yarn testnet",
+    "testnet:eos": "NETWORK_ID=eos yarn testnet", 
     "testnet:tron": "NETWORK_ID=tron TESTNET_MODE=true yarn chain && hardhat run scripts/tron/deploy.js",
 
     "testnet-up": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/upgrade.js",
@@ -57,6 +59,7 @@
     "testnet-up:aurora": "NETWORK_ID=aurora yarn testnet-up",
     "testnet-up:evmos": "NETWORK_ID=evmos yarn testnet-up",
     "testnet-up:gnosis": "NETWORK_ID=gnosis yarn testnet-up",
+    "testnet-up:eos": "NETWORK_ID=eos yarn testnet-up", 
     "testnet-up:tron": "NETWORK_ID=tron TESTNET_MODE=true yarn chain && hardhat run scripts/tron/update.js",
 
     "deploy": "yarn chain && hardhat run scripts/mainnets/deploy-upgradable.js",
@@ -73,6 +76,7 @@
     "deploy:evmos": "HARDHAT_NETWORK=evmos yarn deploy",
     "deploy:movr": "HARDHAT_NETWORK=movr yarn deploy",
     "deploy:beam": "HARDHAT_NETWORK=beam yarn deploy",
+    "deploy:eos": "HARDHAT_NETWORK=eos yarn deploy",
     "deploy:tron": "NETWORK_ID=tron yarn chain && hardhat run scripts/tron/deploy.js",
 
     "up": "yarn chain && hardhat run scripts/mainnets/upgrade.js",
@@ -89,11 +93,13 @@
     "up:evmos": "HARDHAT_NETWORK=evmos yarn up",
     "up:movr": "HARDHAT_NETWORK=movr yarn up",
     "up:beam": "HARDHAT_NETWORK=beam yarn up",
+    "up:eos": "HARDHAT_NETWORK=eos yarn up",
     "up:tron": "HARDHAT_NETWORK=tron yarn chain && hardhat run scripts/tron/update.js",
 
     "token": "yarn chain && hardhat run scripts/mainnets/token.js",
     "token:avax": "HARDHAT_NETWORK=avax yarn token",
     "token:arb": "HARDHAT_NETWORK=arb yarn token",
+    "token:opt": "HARDHAT_NETWORK=opt yarn token",
     "token:cfx": "HARDHAT_NETWORK=cfx yarn token",
     "token:aurora": "HARDHAT_NETWORK=aurora yarn token",
     "token:evmos": "HARDHAT_NETWORK=evmos yarn token",
@@ -112,12 +118,13 @@
     "deposit:evmos": "HARDHAT_NETWORK=evmos yarn deposit",
     "deposit:movr": "HARDHAT_NETWORK=movr yarn deposit",
     "deposit:beam": "HARDHAT_NETWORK=beam yarn deposit",
+    "deposit:eos": "HARDHAT_NETWORK=eos yarn deposit",
     "deposit:tron": "hardhat run scripts/tron/deposit.js"
   },
   "devDependencies": {
     "@mesonfi/contract-abis": "^0.11.0",
     "@mesonfi/contract-types": "^0.11.0",
-    "@mesonfi/presets": "^0.11.1",
+    "@mesonfi/presets": "^0.11.3",
     "@mesonfi/sdk": "^0.11.2",
     "@nomiclabs/hardhat-ethers": "^2.0.3",
     "@nomiclabs/hardhat-waffle": "^2.0.1",

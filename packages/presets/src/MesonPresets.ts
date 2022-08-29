@@ -103,7 +103,7 @@ export class MesonPresets {
   }
 
   getAllNetworks(): PresetNetwork[] {
-    return this._networks ?? mainnets
+    return (this._networks ?? mainnets).filter(n => !!n.url)
   }
 
   getNetwork(id: string): PresetNetwork {
