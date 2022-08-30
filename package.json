@@ -33,6 +33,7 @@
     "chain:gnosis": "NETWORK_ID=gnosis yarn chain",
     "chain:tron": "NETWORK_ID=tron yarn chain",
     "chain:eos": "NETWORK_ID=eos yarn chain",
+    "chain:emerald": "NETWORK_ID=emerald yarn chain",
 
     "testnet": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/deploy-upgradable.js",
     "testnet:eth": "NETWORK_ID=eth yarn testnet",
@@ -46,6 +47,7 @@
     "testnet:evmos":  "NETWORK_ID=evmos yarn testnet",
     "testnet:gnosis":  "NETWORK_ID=gnosis yarn testnet",
     "testnet:eos": "NETWORK_ID=eos yarn testnet", 
+    "testnet:emerald": "NETWORK_ID=emerald yarn testnet", 
     "testnet:tron": "NETWORK_ID=tron TESTNET_MODE=true yarn chain && hardhat run scripts/tron/deploy.js",
 
     "testnet-up": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/upgrade.js",
@@ -60,6 +62,7 @@
     "testnet-up:evmos": "NETWORK_ID=evmos yarn testnet-up",
     "testnet-up:gnosis": "NETWORK_ID=gnosis yarn testnet-up",
     "testnet-up:eos": "NETWORK_ID=eos yarn testnet-up", 
+    "testnet-up:emerald": "NETWORK_ID=emerald yarn testnet-up", 
     "testnet-up:tron": "NETWORK_ID=tron TESTNET_MODE=true yarn chain && hardhat run scripts/tron/update.js",
 
     "deploy": "yarn chain && hardhat run scripts/mainnets/deploy-upgradable.js",
@@ -77,6 +80,7 @@
     "deploy:movr": "HARDHAT_NETWORK=movr yarn deploy",
     "deploy:beam": "HARDHAT_NETWORK=beam yarn deploy",
     "deploy:eos": "HARDHAT_NETWORK=eos yarn deploy",
+    "deploy:emerald": "HARDHAT_NETWORK=emerald yarn deploy",
     "deploy:tron": "NETWORK_ID=tron yarn chain && hardhat run scripts/tron/deploy.js",
 
     "up": "yarn chain && hardhat run scripts/mainnets/upgrade.js",
@@ -94,6 +98,7 @@
     "up:movr": "HARDHAT_NETWORK=movr yarn up",
     "up:beam": "HARDHAT_NETWORK=beam yarn up",
     "up:eos": "HARDHAT_NETWORK=eos yarn up",
+    "up:emerald": "HARDHAT_NETWORK=emerald yarn up",
     "up:tron": "HARDHAT_NETWORK=tron yarn chain && hardhat run scripts/tron/update.js",
 
     "token": "yarn chain && hardhat run scripts/mainnets/token.js",
@@ -118,6 +123,7 @@
     "deposit:movr": "HARDHAT_NETWORK=movr yarn deposit",
     "deposit:beam": "HARDHAT_NETWORK=beam yarn deposit",
     "deposit:eos": "HARDHAT_NETWORK=eos yarn deposit",
+    "deposit:emerald": "HARDHAT_NETWORK=emerald yarn deposit",
     "deposit:tron": "hardhat run scripts/tron/deposit.js"
   },
   "devDependencies": {

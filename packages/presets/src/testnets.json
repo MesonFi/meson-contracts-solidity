@@ -475,5 +475,42 @@
         "addr": "0xCF1511622929F4BA960dfA9b24Be84A8Fc620bd5"
       }
     ]
+  },
+  {
+    "id": "emerald-testnet",
+    "name": "Emerald Paratime Mainnet",
+    "alias": "EMER",
+    "chainId": "0xa515",
+    "slip44": "0x800001da",
+    "shortSlip44": "0x01da",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://testnet.emerald.oasis.dev",
+    "explorer": "https://testnet.explorer.emerald.oasis.dev/",
+    "nativeCurrency": {
+      "name": "ROSE",
+      "symbol": "ROSE",
+      "decimals": 18
+    },
+    "mesonAddress": "0xc24424C27Cf43e4403B42721C86dF782f7788B89",
+    "tokens": [
+      {
+        "name": "ROSE USDT",
+        "symbol": "roseUSDT",
+        "decimals": 6,
+        "tokenIndex": 1,
+        "addr": "0x51820aEFc3Aa242D7416D7e522b75BFb32446d6e"
+      },
+      {
+        "name": "ROSE USDC",
+        "symbol": "roseUSDC",
+        "decimals": 6,
+        "tokenIndex": 2,
+        "addr": "0x751DE3875aeF8C18d7FE983c6DeeFe366bed438f"
+      }
+    ]
   }
 ]
