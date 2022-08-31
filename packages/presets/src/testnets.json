@@ -475,5 +475,40 @@
         "addr": "0xCF1511622929F4BA960dfA9b24Be84A8Fc620bd5"
       }
     ]
+  },
+  {
+    "id": "zksync-testnet",
+    "name": "zkSync alpha testnet",
+    "alias": "ZKSYNC",
+    "chainId": "0x118",
+    "slip44": "0x00000118",
+    "shortSlip44": "0x0118",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://zksync2-testnet.zksync.dev",
+    "explorer": "https://zksync2-testnet.zkscan.io",
+    "nativeCurrency": {
+      "name": "goerliETH",
+      "symbol": "goerliETH",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "tokens": [
+      {
+        "name": "zksync USDT",
+        "symbol": "zkUSDT",
+        "decimals": 6,
+        "tokenIndex": 1
+      },
+      {
+        "name": "zksync USDC",
+        "symbol": "zkUSDC",
+        "decimals": 6,
+        "tokenIndex": 2
+      }
+    ]
   }
 ]

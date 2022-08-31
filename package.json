@@ -33,6 +33,7 @@
     "chain:gnosis": "NETWORK_ID=gnosis yarn chain",
     "chain:tron": "NETWORK_ID=tron yarn chain",
     "chain:eos": "NETWORK_ID=eos yarn chain",
+    "chain:zksync": "NETWORK_ID=zksync yarn chain",
 
     "testnet": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/deploy-upgradable.js",
     "testnet:eth": "NETWORK_ID=eth yarn testnet",
@@ -47,6 +48,7 @@
     "testnet:gnosis":  "NETWORK_ID=gnosis yarn testnet",
     "testnet:eos": "NETWORK_ID=eos yarn testnet", 
     "testnet:tron": "NETWORK_ID=tron TESTNET_MODE=true yarn chain && hardhat run scripts/tron/deploy.js",
+    "testnet:zksync": "NETWORK_ID=zksync TESTNET_MODE=true yarn chain && hardhat run scripts/zksync/deploy.js",
 
     "testnet-up": "TESTNET_MODE=true yarn chain && hardhat run scripts/testnets/upgrade.js",
     "testnet-up:eth": "NETWORK_ID=eth yarn testnet-up",
@@ -61,6 +63,7 @@
     "testnet-up:gnosis": "NETWORK_ID=gnosis yarn testnet-up",
     "testnet-up:eos": "NETWORK_ID=eos yarn testnet-up", 
     "testnet-up:tron": "NETWORK_ID=tron TESTNET_MODE=true yarn chain && hardhat run scripts/tron/update.js",
+    "testnet-up:zksync": "NETWORK_ID=zksync TESTNET_MODE=true yarn chain && hardhat run scripts/zksync/update.js",
 
     "deploy": "yarn chain && hardhat run scripts/mainnets/deploy-upgradable.js",
     "deploy:eth": "HARDHAT_NETWORK=eth yarn deploy",
@@ -78,6 +81,7 @@
     "deploy:beam": "HARDHAT_NETWORK=beam yarn deploy",
     "deploy:eos": "HARDHAT_NETWORK=eos yarn deploy",
     "deploy:tron": "NETWORK_ID=tron yarn chain && hardhat run scripts/tron/deploy.js",
+    "deploy:zksync": "NETWORK_ID=zksync yarn chain && hardhat run scripts/zksync/deploy.js",
 
     "up": "yarn chain && hardhat run scripts/mainnets/upgrade.js",
     "up:eth": "HARDHAT_NETWORK=eth yarn up",
@@ -95,6 +99,7 @@
     "up:beam": "HARDHAT_NETWORK=beam yarn up",
     "up:eos": "HARDHAT_NETWORK=eos yarn up",
     "up:tron": "HARDHAT_NETWORK=tron yarn chain && hardhat run scripts/tron/update.js",
+    "up:zksync": "HARDHAT_NETWORK=zksync yarn chain && hardhat run scripts/zksync/update.js",
 
     "token": "yarn chain && hardhat run scripts/mainnets/token.js",
     "token:avax": "HARDHAT_NETWORK=avax yarn token",
@@ -119,7 +124,8 @@
     "deposit:movr": "HARDHAT_NETWORK=movr yarn deposit",
     "deposit:beam": "HARDHAT_NETWORK=beam yarn deposit",
     "deposit:eos": "HARDHAT_NETWORK=eos yarn deposit",
-    "deposit:tron": "hardhat run scripts/tron/deposit.js"
+    "deposit:tron": "hardhat run scripts/tron/deposit.js",
+    "deposit:zksync": "hardhat run scripts/zksync/deposit.js"
   },
   "devDependencies": {
     "@mesonfi/contract-abis": "^0.11.0",
