@@ -262,14 +262,14 @@ describe('MesonPools', () => {
 
   describe('#release for fee waived swap', async () => {
     it('reject fee waived swap for non-premium signer', async () => {
-      const swap = mesonClientForInitiator.requestSwap({ ...getPartialSwap(), salt: '0x40' }, outChain)
+      const swap = mesonClientForInitiator.requestSwap({ ...getPartialSwap(), salt: '0xc0' }, outChain)
       const signedReleaseData = await swap.signForRelease(TestAddress, true)
       const signedRelease = new SignedSwapRelease(signedReleaseData)
       await expect(mesonClientForInitiator.release(signedRelease)).to.be.revertedWith('Caller is not the premium manager')
     })
 
     it('releases a fee waived swap', async () => {
-      const swap = mesonClientForInitiator.requestSwap({ ...getPartialSwap(), salt: '0x40' }, outChain)
+      const swap = mesonClientForInitiator.requestSwap({ ...getPartialSwap(), salt: '0xc0' }, outChain)
       const signedRequestData = await swap.signForRequest(true)
       const signedRequest = new SignedSwapRequest(signedRequestData)
       const signedReleaseData = await swap.signForRelease(TestAddress, true)
