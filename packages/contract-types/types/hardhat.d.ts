@@ -13,10 +13,6 @@ import * as Contracts from ".";
 declare module "hardhat/types/runtime" {
   interface HardhatEthersHelpers extends HardhatEthersHelpersBase {
     getContractFactory(
-      name: "IERC1822ProxiableUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC1822ProxiableUpgradeable__factory>;
-    getContractFactory(
       name: "IBeaconUpgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IBeaconUpgradeable__factory>;
@@ -24,10 +20,6 @@ declare module "hardhat/types/runtime" {
       name: "ERC1967UpgradeUpgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC1967UpgradeUpgradeable__factory>;
-    getContractFactory(
-      name: "Initializable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Initializable__factory>;
     getContractFactory(
       name: "UUPSUpgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -44,10 +36,6 @@ declare module "hardhat/types/runtime" {
       name: "IERC20Upgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC20Upgradeable__factory>;
-    getContractFactory(
-      name: "ContextUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ContextUpgradeable__factory>;
     getContractFactory(
       name: "ERC20",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -101,6 +89,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockToken__factory>;
     getContractFactory(
+      name: "SampleThirdPartyDapp",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.SampleThirdPartyDapp__factory>;
+    getContractFactory(
       name: "UCTUpgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.UCTUpgradeable__factory>;
@@ -112,6 +104,10 @@ declare module "hardhat/types/runtime" {
       name: "IERC20Minimal",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC20Minimal__factory>;
+    getContractFactory(
+      name: "ITransferWithBeneficiary",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ITransferWithBeneficiary__factory>;
     getContractFactory(
       name: "MesonHelpers",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -126,11 +122,6 @@ declare module "hardhat/types/runtime" {
     ): Promise<Contracts.MesonTokens__factory>;
 
     getContractAt(
-      name: "IERC1822ProxiableUpgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC1822ProxiableUpgradeable>;
-    getContractAt(
       name: "IBeaconUpgradeable",
       address: string,
       signer?: ethers.Signer
@@ -140,11 +131,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.ERC1967UpgradeUpgradeable>;
-    getContractAt(
-      name: "Initializable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Initializable>;
     getContractAt(
       name: "UUPSUpgradeable",
       address: string,
@@ -165,11 +151,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC20Upgradeable>;
-    getContractAt(
-      name: "ContextUpgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ContextUpgradeable>;
     getContractAt(
       name: "ERC20",
       address: string,
@@ -236,6 +217,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.MockToken>;
     getContractAt(
+      name: "SampleThirdPartyDapp",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.SampleThirdPartyDapp>;
+    getContractAt(
       name: "UCTUpgradeable",
       address: string,
       signer?: ethers.Signer
@@ -250,6 +236,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC20Minimal>;
+    getContractAt(
+      name: "ITransferWithBeneficiary",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ITransferWithBeneficiary>;
     getContractAt(
       name: "MesonHelpers",
       address: string,
