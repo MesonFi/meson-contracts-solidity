@@ -203,9 +203,17 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
     }
 
-    _safeTransfer(_tokenList[tokenIndex], recipient, releaseAmount, tokenIndex == 255);
+    _release(encodedSwap, tokenIndex, initiator, recipient, releaseAmount);
 
     emit SwapReleased(encodedSwap);
+  }
+
+  function _release(uint256 encodedSwap, uint8 tokenIndex, address initiator, address recipient, uint256 amount) private {
+    if (_willTransferToContract(encodedSwap)) {
+      _transferToContract(_tokenList[tokenIndex], recipient, initiator, amount, tokenIndex == 255, _saltDataFrom(encodedSwap));
+    } else {
+      _safeTransfer(_tokenList[tokenIndex], recipient, amount, tokenIndex == 255);
+    }
   }
 
   /// @notice Read information for a locked swap

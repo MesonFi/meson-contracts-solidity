@@ -13,8 +13,10 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// key: `encodedSwap` in format of `amount:uint48|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
   ///   amount: The amount of tokens of this swap, always in decimal 6. The amount of a swap is capped at $100k so it can be safely encoded in uint48;
   ///   salt: The salt value of this swap, carrying some information below:
+  ///     salt & 0x8000000000 == true => will release to an owa address, otherwise a smart contract;
   ///     salt & 0x4000000000 == true => will waive *service fee*;
   ///     salt & 0x0800000000 == true => use *non-typed signing* (some wallets such as hardware wallets don't support EIP-712v1);
+  ///     salt & 0x00ffffffff: customized data that can be passed to integrated 3rd-party smart contract;
   ///   fee: The fee given to LPs (liquidity providers). An extra service fee maybe charged afterwards;
   ///   expireTs: The expiration time of this swap on the initial chain. The LP should `executeSwap` and receive his funds before `expireTs`;
   ///   outChain: The target chain of a cross-chain swap (given by the last 2 bytes of SLIP-44);
