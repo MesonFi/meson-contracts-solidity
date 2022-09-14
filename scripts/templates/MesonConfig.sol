@@ -7,6 +7,9 @@ contract MesonConfig {
   // Ref https://github.com/satoshilabs/slips/blob/master/slip-0044.md
   uint16 constant SHORT_COIN_TYPE = CONFIG_COIN_TYPE;
 
+  uint256 constant MAX_SWAP_AMOUNT = 1e11; // 100,000.000000 = 100k
+  uint256 constant SERVICE_FEE_RATE = 10; // service fee = 10 / 10000 = 0.1%
+
   uint256 constant MIN_BOND_TIME_PERIOD = 1 hours;
   uint256 constant MAX_BOND_TIME_PERIOD = 2 hours;
   uint256 constant LOCK_TIME_PERIOD = CONFIG_LOCK_TIME;

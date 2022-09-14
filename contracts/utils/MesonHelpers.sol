@@ -105,16 +105,8 @@ contract MesonHelpers is MesonConfig {
   /// @notice Calculate the service fee from `encodedSwap`
   /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
-    return _amountFrom(encodedSwap) / 1000; // Default to `serviceFee` = 0.1% * `amount`
+    return _amountFrom(encodedSwap) * SERVICE_FEE_RATE / 10000; // Default to `serviceFee` = 0.1% * `amount`
   }
-
-  /// [Suggestion]: mutable service fee points rate
-  // uint public feePointsRate = 10;
-  // modifier onlyOwner() {...}
-  // function setFeePoints(uint newFeePoints) onlyOwner external {...}
-  // function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
-  //   return uint256(encodedSwap >> 208) * feePointsRate / 10000;
-  // }
 
   /// @notice Decode `fee` (the fee for LPs) from `encodedSwap`
   /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
