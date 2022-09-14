@@ -259,9 +259,7 @@ contract MesonHelpers is MesonConfig {
 
     if (_inChainFrom(encodedSwap) == 0x00c3) {
       bytes32 digest = keccak256(abi.encodePacked(
-        nonTyped
-          ? bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33330a)  // HEX of "\x19TRON Signed Message:\n33\n"
-          : bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33320a), // HEX of "\x19TRON Signed Message:\n32\n"
+        nonTyped ? TRON_SIGN_HEADER_33 : TRON_SIGN_HEADER_32,
         encodedSwap
       ));
       require(signer == ecrecover(digest, v, r, s), "Invalid signature");
@@ -269,10 +267,7 @@ contract MesonHelpers is MesonConfig {
     }
 
     if (nonTyped) {
-      bytes32 digest = keccak256(abi.encodePacked(
-        bytes28(0x19457468657265756d205369676e6564204d6573736167653a0a3332), // HEX of "\x19Ethereum Signed Message:\n32"
-        encodedSwap
-      ));
+      bytes32 digest = keccak256(abi.encodePacked(ETH_SIGN_HEADER, encodedSwap));
       require(signer == ecrecover(digest, v, r, s), "Invalid signature");
       return;
     }
@@ -313,9 +308,7 @@ contract MesonHelpers is MesonConfig {
 
     if (_inChainFrom(encodedSwap) == 0x00c3) {
       bytes32 digest = keccak256(abi.encodePacked(
-        nonTyped
-          ? bytes25(0x1954524f4e205369676e6564204d6573736167653a0a35330a)  // HEX of "\x19TRON Signed Message:\n53\n"
-          : bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33320a), // HEX of "\x19TRON Signed Message:\n32\n"
+        nonTyped ? TRON_SIGN_HEADER_53 : TRON_SIGN_HEADER_32,
         encodedSwap,
         recipient
       ));
@@ -325,18 +318,15 @@ contract MesonHelpers is MesonConfig {
 
     bytes32 digest;
     if (nonTyped) {
-      digest = keccak256(abi.encodePacked(
-        bytes28(0x19457468657265756d205369676e6564204d6573736167653a0a3332), // HEX of "\x19Ethereum Signed Message:\n32"
-        keccak256(abi.encodePacked(encodedSwap, recipient))
-      ));
+      digest = keccak256(abi.encodePacked(ETH_SIGN_HEADER, keccak256(abi.encodePacked(encodedSwap, recipient))));
     } else if (_outChainFrom(encodedSwap) == 0x00c3) {
+      bytes32 typehash = RELEASE_TO_TRON_TYPE_HASH;
       assembly {
         mstore(21, recipient)
         mstore8(32, 0x41)
         mstore(0, encodedSwap)
         mstore(32, keccak256(0, 53))
-        // mstore(0, 0xcdd10eb72226dc70c96479571183c7d98ddba64dcc287980e7f6deceaad47c1c) // testnet
-        mstore(0, 0xf6ea10de668a877958d46ed7d53eaf47124fda9bee9423390a28c203556a2e55) // mainnet
+        mstore(0, typehash)
         digest := keccak256(0, 64)
       }
     } else {
