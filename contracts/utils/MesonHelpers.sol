@@ -35,6 +35,10 @@ contract MesonHelpers is MesonConfig {
     uint256 amount,
     bool isUCT
   ) internal {
+    uint32 size;
+    assembly { size := extcodesize(token) }
+    require(size > 0, "The given token address is not a contract");
+
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
       ERC20_TRANSFER_SELECTOR,
       recipient,
@@ -81,6 +85,11 @@ contract MesonHelpers is MesonConfig {
   ) internal {
     require(token != address(0), "Token not supported");
     require(amount > 0, "Amount must be greater than zero");
+
+    uint32 size;
+    assembly { size := extcodesize(token) }
+    require(size > 0, "The given token address is not a contract");
+
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
       ERC20_TRANSFER_FROM_SELECTOR,
       sender,
