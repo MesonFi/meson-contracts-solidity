@@ -63,7 +63,7 @@ contract MesonHelpers is MesonConfig {
   ) internal {
     uint256 adjustedAmount = amount;
     // uint256 adjustedAmount = isUCT ? amount : amount * 1e12; // need to switch to this line if deploying to BNB Chain or Conflux
-    IERC20Minimal(token).increaseAllowance(contractAddr, adjustedAmount);
+    IERC20Minimal(token).approve(contractAddr, adjustedAmount);
     ITransferWithBeneficiary(contractAddr).transferWithBeneficiary(token, adjustedAmount, beneficiary, data);
   }
 
