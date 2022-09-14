@@ -142,7 +142,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(until < _expireTsFrom(encodedSwap) - 5 minutes, "Cannot lock because expireTs is soon.");
 
     uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, poolIndex);
-    // Only (amount - service fee) is locked from the LP pool. The service fee will be charged on release
+    // Only (amount - lp fee) is locked from the LP pool. The service fee will be charged on release
     _balanceOfPoolToken[poolTokenIndex] -= (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
     
     _lockedSwaps[swapId] = _lockedSwapFrom(until, poolIndex);
@@ -162,7 +162,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(_untilFromLocked(lockedSwap) < block.timestamp, "Swap still in lock");
 
     uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, _poolIndexFromLocked(lockedSwap));
-    // (amount - service fee) will be returned because only that amount was locked
+    // (amount - lp fee) will be returned because only that amount was locked
     _balanceOfPoolToken[poolTokenIndex] += (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
     _lockedSwaps[swapId] = 0;
 
