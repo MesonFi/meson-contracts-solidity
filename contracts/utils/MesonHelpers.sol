@@ -9,6 +9,7 @@ import "../MesonConfig.sol";
 /// @notice The class that provides helper functions for Meson protocol
 contract MesonHelpers is MesonConfig {
   bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256("transfer(address,uint256)"));
+  bytes4 private constant ERC20_TRANSFER_FROM_SELECTOR = bytes4(keccak256("transferFrom(address,address,uint256)"));
 
   function _msgSender() internal view returns (address) {
     return msg.sender;
@@ -81,7 +82,7 @@ contract MesonHelpers is MesonConfig {
     require(token != address(0), "Token not supported");
     require(amount > 0, "Amount must be greater than zero");
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
-      bytes4(0x23b872dd), // bytes4(keccak256(bytes("transferFrom(address,address,uint256)")))
+      ERC20_TRANSFER_FROM_SELECTOR,
       sender,
       address(this),
       amount
