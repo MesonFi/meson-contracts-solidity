@@ -1,6 +1,7 @@
 import { pack } from '@ethersproject/solidity'
-import { hexZeroPad, isHexString } from '@ethersproject/bytes'
+import { hexlify, hexZeroPad, isHexString } from '@ethersproject/bytes'
 import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
+import { randomBytes } from '@ethersproject/random'
 
 const swapStruct = [
   { name: 'amount', type: 'uint48' },
@@ -107,9 +108,8 @@ export class Swap implements SwapData {
     if (strLength === 0) {
       return ''
     }
-    const max = 2 ** Math.min((strLength * 4), 32)
-    const rnd = BigNumber.from(Math.floor(Math.random() * max))
-    return hexZeroPad(rnd.toHexString(), strLength / 2).replace('0x', '')
+    const randomLength = Math.min((strLength / 2), 4)
+    return hexZeroPad(randomBytes(randomLength), strLength / 2).replace('0x', '')
   }
 
   get encoded(): string {
