@@ -8,7 +8,7 @@ import "../MesonConfig.sol";
 /// @title MesonHelpers
 /// @notice The class that provides helper functions for Meson protocol
 contract MesonHelpers is MesonConfig {
-  bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
+  bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256("transfer(address,uint256)"));
 
   function _msgSender() internal view returns (address) {
     return msg.sender;
@@ -35,7 +35,7 @@ contract MesonHelpers is MesonConfig {
     bool isUCT
   ) internal {
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
-      bytes4(0xa9059cbb), // bytes4(keccak256(bytes("transfer(address,uint256)")))
+      ERC20_TRANSFER_SELECTOR,
       recipient,
       amount
       // isUCT ? amount : amount * 1e12 // need to switch to this line if deploying to BNB Chain or Conflux
