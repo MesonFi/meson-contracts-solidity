@@ -17,11 +17,12 @@ contract UCTUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
   address private _minter;
   address private _mesonContract;
 
-  function initialize(address minter) public initializer {
+  function initialize(address minter, address mesonContract) public initializer {
     __ERC20_init("USD Coupon Token (https://meson.fi)", "UCT");
     _owner = _msgSender();
     _minter = minter;
-    // _mesonContract = ;
+    require(mesonContract != address(0), "Address of meson contract cannot be zero");
+    _mesonContract = mesonContract;
   }
 
   function decimals() public pure override returns (uint8) {

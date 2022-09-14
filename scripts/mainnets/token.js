@@ -16,7 +16,7 @@ async function deploy() {
 
   const UCT = await ethers.getContractFactory('UCTUpgradeable', wallet)
   console.log('Deploying UCT...')
-  const uct = await upgrades.deployProxy(UCT, [MINTER], { kind: 'uups' })
+  const uct = await upgrades.deployProxy(UCT, [MINTER, network.mesonAddress], { kind: 'uups' })
   await uct.deployed()
   console.log('UCT deployed to:', uct.address)
 }
