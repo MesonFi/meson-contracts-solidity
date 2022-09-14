@@ -34,7 +34,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     address poolOwner = _msgSender();
     uint40 poolIndex = _poolIndexFrom(poolTokenIndex);
-    require(poolIndex != 0, "Cannot use 0 as pool index");
+    require(poolIndex != 0, "Cannot use 0 as pool index"); // pool 0 is reserved for meson service fee
     require(ownerOfPool[poolIndex] == address(0), "Pool index already registered");
     require(poolOfAuthorizedAddr[poolOwner] == 0, "Signer address already registered");
     ownerOfPool[poolIndex] = poolOwner;
@@ -59,7 +59,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(amount > 0, "Amount must be positive");
 
     uint40 poolIndex = _poolIndexFrom(poolTokenIndex);
-    require(poolIndex != 0, "Cannot use 0 as pool index");
+    require(poolIndex != 0, "Cannot use 0 as pool index"); // pool 0 is reserved for meson service fee
     require(ownerOfPool[poolIndex] == _msgSender(), "Need the pool owner as the signer");
     _balanceOfPoolToken[poolTokenIndex] += amount;
     uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
@@ -76,7 +76,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(amount > 0, "Amount must be positive");
 
     uint40 poolIndex = _poolIndexFrom(poolTokenIndex);
-    require(poolIndex != 0, "Cannot use 0 as pool index");
+    require(poolIndex != 0, "Cannot use 0 as pool index"); // pool 0 is reserved for meson service fee
     require(ownerOfPool[poolIndex] == _msgSender(), "Need the pool owner as the signer");
     _balanceOfPoolToken[poolTokenIndex] -= amount;
     uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
@@ -212,7 +212,10 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       uint256 serviceFee = _serviceFee(encodedSwap);
       // Subtract service fee from the release amount
       releaseAmount -= serviceFee;
-      // The collected service fee will be stored in `_balanceOfPoolToken` with `poolIndex = 0`
+      // Collected service fee will be stored in `_balanceOfPoolToken` with `poolIndex = 0`.
+      // Currently, no one is capable to withdraw fund from pool 0. In the future, Meson protocol
+      // will specify the purpose of service fee and its usage permission, and upgrade the contract
+      // accordingly.
       _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
     }
 
