@@ -35,7 +35,7 @@ describe('MesonPools', () => {
     mesonInstance = result.pools.connect(poolOwner) // pool owner is signer
 
     const swapSigner = new EthersWalletSwapSigner(initiator)
-    mesonClientForInitiator = await MesonClient.Create(result.pools as any, swapSigner)
+    mesonClientForInitiator = await MesonClient.Create((result.pools as any).connect(initiator), swapSigner)
     mesonClientForPoolOwner = await MesonClient.Create((mesonInstance as any).connect(poolOwner))
     outChain = mesonClientForPoolOwner.shortCoinType
 
@@ -57,8 +57,8 @@ describe('MesonPools', () => {
   })
 
   describe('#depositAndRegister', () => {
-      const amount = ethers.utils.parseUnits('1000', 6)
-      it('rejects zero pool index', async () => {
+    const amount = ethers.utils.parseUnits('1000', 6)
+    it('rejects zero pool index', async () => {
       await expect(mesonClientForPoolOwner.depositAndRegister(token.address, amount, '0'))
         .to.be.revertedWith('Cannot use 0 as pool index')
     })
@@ -133,6 +133,61 @@ describe('MesonPools', () => {
       await mesonClientForPoolOwner.depositAndRegister(token.address,  amount, '1')
       await mesonClientForPoolOwner.deposit(token.address,  amount)
       expect(await mesonInstance.poolTokenBalance(token.address, poolOwner.address)).to.equal(doubleAmount)
+    })
+  })
+
+  describe('#addAuthorizedAddr', () => {
+    const amount = ethers.utils.parseUnits('1000', 6)
+    it('rejects if pool is not registered', async () => {
+      await expect(mesonInstance.addAuthorizedAddr(TestAddress))
+        .to.be.revertedWith('The signer does not register a pool')
+    })
+    it('accepts a valid call', async () => {
+      await token.approve(mesonInstance.address, amount)
+      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+
+      await mesonInstance.addAuthorizedAddr(TestAddress)
+      expect(await mesonInstance.poolOfAuthorizedAddr(TestAddress)).to.equal(1)
+    })
+    it('rejects if signer is not the pool owner', async () => {
+      await token.approve(mesonInstance.address, amount)
+      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+
+      await mesonInstance.addAuthorizedAddr(initiator.address)
+      await expect(mesonInstance.connect(initiator).addAuthorizedAddr(TestAddress))
+        .to.be.revertedWith('Need the pool owner as the signer')
+    })
+    it('rejects if address is already authorized', async () => {
+      await token.approve(mesonInstance.address, amount)
+      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+
+      await mesonInstance.addAuthorizedAddr(TestAddress)
+      await expect(mesonInstance.addAuthorizedAddr(TestAddress))
+        .to.be.revertedWith('Addr is authorized for another pool')
+    })
+  })
+
+  describe('#removeAuthorizedAddr', () => {
+    const amount = ethers.utils.parseUnits('1000', 6)
+    it('rejects if pool is not registered', async () => {
+      await expect(mesonInstance.removeAuthorizedAddr(TestAddress))
+        .to.be.revertedWith('The signer does not register a pool')
+    })
+    it('accepts a valid call', async () => {
+      await token.approve(mesonInstance.address, amount)
+      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+
+      await mesonInstance.addAuthorizedAddr(TestAddress)
+      await mesonInstance.removeAuthorizedAddr(TestAddress)
+      expect(await mesonInstance.poolOfAuthorizedAddr(TestAddress)).to.equal(0)
+    })
+    it('rejects if signer is not the pool owner', async () => {
+      await token.approve(mesonInstance.address, amount)
+      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+
+      await mesonInstance.addAuthorizedAddr(initiator.address)
+      await expect(mesonInstance.connect(initiator).removeAuthorizedAddr(TestAddress))
+        .to.be.revertedWith('Need the pool owner as the signer')
     })
   })
 
