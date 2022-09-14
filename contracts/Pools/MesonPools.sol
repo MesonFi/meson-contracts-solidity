@@ -46,6 +46,9 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _balanceOfPoolToken[poolTokenIndex] += amount;
     uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
     _unsafeDepositToken(_tokenList[tokenIndex], poolOwner, amount, tokenIndex == 255);
+
+    emit PoolRegistered(poolIndex, poolOwner);
+    emit PoolDeposited(poolTokenIndex, amount);
   }
 
   /// @notice Deposit tokens into the liquidity pool.
@@ -64,6 +67,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _balanceOfPoolToken[poolTokenIndex] += amount;
     uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
     _unsafeDepositToken(_tokenList[tokenIndex], _msgSender(), amount, tokenIndex == 255);
+
+    emit PoolDeposited(poolTokenIndex, amount);
   }
 
   /// @notice Withdraw tokens from the liquidity pool.
@@ -79,6 +84,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _balanceOfPoolToken[poolTokenIndex] -= amount;
     uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
     _safeTransfer(_tokenList[tokenIndex], _msgSender(), amount, tokenIndex == 255);
+
+    emit PoolWithdrawn(poolTokenIndex, amount);
   }
 
   /// @notice Add an authorized address to the pool
@@ -91,6 +98,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(poolIndex != 0, "The signer does not register a pool");
     require(poolOwner == ownerOfPool[poolIndex], "Need the pool owner as the signer");
     poolOfAuthorizedAddr[addr] = poolIndex;
+
+    emit PoolAuthorizedAddrAdded(poolIndex, addr);
   }
   
   /// @notice Remove an authorized address from the pool
@@ -103,6 +112,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(poolOwner == ownerOfPool[poolIndex], "Need the pool owner as the signer");
     require(poolOfAuthorizedAddr[addr] == poolIndex, "Addr is not authorized for the signer's pool");
     poolOfAuthorizedAddr[addr] = 0;
+
+    emit PoolAuthorizedAddrRemoved(poolIndex, addr);
   }
 
   /// @notice Lock funds to match a swap request. This is step 2️⃣ in a swap.
@@ -157,6 +168,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     // (amount - service fee) will be returned because only that amount was locked
     _balanceOfPoolToken[poolTokenIndex] += (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
     _lockedSwaps[swapId] = 0;
+
+    emit SwapUnlocked(encodedSwap);
   }
 
   /// @notice Release tokens to satisfy a locked swap. This is step 3️⃣ in a swap.
