@@ -28,6 +28,11 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   //    poolIndex: The index of an LP pool. See `ownerOfPool` in `MesonStates.sol` for more information.
   mapping(uint256 => uint200) internal _postedSwaps;
 
+  /// @dev This empty reserved space is put in place to allow future versions to
+  /// add new variables without shifting down storage in the inheritance chain.
+  /// See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+  uint256[10] private __gap;
+
   /// @notice Anyone can call this method to post a swap request. This is step 1️⃣ in a swap.
   /// The r,s,v signature must be signed by the swap initiator. The initiator can call
   /// this method directly, in which case `poolIndex` should be zero and wait for LPs

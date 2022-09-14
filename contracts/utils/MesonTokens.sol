@@ -18,6 +18,11 @@ contract MesonTokens {
   /// value: `tokenIndex` in range of 1-255; zero means unsupported
   mapping(address => uint8) internal _indexOfToken;
 
+  /// @dev This empty reserved space is put in place to allow future versions to
+  /// add new variables without shifting down storage in the inheritance chain.
+  /// See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+  uint256[10] private __gap;
+
   function tokenForIndex(uint8 tokenIndex) external view returns (address) {
     return _tokenList[tokenIndex];
   }

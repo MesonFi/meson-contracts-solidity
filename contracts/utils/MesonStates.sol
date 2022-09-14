@@ -46,6 +46,11 @@ contract MesonStates is MesonTokens, MesonHelpers {
   /// The pool index 0 is reserved for use by Meson to store service fees
   mapping(uint48 => uint256) internal _balanceOfPoolToken;
 
+  /// @dev This empty reserved space is put in place to allow future versions to
+  /// add new variables without shifting down storage in the inheritance chain.
+  /// See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+  uint256[20] private __gap;
+
   function poolTokenBalance(address token, address addr) external view returns (uint256) {
     uint8 tokenIndex = _indexOfToken[token];
     uint40 poolIndex = poolOfAuthorizedAddr[addr];
