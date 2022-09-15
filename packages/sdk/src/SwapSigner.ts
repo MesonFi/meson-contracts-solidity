@@ -10,6 +10,12 @@ const NOTICE_TESTNET_SIGN_RELEASE = 'Sign to release a swap on Meson (Testnet)'
 
 export type Signature = [string, string, number]
 
+const nonTyped = encoded => parseInt(encoded[15], 16) >= 8
+const fromTron = encoded => encoded.substring(60, 64) === '00c3'
+const toTron = encoded => encoded.substring(54, 58) === '00c3'
+const hexAddress = addr => `0x${TronWeb.address.toHex(addr).substring(2)}`
+const noticeRecipient = encoded => toTron(encoded) ? 'Recipient (tron address in hex format)' : 'Recipient'
+
 export class SwapSigner {
   readonly signer: any
 
@@ -35,66 +41,29 @@ export class SwapSigner {
   }
 
   static hashRequest(encoded: string, testnet?: boolean): string {
-    if (encoded.substring(60, 64) === '00c3') {
-      // for Tron
-      const header = parseInt(encoded[15], 16) >= 8
-        ? '\x19TRON Signed Message:\n33\n'
-        : '\x19TRON Signed Message:\n32\n'
+    if (fromTron(encoded)) {
+      const header = nonTyped(encoded) ? '\x19TRON Signed Message:\n33\n' : '\x19TRON Signed Message:\n32\n'
       return keccak256(pack(['string', 'bytes32'], [header, encoded]))
-    }
-    if (parseInt(encoded[15], 16) >= 8) {
-      // for Ethereum eth_sign
+    } else if (nonTyped(encoded)) {
       const header = '\x19Ethereum Signed Message:\n32'
       return keccak256(pack(['string', 'bytes32'], [header, encoded]))
     }
     const notice = testnet ? NOTICE_TESTNET_SIGN_REQUEST : NOTICE_SIGN_REQUEST
     const typeHash = keccak256(pack(['string'], [`bytes32 ${notice}`]))
-    return keccak256(pack(
-      ['bytes32', 'bytes32'],
-      [typeHash, keccak256(encoded)],
-    ))
-  }
-
-  static getReleaseTypeHash(encoded: string, testnet?: boolean) {
-    const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
-    if (encoded.substring(54, 58) === '00c3') {
-      return keccak256(pack(['string', 'string'], [`bytes32 ${notice}`, 'bytes21 Recipient (tron address in hex format)']))
-    } else {
-      return keccak256(pack(['string', 'string'], [`bytes32 ${notice}`, 'address Recipient']))
-    }
-  }
-
-  static getReleaseValueHash(encoded: string, recipient: string) {
-    if (encoded.substring(54, 58) === '00c3') {
-      const hexRecipient = TronWeb.address.toHex(recipient)
-      return keccak256(pack(['bytes32', 'bytes21'], [encoded, `0x${hexRecipient}`]))
-    } else {
-      return keccak256(pack(['bytes32', 'address'], [encoded, recipient]))
-    }
+    return keccak256(pack(['bytes32', 'bytes32'], [typeHash, keccak256(encoded)]))
   }
 
   static hashRelease(encoded: string, recipient: string, testnet?: boolean): string {
-    if (encoded.substring(60, 64) === '00c3') {
-      // for Tron
-      const header = parseInt(encoded[15], 16) >= 8
-        ? '\x19TRON Signed Message:\n53\n'
-        : '\x19TRON Signed Message:\n32\n'
+    if (fromTron(encoded)) {
+      const header = nonTyped(encoded) ? '\x19TRON Signed Message:\n53\n' : '\x19TRON Signed Message:\n32\n'
       return keccak256(pack(['string', 'bytes32', 'address'], [header, encoded, recipient]))
+    } else if (nonTyped(encoded)) {
+      const header = '\x19Ethereum Signed Message:\n52'
+      return keccak256(pack(['string', 'bytes32', 'address'], [header, encoded, hexAddress(recipient)]))
     }
-    if (parseInt(encoded[15], 16) >= 8) {
-      let hash
-      if (encoded.substring(54, 58) === '00c3') {
-        const hexRecipient = TronWeb.address.toHex(recipient).substring(2)
-        hash = keccak256(pack(['bytes32', 'address'], [encoded, `0x${hexRecipient}`]))
-      } else {
-        hash = keccak256(pack(['bytes32', 'address'], [encoded, recipient]))
-      }
-      // for Ethereum eth_sign
-      const header = '\x19Ethereum Signed Message:\n32'
-      return keccak256(pack(['string', 'bytes32'], [header, hash]))
-    }
-    const typeHash = SwapSigner.getReleaseTypeHash(encoded, testnet)
-    const valueHash = SwapSigner.getReleaseValueHash(encoded, recipient)
+    const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
+    const typeHash = keccak256(pack(['string', 'string'], [`bytes32 ${notice}`, `address ${noticeRecipient(encoded)}`]))
+    const valueHash = keccak256(pack(['bytes32', 'address'], [encoded, hexAddress(recipient)]))
     return keccak256(pack(['bytes32', 'bytes32'], [typeHash, valueHash]))
   }
 }
@@ -144,48 +113,35 @@ export class RemoteSwapSigner extends SwapSigner {
   }
 
   async signSwapRequest(encoded: string, testnet?: boolean): Promise<Signature> {
-    if (encoded.substring(60, 64) === '00c3') {
-      const signature = await this.remoteSigner.signMessage(encoded.replace('0x', '0x0a'))
-      return this._separateSignature(signature)
+    let signature
+    if (fromTron(encoded)) {
+      signature = await this.remoteSigner.signMessage(encoded.replace('0x', '0x0a'))
+    } else if (nonTyped(encoded)) {
+      signature = await this.remoteSigner.signMessage(encoded)
+    } else {
+      const notice = testnet ? NOTICE_TESTNET_SIGN_REQUEST : NOTICE_SIGN_REQUEST
+      const data = [{ type: 'bytes32', name: notice, value: encoded }]
+      signature = await this.remoteSigner.signTypedData(data)
     }
-    if (parseInt(encoded[15], 16) >= 8) {
-      const signature = await this.remoteSigner.signMessage(encoded)
-      return this._separateSignature(signature)
-    }
-    const notice = testnet ? NOTICE_TESTNET_SIGN_REQUEST : NOTICE_SIGN_REQUEST
-    const data = [{ type: 'bytes32', name: notice, value: encoded }]
-    const signature = await this.remoteSigner.signTypedData(data)
     return this._separateSignature(signature)
   }
 
   async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<Signature> {
-    if (encoded.substring(60, 64) === '00c3') {
-      const message = pack(['bytes32', 'address'], [encoded, recipient])
-      const signature = await this.remoteSigner.signMessage(message.replace('0x', '0x0a'))
-      return this._separateSignature(signature)
-    }
-    if (parseInt(encoded[15], 16) >= 8) {
-      let hash
-      if (encoded.substring(54, 58) === '00c3') {
-        const hexRecipient = TronWeb.address.toHex(recipient).substring(2)
-        hash = keccak256(pack(['bytes32', 'address'], [encoded, `0x${hexRecipient}`]))
-      } else {
-        hash = keccak256(pack(['bytes32', 'address'], [encoded, recipient]))
-      }
-      const signature = await this.remoteSigner.signMessage(hash)
-      return this._separateSignature(signature)
-    }
-    const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
-    const data = [
-      { type: 'bytes32', name: notice, value: encoded },
-    ]
-    if (encoded.substring(54, 58) === '00c3') {
-      const hexRecipient = TronWeb.address.toHex(recipient)
-      data.push({ type: 'bytes21', name: 'Recipient (tron address in hex format)', value: `0x${hexRecipient}` })
+    let signature
+    if (fromTron(encoded)) {
+      const message = pack(['bytes32', 'address'], [encoded, recipient]).replace('0x', '0x0a')
+      signature = await this.remoteSigner.signMessage(message)
+    } else if (nonTyped(encoded)) {
+      const message = pack(['bytes32', 'address'], [encoded, hexAddress(recipient)])
+      signature = await this.remoteSigner.signMessage(message)
     } else {
-      data.push({ type: 'address', name: 'Recipient', value: recipient })
+      const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
+      const data = [
+        { type: 'bytes32', name: notice, value: encoded },
+        { type: 'address', name: noticeRecipient(encoded), value: hexAddress(recipient) }
+      ]
+      signature = await this.remoteSigner.signTypedData(data)
     }
-    const signature = await this.remoteSigner.signTypedData(data)
     return this._separateSignature(signature)
   }
 }

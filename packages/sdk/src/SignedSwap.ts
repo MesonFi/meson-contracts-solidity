@@ -75,11 +75,7 @@ export class SignedSwapRelease extends SignedSwapRequest implements SignedSwapRe
     }
     this.recipient = data.recipient
   }
-
-  getTypeHash () {
-    return SwapSigner.getReleaseTypeHash(this.encoded, this.testnet)
-  }
-
+  
   getDigest () {
     return SwapSigner.hashRelease(this.encoded, this.recipient, this.testnet)
   }

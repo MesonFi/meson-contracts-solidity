@@ -3,6 +3,8 @@ import { hexZeroPad, isHexString } from '@ethersproject/bytes'
 import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 import { randomBytes } from '@ethersproject/random'
 
+const MESON_PROTOCOL_VERSION = 1
+
 const swapStruct = [
   { name: 'version', type: 'uint8' },
   { name: 'amount', type: 'uint40' },
@@ -89,7 +91,7 @@ export class Swap implements SwapData {
       throw new Error('Invalid outToken')
     }
 
-    this.version = typeof data.version === 'number' ? data.version : 1
+    this.version = typeof data.version === 'number' ? data.version : MESON_PROTOCOL_VERSION
     this.salt = this._makeFullSalt(data.salt)
     this.expireTs = data.expireTs
     this.inChain = data.inChain

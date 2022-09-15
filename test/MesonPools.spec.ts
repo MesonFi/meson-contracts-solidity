@@ -320,6 +320,27 @@ describe('MesonPools', () => {
       expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
       expect(locked.poolOwner).to.be.undefined
     })
+
+    it('releases a non-typed swap', async () => {
+      const swap = mesonClientForInitiator.requestSwap({ ...getPartialSwap(), salt: '0x88', recipient: TestAddress }, outChain)
+      const signedRequestData = await swap.signForRequest(true)
+      const signedRequest = new SignedSwapRequest(signedRequestData)
+      const signedReleaseData = await swap.signForRelease(TestAddress, true)
+      const signedRelease = new SignedSwapRelease(signedReleaseData)
+      const amount = ethers.utils.parseUnits('2000', 6)
+
+      await token.approve(mesonInstance.address, amount)
+      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+
+      await mesonClientForPoolOwner.lock(signedRequest)
+      await mesonClientForPoolOwner.release(signedRelease)
+
+      const releaseAmount = swap.amount.sub(swap.amount.div(1000)).sub(swap.fee)
+      expect(await token.balanceOf(TestAddress)).to.equal(releaseAmount)
+      const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
+      expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
+      expect(locked.poolOwner).to.be.undefined
+    })
   })
 
   describe('#release for fee waived swap', async () => {
