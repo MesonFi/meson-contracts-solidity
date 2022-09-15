@@ -219,6 +219,13 @@ describe('MesonPools', () => {
   })
 
   describe('#lock', async () => {
+    it('rejects incorrect encoding version', async () => {
+      const swap = mesonClientForInitiator.requestSwap({ ...getPartialSwap(), version: 0 }, outChain)
+      const signedRequestData = await swap.signForRequest(true)
+      const signedRequest = new SignedSwapRequest(signedRequestData)
+
+      await expect(mesonClientForPoolOwner.lock(signedRequest)).to.be.revertedWith('Incorrect encoding version')
+    })
     it('rejects if provider not registered', async () => {
       await expect(mesonClientForPoolOwner.lock(signedRequest))
         .to.be.revertedWith('Caller not registered. Call depositAndRegister.')

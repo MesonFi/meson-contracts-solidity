@@ -40,11 +40,13 @@ export enum LockedSwapStatus {
 }
 
 export interface PartialSwapData {
+  version?: number,
   amount: BigNumberish,
   salt?: string,
   fee: BigNumberish,
   inToken: number,
   outToken: number,
+  recipient: string,
 }
 
 export class MesonClient {

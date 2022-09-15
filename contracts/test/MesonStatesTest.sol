@@ -9,7 +9,8 @@ contract MesonStatesTest is MesonStates {
   }
 
   function encodeSwap(
-    uint48 amount,
+    uint8 version,
+    uint40 amount,
     uint80 salt,
     uint40 fee,
     uint40 expireTs,
@@ -20,6 +21,7 @@ contract MesonStatesTest is MesonStates {
   ) external pure returns (bytes memory) {
     return
       abi.encodePacked(
+        version,
         amount,
         salt,
         fee,
@@ -32,6 +34,7 @@ contract MesonStatesTest is MesonStates {
   }
 
   function decodeSwap(uint256 encodedSwap, uint40 poolIndex) external pure returns (
+    uint8 version,
     uint256 amount,
     uint256 feeForLp,
     uint256 serviceFee,
@@ -43,6 +46,7 @@ contract MesonStatesTest is MesonStates {
     uint8 outTokenIndex,
     bytes6 poolTokenIndexForOutToken
   ) {
+    version = _versionFrom(encodedSwap);
     amount = _amountFrom(encodedSwap);
     feeForLp = _feeForLp(encodedSwap);
     serviceFee = _serviceFee(encodedSwap);

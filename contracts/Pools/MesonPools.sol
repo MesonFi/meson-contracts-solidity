@@ -135,7 +135,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     bytes32 s,
     uint8 v,
     address initiator
-  ) external forTargetChain(encodedSwap) {
+  ) external matchProtocolVersion(encodedSwap) forTargetChain(encodedSwap) {
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     require(_lockedSwaps[swapId] == 0, "Swap already exists");
     _checkRequestSignature(encodedSwap, r, s, v, initiator);

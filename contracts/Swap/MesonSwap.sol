@@ -10,7 +10,8 @@ import "../utils/MesonStates.sol";
 /// on the initial chain of swaps.
 contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @notice Posted Swaps
-  /// key: `encodedSwap` in format of `amount:uint48|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
+  /// key: `encodedSwap` in format of `version:uint8|amount:uint40|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
+  ///   version: Version of encoding
   ///   amount: The amount of tokens of this swap, always in decimal 6. The amount of a swap is capped at $100k so it can be safely encoded in uint48;
   ///   salt: The salt value of this swap, carrying some information below:
   ///     salt & 0x80000000000000000000 == true => will release to an owa address, otherwise a smart contract;
@@ -53,7 +54,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @param v Part of the signature
   /// @param postingValue The value to be written to `_postedSwaps`. See `_postedSwaps` for encoding format
   function postSwap(uint256 encodedSwap, bytes32 r, bytes32 s, uint8 v, uint200 postingValue)
-    external forInitialChain(encodedSwap)
+    external matchProtocolVersion(encodedSwap) forInitialChain(encodedSwap)
   {
     require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
 

@@ -11,6 +11,11 @@ contract MesonHelpers is MesonConfig {
   bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256("transfer(address,uint256)"));
   bytes4 private constant ERC20_TRANSFER_FROM_SELECTOR = bytes4(keccak256("transferFrom(address,address,uint256)"));
 
+  modifier matchProtocolVersion(uint256 encodedSwap) {
+    require(_versionFrom(encodedSwap) == MESON_PROTOCOL_VERSION, "Incorrect encoding version");
+    _;
+  }
+
   function _msgSender() internal view returns (address) {
     return msg.sender;
   }
@@ -106,10 +111,16 @@ contract MesonHelpers is MesonConfig {
     return keccak256(abi.encodePacked(encodedSwap, initiator));
   }
 
+  /// @notice Decode `version` from `encodedSwap`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
+  function _versionFrom(uint256 encodedSwap) internal pure returns (uint8) {
+    return uint8(encodedSwap >> 248);
+  }
+
   /// @notice Decode `amount` from `encodedSwap`
   /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _amountFrom(uint256 encodedSwap) internal pure returns (uint256) {
-    return encodedSwap >> 208;
+    return (encodedSwap >> 208) & 0xFFFFFFFFFF;
   }
 
   /// @notice Calculate the service fee from `encodedSwap`

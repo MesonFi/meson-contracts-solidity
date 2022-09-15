@@ -4,6 +4,8 @@ pragma solidity 0.8.6;
 /// @notice Parameters of the Meson contract
 /// for CONFIG_BLOCKCHAIN_NAME
 contract MesonConfig {
+  uint8 constant MESON_PROTOCOL_VERSION = CONFIG_PROTOCOL_VERSION;
+
   // Ref https://github.com/satoshilabs/slips/blob/master/slip-0044.md
   uint16 constant SHORT_COIN_TYPE = CONFIG_COIN_TYPE;
 

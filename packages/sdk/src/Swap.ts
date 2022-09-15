@@ -1,10 +1,11 @@
 import { pack } from '@ethersproject/solidity'
-import { hexlify, hexZeroPad, isHexString } from '@ethersproject/bytes'
+import { hexZeroPad, isHexString } from '@ethersproject/bytes'
 import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 import { randomBytes } from '@ethersproject/random'
 
 const swapStruct = [
-  { name: 'amount', type: 'uint48' },
+  { name: 'version', type: 'uint8' },
+  { name: 'amount', type: 'uint40' },
   { name: 'salt', type: 'uint80' },
   { name: 'fee', type: 'uint40' },
   { name: 'expireTs', type: 'uint40' },
@@ -16,6 +17,7 @@ const swapStruct = [
 
 export interface SwapData {
   encoded?: string,
+  version?: number,
   amount: BigNumberish,
   salt?: string,
   fee: BigNumberish,
@@ -27,6 +29,7 @@ export interface SwapData {
 }
 
 export class Swap implements SwapData {
+  readonly version: number
   readonly amount: BigNumber
   readonly salt: string
   readonly fee: BigNumber
@@ -45,7 +48,8 @@ export class Swap implements SwapData {
     if (!encoded.startsWith('0x') || encoded.length !== 66) {
       throw new Error('encoded swap should be a hex string of length 66')
     }
-    const amount = BigNumber.from(`0x${encoded.substring(2, 14)}`)
+    const version = parseInt(`0x${encoded.substring(2, 4)}`, 16)
+    const amount = BigNumber.from(`0x${encoded.substring(4, 14)}`)
     const salt = `0x${encoded.substring(14, 34)}`
     const fee = BigNumber.from(`0x${encoded.substring(34, 44)}`)
     const expireTs = parseInt(`0x${encoded.substring(44, 54)}`, 16)
@@ -54,7 +58,7 @@ export class Swap implements SwapData {
     const inChain = `0x${encoded.substring(60, 64)}`
     const inToken = parseInt(`0x${encoded.substring(64, 66)}`, 16)
 
-    return new Swap({ amount, salt, fee, expireTs, inChain, inToken, outChain, outToken })
+    return new Swap({ version, amount, salt, fee, expireTs, inChain, inToken, outChain, outToken })
   }
 
   constructor(data: SwapData) {
@@ -85,6 +89,7 @@ export class Swap implements SwapData {
       throw new Error('Invalid outToken')
     }
 
+    this.version = typeof data.version === 'number' ? data.version : 1
     this.salt = this._makeFullSalt(data.salt)
     this.expireTs = data.expireTs
     this.inChain = data.inChain
@@ -148,6 +153,7 @@ export class Swap implements SwapData {
   toObject(): SwapData {
     return {
       encoded: this.encoded,
+      version: this.version,
       amount: this.amount.toNumber(),
       salt: this.salt,
       fee: this.fee.toNumber(),

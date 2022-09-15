@@ -26,6 +26,7 @@ async function setChainConfig(networkId) {
   }
 
   let config = template
+    .replace('CONFIG_PROTOCOL_VERSION', 1)
     .replace('CONFIG_BLOCKCHAIN_NAME', `${network.name}${testnetMode ? ' Testnet' : ''}`)
     .replace('CONFIG_COIN_TYPE', network.shortSlip44)
 

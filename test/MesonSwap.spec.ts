@@ -53,6 +53,13 @@ describe('MesonSwap', () => {
 
 
   describe('#postSwap', () => {
+    it('rejects incorrect encoding version', async () => {
+      const swap2 = new SwapWithSigner({ ...swap.toObject(), version: 0 }, swap.swapSigner)
+      const signedRequestData = await swap2.signForRequest(true)
+      const signedRequest = new SignedSwapRequest(signedRequestData)
+
+      await expect(mesonClientForPoolOwner.postSwap(signedRequest)).to.be.revertedWith('Incorrect encoding version')
+    })
     it('rejects incorrect inChain', async () => {
       const swap2 = new SwapWithSigner({ ...swap.toObject(), inChain: '0x0001' }, swap.swapSigner)
       const signedRequestData = await swap2.signForRequest(true)

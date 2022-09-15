@@ -82,6 +82,7 @@ describe('MesonStates', () => {
   describe('#encodeSwap', () => {
     it('returns same result as js function', async () => {
       const encodedSwapFromContract = await mesonInstance.encodeSwap(
+        swap.version,
         swap.amount,
         swap.salt,
         swap.fee,
@@ -98,6 +99,7 @@ describe('MesonStates', () => {
   describe('#decodeSwap', () => {
     it('returns decoded swap data', async () => {
       const decoded = await mesonInstance.decodeSwap(swap.encoded, 1)
+      expect(decoded.version).to.equal(swap.version)
       expect(decoded.amount).to.equal(swap.amount)
       expect(decoded.serviceFee).to.equal(swap.amount.div(1000))
       expect(decoded.feeForLp).to.equal(swap.fee)
