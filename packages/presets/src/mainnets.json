@@ -28,6 +28,13 @@
         "decimals": 6,
         "addr": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         "tokenIndex": 2
+      },
+      {
+        "name": "Binance USD",
+        "symbol": "BUSD",
+        "decimals": 18,
+        "addr": "0x4fabb145d64652a948d72533023f6e7a623c7c53",
+        "tokenIndex": 3
       }
     ]
   },
@@ -65,6 +72,13 @@
         "decimals": 18,
         "addr": "0x55d398326f99059ff775485246999027b3197955",
         "tokenIndex": 2
+      },
+      {
+        "name": "Binance USD",
+        "symbol": "BUSD",
+        "decimals": 18,
+        "addr": "0xe9e7cea3dedca5984780bafc599bd69add087d56",
+        "tokenIndex": 3
       }
     ]
   },
