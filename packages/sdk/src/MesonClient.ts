@@ -350,9 +350,9 @@ export class MesonClient {
   }
 
   async _getPostedSwap(encoded: string | BigNumber, overrides: CallOverrides) {
-    const { initiator, poolOwner, executed } = await this.mesonInstance.getPostedSwap(encoded, overrides)
+    const { initiator, poolOwner, exist } = await this.mesonInstance.getPostedSwap(encoded, overrides)
     return {
-      executed,
+      exist,
       initiator: initiator === AddressZero ? undefined : initiator,
       poolOwner: poolOwner === AddressZero ? undefined : poolOwner
     }
@@ -390,8 +390,8 @@ export class MesonClient {
         overrides.blockTag = block
       }
     }
-    const { initiator, poolOwner, executed } = await this._getPostedSwap(encoded, overrides)
-    if (executed) {
+    const { initiator, poolOwner, exist } = await this._getPostedSwap(encoded, overrides)
+    if (exist && !initiator) {
       return { status: PostedSwapStatus.Executed }
     } else if (!initiator) {
       return { status: PostedSwapStatus.NoneOrAfterRunning }

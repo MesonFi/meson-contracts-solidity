@@ -63,9 +63,9 @@ export class TronContract {
   }
 
   async getPostedSwap(encoded: string | BigNumber) {
-    const { initiator, poolOwner, executed } = await this.#instance.getPostedSwap(encoded).call({ from: this.signer })
+    const { initiator, poolOwner, exist } = await this.#instance.getPostedSwap(encoded).call({ from: this.signer })
     return {
-      executed,
+      exist,
       initiator: initiator === AddressZero ? undefined : initiator.replace(/^41/, '0x'),
       poolOwner: poolOwner === AddressZero ? undefined : this.tronWeb.address.fromHex(poolOwner),
     }

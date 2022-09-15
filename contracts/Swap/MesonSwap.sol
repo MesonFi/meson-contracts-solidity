@@ -168,11 +168,11 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
   /// @notice Read information for a posted swap
   function getPostedSwap(uint256 encodedSwap) external view
-    returns (address initiator, address poolOwner, bool executed)
+    returns (address initiator, address poolOwner, bool exist)
   {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     initiator = _initiatorFromPosted(postedSwap);
-    executed = postedSwap == 1;
+    exist = postedSwap > 0;
     if (initiator == address(0)) {
       poolOwner = address(0);
     } else {

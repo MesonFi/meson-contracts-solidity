@@ -108,7 +108,7 @@ describe('MesonSwap', () => {
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
       expect(posted.initiator).to.equal(initiator.address)
       expect(posted.poolOwner).to.equal(poolOwner.address)
-      expect(posted.executed).to.equal(false)
+      expect(posted.exist).to.equal(true)
       
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(amount))
       expect(await token.balanceOf(mesonInstance.address)).to.equal(amount)
@@ -185,7 +185,7 @@ describe('MesonSwap', () => {
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
       expect(posted.initiator).to.equal(AddressZero)
       expect(posted.poolOwner).to.equal(AddressZero)
-      expect(posted.executed).to.equal(false)
+      expect(posted.exist).to.equal(false)
       
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE)
       expect(await token.balanceOf(mesonInstance.address)).to.equal(0)
@@ -210,7 +210,7 @@ describe('MesonSwap', () => {
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
       expect(posted.initiator).to.equal(AddressZero)
       expect(posted.poolOwner).to.equal(AddressZero)
-      expect(posted.executed).to.equal(true)
+      expect(posted.exist).to.equal(true)
 
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(amount))
       expect(await token.balanceOf(poolOwner.address)).to.equal(TOKEN_BALANCE)
@@ -238,7 +238,7 @@ describe('MesonSwap', () => {
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
       expect(posted.initiator).to.equal(AddressZero)
       expect(posted.poolOwner).to.equal(AddressZero)
-      expect(posted.executed).to.equal(false)
+      expect(posted.exist).to.equal(false)
 
       await ethers.provider.send('evm_increaseTime', [-3600])
     })
@@ -253,7 +253,7 @@ describe('MesonSwap', () => {
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
       expect(posted.initiator).to.equal(initiator.address)
       expect(posted.poolOwner).to.equal(poolOwner.address)
-      expect(posted.executed).to.equal(false)
+      expect(posted.exist).to.equal(true)
     })
   })
 })
