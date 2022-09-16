@@ -10,9 +10,9 @@ contract MockToken is ERC20 {
     string memory name,
     string memory symbol,
     uint256 initialSupply,
-    uint8 decimals
+    uint8 decimals_
   ) ERC20(name, symbol) {
-    _decimals = decimals;
+    _decimals = decimals_;
     _mint(msg.sender, initialSupply);
   }
 
