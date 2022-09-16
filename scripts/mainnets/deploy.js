@@ -5,7 +5,7 @@ const CustomGasFeeProviderWrapper = require('./CustomGasFeeProviderWrapper')
 
 require('dotenv').config()
 
-const { HARDHAT_NETWORK, PRIVATE_KEY } = process.env
+const { HARDHAT_NETWORK, PRIVATE_KEY, PREMIUM_MANAGER } = process.env
 
 async function main() {
   const mainnets = require('@mesonfi/presets/src/mainnets.json')
@@ -18,9 +18,11 @@ async function main() {
 
   const Meson = await ethers.getContractFactory('Meson', wallet)
   console.log('Deploying Meson...')
-  const meson = await Meson.deploy(tokens.map(t => t.addr), tokens.map(t => t.tokenIndex))
+  const meson = await Meson.deploy(PREMIUM_MANAGER)
   await meson.deployed()
   console.log('Meson deployed to:', meson.address)
+
+  await meson.addMultipleSupportedTokens(tokens.map(t => t.addr), tokens.map(t => t.tokenIndex))
 
   const shortCoinType = await meson.getShortCoinType()
   if (shortCoinType !== network.shortSlip44) {

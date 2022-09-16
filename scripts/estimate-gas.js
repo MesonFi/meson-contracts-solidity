@@ -22,8 +22,10 @@ async function main() {
 
   const mesonFactory = await ethers.getContractFactory('Meson')
   console.log('Deploying Meson...')
-  const mesonContract = await mesonFactory.deploy([tokenContract.address])
+  const mesonContract = await mesonFactory.deploy(wallet.address)
+  await mesonContract.deployed()
   console.log('Meson deployed to:', mesonContract.address)
+  await mesonContract.addMultipleSupportedTokens([tokenContract.address], [1])
   const mesonClient = await MesonClient.Create(mesonContract, swapSigner)
 
   // approve

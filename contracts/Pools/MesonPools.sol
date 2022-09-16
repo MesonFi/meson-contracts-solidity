@@ -10,11 +10,6 @@ import "../utils/MesonStates.sol";
 /// Methods in this class will be executed when a user wants to swap into this chain.
 /// LP pool operations are also provided in this class.
 contract MesonPools is IMesonPoolsEvents, MesonStates {
-  /// @notice The manager to authorized fee waived swaps
-  /// Only the premium manager can authorize the execution to release for fee waived swaps.
-  /// This address is managed by Meson team.
-  address internal _premiumManager;
-
   /// @notice Locked Swaps
   /// key: `swapId` is calculated from `encodedSwap` and `initiator`. See `_getSwapId` in `MesonHelpers.sol`
   ///   encodedSwap: see `MesonSwap.sol` for defination;
@@ -252,7 +247,5 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _;
   }
 
-  function _onlyPremiumManager() internal view {
-    require(_premiumManager == _msgSender(), "Caller is not the premium manager");
-  }
+  function _onlyPremiumManager() internal view virtual {}
 }

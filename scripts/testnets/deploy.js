@@ -4,7 +4,12 @@ const { ethers } = require('hardhat')
 const { MesonClient } = require('@mesonfi/sdk/src')
 require('dotenv').config()
 
-const { NETWORK_ID, PRIVATE_KEY, DEPOSIT_ON_DEPLOY } = process.env
+const {
+  NETWORK_ID,
+  PRIVATE_KEY,
+  PREMIUM_MANAGER,
+  DEPOSIT_ON_DEPLOY
+} = process.env
 const networkId = NETWORK_ID === 'eth' ? 'ropsten' : NETWORK_ID
 
 async function main() {
@@ -33,9 +38,11 @@ async function main() {
 
   const Meson = await ethers.getContractFactory('Meson', wallet)
   console.log('Deploying Meson...')
-  const meson = await Meson.deploy(tokens.map(t => t.addr), tokens.map(t => t.tokenIndex))
+  const meson = await Meson.deploy(PREMIUM_MANAGER)
   await meson.deployed()
   console.log('Meson deployed to:', meson.address)
+
+  await meson.addMultipleSupportedTokens(tokens.map(t => t.addr), tokens.map(t => t.tokenIndex))
 
   const mesonClient = await MesonClient.Create(mesonContract)
 
