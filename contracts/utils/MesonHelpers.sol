@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
+import "@openzeppelin/contracts/utils/Address.sol";
 import "./IERC20Minimal.sol";
 import "./ITransferWithBeneficiary.sol";
 import "../MesonConfig.sol";
@@ -40,13 +41,11 @@ contract MesonHelpers is MesonConfig {
     uint256 amount,
     uint8 tokenIndex
   ) internal {
+    require(Address.isContract(token), "The given token address is not a contract");
+
     if (_needAdjustAmount(tokenIndex)) {
       amount *= 1e12;
     }
-
-    uint32 size;
-    assembly { size := extcodesize(token) }
-    require(size > 0, "The given token address is not a contract");
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
       ERC20_TRANSFER_SELECTOR,
       recipient,
@@ -73,6 +72,9 @@ contract MesonHelpers is MesonConfig {
     uint8 tokenIndex,
     uint64 data
   ) internal {
+    require(Address.isContract(token), "The given token address is not a contract");
+    require(Address.isContract(contractAddr), "The given recipient address is not a contract");
+
     if (_needAdjustAmount(tokenIndex)) {
       amount *= 1e12;
     }
@@ -93,14 +95,11 @@ contract MesonHelpers is MesonConfig {
   ) internal {
     require(token != address(0), "Token not supported");
     require(amount > 0, "Amount must be greater than zero");
+    require(Address.isContract(token), "The given token address is not a contract");
 
     if (_needAdjustAmount(tokenIndex)) {
       amount *= 1e12;
     }
-
-    uint32 size;
-    assembly { size := extcodesize(token) }
-    require(size > 0, "The given token address is not a contract");
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
       ERC20_TRANSFER_FROM_SELECTOR,
       sender,
