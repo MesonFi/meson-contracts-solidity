@@ -47,7 +47,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     _balanceOfPoolToken[poolTokenIndex] += amount;
     uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
-    _unsafeDepositToken(_tokenList[tokenIndex], poolOwner, amount, tokenIndex);
+    _unsafeDepositToken(tokenForIndex[tokenIndex], poolOwner, amount, tokenIndex);
 
     emit PoolRegistered(poolIndex, poolOwner);
     emit PoolDeposited(poolTokenIndex, amount);
@@ -68,7 +68,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(ownerOfPool[poolIndex] == _msgSender(), "Need the pool owner as the signer");
     _balanceOfPoolToken[poolTokenIndex] += amount;
     uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
-    _unsafeDepositToken(_tokenList[tokenIndex], _msgSender(), amount, tokenIndex);
+    _unsafeDepositToken(tokenForIndex[tokenIndex], _msgSender(), amount, tokenIndex);
 
     emit PoolDeposited(poolTokenIndex, amount);
   }
@@ -85,7 +85,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(ownerOfPool[poolIndex] == _msgSender(), "Need the pool owner as the signer");
     _balanceOfPoolToken[poolTokenIndex] -= amount;
     uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
-    _safeTransfer(_tokenList[tokenIndex], _msgSender(), amount, tokenIndex);
+    _safeTransfer(tokenForIndex[tokenIndex], _msgSender(), amount, tokenIndex);
 
     emit PoolWithdrawn(poolTokenIndex, amount);
   }
@@ -231,9 +231,9 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
   function _release(uint256 encodedSwap, uint8 tokenIndex, address initiator, address recipient, uint256 amount) private {
     if (_willTransferToContract(encodedSwap)) {
-      _transferToContract(_tokenList[tokenIndex], recipient, initiator, amount, tokenIndex, _saltDataFrom(encodedSwap));
+      _transferToContract(tokenForIndex[tokenIndex], recipient, initiator, amount, tokenIndex, _saltDataFrom(encodedSwap));
     } else {
-      _safeTransfer(_tokenList[tokenIndex], recipient, amount, tokenIndex);
+      _safeTransfer(tokenForIndex[tokenIndex], recipient, amount, tokenIndex);
     }
   }
 

@@ -9,26 +9,18 @@ contract MesonTokens {
   /// or added through `_addSupportToken` Only modify this mapping through `_addSupportToken`.
   /// key: `tokenIndex` in range of 1-255; zero means unsupported
   /// value: the supported token's contract address
-  mapping(uint8 => address) internal _tokenList;
+  mapping(uint8 => address) public tokenForIndex;
 
 
   /// @notice The mapping to get `tokenIndex` from a supported token's address
   /// Only modify this mapping through `_addSupportToken`.
   /// key: the supported token's contract address
   /// value: `tokenIndex` in range of 1-255; zero means unsupported
-  mapping(address => uint8) internal _indexOfToken;
+  mapping(address => uint8) public indexOfToken;
 
   /// @dev This empty reserved space is put in place to allow future versions to
   /// add new variables without shifting down storage in the inheritance chain.
   /// See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-
-  function tokenForIndex(uint8 tokenIndex) external view returns (address) {
-    return _tokenList[tokenIndex];
-  }
-
-  function indexOfToken(address token) external view returns (uint8) {
-    return _indexOfToken[token];
-  }
   uint256[50] private __gap;
 
   /// @notice Return all supported token addresses in an array ordered by `tokenIndex`
@@ -37,7 +29,7 @@ contract MesonTokens {
     uint8 i;
     uint8 num;
     for (i = 0; i < 255; i++) {
-      if (_tokenList[i+1] != address(0)) {
+      if (tokenForIndex[i+1] != address(0)) {
         num++;
       }
     }
@@ -45,8 +37,8 @@ contract MesonTokens {
     indexes = new uint8[](num);
     uint8 j = 0;
     for (i = 0; i < 255; i++) {
-      if (_tokenList[i+1] != address(0)) {
-        tokens[j] = _tokenList[i+1];
+      if (tokenForIndex[i+1] != address(0)) {
+        tokens[j] = tokenForIndex[i+1];
         indexes[j] = i+1;
         j++;
       }
@@ -56,9 +48,9 @@ contract MesonTokens {
   function _addSupportToken(address token, uint8 index) internal {
     require(index != 0, "Cannot use 0 as token index");
     require(token != address(0), "Cannot use zero address");
-    require(_indexOfToken[token] == 0, "Token has been added before");
-    require(_tokenList[index] == address(0), "Index has been used");
-    _indexOfToken[token] = index;
-    _tokenList[index] = token;
+    require(indexOfToken[token] == 0, "Token has been added before");
+    require(tokenForIndex[index] == address(0), "Index has been used");
+    indexOfToken[token] = index;
+    tokenForIndex[index] = token;
   }
 }

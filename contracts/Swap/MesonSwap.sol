@@ -21,9 +21,9 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   ///   fee: The fee given to LPs (liquidity providers). An extra service fee maybe charged afterwards;
   ///   expireTs: The expiration time of this swap on the initial chain. The LP should `executeSwap` and receive his funds before `expireTs`;
   ///   outChain: The target chain of a cross-chain swap (given by the last 2 bytes of SLIP-44);
-  ///   outToken: The index of the token on the target chain. See `_tokenList` in `MesonToken.sol`;
+  ///   outToken: The index of the token on the target chain. See `tokenForIndex` in `MesonToken.sol`;
   ///   inChain: The initial chain of a cross-chain swap (given by the last 2 bytes of SLIP-44);
-  ///   inToken: The index of the token on the initial chain. See `_tokenList` in `MesonToken.sol`.
+  ///   inToken: The index of the token on the initial chain. See `tokenForIndex` in `MesonToken.sol`.
   /// value: `postedSwap` in format of `initiator:address|poolIndex:uint40`
   ///   initiator: The swap initiator who created and signed the swap request (not necessarily the one who posted the swap);
   //    poolIndex: The index of an LP pool. See `ownerOfPool` in `MesonStates.sol` for more information.
@@ -77,7 +77,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _postedSwaps[encodedSwap] = postingValue;
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-    _unsafeDepositToken(_tokenList[tokenIndex], initiator, amount, tokenIndex);
+    _unsafeDepositToken(tokenForIndex[tokenIndex], initiator, amount, tokenIndex);
 
     emit SwapPosted(encodedSwap);
   }
@@ -109,7 +109,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _postedSwaps[encodedSwap] = 0; // Swap expired so the same one cannot be posted again
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-    _safeTransfer(_tokenList[tokenIndex], _initiatorFromPosted(postedSwap), _amountFrom(encodedSwap), tokenIndex);
+    _safeTransfer(tokenForIndex[tokenIndex], _initiatorFromPosted(postedSwap), _amountFrom(encodedSwap), tokenIndex);
 
     emit SwapCancelled(encodedSwap);
   }
@@ -152,7 +152,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     if (depositToPool) {
       _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, poolIndex)] += _amountFrom(encodedSwap);
     } else {
-      _safeTransfer(_tokenList[tokenIndex], ownerOfPool[poolIndex], _amountFrom(encodedSwap), tokenIndex);
+      _safeTransfer(tokenForIndex[tokenIndex], ownerOfPool[poolIndex], _amountFrom(encodedSwap), tokenIndex);
     }
   }
 

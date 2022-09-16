@@ -27,7 +27,7 @@ contract MesonHelpers is MesonConfig, Context {
   /// @param token The contract address of the token which will be transferred
   /// @param recipient The recipient of the transfer
   /// @param amount The value of the transfer (always in decimal 6)
-  /// @param tokenIndex The index of token. See `_tokenList` in `MesonTokens.sol`
+  /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
   function _safeTransfer(
     address token,
     address recipient,
@@ -55,7 +55,7 @@ contract MesonHelpers is MesonConfig, Context {
   /// @param contractAddr The smart contract address that will receive transferring tokens
   /// @param beneficiary The beneficiary of `transferWithBeneficiary`
   /// @param amount The value of the transfer (always in decimal 6)
-  /// @param tokenIndex The index of token. See `_tokenList` in `MesonTokens.sol`
+  /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
   /// @param data Extra data passed to the contract
   function _transferToContract(
     address token,
@@ -79,7 +79,7 @@ contract MesonHelpers is MesonConfig, Context {
   /// @param token The contract address of the token which will be transferred
   /// @param sender The sender of the transfer
   /// @param amount The value of the transfer (always in decimal 6)
-  /// @param tokenIndex The index of token. See `_tokenList` in `MesonTokens.sol`
+  /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
   function _unsafeDepositToken(
     address token,
     address sender,
@@ -103,7 +103,7 @@ contract MesonHelpers is MesonConfig, Context {
   }
 
   /// @notice Determine if token has decimal 18 and therefore need to adjust amount
-  /// @param tokenIndex The index of token. See `_tokenList` in `MesonTokens.sol`
+  /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
   function _needAdjustAmount(uint8 tokenIndex) internal pure returns (bool) {
     return tokenIndex > 32 && tokenIndex < 255;
   }
