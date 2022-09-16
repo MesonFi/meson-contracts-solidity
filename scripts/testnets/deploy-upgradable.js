@@ -35,7 +35,7 @@ async function main() {
   console.log('Deploying UpgradableMeson...')
   const meson = await upgrades.deployProxy(
     UpgradableMeson,
-    [tokens.map(t => t.addr)],
+    [tokens.map(t => t.addr), tokens.map(t => t.tokenIndex)],
     { kind: 'uups' }
   )
   await meson.deployed()

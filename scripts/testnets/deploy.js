@@ -33,7 +33,7 @@ async function main() {
 
   const Meson = await ethers.getContractFactory('Meson', wallet)
   console.log('Deploying Meson...')
-  const meson = await Meson.deploy(tokens.map(t => t.addr))
+  const meson = await Meson.deploy(tokens.map(t => t.addr), tokens.map(t => t.tokenIndex))
   await meson.deployed()
   console.log('Meson deployed to:', meson.address)
 

@@ -65,11 +65,13 @@ describe('MesonStates', () => {
     })
   })
 
-  describe('#supportedTokens', () => {
+  describe('#getSupportedTokens', () => {
     it('returns the array of supported tokens', async () => {
       await mesonInstance.addSupportToken(TestAddress, 1)
-      await mesonInstance.addSupportToken(TestAddress2, 2)
-      expect(await mesonInstance.supportedTokens()).to.deep.equal([TestAddress, TestAddress2])
+      await mesonInstance.addSupportToken(TestAddress2, 255)
+      const { tokens, indexes } = await mesonInstance.getSupportedTokens()
+      expect(tokens).to.deep.equal([TestAddress, TestAddress2])
+      expect(indexes).to.deep.equal([1, 255])
     })
   })
 

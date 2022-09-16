@@ -5,9 +5,17 @@ const ERC1967Proxy = require('@openzeppelin/upgrades-core/artifacts/@openzeppeli
 
 const testnetMode = process.env.TESTNET_MODE
 const fullHost = testnetMode ? 'https://api.nileex.io' : 'https://api.trongrid.io'
-const tokens = testnetMode
-  ? ['TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t', 'TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5']
-  : ['TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t']
+let tokens
+if (testnetMode) {
+  tokens = [
+    { addr: 'TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5', tokenIndex: 1 },
+    { addr: 'TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t', tokenIndex: 2 }
+  ]
+} else {
+  tokens = [
+    { addr: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', tokenIndex: 2 }
+  ]
+}
 
 const tronWeb = new TronWeb({
   fullHost,
@@ -30,9 +38,10 @@ async function deploy_contract() {
   const mesonAddress = tronWeb.address.fromHex(meson.address)
   console.log(mesonAddress)
 
-  const hexTokens = tokens.map(t => tronWeb.address.toHex(t).replace(/^(41)/, '0x'))
+  const hexTokens = tokens.map(t => tronWeb.address.toHex(t.addr).replace(/^(41)/, '0x'))
+  const indexes = tokens.map(t => t.tokenIndex)
   const factory = new ethers.ContractFactory(UpgradableMeson.abi , UpgradableMeson.bytecode)
-  const data = factory.interface.encodeFunctionData('initialize', [hexTokens])
+  const data = factory.interface.encodeFunctionData('initialize', [hexTokens, indexes])
 
   let proxy
   try {

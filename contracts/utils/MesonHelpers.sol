@@ -33,22 +33,24 @@ contract MesonHelpers is MesonConfig {
   /// @param token The contract address of the token which will be transferred
   /// @param recipient The recipient of the transfer
   /// @param amount The value of the transfer (always in decimal 6)
-  /// @param isUCT Whether the transferred token is UCT (minted by Meson, see `UCTUpgradeable.sol`)
+  /// @param tokenIndex The index of token. See `_tokenList` in `MesonTokens.sol`
   function _safeTransfer(
     address token,
     address recipient,
     uint256 amount,
-    bool isUCT
+    uint8 tokenIndex
   ) internal {
+    if (_needAdjustAmount(tokenIndex)) {
+      amount *= 1e12;
+    }
+
     uint32 size;
     assembly { size := extcodesize(token) }
     require(size > 0, "The given token address is not a contract");
-
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
       ERC20_TRANSFER_SELECTOR,
       recipient,
       amount
-      // isUCT ? amount : amount * 1e12 // need to switch to this line if deploying to BNB Chain or Conflux
     ));
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
 
@@ -61,48 +63,57 @@ contract MesonHelpers is MesonConfig {
   /// @param contractAddr The smart contract address that will receive transferring tokens
   /// @param beneficiary The beneficiary of `transferWithBeneficiary`
   /// @param amount The value of the transfer (always in decimal 6)
-  /// @param isUCT Whether the transferred token is UCT (minted by Meson, see `UCTUpgradeable.sol`)
+  /// @param tokenIndex The index of token. See `_tokenList` in `MesonTokens.sol`
   /// @param data Extra data passed to the contract
   function _transferToContract(
     address token,
     address contractAddr,
     address beneficiary,
     uint256 amount,
-    bool isUCT,
+    uint8 tokenIndex,
     uint64 data
   ) internal {
-    uint256 adjustedAmount = amount;
-    // uint256 adjustedAmount = isUCT ? amount : amount * 1e12; // need to switch to this line if deploying to BNB Chain or Conflux
-    IERC20Minimal(token).approve(contractAddr, adjustedAmount);
-    ITransferWithBeneficiary(contractAddr).transferWithBeneficiary(token, adjustedAmount, beneficiary, data);
+    if (_needAdjustAmount(tokenIndex)) {
+      amount *= 1e12;
+    }
+    IERC20Minimal(token).approve(contractAddr, amount);
+    ITransferWithBeneficiary(contractAddr).transferWithBeneficiary(token, amount, beneficiary, data);
   }
 
   /// @notice Help the senders to transfer their assets to the Meson contract
   /// @param token The contract address of the token which will be transferred
   /// @param sender The sender of the transfer
   /// @param amount The value of the transfer (always in decimal 6)
-  /// @param isUCT Whether the transferred token is UCT (minted by Meson, see `UCTUpgradeable.sol`)
+  /// @param tokenIndex The index of token. See `_tokenList` in `MesonTokens.sol`
   function _unsafeDepositToken(
     address token,
     address sender,
     uint256 amount,
-    bool isUCT
+    uint8 tokenIndex
   ) internal {
     require(token != address(0), "Token not supported");
     require(amount > 0, "Amount must be greater than zero");
 
+    if (_needAdjustAmount(tokenIndex)) {
+      amount *= 1e12;
+    }
+
     uint32 size;
     assembly { size := extcodesize(token) }
     require(size > 0, "The given token address is not a contract");
-
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
       ERC20_TRANSFER_FROM_SELECTOR,
       sender,
       address(this),
       amount
-      // isUCT ? amount : amount * 1e12 // need to switch to this line if deploying to BNB Chain or Conflux
     ));
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transferFrom failed");
+  }
+
+  /// @notice Determine if token has decimal 18 and therefore need to adjust amount
+  /// @param tokenIndex The index of token. See `_tokenList` in `MesonTokens.sol`
+  function _needAdjustAmount(uint8 tokenIndex) internal pure returns (bool) {
+    return tokenIndex > 32 && tokenIndex < 255;
   }
 
   /// @notice Calculate `swapId` from `encodedSwap`, `initiator`

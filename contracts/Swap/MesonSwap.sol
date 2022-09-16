@@ -77,12 +77,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _postedSwaps[encodedSwap] = postingValue;
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-    _unsafeDepositToken(
-      _tokenList[tokenIndex],
-      initiator,
-      amount,
-      tokenIndex == 255
-    );
+    _unsafeDepositToken(_tokenList[tokenIndex], initiator, amount, tokenIndex);
 
     emit SwapPosted(encodedSwap);
   }
@@ -114,12 +109,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _postedSwaps[encodedSwap] = 0; // Swap expired so the same one cannot be posted again
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-    _safeTransfer(
-      _tokenList[tokenIndex],
-      _initiatorFromPosted(postedSwap),
-      _amountFrom(encodedSwap),
-      tokenIndex == 255
-    );
+    _safeTransfer(_tokenList[tokenIndex], _initiatorFromPosted(postedSwap), _amountFrom(encodedSwap), tokenIndex);
 
     emit SwapCancelled(encodedSwap);
   }
@@ -162,7 +152,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     if (depositToPool) {
       _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, poolIndex)] += _amountFrom(encodedSwap);
     } else {
-      _safeTransfer(_tokenList[tokenIndex], ownerOfPool[poolIndex], _amountFrom(encodedSwap), tokenIndex == 255);
+      _safeTransfer(_tokenList[tokenIndex], ownerOfPool[poolIndex], _amountFrom(encodedSwap), tokenIndex);
     }
   }
 

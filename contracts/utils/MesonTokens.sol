@@ -33,19 +33,23 @@ contract MesonTokens {
 
   /// @notice Return all supported token addresses in an array ordered by `tokenIndex`
   /// This method will only return tokens with consecutive token indexes.
-  function supportedTokens() external view returns (address[] memory tokens) {
-    uint8 len;
-    for (len = 1; len < 256; len++) {
-      if (_tokenList[len] == address(0)) {
-        if (len == 1) {
-          return tokens;
-        }
-        tokens = new address[](len - 1);
-        break;
+  function getSupportedTokens() external view returns (address[] memory tokens, uint8[] memory indexes) {
+    uint8 i;
+    uint8 num;
+    for (i = 0; i < 255; i++) {
+      if (_tokenList[i+1] != address(0)) {
+        num++;
       }
     }
-    for (uint8 i = 1; i < len; i++) {
-      tokens[i - 1] = _tokenList[i];
+    tokens = new address[](num);
+    indexes = new uint8[](num);
+    uint8 j = 0;
+    for (i = 0; i < 255; i++) {
+      if (_tokenList[i+1] != address(0)) {
+        tokens[j] = _tokenList[i+1];
+        indexes[j] = i+1;
+        j++;
+      }
     }
   }
 

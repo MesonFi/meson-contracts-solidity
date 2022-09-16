@@ -10,14 +10,15 @@ contract UpgradableMeson is UUPSUpgradeable, MesonSwap, MesonPools {
   bool private _initialized;
   address private _owner;
 
-  function initialize(address[] memory supportedTokens) public {
+  function initialize(address[] memory tokens, uint8[] memory indexes) public {
+    require(tokens.length == indexes.length, "Tokens and indexes should have the same length");
     require(!_initialized, "Contract instance has already been initialized");
     _initialized = true;
     _owner = _msgSender();
     _premiumManager = _msgSender();
 
-    for (uint8 i = 0; i < supportedTokens.length; i++) {
-      _addSupportToken(supportedTokens[i], i + 1);
+    for (uint8 i = 0; i < tokens.length; i++) {
+      _addSupportToken(tokens[i], indexes[i]);
     }
   }
 

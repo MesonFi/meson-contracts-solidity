@@ -14,11 +14,15 @@ async function main() {
   ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
 
   const wallet = new ethers.Wallet(PRIVATE_KEY, ethers.provider)
-  const tokens = network.tokens.map(t => t.addr)
+  const tokens = network.tokens
 
   const UpgradableMeson = await ethers.getContractFactory('UpgradableMeson', wallet)
   console.log('Deploying UpgradableMeson...')
-  const meson = await upgrades.deployProxy(UpgradableMeson, [tokens], { kind: 'uups' })
+  const meson = await upgrades.deployProxy(
+    UpgradableMeson,
+    [tokens.map(t => t.addr), tokens.map(t => t.tokenIndex)],
+    { kind: 'uups' }
+  )
   await meson.deployed()
   console.log('UpgradableMeson deployed to:', meson.address)
 

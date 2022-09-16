@@ -49,9 +49,12 @@ export class TronContract {
     return await this.#instance.getShortCoinType().call({ from: this.signer })
   }
 
-  async supportedTokens() {
-    const tokens = await this.#instance.supportedTokens().call({ from: this.signer })
-    return tokens.map(t => this.tronWeb.address.fromHex(t))
+  async getSupportedTokens() {
+    const { tokens, indexes } = await this.#instance.getSupportedTokens().call({ from: this.signer })
+    return {
+      tokens: tokens.map(t => this.tronWeb.address.fromHex(t)),
+      indexes,
+    }
   }
 
   async indexOfAddress(addr) {
@@ -167,8 +170,8 @@ export class MesonClientTron extends MesonClient {
   }
 
   override async _getSupportedTokens() {
-    const tokens = await this.mesonInstance.supportedTokens()
-    this._tokens = tokens.map((addr, index) => ({ tokenIndex: index + 1, addr }))
+    const { tokens, indexes } = await this.mesonInstance.getSupportedTokens()
+    this._tokens = tokens.map((addr, i) => ({ tokenIndex: indexes[i], addr }))
   }
 
   override getTokenIndex(addr: string) {
