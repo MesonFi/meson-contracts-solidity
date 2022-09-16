@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
+import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./IERC20Minimal.sol";
 import "./ITransferWithBeneficiary.sol";
@@ -8,21 +9,13 @@ import "../MesonConfig.sol";
 
 /// @title MesonHelpers
 /// @notice The class that provides helper functions for Meson protocol
-contract MesonHelpers is MesonConfig {
+contract MesonHelpers is MesonConfig, Context {
   bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256("transfer(address,uint256)"));
   bytes4 private constant ERC20_TRANSFER_FROM_SELECTOR = bytes4(keccak256("transferFrom(address,address,uint256)"));
 
   modifier matchProtocolVersion(uint256 encodedSwap) {
     require(_versionFrom(encodedSwap) == MESON_PROTOCOL_VERSION, "Incorrect encoding version");
     _;
-  }
-
-  function _msgSender() internal view returns (address) {
-    return msg.sender;
-  }
-
-  function _msgData() internal pure returns (bytes calldata) {
-    return msg.data;
   }
 
   function getShortCoinType() external pure returns (bytes2) {
