@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./IERC20Minimal.sol";
 import "./ITransferWithBeneficiary.sol";
-import "../MesonConfig.sol";
+import "./MesonConfig.sol";
 
 /// @title MesonHelpers
 /// @notice The class that provides helper functions for Meson protocol

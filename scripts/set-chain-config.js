@@ -39,7 +39,7 @@ async function setChainConfig(networkId) {
   config = config.replace(/CONFIG_TESTNET_MODE/g, testnetMode ? ' (Testnet)' : '')
 
   await fs.promises.writeFile(
-    path.join(__dirname, '../contracts/MesonConfig.sol'),
+    path.join(__dirname, '../contracts/utils/MesonConfig.sol'),
     config
   )
 }
