@@ -27,7 +27,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @dev This empty reserved space is put in place to allow future versions to
   /// add new variables without shifting down storage in the inheritance chain.
   /// See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-  uint256[10] private __gap;
+  uint256[50] private __gap;
 
   /// @notice Initially deposit tokens into an LP pool and register a pool index.
   /// This is the prerequisite for LPs if they want to participate in Meson swaps.

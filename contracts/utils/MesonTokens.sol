@@ -21,7 +21,6 @@ contract MesonTokens {
   /// @dev This empty reserved space is put in place to allow future versions to
   /// add new variables without shifting down storage in the inheritance chain.
   /// See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-  uint256[10] private __gap;
 
   function tokenForIndex(uint8 tokenIndex) external view returns (address) {
     return _tokenList[tokenIndex];
@@ -30,6 +29,7 @@ contract MesonTokens {
   function indexOfToken(address token) external view returns (uint8) {
     return _indexOfToken[token];
   }
+  uint256[50] private __gap;
 
   /// @notice Return all supported token addresses in an array ordered by `tokenIndex`
   /// This method will only return tokens with consecutive token indexes.
