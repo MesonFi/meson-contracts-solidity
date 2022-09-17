@@ -30,6 +30,8 @@
     "chain:arbitrum": "NETWORK_ID=arbitrum yarn chain",
     "chain:optimistic": "NETWORK_ID=optimistic yarn chain",
     "chain:gnosis": "NETWORK_ID=gnosis yarn chain",
+    "chain:eos": "NETWORK_ID=eos yarn chain",
+    "chain:zksync": "NETWORK_ID=zksync yarn chain",
     "chain:tron": "NETWORK_ID=tron yarn chain",
     "testnet": "TESTNET_MODE=true yarn chain && UPGRADABLE=true hardhat run scripts/deploy.js",
     "testnet:eth": "NETWORK_ID=eth yarn testnet",
@@ -43,6 +45,7 @@
     "testnet:evmos": "NETWORK_ID=evmos yarn testnet",
     "testnet:gnosis": "NETWORK_ID=gnosis yarn testnet",
     "testnet:eos": "NETWORK_ID=eos yarn testnet",
+    "testnet:zksync": "NETWORK_ID=zksync UPGRADABLE=true hardhat deploy-zksync",
     "testnet:tron": "NETWORK_ID=tron yarn testnet",
     "testnet-up": "TESTNET_MODE=true yarn chain && hardhat run scripts/upgrade.js",
     "testnet-up:eth": "NETWORK_ID=eth yarn testnet-up",
@@ -56,6 +59,7 @@
     "testnet-up:evmos": "NETWORK_ID=evmos yarn testnet-up",
     "testnet-up:gnosis": "NETWORK_ID=gnosis yarn testnet-up",
     "testnet-up:eos": "NETWORK_ID=eos yarn testnet-up",
+    "testnet-up:zksync": "NETWORK_ID=zksync yarn testnet-up",
     "testnet-up:tron": "NETWORK_ID=tron yarn testnet-up",
     "deploy": "yarn chain && UPGRADABLE=true hardhat run scripts/deploy.js",
     "deploy:eth": "HARDHAT_NETWORK=eth yarn deploy",
@@ -72,6 +76,7 @@
     "deploy:movr": "HARDHAT_NETWORK=movr yarn deploy",
     "deploy:beam": "HARDHAT_NETWORK=beam yarn deploy",
     "deploy:eos": "HARDHAT_NETWORK=eos yarn deploy",
+    "deploy:zksync": "HARDHAT_NETWORK=zksync yarn deploy",
     "deploy:tron": "HARDHAT_NETWORK=tron yarn deploy",
     "up": "yarn chain && hardhat run scripts/upgrade.js",
     "up:eth": "HARDHAT_NETWORK=eth yarn up",
@@ -106,6 +111,7 @@
     "pool:movr": "HARDHAT_NETWORK=movr yarn pool",
     "pool:beam": "HARDHAT_NETWORK=beam yarn pool",
     "pool:eos": "HARDHAT_NETWORK=eos yarn pool",
+    "pool:zksync": "HARDHAT_NETWORK=zksync yarn pool",
     "pool:tron": "HARDHAT_NETWORK=tron yarn pool",
     "uct": "yarn chain && hardhat run scripts/uct.js",
     "uct:avax": "HARDHAT_NETWORK=avax yarn token",
@@ -114,6 +120,8 @@
     "uct:evmos": "HARDHAT_NETWORK=evmos yarn token"
   },
   "devDependencies": {
+    "@matterlabs/hardhat-zksync-deploy": "^0.4.0",
+    "@matterlabs/hardhat-zksync-solc": "^0.3.9",
     "@mesonfi/contract-abis": "^1.0.0-alpha.1",
     "@mesonfi/contract-types": "^1.0.0-alpha.1",
     "@mesonfi/presets": "^1.0.0-alpha.1",
@@ -143,7 +151,8 @@
     "ts-generator": "^0.1.1",
     "ts-node": "^10.9.1",
     "typechain": "^8.1.0",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "zksync-web3": "^0.9.0"
   },
   "workspaces": [
     "packages/*"

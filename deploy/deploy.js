@@ -1,8 +1,8 @@
 const { ethers } = require('hardhat')
-const getNetworkWallet = require('./lib/getNetworkWallet')
-const { deployContract, deployMeson } = require('./lib/deploy')
-const { deposit } = require('./lib/pool')
-const updatePresets = require('./lib/updatePresets')
+const getNetworkWallet = require('../scripts/lib/getNetworkWallet')
+const { deployContract, deployMeson } = require('../scripts/lib/deploy')
+const { deposit } = require('../scripts/lib/pool')
+const updatePresets = require('../scripts/lib/updatePresets')
 
 require('dotenv').config()
 
@@ -14,7 +14,7 @@ const {
   DEPOSIT_ON_DEPLOY
 } = process.env
 
-async function main() {
+module.exports = async function deploy() {
   const { network, wallet } = getNetworkWallet(PRIVATE_KEY)
   const tokens = network.tokens
 
@@ -45,5 +45,3 @@ async function main() {
   network.tokens = tokens
   updatePresets(network)
 }
-
-main()

@@ -475,5 +475,42 @@
         "addr": "0x4769650E1136437b0381970C3a26A77C837EbFC4"
       }
     ]
+  },
+  {
+    "id": "zksync-testnet",
+    "name": "zkSync alpha testnet",
+    "alias": "ZKSYNC",
+    "chainId": "0x118",
+    "slip44": "0x00000118",
+    "shortSlip44": "0x0118",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://zksync2-testnet.zksync.dev",
+    "explorer": "https://zksync2-testnet.zkscan.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0xa4aC74864D5dCA84338126bF32F385aC20DDE6D4",
+    "tokens": [
+      {
+        "name": "zksync USDC",
+        "symbol": "zkUSDC",
+        "decimals": 6,
+        "tokenIndex": 1,
+        "addr": "0xB3C5a3C8Fce721894DdaFB831839B5306ACB15BE"
+      },
+      {
+        "name": "zksync USDT",
+        "symbol": "zkUSDT",
+        "decimals": 6,
+        "tokenIndex": 2,
+        "addr": "0x9bfc4A4047ee5C1e3763Df26e0E846833Ecd448b"
+      }
+    ]
   }
 ]

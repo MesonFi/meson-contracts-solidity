@@ -3,6 +3,8 @@ import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-ethers'
 import 'hardhat-change-network'
 import '@openzeppelin/hardhat-upgrades'
+import '@matterlabs/hardhat-zksync-deploy'
+import '@matterlabs/hardhat-zksync-solc'
 import dotenv from 'dotenv'
 
 import { task } from 'hardhat/config'
@@ -12,7 +14,10 @@ import config from './config.json'
 
 dotenv.config()
 
-const INFURA_API_KEY = process.env.INFURA_API_KEY as string
+const {
+  ZKSYNC,
+  INFURA_API_KEY = ''
+} = process.env
 
 const mainnetConnections = Object.fromEntries(
   mainnets
@@ -61,9 +66,28 @@ export default {
       },
     },
   },
+  zksolc: {
+    version: '1.1.6',
+    compilerSource: 'docker',
+    settings: {
+      optimizer: {
+        enabled: true,
+      },
+      experimental: {
+        dockerImage: 'matterlabs/zksolc',
+        tag: 'v1.1.6',
+      },
+    },
+  },
+  zkSyncDeploy: {
+    zkSyncNetwork: 'https://zksync2-testnet.zksync.dev',
+    ethNetwork: 'goerli',
+  },
   defaultNetwork: 'hardhat',
   networks: {
-    hardhat: {},
+    hardhat: {
+      zksync: !!ZKSYNC,
+    },
     obsidians: {
       url: 'http://localhost:62743',
       accounts: 'remote',
