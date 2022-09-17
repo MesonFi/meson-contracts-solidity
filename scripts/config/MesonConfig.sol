@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.6;
+pragma solidity 0.8.16;
 
 /// @notice Parameters of the Meson contract
 /// for CONFIG_BLOCKCHAIN_NAME
