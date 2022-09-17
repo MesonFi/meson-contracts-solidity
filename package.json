@@ -85,6 +85,8 @@
     "up:movr": "HARDHAT_NETWORK=movr yarn up",
     "up:beam": "HARDHAT_NETWORK=beam yarn up",
     "up:tron": "HARDHAT_NETWORK=tron yarn chain && hardhat run scripts/tron/update.js",
+    "deploy-refund": "yarn chain && hardhat run scripts/mainnets/deploy-refund.js",
+    "deploy-refund:poly": "HARDHAT_NETWORK=polygon yarn deploy-refund",
     "pool": "hardhat run scripts/mainnets/pool.js",
     "pool:eth": "HARDHAT_NETWORK=eth yarn pool",
     "pool:bnb": "HARDHAT_NETWORK=bnb yarn pool",

@@ -27,6 +27,8 @@ interface IERC20Minimal {
   /// @return Returns true for a successful approval, false for unsuccessful
   function approve(address spender, uint256 amount) external returns (bool);
 
+  function increaseAllowance(address spender, uint256 addedValue) external returns (bool);
+
   /// @notice Transfers `amount` tokens from `sender` to `recipient` up to the allowance given to the `msg.sender`
   /// @param sender The account from which the transfer will be initiated
   /// @param recipient The recipient of the transfer

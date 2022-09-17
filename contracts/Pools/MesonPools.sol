@@ -15,6 +15,9 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// This address is managed by Meson team.
   address internal _premiumManager;
 
+  // prevent re-entrancy attack of multiple release
+  bool private _releasing;
+
   /// @notice Locked Swaps
   /// key: `swapId` is calculated from `encodedSwap` and `initiator`. See `_getSwapId` in `MesonHelpers.sol`
   ///   encodedSwap: see `MesonSwap.sol` for defination;
@@ -175,6 +178,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     address initiator,
     address recipient
   ) external {
+    require(!_releasing, "Another release is running");
+
     bool feeWaived = _feeWaived(encodedSwap);
     if (feeWaived) {
       // For swaps that service fee is waived, need the premium manager as the signer
@@ -203,9 +208,20 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
     }
 
-    _safeTransfer(_tokenList[tokenIndex], recipient, releaseAmount, tokenIndex == 255);
+    _release(encodedSwap, tokenIndex, initiator, recipient, releaseAmount);
 
     emit SwapReleased(encodedSwap);
+  }
+
+  function _release(uint256 encodedSwap, uint8 tokenIndex, address initiator, address recipient, uint256 amount) private {
+    if (_willTransferToContract(encodedSwap)) {
+      // The recipient contract could possibly re-enter meson contract; set _releasing=true to prevent
+      _releasing = true;
+      _transferToContract(_tokenList[tokenIndex], recipient, initiator, amount, tokenIndex == 255, _saltDataFrom(encodedSwap));
+      _releasing = false;
+    } else {
+      _safeTransfer(_tokenList[tokenIndex], recipient, amount, tokenIndex == 255);
+    }
   }
 
   /// @notice Read information for a locked swap

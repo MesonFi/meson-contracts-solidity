@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
 
-// import "./IERC20Minimal.sol"; // This is needed if deploying to Tron
+import "./IERC20Minimal.sol";
+import "./ITransferWithBeneficiary.sol";
 import "../MesonConfig.sol";
 
 /// @title MesonHelpers
@@ -43,6 +44,27 @@ contract MesonHelpers is MesonConfig {
 
     // The above do not support Tron, so need to switch to the next line if deploying to Tron
     // IERC20Minimal(token).transfer(recipient, amount);
+  }
+
+  /// @notice Transfer tokens to a contract using `transferWithBeneficiary`
+  /// @param token The contract address of the token which will be transferred
+  /// @param contractAddr The smart contract address that will receive transferring tokens
+  /// @param beneficiary The beneficiary of `transferWithBeneficiary`
+  /// @param amount The value of the transfer (always in decimal 6)
+  /// @param isUCT Whether the transferred token is UCT (minted by Meson, see `UCTUpgradeable.sol`)
+  /// @param data Extra data passed to the contract
+  function _transferToContract(
+    address token,
+    address contractAddr,
+    address beneficiary,
+    uint256 amount,
+    bool isUCT,
+    uint64 data
+  ) internal {
+    uint256 adjustedAmount = amount;
+    // uint256 adjustedAmount = isUCT ? amount : amount * 1e12; // need to switch to this line if deploying to BNB Chain or Conflux
+    IERC20Minimal(token).increaseAllowance(contractAddr, adjustedAmount);
+    ITransferWithBeneficiary(contractAddr).transferWithBeneficiary(token, adjustedAmount, beneficiary, data);
   }
 
   /// @notice Help the senders to transfer their assets to the Meson contract
@@ -105,16 +127,28 @@ contract MesonHelpers is MesonConfig {
   function _saltFrom(uint256 encodedSwap) internal pure returns (uint80) {
     return uint80(encodedSwap >> 128);
   }
-  
-  /// @notice Whether the swap was signed in the non-typed manner (usually by hardware wallets)
-  function _signNonTyped(uint256 encodedSwap) internal pure returns (bool) {
-    return (encodedSwap & 0x0800000000000000000000000000000000000000000000000000) > 0;
+
+  /// @notice Decode data from `salt`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
+  function _saltDataFrom(uint256 encodedSwap) internal pure returns (uint64) {
+    return uint64(encodedSwap >> 128);
+  }
+
+  /// @notice Whether the swap should release to a 3rd-party integrated dapp contract
+  /// See method `release` in `MesonPools.sol` for more details
+  function _willTransferToContract(uint256 encodedSwap) internal pure returns (bool) {
+    return (encodedSwap & 0x8000000000000000000000000000000000000000000000000000) == 0;
   }
 
   /// @notice Whether the swap needs to pay service fee
   /// See method `release` in `MesonPools.sol` for more details about the service fee
   function _feeWaived(uint256 encodedSwap) internal pure returns (bool) {
     return (encodedSwap & 0x4000000000000000000000000000000000000000000000000000) > 0;
+  }
+  
+  /// @notice Whether the swap was signed in the non-typed manner (usually by hardware wallets)
+  function _signNonTyped(uint256 encodedSwap) internal pure returns (bool) {
+    return (encodedSwap & 0x0800000000000000000000000000000000000000000000000000) > 0;
   }
 
   /// @notice Decode `expireTs` from `encodedSwap`
