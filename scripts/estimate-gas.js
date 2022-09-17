@@ -5,27 +5,31 @@ const {
   SignedSwapRequest,
   SignedSwapRelease,
 } = require('@mesonfi/sdk/src')
+
+const { deployMeson, deployMesonUpgradable } = require('./evm/lib/deploy')
 const { wallet } = require('../test/shared/wallet')
 const { getPartialSwap } = require('../test/shared/meson')
+
+const {
+  UPGRADABLE = false
+} = process.env
 
 const testnetMode = true
 
 async function main() {
-  // const signer = await hre.ethers.getSigner()
   const swapSigner = new EthersWalletSwapSigner(wallet)
 
-  //#####################---deploy contract ---#############################
   const MockToken = await ethers.getContractFactory('MockToken')
   const totalSupply = ethers.utils.parseUnits('10000', 6)
   const tokenContract = await MockToken.deploy('Mock Token', 'MT', totalSupply, 6)
   console.log('MockToken deployed to:', tokenContract.address)
 
-  const mesonFactory = await ethers.getContractFactory('Meson')
-  console.log('Deploying Meson...')
-  const mesonContract = await mesonFactory.deploy(wallet.address)
-  await mesonContract.deployed()
-  console.log('Meson deployed to:', mesonContract.address)
-  await mesonContract.addMultipleSupportedTokens([tokenContract.address], [1])
+  const deployer = UPGRADABLE ? deployMesonUpgradable : deployMeson
+  const mesonContract = await deployer(
+    wallet.connect(ethers.provider),
+    wallet.address,
+    [{ addr: tokenContract.address, tokenIndex: 1 }]
+  )
   const mesonClient = await MesonClient.Create(mesonContract, swapSigner)
 
   // approve
@@ -88,9 +92,8 @@ async function main() {
 
 function getUsedGas(name, hash) {
   ethers.provider.getTransactionReceipt(hash).then((receipt) => {
-    // console.log('  Hash:', receipt.transactionHash)
     console.log(name, ':', receipt.cumulativeGasUsed.toString())
-  });
+  })
 }
 
 main()

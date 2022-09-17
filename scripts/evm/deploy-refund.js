@@ -1,5 +1,5 @@
 const { ethers } = require('hardhat')
-const CustomGasFeeProviderWrapper = require('./CustomGasFeeProviderWrapper')
+const CustomGasFeeProviderWrapper = require('./lib/CustomGasFeeProviderWrapper')
 
 require('dotenv').config()
 

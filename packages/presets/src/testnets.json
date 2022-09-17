@@ -13,20 +13,20 @@
     "addressFormat": "hex",
     "url": "https://ropsten.infura.io/v3/${INFURA_API_KEY}",
     "explorer": "https://ropsten.etherscan.io",
-    "mesonAddress": "0xCc8dC4C7F79165f3bf234AFb4CA266d125cD45Ec",
+    "mesonAddress": "0x4C5BeD706Ac0683c619e774C4CF22DDD9C6Bd788",
     "tokens": [
       {
         "name": "ETH USDC",
         "symbol": "rUSDC",
         "decimals": 6,
-        "addr": "0x5348c5caC37fC6eB004A4825111c29770c52f6F2",
+        "addr": "0xA15b135328c050F0946f4b4444a708d4Fdea784c",
         "tokenIndex": 1
       },
       {
         "name": "ETH USDT",
         "symbol": "rUSDT",
         "decimals": 6,
-        "addr": "0x449055030B552591BF79A58C8441E4F9237b17Fd",
+        "addr": "0x41a42b4d3514d0FeEA596c1B39Cd33fBC6b5e678",
         "tokenIndex": 2
       }
     ]
@@ -50,20 +50,20 @@
       "symbol": "tBNB",
       "decimals": 18
     },
-    "mesonAddress": "0x3078b92e2515141cAAB53e2DF0e7a12fd8670E22",
+    "mesonAddress": "0xA307851b988F30e19243Fd36ac47abF82b4c52fF",
     "tokens": [
       {
         "name": "BNB USDC",
         "symbol": "bUSDC",
         "decimals": 18,
-        "addr": "0xc3f1585228D02bb9A6Fb9E7E29b8890533048BD7",
+        "addr": "0xBFd6Bf92C3d910601eE391CFD0D20DE73440D7C0",
         "tokenIndex": 33
       },
       {
         "name": "BNB USDT",
         "symbol": "bUSDT",
         "decimals": 18,
-        "addr": "0x14c810CF6e357A600B6c12ca676818BA5367fdE6",
+        "addr": "0xea2EE867707A3fE611a9e6142DC1DC35cb9bDf56",
         "tokenIndex": 34
       }
     ]
@@ -125,20 +125,20 @@
       "symbol": "AVAX",
       "decimals": 18
     },
-    "mesonAddress": "0x0a2641aa123B57d0E18BA9b468326c416B1aA805",
+    "mesonAddress": "0x8454a48799e63d79E9a62aA9db1F067edC59a178",
     "tokens": [
       {
         "name": "AVA USDC",
         "symbol": "aUSDC",
         "decimals": 6,
-        "addr": "0xDEC36F68b7Ce5EC27cDA7a8c6A764aE00293Fd20",
+        "addr": "0x18DD556D74EcB7E08A67F1EaEf84aa65fed92730",
         "tokenIndex": 1
       },
       {
         "name": "AVA USDT",
         "symbol": "aUSDT",
         "decimals": 6,
-        "addr": "0xa7D481F9e37813A31009cAB32b8D73748F7f8eCA",
+        "addr": "0x6b7011E38877331f461e2c1DA506036aA30c21A2",
         "tokenIndex": 2
       }
     ]
@@ -155,27 +155,27 @@
       "walletconnect"
     ],
     "addressFormat": "hex",
-    "url": "https://rpc-mumbai.matic.today",
+    "url": "https://polygon-testnet.public.blastapi.io",
     "explorer": "https://mumbai.polygonscan.com",
     "nativeCurrency": {
       "name": "MATIC",
       "symbol": "MATIC",
       "decimals": 18
     },
-    "mesonAddress": "0x9e298D59DEd116b8565D6926e00C1E5C7998A08c",
+    "mesonAddress": "0x502b176b1C3f358725382291444d3CAC05bc358b",
     "tokens": [
       {
         "name": "MATIC USDC",
         "symbol": "pUSDC",
         "decimals": 6,
-        "addr": "0x2d53530A5fb37c482E853FF5a7C547CEf3b0230C",
+        "addr": "0x9D7184ab2F6aCCF023B5266602855e90B702CC2c",
         "tokenIndex": 1
       },
       {
         "name": "MATIC USDT",
         "symbol": "pUSDT",
         "decimals": 6,
-        "addr": "0xDA351ccb005D8b3f9303A25b75994aA40dD780e6",
+        "addr": "0xb443Ab03a5Fb1aE8FCDfF02dF429A67B2564E34d",
         "tokenIndex": 2
       }
     ]

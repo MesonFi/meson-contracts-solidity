@@ -1,17 +1,14 @@
 const { ethers, upgrades } = require('hardhat')
-const CustomGasFeeProviderWrapper = require('./CustomGasFeeProviderWrapper')
-const UCTUpgradeable = require('../../artifacts/contracts/Token/UCTUpgradeable.sol/UCTUpgradeable.json')
+const switchNetwork = require('../lib/switchNetwork')
+const UCTUpgradeable = require('../../../artifacts/contracts/Token/UCTUpgradeable.sol/UCTUpgradeable.json')
 
 require('dotenv').config()
 
-const { HARDHAT_NETWORK, PRIVATE_KEY, MINTER, MINTER_PK } = process.env
+const { PRIVATE_KEY, MINTER, MINTER_PK } = process.env
 
-const mainnets = require('@mesonfi/presets/src/mainnets.json')
-const index = mainnets.findIndex(item => item.id === HARDHAT_NETWORK)
-const network = mainnets[index]
+const network = switchNetwork()
 
 async function deploy() {
-  ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
   const wallet = new ethers.Wallet(PRIVATE_KEY, ethers.provider)
 
   const UCT = await ethers.getContractFactory('UCTUpgradeable', wallet)
@@ -22,7 +19,6 @@ async function deploy() {
 }
 
 async function upgrade() {
-  ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
   const wallet = new ethers.Wallet(PRIVATE_KEY, ethers.provider)
 
   const UCT = await ethers.getContractFactory('UCTUpgradeable', wallet)
@@ -31,7 +27,6 @@ async function upgrade() {
 }
 
 async function mint(targets, amount) {
-  ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
   const wallet = new ethers.Wallet(MINTER_PK, ethers.provider)
 
   const uct = new ethers.Contract(network.uctAddress, UCTUpgradeable.abi, wallet)
@@ -40,7 +35,6 @@ async function mint(targets, amount) {
 }
 
 async function mint2(targets, amounts) {
-  ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
   const wallet = new ethers.Wallet(MINTER_PK, ethers.provider)
 
   const uct = new ethers.Contract(network.uctAddress, UCTUpgradeable.abi, wallet)
