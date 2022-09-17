@@ -499,5 +499,28 @@
         "tokenIndex": 2
       }
     ]
+  },
+  {
+    "id": "eos",
+    "name": "Trust EVM",
+    "alias": "EOS",
+    "chainId": "0x3cc3",
+    "slip44": "0x800000c2",
+    "shortSlip44": "0x00c2",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "",
+    "explorer": "",
+    "nativeCurrency": {
+      "name": "EVM",
+      "symbol": "EVM",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "tokens": [
+    ]
   }
 ]

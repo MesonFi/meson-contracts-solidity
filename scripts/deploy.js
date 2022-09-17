@@ -1,6 +1,6 @@
 const { ethers } = require('hardhat')
-const switchNetwork = require('./lib/switchNetwork')
-const { deployMeson, deployMesonUpgradable } = require('./lib/deploy')
+const getNetworkWallet = require('./lib/getNetworkWallet')
+const { deployContract, deployMeson } = require('./lib/deploy')
 const { deposit } = require('./lib/pool')
 const updatePresets = require('./lib/updatePresets')
 
@@ -15,25 +15,20 @@ const {
 } = process.env
 
 async function main() {
-  const network = switchNetwork()
+  const { network, wallet } = getNetworkWallet(PRIVATE_KEY)
   const tokens = network.tokens
 
-  const wallet = new ethers.Wallet(PRIVATE_KEY, ethers.provider)
-
   if (!HARDHAT_NETWORK) { // only for testnets
-    const MockToken = await ethers.getContractFactory('MockToken', wallet)
     for await (const token of tokens) {
-      const totalSupply = ethers.utils.parseUnits('1000000', token.decimals)
       console.log(`Deploying ${token.name}...`)
-      const tokenContract = await MockToken.deploy(token.name, token.symbol, totalSupply, token.decimals)
-      await tokenContract.deployed()
+      const totalSupply = ethers.utils.parseUnits('1000000', token.decimals)
+      const args = [token.name, token.symbol, totalSupply.toString(), token.decimals]
+      const tokenContract = await deployContract('MockToken', wallet, args)
       token.addr = tokenContract.address
-      console.log(`${token.name} deployed to:`, token.addr)
     }
   }
 
-  const deployer = UPGRADABLE ? deployMesonUpgradable : deployMeson
-  const meson = await deployer(wallet, PREMIUM_MANAGER, tokens)
+  const meson = await deployMeson(wallet, UPGRADABLE, PREMIUM_MANAGER, tokens)
   network.mesonAddress = meson.address
 
   const shortCoinType = await meson.getShortCoinType()

@@ -1,16 +1,14 @@
 const { ethers, upgrades } = require('hardhat')
-const switchNetwork = require('../lib/switchNetwork')
+const getNetworkWallet = require('../lib/getNetworkWallet')
+const { getContract } = require('../lib/adaptor')
 const UCTUpgradeable = require('../../../artifacts/contracts/Token/UCTUpgradeable.sol/UCTUpgradeable.json')
 
 require('dotenv').config()
 
 const { PRIVATE_KEY, MINTER, MINTER_PK } = process.env
 
-const network = switchNetwork()
-
 async function deploy() {
-  const wallet = new ethers.Wallet(PRIVATE_KEY, ethers.provider)
-
+  const { network, wallet } = getNetworkWallet(PRIVATE_KEY)
   const UCT = await ethers.getContractFactory('UCTUpgradeable', wallet)
   console.log('Deploying UCT...')
   const uct = await upgrades.deployProxy(UCT, [MINTER, network.mesonAddress], { kind: 'uups' })
@@ -19,25 +17,24 @@ async function deploy() {
 }
 
 async function upgrade() {
-  const wallet = new ethers.Wallet(PRIVATE_KEY, ethers.provider)
-
+  const { network, wallet } = getNetworkWallet(PRIVATE_KEY)
   const UCT = await ethers.getContractFactory('UCTUpgradeable', wallet)
   console.log('Upgrading UCT...')
   await upgrades.upgradeProxy(network.uctAddress, UCT)
 }
 
 async function mint(targets, amount) {
-  const wallet = new ethers.Wallet(MINTER_PK, ethers.provider)
+  const { network, wallet } = getNetworkWallet(MINTER_PK)
 
-  const uct = new ethers.Contract(network.uctAddress, UCTUpgradeable.abi, wallet)
+  const uct = getContract(network.uctAddress, UCTUpgradeable.abi, wallet)
   const tx = await uct.batchMint(targets, ethers.utils.parseUnits(amount, 4))
   await tx.wait()
 }
 
 async function mint2(targets, amounts) {
-  const wallet = new ethers.Wallet(MINTER_PK, ethers.provider)
+  const { network, wallet } = getNetworkWallet(MINTER_PK)
 
-  const uct = new ethers.Contract(network.uctAddress, UCTUpgradeable.abi, wallet)
+  const uct = getContract(network.uctAddress, UCTUpgradeable.abi, wallet)
   const tx = await uct.batchMint2(targets, amounts)
   await tx.wait()
 }
@@ -55,7 +52,7 @@ async function batchMint(amount) {
 }
 
 // const core = require('./core.json')
-const list = require('./cashback.json')
+const list = require('./data/cashback.json')
 // const targets = list.filter(addr => ethers.utils.isAddress(addr))
 mint([], '100')
 // mint2(list.map(i => i.address), list.map(i => i.cashback))

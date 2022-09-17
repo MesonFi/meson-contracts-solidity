@@ -9,7 +9,7 @@ module.exports = function updatePresets (network) {
     const mainnets = require('@mesonfi/presets/src/mainnets.json')
     const index = mainnets.findIndex(item => item.id === HARDHAT_NETWORK)
     mainnets.splice(index, 1, network)
-    const mainnetsPath = path.join(__dirname, '../../../packages/presets/src/mainnets.json')
+    const mainnetsPath = path.join(__dirname, '../../packages/presets/src/mainnets.json')
     fs.writeFileSync(mainnetsPath, JSON.stringify(mainnets, null, 2))
   } else {
     // testnet
@@ -20,7 +20,7 @@ module.exports = function updatePresets (network) {
       throw new Error(`Invalid network: ${networkId}`)
     }
     testnets.splice(index, 1, network)
-    const testnetsPath = path.join(__dirname, '../../../packages/presets/src/testnets.json')
+    const testnetsPath = path.join(__dirname, '../../packages/presets/src/testnets.json')
     fs.writeFileSync(testnetsPath, JSON.stringify(testnets, null, 2))
   }
 }

@@ -11,7 +11,7 @@ async function setChainConfig(networkId) {
   }
 
   const template = await fs.promises.readFile(
-    path.join(__dirname, 'templates/MesonConfig.sol'),
+    path.join(__dirname, 'MesonConfig.sol'),
     'utf8'
   )
 
@@ -39,7 +39,7 @@ async function setChainConfig(networkId) {
   config = config.replace(/CONFIG_TESTNET_MODE/g, testnetMode ? ' (Testnet)' : '')
 
   await fs.promises.writeFile(
-    path.join(__dirname, '../contracts/utils/MesonConfig.sol'),
+    path.join(__dirname, '../../contracts/utils/MesonConfig.sol'),
     config
   )
 }

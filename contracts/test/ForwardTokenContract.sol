@@ -9,7 +9,7 @@ import "../utils/ITransferWithBeneficiary.sol";
 /// to deposit cross-chain'ed stablecoins to the 3rd-party dapp contract
 /// on behalf of the user. The user will receive the benefits corresponding
 /// to this deposit.
-contract SampleThirdPartyDapp is ITransferWithBeneficiary {
+contract ForwardTokenContract is ITransferWithBeneficiary {
   function transferWithBeneficiary(
     address token,
     uint256 amount,

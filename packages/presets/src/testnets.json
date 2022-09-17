@@ -86,22 +86,22 @@
       "symbol": "TRX",
       "decimals": 6
     },
-    "mesonAddress": "TYtGRRt9ZcAtYEEVG4B5vGuxAWsrQ2WTFo",
+    "mesonAddress": "THb1PD7tiJF2X8P7pZPvkFombkeUrSt6m8",
     "tokens": [
       {
         "name": "TRX USDC",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5",
-        "link": "token20/TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5",
+        "addr": "TNRrC6A23gZKom6Kmg8hHcC1JrWnpwhomn",
+        "link": "token20/TNRrC6A23gZKom6Kmg8hHcC1JrWnpwhomn",
         "tokenIndex": 1
       },
       {
         "name": "TRX USDT",
         "symbol": "USDT",
         "decimals": 6,
-        "addr": "TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t",
-        "link": "token20/TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t",
+        "addr": "TMKuw7uKSvYjhK3neAWfrT3rX36H3M9ReQ",
+        "link": "token20/TMKuw7uKSvYjhK3neAWfrT3rX36H3M9ReQ",
         "tokenIndex": 2
       }
     ]
@@ -162,20 +162,20 @@
       "symbol": "MATIC",
       "decimals": 18
     },
-    "mesonAddress": "0x502b176b1C3f358725382291444d3CAC05bc358b",
+    "mesonAddress": "0xDFaEaE8CF7e53700257e723dE77519Ec9de76758",
     "tokens": [
       {
         "name": "MATIC USDC",
         "symbol": "pUSDC",
         "decimals": 6,
-        "addr": "0x9D7184ab2F6aCCF023B5266602855e90B702CC2c",
+        "addr": "0x6Dc0a937FF21F8fA5237e2015E4cBB74b5afE7C4",
         "tokenIndex": 1
       },
       {
         "name": "MATIC USDT",
         "symbol": "pUSDT",
         "decimals": 6,
-        "addr": "0xb443Ab03a5Fb1aE8FCDfF02dF429A67B2564E34d",
+        "addr": "0x3abFF3fb0E4B99B8563173FF580896D70a41c315",
         "tokenIndex": 2
       }
     ]
@@ -199,20 +199,20 @@
       "symbol": "FTM",
       "decimals": 18
     },
-    "mesonAddress": "0x09aeF1AD659C80aA06c94982D3ff10d4C1886F76",
+    "mesonAddress": "0x92fAb2252eB9bF4aB77e65C9c43c43B4D2AE7A62",
     "tokens": [
       {
         "name": "FTM USDC",
         "symbol": "fUSDC",
         "decimals": 6,
-        "addr": "0x1F5BD64EA32E64570c78893633A28B8cf27c8A9F",
+        "addr": "0xd42Fdb4E06DB51FE9A03E9AE8825D84DBCC34801",
         "tokenIndex": 1
       },
       {
         "name": "FTM USDT",
         "symbol": "fUSDT",
         "decimals": 6,
-        "addr": "0x0cB2E738A9eF1f1b21a5b41e5D27bb63EdB075cf",
+        "addr": "0xC7E8e3D22669C0f6a3feFc2C6b6F0abCce260cEA",
         "tokenIndex": 2
       }
     ]
@@ -436,6 +436,43 @@
         "decimals": 6,
         "addr": "0xF37eE9D96a307608AA65cfBd5D6BF9bd282098BE",
         "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "eos-testnet",
+    "name": "Trust EVM Testnet",
+    "alias": "EOS",
+    "chainId": "0x3cc3",
+    "slip44": "0x800000c2",
+    "shortSlip44": "0x00c2",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://api.testnet-dev.trust.one",
+    "explorer": "https://trustscan.one",
+    "nativeCurrency": {
+      "name": "EVM",
+      "symbol": "EVM",
+      "decimals": 18
+    },
+    "mesonAddress": "0xE4BBC343174142f5DE8245F43A6C2ea5829965a8",
+    "tokens": [
+      {
+        "name": "EOS USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "tokenIndex": 1,
+        "addr": "0x55336241644EcbCe99F6843fC972De0EF15365fB"
+      },
+      {
+        "name": "EOS USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "tokenIndex": 2,
+        "addr": "0x4769650E1136437b0381970C3a26A77C837EbFC4"
       }
     ]
   }

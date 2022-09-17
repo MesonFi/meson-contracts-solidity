@@ -1,9 +1,8 @@
-const { ethers } = require('hardhat')
-const CustomGasFeeProviderWrapper = require('./CustomGasFeeProviderWrapper')
+const { getWallet } = require('./adaptor')
 
 const { HARDHAT_NETWORK, NETWORK_ID } = process.env
 
-module.exports = function switchNetwork() {
+module.exports = function getNetworkWallet(privateKey) {
   let network
   if (HARDHAT_NETWORK) {
     // mainnet
@@ -17,8 +16,8 @@ module.exports = function switchNetwork() {
     if (!network) {
       throw new Error(`Invalid network: ${networkId}`)
     }
-    hre.changeNetwork(network.id)
   }
-  ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
-  return network
+
+  const wallet = getWallet(network, privateKey)
+  return { network, wallet }
 }

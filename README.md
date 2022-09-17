@@ -37,7 +37,7 @@ The deployment process consists of the following steps
 4. Deploy the upgradable version of Meson with signer given by environment variables;
 5. Write the address of deployed contract back to `@mesonfi/presets`.
 
-See the actual deploy scripts located in `scripts/evm/deploy.js`. The connection config to different blockchains are given by the `@mesonfi/presets` sdk in the `packages/presets/testnets.json` and `packages/presets/mainnets.json` files.
+See the actual deploy scripts located in `scripts/deploy.js`. The connection config to different blockchains are given by the `@mesonfi/presets` sdk in the `packages/presets/testnets.json` and `packages/presets/mainnets.json` files.
 
 ### Constructor parameters
 
@@ -45,4 +45,4 @@ Meson use a whitelist for supported stablecoins (`address[] supportedTokens`), w
 
 ## Become a Liquidity Provider
 
-Any user who wishes to become Meson's liquidity provider needs to first register a pool index (by calling contract method `depositAndRegister`) and transfer supported stablecoins into the Meson contract. Related operations are provided in `scripts/evm/pool.js`. Open the corresponding file and edit the parameters include token index, deposit amount, pool index, and run `yarn pool:[id]` to execute the deposit operation. The `pool.js` files also provide withdraw scripts and please use them as needed.
+Any user who wishes to become Meson's liquidity provider needs to first register a pool index (by calling contract method `depositAndRegister`) and transfer supported stablecoins into the Meson contract. Related operations are provided in `scripts/pool.js`. Open the corresponding file and edit the parameters include token index, deposit amount, pool index, and run `yarn pool:[id]` to execute the deposit operation. The `pool.js` files also provide withdraw scripts and please use them as needed.
