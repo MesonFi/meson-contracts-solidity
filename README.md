@@ -7,9 +7,9 @@ See [Meson Docs](https://docs.meson.fi/protocol/background) for the design detai
 
 This repo includes Meson's smart contracts in Solidity for deployment to multiple EVM-compatible blockchains. It also includes Meson JS SDKs in the `packages` folder for integrating into other Meson projects to interact with Meson contracts.
 
-Run `yarn` to install the project dependencies. Because the contracts of Meson need to be deployed on different chains, this project provides a script to switch current chain. Before the first time of compilation, run `yarn chain:eth` to initialize contracts to Ethereum blockchain. This command will copy the config file `MesonConfig.sol` to `contracts/utils` folder and set system invariants for Ethereum mainnet.
+Run `yarn` to install the project dependencies. Because the contracts of Meson need to be deployed on different chains, this project provides a script to switch current chain. Before the first time of compilation, run `yarn hardhat chain --testnet ropsten` to initialize contracts to Ropsten testnet. This command will copy the config file `MesonConfig.sol` to `contracts/utils` folder and set system invariants for the selected chain.
 
-See `packages.json` and look for scripts of `chain:[id]` for other commands that switch the project to other chains. By default this command will switch the Meson project to a mainnet. If you want to switch to a testnet, run `TESTNET_MODE=true yarn chain:[id]`.
+You can also run `yarn hardhat chain --testnet [id]` or `yarn hardhat chain --mainnet [id]` to switch the project to other chains. See `packages/presets/testnets.json` and `packages/presets/mainnets.json` for available chains and their respective id's.
 
 ### Run tests
 
@@ -23,7 +23,7 @@ Run `yarn docgen` to generate docs for Meson smart contracts, which are extracte
 
 ### Estimate gas consumptions
 
-This project provides two scripts to estimate gas consumptions for crucial methos of Meson. Run `yarn estimate` to estimate the normal deployed Meson contracts, and run `yarn estiamte-upgradable` to estimate gas when Meson is deployed as an upgradable contract.
+This project provides two scripts to estimate gas consumptions for crucial methos of Meson. Run `yarn hardhat estimate` to estimate the normal deployed Meson contracts, and run `yarn hardhat estimate --upgradable true` to estimate gas when Meson is deployed as an upgradable contract.
 
 ## Deployment
 
@@ -45,4 +45,4 @@ Meson use a whitelist for supported stablecoins (`address[] supportedTokens`), w
 
 ## Become a Liquidity Provider
 
-Any user who wishes to become Meson's liquidity provider needs to first register a pool index (by calling contract method `depositAndRegister`) and transfer supported stablecoins into the Meson contract. Related operations are provided in `scripts/pool.js`. Open the corresponding file and edit the parameters include token index, deposit amount, pool index, and run `yarn pool:[id]` to execute the deposit operation. The `pool.js` files also provide withdraw scripts and please use them as needed.
+Any user who wishes to become Meson's liquidity provider needs to first register a pool index (by calling contract method `depositAndRegister`) and transfer supported stablecoins into the Meson contract. Related operations are provided in `scripts/pool.js`. Open the corresponding file and edit the parameters include token symbol, deposit amount, pool index, and run `yarn hardhat pool --testnet [id]` or `yarn hardhat pool --mainnet [id]` to execute the deposit operation. The `pool.js` files also provide withdraw scripts and please use them as needed.

@@ -522,5 +522,42 @@
     "mesonAddress": "",
     "tokens": [
     ]
+  },
+  {
+    "id": "zksync",
+    "name": "zkSync",
+    "alias": "ZKSYNC",
+    "chainId": "0x118",
+    "slip44": "0x00000118",
+    "shortSlip44": "0x0118",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "",
+    "explorer": "",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "tokenIndex": 1,
+        "addr": ""
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "tokenIndex": 2,
+        "addr": ""
+      }
+    ]
   }
 ]

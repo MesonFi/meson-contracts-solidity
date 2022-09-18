@@ -1,5 +1,5 @@
 const { ethers } = require('hardhat')
-const getNetworkWallet = require('./lib/getNetworkWallet')
+const { getWallet } = require('./lib/adaptor')
 const { deployContract, deployMeson } = require('./lib/deploy')
 const { deposit } = require('./lib/pool')
 const updatePresets = require('./lib/updatePresets')
@@ -7,18 +7,22 @@ const updatePresets = require('./lib/updatePresets')
 require('dotenv').config()
 
 const {
-  HARDHAT_NETWORK,
+  ZKSYNC,
   PRIVATE_KEY,
   PREMIUM_MANAGER,
-  UPGRADABLE = false,
-  DEPOSIT_ON_DEPLOY
+  DEPOSIT_ON_DEPLOY,
 } = process.env
 
-async function main() {
-  const { network, wallet } = getNetworkWallet(PRIVATE_KEY)
+module.exports = async function deploy(network, upgradable, testnetMode) {
+  if (network.id.startsWith('zksync') && !ZKSYNC) {
+    throw new Error('Need to set environment variable ZKSYNC=true for zksync')
+  }
+  await hre.run('compile')
+
+  const wallet = getWallet(network, PRIVATE_KEY)
   const tokens = network.tokens
 
-  if (!HARDHAT_NETWORK) { // only for testnets
+  if (testnetMode) { // only for testnets
     for await (const token of tokens) {
       console.log(`Deploying ${token.name}...`)
       const totalSupply = ethers.utils.parseUnits('1000000', token.decimals)
@@ -28,7 +32,7 @@ async function main() {
     }
   }
 
-  const meson = await deployMeson(wallet, UPGRADABLE, PREMIUM_MANAGER, tokens)
+  const meson = await deployMeson(wallet, upgradable, PREMIUM_MANAGER, tokens)
   network.mesonAddress = meson.address
 
   const shortCoinType = await meson.getShortCoinType()
@@ -36,7 +40,7 @@ async function main() {
     throw new Error('Coin type does not match')
   }
 
-  if (!HARDHAT_NETWORK && DEPOSIT_ON_DEPLOY) { // only for testnets
+  if (testnetMode && DEPOSIT_ON_DEPLOY) { // only for testnets
     for await(const token of tokens) {
       await deposit(token.symbol, DEPOSIT_ON_DEPLOY, { network, wallet })
     }
@@ -45,5 +49,3 @@ async function main() {
   network.tokens = tokens
   updatePresets(network)
 }
-
-main()

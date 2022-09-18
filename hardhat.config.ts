@@ -3,7 +3,10 @@ import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-ethers'
 import 'hardhat-change-network'
 import '@openzeppelin/hardhat-upgrades'
+import '@matterlabs/hardhat-zksync-deploy'
+import '@matterlabs/hardhat-zksync-solc'
 import dotenv from 'dotenv'
+import { HardhatPluginError } from 'hardhat/plugins';
 
 import { task } from 'hardhat/config'
 import mainnets from '@mesonfi/presets/src/mainnets.json'
@@ -12,7 +15,10 @@ import config from './config.json'
 
 dotenv.config()
 
-const INFURA_API_KEY = process.env.INFURA_API_KEY as string
+const {
+  ZKSYNC,
+  INFURA_API_KEY = ''
+} = process.env
 
 const mainnetConnections = Object.fromEntries(
   mainnets
@@ -33,18 +39,85 @@ const testnetConnections = Object.fromEntries(
     }])
 )
 
-task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners()
-  for (const account of accounts) {
-    console.log(account.address)
-  }
-})
+task('chain', 'Switch chain-specific config for Meson')
+  .addParam('mainnet', 'Mainnet network id', '')
+  .addParam('testnet', 'Testnet network id', 'local')
+  .setAction(async taskArgs => {
+    const networkId = taskArgs.mainnet || taskArgs.testnet
+    const testnetMode = !taskArgs.mainnet
+    const setChainConfig = require('./scripts/config/set-chain-config')
+    await setChainConfig(networkId, testnetMode)
+  })
 
-task('balance', `Prints an account's balance`)
-  .addParam('account', `The account's address`)
+task('estimate', 'Estimate gas usage for Meson')
+  .addParam('upgradable', 'If using MesonUpgradable', 'false')
+  .setAction(async taskArgs => {
+    if (!['true', 'false'].includes(taskArgs.upgradable)) {
+      throw new HardhatPluginError(`The '--upgradable' parameter can only be 'true' or 'false'`)
+    }
+    const estimateGas = require('./scripts/estimate-gas')
+    await estimateGas(taskArgs.upgradable === 'true')
+  })
+
+async function _switchNetwork(taskArgs: any) {
+  const networkId = taskArgs.mainnet || taskArgs.testnet
+  if (networkId === 'local') {
+    throw new HardhatPluginError(`Network id cannot be 'local'`)
+  }
+  const testnetMode = !taskArgs.mainnet
+  const setChainConfig = require('./scripts/config/set-chain-config')
+  const network = await setChainConfig(networkId, testnetMode)
+  return { network, testnetMode }
+}
+
+task('deploy', 'Deploy Meson contract')
+  .addParam('mainnet', 'Mainnet network id', '')
+  .addParam('testnet', 'Testnet network id', '')
+  .addParam('upgradable', 'If using MesonUpgradable', 'false')
+  .setAction(async taskArgs => {
+    if (!['true', 'false'].includes(taskArgs.upgradable)) {
+      throw new HardhatPluginError(`The '--upgradable' parameter can only be 'true' or 'false'`)
+    }
+
+    const { network, testnetMode } = await _switchNetwork(taskArgs)
+    const deploy = require('./scripts/deploy')
+    await deploy(network, taskArgs.upgradable === 'true', testnetMode)
+  })
+
+task('upgrade', 'Upgrade Meson contract')
+  .addParam('mainnet', 'Mainnet network id', '')
+  .addParam('testnet', 'Testnet network id', '')
   .setAction(async (taskArgs, hre) => {
-    const balance = await hre.ethers.provider.getBalance(taskArgs.account)
-    console.log(hre.ethers.utils.formatEther(balance), 'ETH')
+    const { network } = await _switchNetwork(taskArgs)
+    const upgrade = require('./scripts/upgrade')
+    await upgrade(network)
+  })
+
+task('pool', 'Perform pool operation')
+  .addParam('mainnet', 'Mainnet network id', '')
+  .addParam('testnet', 'Testnet network id', '')
+  .setAction(async taskArgs => {
+    const { network } = await _switchNetwork(taskArgs)
+    const pool = require('./scripts/pool')
+    await pool(network)
+  })
+
+task('uct', 'Run UCT script')
+  .addParam('mainnet', 'Mainnet network id', '')
+  .addParam('testnet', 'Testnet network id', '')
+  .setAction(async (taskArgs, hre) => {
+    const { network } = await _switchNetwork(taskArgs)
+    const uct = require('./scripts/uct')
+    await uct(network)
+  })
+
+task('deploy-forward', 'Deploy ForwardTokenContract')
+  .addParam('mainnet', 'Mainnet network id', '')
+  .addParam('testnet', 'Testnet network id', '')
+  .setAction(async taskArgs => {
+    const { network } = await _switchNetwork(taskArgs)
+    const deployForward = require('./scripts/deploy-forward')
+    await deployForward(network)
   })
 
 export default {
@@ -61,9 +134,25 @@ export default {
       },
     },
   },
+  zksolc: {
+    version: '1.1.6',
+    compilerSource: 'docker',
+    settings: {
+      experimental: {
+        dockerImage: 'matterlabs/zksolc',
+        tag: 'v1.1.6',
+      },
+    },
+  },
+  zkSyncDeploy: {
+    zkSyncNetwork: 'https://zksync2-testnet.zksync.dev',
+    ethNetwork: 'goerli',
+  },
   defaultNetwork: 'hardhat',
   networks: {
-    hardhat: {},
+    hardhat: {
+      zksync: !!ZKSYNC,
+    },
     obsidians: {
       url: 'http://localhost:62743',
       accounts: 'remote',

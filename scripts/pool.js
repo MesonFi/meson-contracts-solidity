@@ -1,5 +1,4 @@
-const { ethers } = require('hardhat')
-const getNetworkWallet = require('./lib/getNetworkWallet')
+const { getWallet } = require('./lib/adaptor')
 const { deposit, withdraw, send } = require('./lib/pool')
 
 require('dotenv').config()
@@ -10,8 +9,8 @@ const amount = '10'
 const symbol = 'USDC'
 const recipient = ''
 
-async function main() {
-  const { network, wallet } = getNetworkWallet(LP_PRIVATE_KEY)
+module.exports = async function pool(network) {
+  const wallet = getWallet(network, LP_PRIVATE_KEY)
   console.log(`LP address: ${wallet.address}`)
   
   const tx = await deposit(symbol, amount, { network, wallet })
@@ -19,5 +18,3 @@ async function main() {
   // const tx = await send(symbol, amount, recipient, { network, wallet })
   console.log(tx)
 }
-
-main()
