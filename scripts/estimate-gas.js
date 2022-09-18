@@ -10,13 +10,9 @@ const { deployContract, deployMeson } = require('./lib/deploy')
 const { wallet: unconnectedWallet } = require('../test/shared/wallet')
 const { getPartialSwap } = require('../test/shared/meson')
 
-const {
-  UPGRADABLE = false
-} = process.env
-
 const testnetMode = true
 
-async function main() {
+module.exports = async function main(upgradable) {
   const wallet = unconnectedWallet.connect(ethers.provider)
   const swapSigner = new EthersWalletSwapSigner(wallet)
 
@@ -24,7 +20,7 @@ async function main() {
   const tokenContract = await deployContract('MockToken', wallet, ['Mock Token', 'MT', totalSupply, 6])
 
   const tokens = [{ addr: tokenContract.address, tokenIndex: 1 }]
-  const mesonContract = await deployMeson(wallet, UPGRADABLE, wallet.address, tokens)
+  const mesonContract = await deployMeson(wallet, !!upgradable, wallet.address, tokens)
   const mesonClient = await MesonClient.Create(mesonContract, swapSigner)
 
   // approve
@@ -89,5 +85,3 @@ function getUsedGas(name, hash) {
     console.log(name, ':', receipt.cumulativeGasUsed.toString())
   })
 }
-
-main()

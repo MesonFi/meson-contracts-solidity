@@ -13,20 +13,20 @@
     "addressFormat": "hex",
     "url": "https://ropsten.infura.io/v3/${INFURA_API_KEY}",
     "explorer": "https://ropsten.etherscan.io",
-    "mesonAddress": "0x4C5BeD706Ac0683c619e774C4CF22DDD9C6Bd788",
+    "mesonAddress": "0xAB3F5A89FdaD07e5CEdf005BF8387CcD59c6Af98",
     "tokens": [
       {
         "name": "ETH USDC",
         "symbol": "rUSDC",
         "decimals": 6,
-        "addr": "0xA15b135328c050F0946f4b4444a708d4Fdea784c",
+        "addr": "0x11F57B99b903aa0274D278c8f69B6937beB1E018",
         "tokenIndex": 1
       },
       {
         "name": "ETH USDT",
         "symbol": "rUSDT",
         "decimals": 6,
-        "addr": "0x41a42b4d3514d0FeEA596c1B39Cd33fBC6b5e678",
+        "addr": "0x3BE8e4A5aC9eb75FE7d29D3C961BBB1537E41C38",
         "tokenIndex": 2
       }
     ]
@@ -50,21 +50,28 @@
       "symbol": "tBNB",
       "decimals": 18
     },
-    "mesonAddress": "0xA307851b988F30e19243Fd36ac47abF82b4c52fF",
+    "mesonAddress": "0xEdaeb96bF8692Acc91d7d0F92B6BD08Fc43EAAf9",
     "tokens": [
       {
-        "name": "BNB USDC",
-        "symbol": "bUSDC",
+        "name": "USDC",
+        "symbol": "USDC",
         "decimals": 18,
-        "addr": "0xBFd6Bf92C3d910601eE391CFD0D20DE73440D7C0",
+        "addr": "0x84271EAa186c4d2441ff02c853e881C6bdcB9027",
         "tokenIndex": 33
       },
       {
-        "name": "BNB USDT",
-        "symbol": "bUSDT",
+        "name": "USDT",
+        "symbol": "USDT",
         "decimals": 18,
-        "addr": "0xea2EE867707A3fE611a9e6142DC1DC35cb9bDf56",
+        "addr": "0x54Ac1B50D6187449e3586Be6A9cd7FABBBf671c7",
         "tokenIndex": 34
+      },
+      {
+        "name": "BUST",
+        "symbol": "BUST",
+        "decimals": 18,
+        "addr": "0x2237091a0B44127f79DBd4298C8507741C95C824",
+        "tokenIndex": 35
       }
     ]
   },
@@ -86,22 +93,22 @@
       "symbol": "TRX",
       "decimals": 6
     },
-    "mesonAddress": "THb1PD7tiJF2X8P7pZPvkFombkeUrSt6m8",
+    "mesonAddress": "TLp3uheXyLjAKJ8qP8J2Hd4TuPPXscmSBK",
     "tokens": [
       {
         "name": "TRX USDC",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "TNRrC6A23gZKom6Kmg8hHcC1JrWnpwhomn",
-        "link": "token20/TNRrC6A23gZKom6Kmg8hHcC1JrWnpwhomn",
+        "addr": "TQTneKAN99SXJvqJug5v7KFWfo9D9YM1ep",
+        "link": "token20/TQTneKAN99SXJvqJug5v7KFWfo9D9YM1ep",
         "tokenIndex": 1
       },
       {
         "name": "TRX USDT",
         "symbol": "USDT",
         "decimals": 6,
-        "addr": "TMKuw7uKSvYjhK3neAWfrT3rX36H3M9ReQ",
-        "link": "token20/TMKuw7uKSvYjhK3neAWfrT3rX36H3M9ReQ",
+        "addr": "TMM1FFGnKroocSjeaSr1ffb8m9zCcepato",
+        "link": "token20/TMM1FFGnKroocSjeaSr1ffb8m9zCcepato",
         "tokenIndex": 2
       }
     ]
@@ -162,20 +169,20 @@
       "symbol": "MATIC",
       "decimals": 18
     },
-    "mesonAddress": "0xDFaEaE8CF7e53700257e723dE77519Ec9de76758",
+    "mesonAddress": "0x2B5A7BA27abC02441B5213f08FD0060e5260Cb91",
     "tokens": [
       {
         "name": "MATIC USDC",
         "symbol": "pUSDC",
         "decimals": 6,
-        "addr": "0x6Dc0a937FF21F8fA5237e2015E4cBB74b5afE7C4",
+        "addr": "0xBfA416a6821fcBAa953815E0725eC3DbC208a5B5",
         "tokenIndex": 1
       },
       {
         "name": "MATIC USDT",
         "symbol": "pUSDT",
         "decimals": 6,
-        "addr": "0x3abFF3fb0E4B99B8563173FF580896D70a41c315",
+        "addr": "0x5f71e5c6F178515f60efa27FcD80666386A3B745",
         "tokenIndex": 2
       }
     ]
@@ -495,21 +502,21 @@
       "symbol": "ETH",
       "decimals": 18
     },
-    "mesonAddress": "0xa4aC74864D5dCA84338126bF32F385aC20DDE6D4",
+    "mesonAddress": "0x8b37e9dB2Aa8EC8C2F80d4947D148A85a57bC911",
     "tokens": [
       {
         "name": "zksync USDC",
         "symbol": "zkUSDC",
         "decimals": 6,
         "tokenIndex": 1,
-        "addr": "0xB3C5a3C8Fce721894DdaFB831839B5306ACB15BE"
+        "addr": "0xaA2df237EE7de9045dd36Adbcf8b19Bf63131742"
       },
       {
         "name": "zksync USDT",
         "symbol": "zkUSDT",
         "decimals": 6,
         "tokenIndex": 2,
-        "addr": "0x9bfc4A4047ee5C1e3763Df26e0E846833Ecd448b"
+        "addr": "0xdf5A60db3B5B228E02B6209175797a996b4e1F31"
       }
     ]
   }

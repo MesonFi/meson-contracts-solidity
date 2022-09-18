@@ -1,11 +1,9 @@
 const path = require('path')
 const fs = require('fs')
+const testnets = require('@mesonfi/presets/src/testnets.json')
 const presets = require('@mesonfi/presets/src/mainnets.json')
 
-const testnetMode = process.env.TESTNET_MODE
-const networkId = process.env.NETWORK_ID || process.env.HARDHAT_NETWORK
-
-async function setChainConfig(networkId) {
+module.exports = async function setChainConfig(networkId, testnetMode) {
   if (!networkId) {
     throw new Error(`No networkId specified`)
   }
@@ -18,6 +16,8 @@ async function setChainConfig(networkId) {
   let network
   if (networkId === 'local') {
     network = { name: 'Local', shortSlip44: '0x0001' }
+  } else if (testnetMode) {
+    network = testnets.find(item => item.id.startsWith(networkId))
   } else {
     network = presets.find(item => item.id.startsWith(networkId))
   }
@@ -25,9 +25,11 @@ async function setChainConfig(networkId) {
     throw new Error(`Invalid network: ${networkId}`)
   }
 
+  console.log(`Switch chain config to: ${networkId} ${testnetMode ? 'testnet' : 'mainnet'}`)
+
   let config = template
     .replace('CONFIG_PROTOCOL_VERSION', 1)
-    .replace('CONFIG_BLOCKCHAIN_NAME', `${network.name}${testnetMode ? ' Testnet' : ''}`)
+    .replace('CONFIG_BLOCKCHAIN_NAME', `${network.name}`)
     .replace('CONFIG_COIN_TYPE', network.shortSlip44)
 
   if (network.shortSlip44 === '0x003c') {
@@ -42,6 +44,6 @@ async function setChainConfig(networkId) {
     path.join(__dirname, '../../contracts/utils/MesonConfig.sol'),
     config
   )
-}
 
-setChainConfig(networkId)
+  return network
+}

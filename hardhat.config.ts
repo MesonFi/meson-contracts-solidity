@@ -6,6 +6,7 @@ import '@openzeppelin/hardhat-upgrades'
 import '@matterlabs/hardhat-zksync-deploy'
 import '@matterlabs/hardhat-zksync-solc'
 import dotenv from 'dotenv'
+import { HardhatPluginError } from 'hardhat/plugins';
 
 import { task } from 'hardhat/config'
 import mainnets from '@mesonfi/presets/src/mainnets.json'
@@ -38,18 +39,83 @@ const testnetConnections = Object.fromEntries(
     }])
 )
 
-task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
+task('chain', 'Switch chain-specific config for Meson')
+  .addParam('mainnet', 'Mainnet network id', '')
+  .addParam('testnet', 'Testnet network id', 'local')
+  .setAction(async taskArgs => {
+    const networkId = taskArgs.mainnet || taskArgs.testnet
+    const testnetMode = !taskArgs.mainnet
+    const setChainConfig = require('./scripts/config/set-chain-config')
+    await setChainConfig(networkId, testnetMode)
+  })
+
+task('estimate', 'Estimate gas usage for Meson')
+  .addParam('upgradable', 'If using MesonUpgradable', 'false')
+  .setAction(async taskArgs => {
+    if (!['true', 'false'].includes(taskArgs.upgradable)) {
+      throw new HardhatPluginError(`The '--upgradable' parameter can only be 'true' or 'false'`)
+    }
+    const estimateGas = require('./scripts/estimate-gas')
+    await estimateGas(taskArgs.upgradable === 'true')
+  })
+
+task('deploy', 'Deploy Meson contract')
+  .addParam('mainnet', 'Mainnet network id', '')
+  .addParam('testnet', 'Testnet network id', '')
+  .addParam('upgradable', 'If using MesonUpgradable', 'false')
+  .setAction(async taskArgs => {
+    if (!['true', 'false'].includes(taskArgs.upgradable)) {
+      throw new HardhatPluginError(`The '--upgradable' parameter can only be 'true' or 'false'`)
+    }
+    const networkId = taskArgs.mainnet || taskArgs.testnet
+    if (networkId === 'local') {
+      throw new HardhatPluginError(`Network id cannot be 'local'`)
+    }
+    const testnetMode = !taskArgs.mainnet
+    const setChainConfig = require('./scripts/config/set-chain-config')
+    const network = await setChainConfig(networkId, testnetMode)
+
+    const deploy = require('./scripts/deploy')
+    await deploy(network, taskArgs.upgradable === 'true', testnetMode)
+  })
+
+task('upgrade', 'Upgrade Meson contract', async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners()
   for (const account of accounts) {
     console.log(account.address)
   }
 })
 
-task('balance', `Prints an account's balance`)
-  .addParam('account', `The account's address`)
-  .setAction(async (taskArgs, hre) => {
-    const balance = await hre.ethers.provider.getBalance(taskArgs.account)
-    console.log(hre.ethers.utils.formatEther(balance), 'ETH')
+task('pool', 'Perform pool operation')
+  .addParam('mainnet', 'Mainnet network id', '')
+  .addParam('testnet', 'Testnet network id', '')
+  .setAction(async taskArgs => {
+    const networkId = taskArgs.mainnet || taskArgs.testnet
+    if (networkId === 'local') {
+      throw new HardhatPluginError(`Network id cannot be 'local'`)
+    }
+    const testnetMode = !taskArgs.mainnet
+    const setChainConfig = require('./scripts/config/set-chain-config')
+    const network = await setChainConfig(networkId, testnetMode)
+
+    const pool = require('./scripts/pool')
+    await pool(network)
+  })
+
+task('deploy-forward', 'Deploy ForwardTokenContract')
+  .addParam('mainnet', 'Mainnet network id', '')
+  .addParam('testnet', 'Testnet network id', '')
+  .setAction(async taskArgs => {
+    const networkId = taskArgs.mainnet || taskArgs.testnet
+    if (networkId === 'local') {
+      throw new HardhatPluginError(`Network id cannot be 'local'`)
+    }
+    const testnetMode = !taskArgs.mainnet
+    const setChainConfig = require('./scripts/config/set-chain-config')
+    const network = await setChainConfig(networkId, testnetMode)
+
+    const deployForward = require('./scripts/deploy-forward')
+    await deployForward(network)
   })
 
 export default {
