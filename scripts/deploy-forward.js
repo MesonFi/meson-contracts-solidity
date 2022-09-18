@@ -1,5 +1,4 @@
-const { getWallet } = require('./lib/adaptor')
-const { deployContract } = require('./lib/deploy')
+const { getWallet, deployContract } = require('./lib/adaptor')
 
 require('dotenv').config()
 

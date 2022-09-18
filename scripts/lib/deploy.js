@@ -1,8 +1,6 @@
 const { Meson } = require('@mesonfi/contract-abis')
 const { deployContract, getContract } = require('./adaptor')
 
-exports.deployContract = deployContract
-
 exports.deployMeson = async function deployMeson(wallet, upgradable, premiumManager, tokens) {
   let mesonContract
   if (upgradable) {

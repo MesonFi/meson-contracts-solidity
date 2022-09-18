@@ -6,7 +6,8 @@ const {
   SignedSwapRelease,
 } = require('@mesonfi/sdk/src')
 
-const { deployContract, deployMeson } = require('./lib/deploy')
+const { deployContract } = require('./lib/adaptor')
+const { deployMeson } = require('./lib/deploy')
 const { wallet: unconnectedWallet } = require('../test/shared/wallet')
 const { getPartialSwap } = require('../test/shared/meson')
 

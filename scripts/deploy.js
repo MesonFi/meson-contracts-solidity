@@ -1,6 +1,6 @@
 const { ethers } = require('hardhat')
-const { getWallet } = require('./lib/adaptor')
-const { deployContract, deployMeson } = require('./lib/deploy')
+const { getWallet, deployContract } = require('./lib/adaptor')
+const { deployMeson } = require('./lib/deploy')
 const { deposit } = require('./lib/pool')
 const updatePresets = require('./lib/updatePresets')
 
