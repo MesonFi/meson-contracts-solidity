@@ -11,7 +11,7 @@ exports.getWallet = function getTronWeb(network, privateKey) {
 
 exports.deployContract = async function deployContract(name, wallet, args) {
   const factory = await ethers.getContractFactory(name)
-  const abi = JSON.parse(factory.interface.format(ethers.utils.FormatTypes.json))
+  const abi = JSON.parse(factory.interface.format('json'))
   const constructor = abi.find(({ type }) => type === 'constructor')
   if (constructor) {
     constructor.stateMutability = constructor.payable ? 'payable' : 'nonpayable'
@@ -37,6 +37,8 @@ function _wrapTronContract(instance) {
     get(target, prop) {
       if (prop === 'address') {
         return TronWeb.address.fromHex(target.address)
+      } else if (prop === 'interface') {
+        return new ethers.utils.Interface(target.abi)
       }
       const method = target.methodInstances[prop]
       if (method?.abi?.type === 'function') {

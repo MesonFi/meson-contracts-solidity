@@ -1,18 +1,24 @@
-const { ethers, upgrades } = require('hardhat')
-const getNetworkWallet = require('./lib/getNetworkWallet')
+const { getWallet, deployContract, getContract } = require('./lib/adaptor')
 
 require('dotenv').config()
 
-const { PRIVATE_KEY } = process.env
+const {
+  ZKSYNC,
+  PRIVATE_KEY
+} = process.env
 
-async function main() {
-  const { network, wallet } = getNetworkWallet(PRIVATE_KEY)
+module.exports = async function upgrade(network) {
+  if (network.id.startsWith('zksync') && !ZKSYNC) {
+    throw new Error('Need to set environment variable ZKSYNC=true for zksync')
+  }
+  await hre.run('compile')
 
-  // TODO
-  // const UpgradableMeson = await ethers.getContractFactory('UpgradableMeson', wallet)
-  // console.log('Upgrading UpgradableMeson...')
-  // await upgrades.upgradeProxy(network.mesonAddress, UpgradableMeson)
-  // console.log('UpgradableMeson upgraded')
+  const wallet = getWallet(network, PRIVATE_KEY)
+
+  console.log('Deploying UpgradableMeson...')
+  const impl = await deployContract('UpgradableMeson', wallet)
+  const abi = JSON.parse(impl.interface.format('json'))
+  const proxy = getContract(network.mesonAddress, abi, wallet)
+  await proxy.upgradeTo(impl.address)
+  console.log('Meson upgraded')
 }
-
-main()

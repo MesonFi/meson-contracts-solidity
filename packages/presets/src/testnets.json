@@ -111,7 +111,8 @@
         "link": "token20/TMM1FFGnKroocSjeaSr1ffb8m9zCcepato",
         "tokenIndex": 2
       }
-    ]
+    ],
+    "uctAddress": "TPLhxZLJJipHMM9zuwt93G6m79tPfxP7dT"
   },
   {
     "id": "avax-testnet",
@@ -185,7 +186,8 @@
         "addr": "0x5f71e5c6F178515f60efa27FcD80666386A3B745",
         "tokenIndex": 2
       }
-    ]
+    ],
+    "uctAddress": "0xBDFE12A2290883886fDa279472a5E9F41f6C0D5e"
   },
   {
     "id": "ftm-testnet",

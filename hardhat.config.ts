@@ -59,6 +59,17 @@ task('estimate', 'Estimate gas usage for Meson')
     await estimateGas(taskArgs.upgradable === 'true')
   })
 
+async function _switchNetwork(taskArgs: any) {
+  const networkId = taskArgs.mainnet || taskArgs.testnet
+  if (networkId === 'local') {
+    throw new HardhatPluginError(`Network id cannot be 'local'`)
+  }
+  const testnetMode = !taskArgs.mainnet
+  const setChainConfig = require('./scripts/config/set-chain-config')
+  const network = await setChainConfig(networkId, testnetMode)
+  return { network, testnetMode }
+}
+
 task('deploy', 'Deploy Meson contract')
   .addParam('mainnet', 'Mainnet network id', '')
   .addParam('testnet', 'Testnet network id', '')
@@ -67,53 +78,44 @@ task('deploy', 'Deploy Meson contract')
     if (!['true', 'false'].includes(taskArgs.upgradable)) {
       throw new HardhatPluginError(`The '--upgradable' parameter can only be 'true' or 'false'`)
     }
-    const networkId = taskArgs.mainnet || taskArgs.testnet
-    if (networkId === 'local') {
-      throw new HardhatPluginError(`Network id cannot be 'local'`)
-    }
-    const testnetMode = !taskArgs.mainnet
-    const setChainConfig = require('./scripts/config/set-chain-config')
-    const network = await setChainConfig(networkId, testnetMode)
 
+    const { network, testnetMode } = await _switchNetwork(taskArgs)
     const deploy = require('./scripts/deploy')
     await deploy(network, taskArgs.upgradable === 'true', testnetMode)
   })
 
-task('upgrade', 'Upgrade Meson contract', async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners()
-  for (const account of accounts) {
-    console.log(account.address)
-  }
-})
+task('upgrade', 'Upgrade Meson contract')
+  .addParam('mainnet', 'Mainnet network id', '')
+  .addParam('testnet', 'Testnet network id', '')
+  .setAction(async (taskArgs, hre) => {
+    const { network } = await _switchNetwork(taskArgs)
+    const upgrade = require('./scripts/upgrade')
+    await upgrade(network)
+  })
 
 task('pool', 'Perform pool operation')
   .addParam('mainnet', 'Mainnet network id', '')
   .addParam('testnet', 'Testnet network id', '')
   .setAction(async taskArgs => {
-    const networkId = taskArgs.mainnet || taskArgs.testnet
-    if (networkId === 'local') {
-      throw new HardhatPluginError(`Network id cannot be 'local'`)
-    }
-    const testnetMode = !taskArgs.mainnet
-    const setChainConfig = require('./scripts/config/set-chain-config')
-    const network = await setChainConfig(networkId, testnetMode)
-
+    const { network } = await _switchNetwork(taskArgs)
     const pool = require('./scripts/pool')
     await pool(network)
+  })
+
+task('uct', 'Run UCT script')
+  .addParam('mainnet', 'Mainnet network id', '')
+  .addParam('testnet', 'Testnet network id', '')
+  .setAction(async (taskArgs, hre) => {
+    const { network } = await _switchNetwork(taskArgs)
+    const uct = require('./scripts/uct')
+    await uct(network)
   })
 
 task('deploy-forward', 'Deploy ForwardTokenContract')
   .addParam('mainnet', 'Mainnet network id', '')
   .addParam('testnet', 'Testnet network id', '')
   .setAction(async taskArgs => {
-    const networkId = taskArgs.mainnet || taskArgs.testnet
-    if (networkId === 'local') {
-      throw new HardhatPluginError(`Network id cannot be 'local'`)
-    }
-    const testnetMode = !taskArgs.mainnet
-    const setChainConfig = require('./scripts/config/set-chain-config')
-    const network = await setChainConfig(networkId, testnetMode)
-
+    const { network } = await _switchNetwork(taskArgs)
     const deployForward = require('./scripts/deploy-forward')
     await deployForward(network)
   })
