@@ -55,8 +55,8 @@ describe('MesonClient', () => {
 
   describe('#shortCoinType', () => {
     it('returns the shortCoinType', () => {
-      // expect(mesonClientForInitiator.shortCoinType).to.equal('0x003c')
-      // expect(mesonClientForPoolOwner.shortCoinType).to.equal('0x003c')
+      expect(mesonClientForInitiator.shortCoinType).to.equal('0x003c')
+      expect(mesonClientForPoolOwner.shortCoinType).to.equal('0x003c')
     })
   })
 
