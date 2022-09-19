@@ -7,7 +7,7 @@ import "./MesonManager.sol";
 /// @notice A plain non-upgradeable Meson
 contract Meson is MesonManager {
   constructor(address premiumManager) {
-    _owner = _msgSender();
-    _premiumManager = premiumManager;
+    _transferOwnership(_msgSender());
+    _transferPremiumManager(premiumManager);
   }
 }

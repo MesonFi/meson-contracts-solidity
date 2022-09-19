@@ -6,8 +6,8 @@ import "./MesonManager.sol";
 
 contract UpgradableMeson is UUPSUpgradeable, MesonManager {
   function initialize(address owner, address premiumManager) external initializer {
-    _owner = owner;
-    _premiumManager = premiumManager;
+    _transferOwnership(owner);
+    _transferPremiumManager(premiumManager);
   }
 
   function _authorizeUpgrade(address) internal override onlyOwner {}

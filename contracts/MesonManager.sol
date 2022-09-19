@@ -22,6 +22,10 @@ contract MesonManager is MesonSwap, MesonPools {
   /// See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
   uint256[50] private __gap;
 
+  event OwnerTransferred(address indexed prevOwner, address indexed newOwner);
+
+  event PremiumManagerTransferred(address indexed prevPremiumManager, address indexed newPremiumManager);
+
   /// @notice The owner will also have the permission to add supported tokens
   function addSupportToken(address token, uint8 index) external onlyOwner {
     _addSupportToken(token, index);
@@ -35,12 +39,35 @@ contract MesonManager is MesonSwap, MesonPools {
     }
   }
 
+  function transferOwnership(address newOwner) public onlyOwner {
+    _transferOwnership(newOwner);
+  }
+
+  function transferPremiumManager(address newPremiumManager) public {
+    _onlyPremiumManager();
+    _transferPremiumManager(newPremiumManager);
+  }
+
   modifier onlyOwner() {
     require(_owner == _msgSender(), "Caller is not the owner");
     _;
   }
 
+  function _transferOwnership(address newOwner) internal {
+    require(newOwner != address(0), "New owner cannot be zero address");
+    address prevOwner = _owner;
+    _owner = newOwner;
+    emit OwnerTransferred(prevOwner, newOwner);
+  }
+
   function _onlyPremiumManager() internal view override {
     require(_premiumManager == _msgSender(), "Caller is not the premium manager");
+  }
+
+  function _transferPremiumManager(address newPremiumManager) internal {
+    require(newPremiumManager != address(0), "New premium manager be zero address");
+    address prevPremiumManager = _premiumManager;
+    _premiumManager = newPremiumManager;
+    emit PremiumManagerTransferred(prevPremiumManager, newPremiumManager);
   }
 }
