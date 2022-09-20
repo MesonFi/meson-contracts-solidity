@@ -52,7 +52,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// The LP should be careful to make sure the `poolTokenIndex` is correct.
   /// Make sure to call `depositAndRegister` first and register a pool index.
   /// Otherwise, token may be deposited to others.
-  /// @dev Designed to be used by LPs (pool owners) who have already registered a pool index
+  /// @dev Designed to be used by addresses authorized to a pool
   /// @param amount The amount of tokens to be added to the pool
   /// @param poolTokenIndex In format of `tokenIndex:uint8|poolIndex:uint40`. See `_balanceOfPoolToken` in `MesonStates.sol` for more information.
   function deposit(uint256 amount, uint48 poolTokenIndex) external {
@@ -60,7 +60,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     uint40 poolIndex = _poolIndexFrom(poolTokenIndex);
     require(poolIndex != 0, "Cannot use 0 as pool index"); // pool 0 is reserved for meson service fee
-    require(ownerOfPool[poolIndex] == _msgSender(), "Need the pool owner as the signer");
+    require(poolIndex == poolOfAuthorizedAddr[_msgSender()], "Need an authorized address as the signer");
     _balanceOfPoolToken[poolTokenIndex] += amount;
     uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
     _unsafeDepositToken(tokenForIndex[tokenIndex], _msgSender(), amount, tokenIndex);
