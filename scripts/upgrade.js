@@ -1,24 +1,20 @@
-const { getWallet, deployContract, getContract } = require('./lib/adaptor')
+const { adaptor } = require('@mesonfi/sdk')
+const { getProvider } = require('./lib/getProvider')
+const { deployContract } = require('./lib/deploy')
 
 require('dotenv').config()
 
-const {
-  ZKSYNC,
-  PRIVATE_KEY
-} = process.env
+const { PRIVATE_KEY } = process.env
 
 module.exports = async function upgrade(network) {
-  if (network.id.startsWith('zksync') && !ZKSYNC) {
-    throw new Error('Need to set environment variable ZKSYNC=true for zksync')
-  }
+  const provider = getProvider(network)
   await hre.run('compile')
 
-  const wallet = getWallet(network, PRIVATE_KEY)
-
+  const wallet = adaptor.getWallet(PRIVATE_KEY, provider)
   console.log('Deploying UpgradableMeson...')
   const impl = await deployContract('UpgradableMeson', wallet)
   const abi = JSON.parse(impl.interface.format('json'))
-  const proxy = getContract(network.mesonAddress, abi, wallet)
+  const proxy = adaptor.getContract(network.mesonAddress, abi, wallet)
   await proxy.upgradeTo(impl.address)
   console.log('Meson upgraded')
 }

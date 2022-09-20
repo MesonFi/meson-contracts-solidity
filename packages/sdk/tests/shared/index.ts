@@ -1,10 +1,9 @@
-import { BigNumberish } from '@ethersproject/bignumber'
-import { parseUnits } from '@ethersproject/units'
+import { BigNumberish, utils } from 'ethers'
 import { PartialSwapData, SwapData, SignedSwapRequestData, SignedSwapReleaseData } from '../..'
 
 export function getPartialSwap({
-  amount = parseUnits('1000', 6) as BigNumberish,
-  fee = parseUnits('1', 6) as BigNumberish,
+  amount = utils.parseUnits('1000', 6) as BigNumberish,
+  fee = utils.parseUnits('1', 6) as BigNumberish,
   inToken = 1,
   outToken = 1,
 } = {}): PartialSwapData {
@@ -19,8 +18,8 @@ export function getPartialSwap({
 }
 
 export function getSwap({
-  amount = parseUnits('1000', 6) as BigNumberish,
-  fee = parseUnits('1', 6) as BigNumberish,
+  amount = utils.parseUnits('1000', 6) as BigNumberish,
+  fee = utils.parseUnits('1', 6) as BigNumberish,
   expireTs = Math.floor(Date.now() / 1000) + 5400,
   inChain = '0x0001',
   inToken = 2,

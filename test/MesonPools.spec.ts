@@ -8,7 +8,6 @@ import {
   SignedSwapRelease,
 } from '@mesonfi/sdk/src'
 import { MockToken, MesonPoolsTest } from '@mesonfi/contract-types'
-import { pack } from '@ethersproject/solidity'
 
 import { expect } from './shared/expect'
 import { initiator, poolOwner } from './shared/wallet'
@@ -70,7 +69,7 @@ describe('MesonPools', () => {
       await expect(mesonClientForPoolOwner.depositAndRegister(TestAddress, amount, '1'))
         .to.be.rejectedWith('Token not supported')
 
-      const poolTokenIndex = pack(['uint8', 'uint40'], [2, 1])
+      const poolTokenIndex = ethers.utils.solidityPack(['uint8', 'uint40'], [2, 1])
       await expect(mesonInstance.depositAndRegister(1000, poolTokenIndex))
         .to.be.revertedWith('Token not supported')
     })
@@ -117,7 +116,7 @@ describe('MesonPools', () => {
       await expect(mesonClientForPoolOwner.deposit(TestAddress, amount))
         .to.be.rejectedWith('Token not supported')
 
-      const poolTokenIndex = pack(['uint8', 'uint40'], [2, 1])
+      const poolTokenIndex = ethers.utils.solidityPack(['uint8', 'uint40'], [2, 1])
       await expect(mesonInstance.deposit(1000, poolTokenIndex))
         .to.be.revertedWith('Token not supported')
     })
@@ -194,7 +193,7 @@ describe('MesonPools', () => {
   describe('#withdraw', () => {
     const amount = ethers.utils.parseUnits('1000', 6)
     it('rejects if pool not registered', async () => {
-      const poolTokenIndex = pack(['uint8', 'uint40'], [1, 1])
+      const poolTokenIndex = ethers.utils.solidityPack(['uint8', 'uint40'], [1, 1])
       await expect(mesonInstance.withdraw(amount, poolTokenIndex))
         .to.be.revertedWith('Need the pool owner as the signer')
     })
@@ -203,7 +202,7 @@ describe('MesonPools', () => {
       await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
 
       const withdrawAmount = ethers.utils.parseUnits('1001', 6)
-      const poolTokenIndex = pack(['uint8', 'uint40'], [1, 1])
+      const poolTokenIndex = ethers.utils.solidityPack(['uint8', 'uint40'], [1, 1])
       await expect(mesonInstance.withdraw(withdrawAmount, poolTokenIndex))
         .to.be.revertedWith('panic code 0x11')
     })
@@ -212,7 +211,7 @@ describe('MesonPools', () => {
       await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
 
       const withdrawAmount = ethers.utils.parseUnits('1', 6)
-      const poolTokenIndex = pack(['uint8', 'uint40'], [1, 1])
+      const poolTokenIndex = ethers.utils.solidityPack(['uint8', 'uint40'], [1, 1])
       await mesonInstance.withdraw(withdrawAmount, poolTokenIndex)
       expect(await mesonInstance.poolTokenBalance(token.address, poolOwner.address)).to.equal(amount.sub(withdrawAmount))
     })
@@ -256,10 +255,10 @@ describe('MesonPools', () => {
       await mesonClientForPoolOwner.lock(signedRequest)
       
       const poolBalance = amount.sub(swap.amount.sub(swap.fee))
-      expect(await mesonInstance.poolTokenBalance(mesonClientForPoolOwner.token(1), poolOwner.address)).to.equal(poolBalance)
+      expect(await mesonInstance.poolTokenBalance(mesonClientForPoolOwner.tokenAddr(1), poolOwner.address)).to.equal(poolBalance)
       const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
       expect(locked.status).to.equal(LockedSwapStatus.Locked)
-      expect(locked.poolOwner).to.equal(poolOwner.address)
+      expect(locked.poolOwner).to.equal(poolOwner.address.toLowerCase())
     })
     it('rejects if swap already exists', async () => {
       const amount = ethers.utils.parseUnits('2000', 6)
@@ -293,7 +292,7 @@ describe('MesonPools', () => {
       await ethers.provider.send('evm_increaseTime', [3600])
       await mesonClientForPoolOwner.unlock(signedRequest)
 
-      expect(await mesonInstance.poolTokenBalance(mesonClientForPoolOwner.token(1), poolOwner.address)).to.equal(amount)
+      expect(await mesonInstance.poolTokenBalance(mesonClientForPoolOwner.tokenAddr(1), poolOwner.address)).to.equal(amount)
       const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
       expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
       expect(locked.poolOwner).to.be.undefined

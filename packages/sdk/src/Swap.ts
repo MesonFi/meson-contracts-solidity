@@ -1,7 +1,4 @@
-import { pack } from '@ethersproject/solidity'
-import { hexZeroPad, isHexString } from '@ethersproject/bytes'
-import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
-import { randomBytes } from '@ethersproject/random'
+import { BigNumber, BigNumberish, utils } from 'ethers'
 
 const MESON_PROTOCOL_VERSION = 1
 
@@ -45,7 +42,7 @@ export class Swap implements SwapData {
 
   static decode (encoded: string | BigNumber): Swap {
     if (typeof encoded !== 'string') {
-      encoded = hexZeroPad(encoded.toHexString(), 32)
+      encoded = utils.hexZeroPad(encoded.toHexString(), 32)
     }
     if (!encoded.startsWith('0x') || encoded.length !== 66) {
       throw new Error('encoded swap should be a hex string of length 66')
@@ -102,7 +99,7 @@ export class Swap implements SwapData {
 
   private _makeFullSalt(salt?: string): string {
     if (salt) {
-      if (!isHexString(salt) || salt.length > 22) {
+      if (!utils.isHexString(salt) || salt.length > 22) {
         throw new Error('The given salt is invalid')
       }
       return `${salt}${this._randomHex(22 - salt.length)}`
@@ -116,14 +113,14 @@ export class Swap implements SwapData {
       return ''
     }
     const randomLength = Math.min((strLength / 2), 4)
-    return hexZeroPad(randomBytes(randomLength), strLength / 2).replace('0x', '')
+    return utils.hexZeroPad(utils.randomBytes(randomLength), strLength / 2).replace('0x', '')
   }
 
   get encoded(): string {
     if (!this._encoded) {
       const types = swapStruct.map(i => i.type)
       const values = swapStruct.map(i => (this as any)[i.name])
-      this._encoded = pack(types, values)
+      this._encoded = utils.solidityPack(types, values)
     }
     return this._encoded
   }

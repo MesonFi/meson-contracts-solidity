@@ -1,33 +1,28 @@
-import type { Signer } from '@ethersproject/abstract-signer'
-import {
-  StaticJsonRpcProvider,
-  WebSocketProvider,
-  FallbackProvider,
-  type Provider
-} from '@ethersproject/providers'
-import { ErrorCode } from '@ethersproject/logger'
-import { Contract } from '@ethersproject/contracts'
-
+import { providers, errors, type Signer } from 'ethers'
 import TronWeb from 'tronweb'
 
 import {
   MesonClient,
-  MesonClientTron,
-  TronContract,
   Swap,
   PostedSwapStatus,
-  LockedSwapStatus
+  LockedSwapStatus,
+  adaptor,
 } from '@mesonfi/sdk'
 import { Meson } from '@mesonfi/contract-abis'
 
 import testnets from './testnets.json'
 import mainnets from './mainnets.json'
 
-class RpcFallbackProvider extends FallbackProvider {
+import v0_testnets from './v0/testnets.json'
+import v0_mainnets from './v0/mainnets.json'
+
+const v0_networks = [...v0_mainnets, ...v0_testnets]
+
+class RpcFallbackProvider extends providers.FallbackProvider {
   async send(method, params) {
     for await (const c of this.providerConfigs) {
       try {
-        return await (c.provider as StaticJsonRpcProvider).send(method, params)
+        return await (c.provider as providers.StaticJsonRpcProvider).send(method, params)
       } catch (e) {
       }
     }
@@ -35,26 +30,26 @@ class RpcFallbackProvider extends FallbackProvider {
   }
 }
 
-class FailsafeStaticJsonRpcProvider extends StaticJsonRpcProvider {
+class FailsafeStaticJsonRpcProvider extends providers.StaticJsonRpcProvider {
   async perform (method, params) {
     try {
       return await super.perform(method, params)
     } catch (e) {
-      if (e.code === ErrorCode.CALL_EXCEPTION) {
-        e.code = ErrorCode.SERVER_ERROR
+      if (e.code === errors.CALL_EXCEPTION) {
+        e.code = errors.SERVER_ERROR
       }
       throw e
     }
   }
 }
 
-class FailsafeWebSocketProvider extends WebSocketProvider {
+class FailsafeWebSocketProvider extends providers.WebSocketProvider {
   async perform (method, params) {
     try {
       return await super.perform(method, params)
     } catch (e) {
-      if (e.code === ErrorCode.CALL_EXCEPTION) {
-        e.code = ErrorCode.SERVER_ERROR
+      if (e.code === errors.CALL_EXCEPTION) {
+        e.code = errors.SERVER_ERROR
       }
       throw e
     }
@@ -103,7 +98,7 @@ export class MesonPresets {
   }
 
   getAllNetworks(): PresetNetwork[] {
-    return this._networks ?? mainnets
+    return (this._networks ?? mainnets).filter(n => n.url)
   }
 
   getNetwork(id: string): PresetNetwork {
@@ -133,28 +128,56 @@ export class MesonPresets {
       symbol: 'UCT',
       decimals: 4,
       tokenIndex: 255,
-    }]
+    }].filter(t => t.addr)
   }
 
   getToken(networkId: string, tokenIndex: number): PresetToken {
     const tokens = this.getTokensForNetwork(networkId)
-    return tokens.find(t => t.tokenIndex === tokenIndex)
+    return tokens?.find(t => t.tokenIndex === tokenIndex)
   }
 
-  getClient(id: string, provider: Provider | Signer): MesonClient {
+  getV0Token(networkId: string, tokenIndex: number): PresetToken {
+    const tokens = v0_networks.find(n => n.id === networkId)?.tokens
+    return tokens?.find(t => t.tokenIndex === tokenIndex)
+  }
+
+  getNetworkToken(shortCoinType: string, tokenIndex: number, version: number = 1):
+    { network: PresetNetwork; token: any }
+  {
+    const network = this.getNetworkFromShortCoinType(shortCoinType)
+    if (!network) {
+      return
+    }
+    let token
+    if (version === 0) {
+      token = this.getV0Token(network.id, tokenIndex)
+    } else {
+      token = this.getToken(network.id, tokenIndex)
+    }
+    if (!token) {
+      return
+    }
+    return { network, token }
+  }
+
+  parseInOutNetworkTokens(encoded: string) {
+    if (!encoded) {
+      return {}
+    }
+    const swap = Swap.decode(encoded)
+    const from = this.getNetworkToken(swap.inChain, swap.inToken, swap.version)
+    const to = this.getNetworkToken(swap.outChain, swap.outToken, swap.version)
+    return { swap, from, to }
+  }
+
+  getClient(id: string, provider: providers.Provider | Signer): MesonClient {
     const network = this.getNetwork(id)
     if (!network) {
       throw new Error(`Unsupported network: ${id}`)
     }
     if (!this._cache.get(id)) {
-      let client
-      if (id.startsWith('tron')) {
-        const instance = new TronContract(network.mesonAddress, Meson.abi, provider)
-        client = new MesonClientTron(instance, network.shortSlip44)
-      } else {
-        const instance = new Contract(network.mesonAddress, Meson.abi, provider)
-        client = new MesonClient(instance, network.shortSlip44)
-      }
+      const instance = adaptor.getContract(network.mesonAddress, Meson.abi, provider)
+      const client = new MesonClient(instance, network.shortSlip44)
       this._cache.set(id, client)
     }
     return this._cache.get(id)
@@ -180,20 +203,15 @@ export class MesonPresets {
         })
         provider = new RpcFallbackProvider(fallbacks, quorum.threshold)
       } else if (ws) {
-        provider = new WebSocketProvider(ws, providerNetwork)
+        provider = new providers.WebSocketProvider(ws, providerNetwork)
       } else if (url.startsWith('ws')) {
-        provider = new WebSocketProvider(url, providerNetwork)
+        provider = new providers.WebSocketProvider(url, providerNetwork)
       } else {
-        provider = new StaticJsonRpcProvider(url, providerNetwork)
+        provider = new providers.StaticJsonRpcProvider(url, providerNetwork)
       }
-      let client
-      if (id.startsWith('tron')) {
-        const instance = new TronContract(network.mesonAddress, Meson.abi, provider)
-        client = new MesonClientTron(instance, network.shortSlip44)
-      } else {
-        const instance = new Contract(network.mesonAddress, Meson.abi, provider)
-        client = new MesonClient(instance, network.shortSlip44)
-      }
+
+      const instance = adaptor.getContract(network.mesonAddress, Meson.abi, provider)
+      const client = new MesonClient(instance, network.shortSlip44)
       this._cache.set(id, client)
     }
     return this._cache.get(id)

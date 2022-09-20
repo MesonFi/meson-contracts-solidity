@@ -1,28 +1,20 @@
-import {
-  type JsonRpcProvider,
-  type TransactionRequest,
-  type FeeData,
-  StaticJsonRpcProvider,
-  WebSocketProvider
-} from '@ethersproject/providers'
-import { BigNumber } from '@ethersproject/bignumber'
-import { type Deferrable, resolveProperties } from '@ethersproject/properties'
+import { providers, BigNumber, utils } from 'ethers'
 
-export const CustomFeeHttpProvider = extendProvider(StaticJsonRpcProvider) as typeof StaticJsonRpcProvider
-export const CustomFeeWsProvider = extendProvider(WebSocketProvider) as typeof WebSocketProvider
+export const CustomFeeHttpProvider = extendProvider(providers.StaticJsonRpcProvider) as typeof providers.StaticJsonRpcProvider
+export const CustomFeeWsProvider = extendProvider(providers.WebSocketProvider) as typeof providers.WebSocketProvider
 
 type Class<T> = new (...args: any[]) => T
-function extendProvider(Provider: Class<JsonRpcProvider>) {
+function extendProvider(Provider: Class<providers.JsonRpcProvider>) {
   class CustomFeeProvider extends Provider {
-    override async estimateGas(transaction: Deferrable<TransactionRequest>): Promise<BigNumber> {
+    override async estimateGas(transaction: utils.Deferrable<providers.TransactionRequest>): Promise<BigNumber> {
       const gasLimit = await super.estimateGas(transaction)
       // TODO: logger.debug('Transaction', `estimate gas success`, { estimateGas: gasLimit.toString() })
       // TODO: log errors
       return gasLimit.mul(1.2 * 100).div(100)
     }
 
-    override async getFeeData(): Promise<FeeData> {
-      const { block, gasPrice } = await resolveProperties({
+    override async getFeeData(): Promise<providers.FeeData> {
+      const { block, gasPrice } = await utils.resolveProperties({
         block: this.getBlock('latest'),
         gasPrice: this.getGasPrice().catch((error) => {
           // @TODO: Why is this now failing on Calaveras?
@@ -43,7 +35,7 @@ function extendProvider(Provider: Class<JsonRpcProvider>) {
 
       // TODO: gasPriceRange.limitWithin(result.gasPrice)
       // TODO: log and log errors
-      return { maxFeePerGas, maxPriorityFeePerGas, gasPrice }
+      return { maxFeePerGas, maxPriorityFeePerGas, gasPrice, lastBaseFeePerGas: null }
     }
 
     override async getGasPrice(): Promise<BigNumber> {

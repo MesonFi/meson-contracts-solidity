@@ -1,21 +1,21 @@
 const { ethers } = require('hardhat')
+const { adaptor } = require('@mesonfi/sdk')
 const { Meson, ERC20 } = require('@mesonfi/contract-abis')
-const { getContract } = require('./adaptor')
 
 function getToken(network, symbol, wallet) {
   const token = symbol.toLowerCase() === 'uct'
     ? { addr: network.uctAddress, tokenIndex: 255 }
     : network.tokens.find(t => t.symbol.toLowerCase().includes(symbol.toLowerCase()))
-  const instance = getContract(token.addr, ERC20.abi, wallet)
+  const instance = adaptor.getContract(token.addr, ERC20.abi, wallet)
   return { instance, tokenIndex: token.tokenIndex }
 }
 
 exports.deposit = async function deposit(symbol, amount, { network, wallet }) {
-  const mesonInstance = getContract(network.mesonAddress, Meson.abi, wallet)
+  const mesonInstance = adaptor.getContract(network.mesonAddress, Meson.abi, wallet)
   const token = getToken(network, symbol, wallet)
   const decimals = await token.instance.decimals()
   const value = ethers.utils.parseUnits(amount, decimals)
-  const allowance = await token.instance.allowance(wallet.address, mesonInstance.address)
+  const allowance = await token.instance.allowance(await wallet.getAddress(), mesonInstance.address)
   console.log(`Allowance: ${ethers.utils.formatUnits(allowance, decimals)}`)
   if (allowance.lt(value)) {
     console.log(`Approving...`)
@@ -25,7 +25,7 @@ exports.deposit = async function deposit(symbol, amount, { network, wallet }) {
   }
 
   console.log(`Depositing ${amount} ${symbol}...`)
-  const poolIndex = await mesonInstance.poolOfAuthorizedAddr(wallet.address)
+  const poolIndex = await mesonInstance.poolOfAuthorizedAddr(await wallet.getAddress())
   const needRegister = poolIndex == 0
   const poolTokenIndex = token.tokenIndex * 2**40 + (needRegister ? 1 : poolIndex)
 
@@ -40,11 +40,11 @@ exports.deposit = async function deposit(symbol, amount, { network, wallet }) {
 }
 
 exports.withdraw = async function withdraw(symbol, amount, { network, wallet }) {
-  const mesonInstance = getContract(network.mesonAddress, Meson.abi, wallet)
+  const mesonInstance = adaptor.getContract(network.mesonAddress, Meson.abi, wallet)
   const token = getToken(network, symbol, wallet)
 
   console.log(`Withdrawing ${amount} ${symbol}...`)
-  const poolIndex = await mesonInstance.poolOfAuthorizedAddr(wallet.address)
+  const poolIndex = await mesonInstance.poolOfAuthorizedAddr(await wallet.getAddress())
   const poolTokenIndex = token.tokenIndex * 2**40 + poolIndex
 
   // const gasLimit = await mesonInstance.estimateGas.withdraw(ethers.utils.parseUnits(amount, 6), poolTokenIndex)

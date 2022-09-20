@@ -1,4 +1,4 @@
-import { recoverAddress } from '@ethersproject/transactions'
+import { utils } from 'ethers'
 
 import type { Signature } from './SwapSigner'
 import { Swap } from './Swap'
@@ -45,7 +45,7 @@ export class SignedSwapRequest implements SignedSwapRequestData {
 
   checkSignature () {
     const [r, s, v] = this.signature
-    const recovered = recoverAddress(this.getDigest(), { r, s, v }).toLowerCase()
+    const recovered = utils.recoverAddress(this.getDigest(), { r, s, v }).toLowerCase()
     if (recovered !== this.initiator) {
       throw new Error('Invalid signature')
     }

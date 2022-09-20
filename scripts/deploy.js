@@ -1,25 +1,23 @@
 const { ethers } = require('hardhat')
-const { getWallet, deployContract } = require('./lib/adaptor')
-const { deployMeson } = require('./lib/deploy')
+const { adaptor } = require('@mesonfi/sdk')
+const { getProvider } = require('./lib/getProvider')
+const { deployMeson, deployContract } = require('./lib/deploy')
 const { deposit } = require('./lib/pool')
 const updatePresets = require('./lib/updatePresets')
 
 require('dotenv').config()
 
 const {
-  ZKSYNC,
   PRIVATE_KEY,
   PREMIUM_MANAGER,
   DEPOSIT_ON_DEPLOY,
 } = process.env
 
 module.exports = async function deploy(network, upgradable, testnetMode) {
-  if (network.id.startsWith('zksync') && !ZKSYNC) {
-    throw new Error('Need to set environment variable ZKSYNC=true for zksync')
-  }
+  const provider = getProvider(network)
   await hre.run('compile')
 
-  const wallet = getWallet(network, PRIVATE_KEY)
+  const wallet = adaptor.getWallet(PRIVATE_KEY, provider)
   const tokens = network.tokens
 
   if (testnetMode) { // only for testnets

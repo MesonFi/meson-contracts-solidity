@@ -1,8 +1,6 @@
 import { ethers, waffle } from 'hardhat'
 import { EthersWalletSwapSigner, SwapWithSigner } from '@mesonfi/sdk'
 import { MesonStatesTest } from '@mesonfi/contract-types'
-import { pack } from '@ethersproject/solidity'
-import { AddressZero } from '@ethersproject/constants'
 
 import { expect } from './shared/expect'
 import { initiator } from './shared/wallet'
@@ -31,7 +29,7 @@ describe('MesonStates', () => {
         .to.revertedWith('Cannot use 0 as token index')
     })
     it('rejects zero address', async () => {
-      await expect(mesonInstance.addSupportToken(AddressZero, 1))
+      await expect(mesonInstance.addSupportToken(ethers.constants.AddressZero, 1))
         .to.revertedWith('Cannot use zero address')
     })
     it('accepts non-zero index', async () => {
@@ -51,16 +49,16 @@ describe('MesonStates', () => {
   describe('#tokenForIndex', () => {
     it('returns the token address by index', async () => {
       await mesonInstance.addSupportToken(TestAddress, 1)
-      expect(await mesonInstance.tokenForIndex(0)).to.equal(AddressZero)
+      expect(await mesonInstance.tokenForIndex(0)).to.equal(ethers.constants.AddressZero)
       expect(await mesonInstance.tokenForIndex(1)).to.equal(TestAddress)
-      expect(await mesonInstance.tokenForIndex(2)).to.equal(AddressZero)
+      expect(await mesonInstance.tokenForIndex(2)).to.equal(ethers.constants.AddressZero)
     })
   })
 
   describe('#indexOfToken', () => {
     it('returns the token index by address', async () => {
       await mesonInstance.addSupportToken(TestAddress, 1)
-      expect(await mesonInstance.indexOfToken(AddressZero)).to.equal(0)
+      expect(await mesonInstance.indexOfToken(ethers.constants.AddressZero)).to.equal(0)
       expect(await mesonInstance.indexOfToken(TestAddress)).to.equal(1)
     })
   })
@@ -111,13 +109,13 @@ describe('MesonStates', () => {
       expect(decoded.inTokenIndex).to.equal(swap.inToken)
       expect(decoded.outChain).to.equal(swap.outChain)
       expect(decoded.outTokenIndex).to.equal(swap.outToken)
-      expect(decoded.poolTokenIndexForOutToken).to.equal(pack(['uint8', 'uint40'], [swap.outToken, 1]))
+      expect(decoded.poolTokenIndexForOutToken).to.equal(ethers.utils.solidityPack(['uint8', 'uint40'], [swap.outToken, 1]))
     })
   })
 
   describe('#decodePostedSwap', () => {
     it('returns decoded posted swap data', async () => {
-      const postedSwap = pack(['address', 'uint40'], [TestAddress, 1])
+      const postedSwap = ethers.utils.solidityPack(['address', 'uint40'], [TestAddress, 1])
       const decodedPosted = await mesonInstance.decodePostedSwap(postedSwap)
       expect(decodedPosted.initiator).to.equal(TestAddress)
       expect(decodedPosted.poolIndex).to.equal(1)
@@ -127,7 +125,7 @@ describe('MesonStates', () => {
   describe('#lockedSwapFrom', () => {
     it('returns same result as js function', async () => {
       const ts = Math.floor(Date.now() / 1000)
-      const lockedSwap = pack(['uint40', 'uint40'], [ts, 1])
+      const lockedSwap = ethers.utils.solidityPack(['uint40', 'uint40'], [ts, 1])
       expect(await mesonInstance.lockedSwapFrom(ts, 1)).to.equal(lockedSwap)
     })
   })
@@ -135,7 +133,7 @@ describe('MesonStates', () => {
   describe('#decodeLockedSwap', () => {
     it('returns decoded locked swap data', async () => {
       const ts = Math.floor(Date.now() / 1000)
-      const lockedSwap = pack(['uint40', 'uint40'], [ts, 1])
+      const lockedSwap = ethers.utils.solidityPack(['uint40', 'uint40'], [ts, 1])
       const decodedLocked = await mesonInstance.decodeLockedSwap(lockedSwap)
       expect(decodedLocked.poolIndex).to.equal(1)
       expect(decodedLocked.until).to.equal(ts)
@@ -144,14 +142,14 @@ describe('MesonStates', () => {
 
   describe('#poolTokenIndexFrom', () => {
     it('returns same result as js function', async () => {
-      const poolTokenIndex = pack(['uint8', 'uint40'], [1, 2])
+      const poolTokenIndex = ethers.utils.solidityPack(['uint8', 'uint40'], [1, 2])
       expect(await mesonInstance.poolTokenIndexFrom(1, 2)).to.equal(poolTokenIndex)
     })
   })
 
   describe('#decodePoolTokenIndex', () => {
     it('returns decoded balance index data', async () => {
-      const poolTokenIndex = pack(['uint8', 'uint40'], [1, 2])
+      const poolTokenIndex = ethers.utils.solidityPack(['uint8', 'uint40'], [1, 2])
       const decoded = await mesonInstance.decodePoolTokenIndex(poolTokenIndex)
       expect(decoded.tokenIndex).to.equal(1)
       expect(decoded.poolIndex).to.equal(2)

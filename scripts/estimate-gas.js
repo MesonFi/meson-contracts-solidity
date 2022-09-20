@@ -6,8 +6,7 @@ const {
   SignedSwapRelease,
 } = require('@mesonfi/sdk/src')
 
-const { deployContract } = require('./lib/adaptor')
-const { deployMeson } = require('./lib/deploy')
+const { deployContract, deployMeson } = require('./lib/deploy')
 const { wallet: unconnectedWallet } = require('../test/shared/wallet')
 const { getPartialSwap } = require('../test/shared/meson')
 
@@ -21,7 +20,7 @@ module.exports = async function main(upgradable) {
   const tokenContract = await deployContract('MockToken', wallet, ['Mock Token', 'MT', totalSupply, 6])
 
   const tokens = [{ addr: tokenContract.address, tokenIndex: 1 }]
-  const mesonContract = await deployMeson(wallet, !!upgradable, wallet.address, tokens)
+  const mesonContract = await deployMeson(wallet, !!upgradable, await wallet.getAddress(), tokens)
   const mesonClient = await MesonClient.Create(mesonContract, swapSigner)
 
   // approve
@@ -31,11 +30,11 @@ module.exports = async function main(upgradable) {
 
   // deposits
   const amount = ethers.utils.parseUnits('1000', 6)
-  const depositTx1 = await mesonClient.depositAndRegister(mesonClient.token(1), amount, '1')
+  const depositTx1 = await mesonClient.depositAndRegister(mesonClient.tokenAddr(1), amount, '1')
   getUsedGas('first deposit', depositTx1.hash)
   await depositTx1.wait(1)
 
-  const depositTx2 = await mesonClient.deposit(mesonClient.token(1), amount)
+  const depositTx2 = await mesonClient.deposit(mesonClient.tokenAddr(1), amount)
   getUsedGas('another deposit', depositTx2.hash)
   await depositTx2.wait(1)
 

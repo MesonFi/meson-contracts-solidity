@@ -1,19 +1,21 @@
 const { ethers } = require('hardhat')
+const { adaptor } = require('@mesonfi/sdk')
 const TronWeb = require('tronweb')
-const { getWallet, deployContract, getContract } = require('./lib/adaptor')
+
+const { getProvider } = require('./lib/getProvider')
+const { deployContract } = require('./lib/deploy')
 const updatePresets = require('./lib/updatePresets')
 
 require('dotenv').config()
 
 const {
-  ZKSYNC,
   PRIVATE_KEY,
   MINTER,
   MINTER_PK
 } = process.env
 
 module.exports = async function uct(network) {
-  // await deploy(network)
+  await deploy(network)
   // await upgrade(network)
 
   // await mint(network, [], '100')
@@ -23,11 +25,9 @@ module.exports = async function uct(network) {
 }
 
 async function deploy(network) {
-  if (network.id.startsWith('zksync') && !ZKSYNC) {
-    throw new Error('Need to set environment variable ZKSYNC=true for zksync')
-  }
+  const provider = getProvider(network)
+  const wallet = adaptor.getWallet(PRIVATE_KEY, provider)
 
-  const wallet = getWallet(network, PRIVATE_KEY)
   console.log('Deploying UCTUpgradeable...')
   const impl = await deployContract('UCTUpgradeable', wallet)
   console.log('Deploying Proxy...')
@@ -39,32 +39,31 @@ async function deploy(network) {
 }
 
 async function upgrade(network) {
-  if (network.id.startsWith('zksync') && !ZKSYNC) {
-    throw new Error('Need to set environment variable ZKSYNC=true for zksync')
-  }
-
-  const wallet = getWallet(network, PRIVATE_KEY)
+  const provider = getProvider(network)
+  const wallet = adaptor.getWallet(PRIVATE_KEY, provider)
 
   console.log('Deploying UCTUpgradeable...')
   const impl = await deployContract('UCTUpgradeable', wallet)
   const abi = JSON.parse(impl.interface.format('json'))
-  const proxy = getContract(network.uctAddress, abi, wallet)
+  const proxy = adaptor.getContract(network.uctAddress, abi, wallet)
   await proxy.upgradeTo(impl.address)
   console.log('UCTUpgradeable upgraded')
 }
 
 async function mint(network, targets, amount) {
-  const wallet = getWallet(network, MINTER_PK)
+  const provider = getProvider(network)
+  const wallet = adaptor.getWallet(MINTER_PK, provider)
 
-  const uct = getContract(network.uctAddress, UCTUpgradeable.abi, wallet)
+  const uct = adaptor.getContract(network.uctAddress, UCTUpgradeable.abi, wallet)
   const tx = await uct.batchMint(targets, ethers.utils.parseUnits(amount, 4))
   await tx.wait()
 }
 
 async function mint2(network, targets, amounts) {
-  const wallet = getWallet(network, MINTER_PK)
+  const provider = getProvider(network)
+  const wallet = adaptor.getWallet(MINTER_PK, provider)
 
-  const uct = getContract(network.uctAddress, UCTUpgradeable.abi, wallet)
+  const uct = adaptor.getContract(network.uctAddress, UCTUpgradeable.abi, wallet)
   const tx = await uct.batchMint2(targets, amounts)
   await tx.wait()
 }

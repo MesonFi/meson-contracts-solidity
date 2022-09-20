@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { BigNumber } from '@ethersproject/bignumber'
+import { BigNumber } from 'ethers'
 
 import { Swap } from '../src'
 import { getSwap } from './shared'

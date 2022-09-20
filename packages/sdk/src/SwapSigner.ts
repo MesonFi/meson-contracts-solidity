@@ -1,6 +1,4 @@
-import type { Wallet } from '@ethersproject/wallet'
-import { pack } from '@ethersproject/solidity'
-import { keccak256 } from '@ethersproject/keccak256'
+import { utils, type Wallet } from 'ethers'
 import TronWeb from 'tronweb'
 
 const NOTICE_SIGN_REQUEST = 'Sign to request a swap on Meson'
@@ -43,28 +41,28 @@ export class SwapSigner {
   static hashRequest(encoded: string, testnet?: boolean): string {
     if (fromTron(encoded)) {
       const header = nonTyped(encoded) ? '\x19TRON Signed Message:\n33\n' : '\x19TRON Signed Message:\n32\n'
-      return keccak256(pack(['string', 'bytes32'], [header, encoded]))
+      return utils.solidityKeccak256(['string', 'bytes32'], [header, encoded])
     } else if (nonTyped(encoded)) {
       const header = '\x19Ethereum Signed Message:\n32'
-      return keccak256(pack(['string', 'bytes32'], [header, encoded]))
+      return utils.solidityKeccak256(['string', 'bytes32'], [header, encoded])
     }
     const notice = testnet ? NOTICE_TESTNET_SIGN_REQUEST : NOTICE_SIGN_REQUEST
-    const typeHash = keccak256(pack(['string'], [`bytes32 ${notice}`]))
-    return keccak256(pack(['bytes32', 'bytes32'], [typeHash, keccak256(encoded)]))
+    const typeHash = utils.solidityKeccak256(['string'], [`bytes32 ${notice}`])
+    return utils.solidityKeccak256(['bytes32', 'bytes32'], [typeHash, utils.keccak256(encoded)])
   }
 
   static hashRelease(encoded: string, recipient: string, testnet?: boolean): string {
     if (fromTron(encoded)) {
       const header = nonTyped(encoded) ? '\x19TRON Signed Message:\n53\n' : '\x19TRON Signed Message:\n32\n'
-      return keccak256(pack(['string', 'bytes32', 'address'], [header, encoded, recipient]))
+      return utils.solidityKeccak256(['string', 'bytes32', 'address'], [header, encoded, recipient])
     } else if (nonTyped(encoded)) {
       const header = '\x19Ethereum Signed Message:\n52'
-      return keccak256(pack(['string', 'bytes32', 'address'], [header, encoded, hexAddress(recipient)]))
+      return utils.solidityKeccak256(['string', 'bytes32', 'address'], [header, encoded, hexAddress(recipient)])
     }
     const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
-    const typeHash = keccak256(pack(['string', 'string'], [`bytes32 ${notice}`, `address ${noticeRecipient(encoded)}`]))
-    const valueHash = keccak256(pack(['bytes32', 'address'], [encoded, hexAddress(recipient)]))
-    return keccak256(pack(['bytes32', 'bytes32'], [typeHash, valueHash]))
+    const typeHash = utils.solidityKeccak256(['string', 'string'], [`bytes32 ${notice}`, `address ${noticeRecipient(encoded)}`])
+    const valueHash = utils.solidityKeccak256(['bytes32', 'address'], [encoded, hexAddress(recipient)])
+    return utils.solidityKeccak256(['bytes32', 'bytes32'], [typeHash, valueHash])
   }
 }
 
@@ -129,10 +127,10 @@ export class RemoteSwapSigner extends SwapSigner {
   async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<Signature> {
     let signature
     if (fromTron(encoded)) {
-      const message = pack(['bytes32', 'address'], [encoded, recipient]).replace('0x', '0x0a')
+      const message = utils.solidityPack(['bytes32', 'address'], [encoded, recipient]).replace('0x', '0x0a')
       signature = await this.remoteSigner.signMessage(message)
     } else if (nonTyped(encoded)) {
-      const message = pack(['bytes32', 'address'], [encoded, hexAddress(recipient)])
+      const message = utils.solidityPack(['bytes32', 'address'], [encoded, hexAddress(recipient)])
       signature = await this.remoteSigner.signMessage(message)
     } else {
       const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE

@@ -1,18 +1,15 @@
-const { getWallet, deployContract } = require('./lib/adaptor')
+const { adaptor } = require('@mesonfi/sdk')
+const { getProvider } = require('./lib/getProvider')
+const { deployContract } = require('./lib/deploy')
 
 require('dotenv').config()
 
-const {
-  ZKSYNC,
-  PRIVATE_KEY
-} = process.env
+const { PRIVATE_KEY } = process.env
 
 module.exports = async function deployForwardContract(network) {
-  if (network.id.startsWith('zksync') && !ZKSYNC) {
-    throw new Error('Need to set environment variable ZKSYNC=true for zksync')
-  }
+  const provider = getProvider(network)
 
-  const wallet = getWallet(network, PRIVATE_KEY)
+  const wallet = adaptor.getWallet(PRIVATE_KEY, provider)
   console.log('Deploying ForwardTokenContract...')
   await deployContract('ForwardTokenContract', wallet)
 }
