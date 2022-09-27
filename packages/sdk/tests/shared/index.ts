@@ -1,10 +1,9 @@
-import { BigNumberish } from '@ethersproject/bignumber'
-import { parseUnits } from '@ethersproject/units'
+import { BigNumberish, utils } from 'ethers'
 import { PartialSwapData, SwapData, SignedSwapRequestData, SignedSwapReleaseData } from '../..'
 
 export function getPartialSwap({
-  amount = parseUnits('1000', 6) as BigNumberish,
-  fee = parseUnits('1', 6) as BigNumberish,
+  amount = utils.parseUnits('1000', 6) as BigNumberish,
+  fee = utils.parseUnits('1', 6) as BigNumberish,
   inToken = 1,
   outToken = 1,
 } = {}): PartialSwapData {
@@ -19,8 +18,8 @@ export function getPartialSwap({
 }
 
 export function getSwap({
-  amount = parseUnits('1000', 6) as BigNumberish,
-  fee = parseUnits('1', 6) as BigNumberish,
+  amount = utils.parseUnits('1000', 6) as BigNumberish,
+  fee = utils.parseUnits('1', 6) as BigNumberish,
   expireTs = Math.floor(Date.now() / 1000) + 5400,
   inChain = '0x0001',
   inToken = 2,
@@ -46,19 +45,19 @@ interface ExtendedSignedSwapRequestData extends SignedSwapRequestData {
 
 export const signedSwapRequestData = {
   testnet: true,
-  encoded: '0x00003b9aca000000000000008140328700000f424000621d7ef8003c01003c01',
+  encoded: '0x01003b9aca000000000000008140328700000f424000621d7ef8003c01003c01',
   initiator: '0x63FC2aD3d021a4D7e64323529a55a9442C444dA0',
-  digest: '0x412a992ebcc7bc875222e7c69adf148b1fe145110d1fc9dc29f0a0268d7e54df',
+  digest: '0xae2ef152547628db8ec4d935ea85828b120aca6ece438207f8dcaa842e69ff0f',
   signature: [
-    '0x59fa1a243a6003c21e50ceb2322cd8fcf09601e8dd4ac1b3baf54b93515fc29a',
-    '0x2e6796f3c146d0ffd926a5898341c88d8947149917833647e1064c8644cd6a4c',
+    '0x3cd0c5a3abe5214b5001e44d73d02b6fa7068f46256090c1043ebcd23483c2d0',
+    '0x2d4038d42b0b247fefa54c123675a5a4984431c9033261f96f0084d42a5d52c7',
     28
   ],
-  mainnetDigest: '0x62260aeff2d08a819fbcfe8eec99b98371255aa95c1413d56fc230be4377c9f5',
+  mainnetDigest: '0x778f68046136b3a42d3f715762b1e114926da740d4a3b9ada63d0af2964d6302',
   mainnetSignature: [
-    '0x895e02db52b697000e81a14be19ee8bcb9336487fca9f8418ade1baf2ee8cd1c',
-    '0x6c73c13f9d6c5a257cda7d0ec85b6297d643da45c838eb03aa745b6435050fb8',
-    28
+    '0x39e66dc0fcacad5f09cc92a92ec6e279c8445e68c9c417d1b67a7a268465bc73',
+    '0x7bb7b56caedd14c12a10b2f71dabd50e46941de3c26b7039c8e1be5d3d4282e7',
+    27
   ]
 } as ExtendedSignedSwapRequestData
 
@@ -70,19 +69,19 @@ interface ExtendedSignedSwapReleaseData extends SignedSwapReleaseData {
 
 export const signedSwapReleaseData = {
   testnet: true,
-  encoded: '0x00003b9aca000000000000008140328700000f424000621d7ef8003c01003c01',
+  encoded: '0x01003b9aca000000000000008140328700000f424000621d7ef8003c01003c01',
   initiator: '0x63FC2aD3d021a4D7e64323529a55a9442C444dA0',
   recipient: '0xD1D84F0e28D6fedF03c73151f98dF95139700aa7',
-  digest: '0x1e82a182a014967a4fa1f945fb72b191d3efa7a949c4e364064db05ecea46a3a',
+  digest: '0xf0331cc7c17b25ed6bfd9bd1ea3bc35d0afbc9dd6148d5c5ad585ad24fa3944c',
   signature: [
-    '0x0dcb3f16caecf58d5cb4f322205b2050197a570d5414b40ded15a25a0a0ed513',
-    '0x77932f8852466065b981da7a3b7c06c178ee519638b23ec41e65456e6f73a712',
-    27
+    '0x7b865163e2e513a187f8a6d9a73f7ae4a5026d510da2c48a486888ba54e4a483',
+    '0x3b7e6ed417a721247b27dba3968e8b08179eb940ebb8e4865b574149e0cf7097',
+    28
   ],
-  mainnetDigest: '0x3c651888c7d3e8ac90f7a335300c44a9d01c92f2c3d420d7a617dcc953eb49eb',
+  mainnetDigest: '0x46e800b7c736d9fe41e74f6719ff6b1c230e04b3b47f58896714b6f14e371193',
   mainnetSignature: [
-    '0x02b12b894cbebe57d319ea6a02c8acecfcf5b7c3f637133d239ed18bf0ca3b1f',
-    '0x032be9e60296b2c5757aedc1e900e8cac52bc048e0258e552d200abc7cefd25a',
+    '0xf8eabaa8bd8f26c5d0338a0b1fcc9e577bb33c77ede12c130ca39a506129a36f',
+    '0x5ffde39331c79c9c37fa0497ae53bb4ba3e8ec3a8e59cc8f601d6a7dfbeccf6e',
     28
   ]
 } as ExtendedSignedSwapReleaseData

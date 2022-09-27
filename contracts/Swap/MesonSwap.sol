@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.6;
+pragma solidity 0.8.16;
 
 import "./IMesonSwapEvents.sol";
 import "../utils/MesonStates.sol";
@@ -10,7 +10,8 @@ import "../utils/MesonStates.sol";
 /// on the initial chain of swaps.
 contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @notice Posted Swaps
-  /// key: `encodedSwap` in format of `amount:uint48|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
+  /// key: `encodedSwap` in format of `version:uint8|amount:uint40|salt:uint80|fee:uint40|expireTs:uint40|outChain:uint16|outToken:uint8|inChain:uint16|inToken:uint8`
+  ///   version: Version of encoding
   ///   amount: The amount of tokens of this swap, always in decimal 6. The amount of a swap is capped at $100k so it can be safely encoded in uint48;
   ///   salt: The salt value of this swap, carrying some information below:
   ///     salt & 0x80000000000000000000 == true => will release to an owa address, otherwise a smart contract;
@@ -20,13 +21,18 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   ///   fee: The fee given to LPs (liquidity providers). An extra service fee maybe charged afterwards;
   ///   expireTs: The expiration time of this swap on the initial chain. The LP should `executeSwap` and receive his funds before `expireTs`;
   ///   outChain: The target chain of a cross-chain swap (given by the last 2 bytes of SLIP-44);
-  ///   outToken: The index of the token on the target chain. See `_tokenList` in `MesonToken.sol`;
+  ///   outToken: The index of the token on the target chain. See `tokenForIndex` in `MesonToken.sol`;
   ///   inChain: The initial chain of a cross-chain swap (given by the last 2 bytes of SLIP-44);
-  ///   inToken: The index of the token on the initial chain. See `_tokenList` in `MesonToken.sol`.
+  ///   inToken: The index of the token on the initial chain. See `tokenForIndex` in `MesonToken.sol`.
   /// value: `postedSwap` in format of `initiator:address|poolIndex:uint40`
   ///   initiator: The swap initiator who created and signed the swap request (not necessarily the one who posted the swap);
   //    poolIndex: The index of an LP pool. See `ownerOfPool` in `MesonStates.sol` for more information.
   mapping(uint256 => uint200) internal _postedSwaps;
+
+  /// @dev This empty reserved space is put in place to allow future versions to
+  /// add new variables without shifting down storage in the inheritance chain.
+  /// See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+  uint256[50] private __gap;
 
   /// @notice Anyone can call this method to post a swap request. This is step 1️⃣ in a swap.
   /// The r,s,v signature must be signed by the swap initiator. The initiator can call
@@ -48,12 +54,12 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @param v Part of the signature
   /// @param postingValue The value to be written to `_postedSwaps`. See `_postedSwaps` for encoding format
   function postSwap(uint256 encodedSwap, bytes32 r, bytes32 s, uint8 v, uint200 postingValue)
-    external forInitialChain(encodedSwap)
+    external matchProtocolVersion(encodedSwap) forInitialChain(encodedSwap)
   {
     require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
 
     uint256 amount = _amountFrom(encodedSwap);
-    require(amount <= 1e11, "For security reason, amount cannot be greater than 100k");
+    require(amount <= MAX_SWAP_AMOUNT, "For security reason, amount cannot be greater than 100k");
 
     uint256 delta = _expireTsFrom(encodedSwap) - block.timestamp;
     // Underflow would trigger "Expire ts too late" error
@@ -71,12 +77,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _postedSwaps[encodedSwap] = postingValue;
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-    _unsafeDepositToken(
-      _tokenList[tokenIndex],
-      initiator,
-      amount,
-      tokenIndex == 255
-    );
+    _unsafeDepositToken(tokenForIndex[tokenIndex], initiator, amount, tokenIndex);
 
     emit SwapPosted(encodedSwap);
   }
@@ -108,12 +109,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _postedSwaps[encodedSwap] = 0; // Swap expired so the same one cannot be posted again
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-    _safeTransfer(
-      _tokenList[tokenIndex],
-      _initiatorFromPosted(postedSwap),
-      _amountFrom(encodedSwap),
-      tokenIndex == 255
-    );
+    _safeTransfer(tokenForIndex[tokenIndex], _initiatorFromPosted(postedSwap), _amountFrom(encodedSwap), tokenIndex);
 
     emit SwapCancelled(encodedSwap);
   }
@@ -156,17 +152,17 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     if (depositToPool) {
       _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, poolIndex)] += _amountFrom(encodedSwap);
     } else {
-      _safeTransfer(_tokenList[tokenIndex], ownerOfPool[poolIndex], _amountFrom(encodedSwap), tokenIndex == 255);
+      _safeTransfer(tokenForIndex[tokenIndex], ownerOfPool[poolIndex], _amountFrom(encodedSwap), tokenIndex);
     }
   }
 
   /// @notice Read information for a posted swap
   function getPostedSwap(uint256 encodedSwap) external view
-    returns (address initiator, address poolOwner, bool executed)
+    returns (address initiator, address poolOwner, bool exist)
   {
     uint200 postedSwap = _postedSwaps[encodedSwap];
     initiator = _initiatorFromPosted(postedSwap);
-    executed = postedSwap == 1;
+    exist = postedSwap > 0;
     if (initiator == address(0)) {
       poolOwner = address(0);
     } else {

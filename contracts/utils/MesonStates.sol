@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.6;
+pragma solidity 0.8.16;
 
 import "./MesonTokens.sol";
 import "./MesonHelpers.sol";
@@ -38,7 +38,7 @@ contract MesonStates is MesonTokens, MesonHelpers {
   ///
   /// The balance of a token in an LP pool is `_balanceOfPoolToken[poolTokenIndex]` in which
   /// the `poolTokenIndex` is in format of `tokenIndex:uint8|poolIndex:uint40`. `tokenIndex`
-  /// is the index of supported tokens given by `_tokenList` (see definition in `MesonTokens.sol`).
+  /// is the index of supported tokens given by `tokenForIndex` (see definition in `MesonTokens.sol`).
   /// The balances are always store as tokens have decimal 6, which is the case for USDC/USDT on most chains
   /// except BNB Chain & Conflux. In the exceptional cases, the value of token amount will be converted
   /// on deposit and withdrawal (see `_safeTransfer` and `_unsafeDepositToken` in `MesonHelpers.sol`).
@@ -46,8 +46,13 @@ contract MesonStates is MesonTokens, MesonHelpers {
   /// The pool index 0 is reserved for use by Meson to store service fees
   mapping(uint48 => uint256) internal _balanceOfPoolToken;
 
+  /// @dev This empty reserved space is put in place to allow future versions to
+  /// add new variables without shifting down storage in the inheritance chain.
+  /// See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+  uint256[50] private __gap;
+
   function poolTokenBalance(address token, address addr) external view returns (uint256) {
-    uint8 tokenIndex = _indexOfToken[token];
+    uint8 tokenIndex = indexOfToken[token];
     uint40 poolIndex = poolOfAuthorizedAddr[addr];
     if (poolIndex == 0 || tokenIndex == 0) {
       return 0;
@@ -56,7 +61,7 @@ contract MesonStates is MesonTokens, MesonHelpers {
   }
   
   /// @notice The collected service fee of a specific token.
-  /// @param tokenIndex The index of a supported token. See `_tokenList` in `MesonTokens.sol`
+  /// @param tokenIndex The index of a supported token. See `tokenForIndex` in `MesonTokens.sol`
   function serviceFeeCollected(uint8 tokenIndex) external view returns (uint256) {
     return _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, 0)];
   }

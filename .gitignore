@@ -5,9 +5,12 @@ node_modules
 /.openzeppelin
 
 /cache
+/cache-zk
 /artifacts
+/artifacts-zk
 /deploys
 /docs
 
-/contracts/MesonConfig.sol
 .env
+
+/contracts/utils/MesonConfig.sol

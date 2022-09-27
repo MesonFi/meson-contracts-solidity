@@ -11,22 +11,22 @@
       "walletconnect"
     ],
     "addressFormat": "hex",
-    "url": "https://ropsten.infura.io/v3/${INFURA_API_KEY}",
+    "url": "https://rpc.ankr.com/eth_ropsten",
     "explorer": "https://ropsten.etherscan.io",
-    "mesonAddress": "0xCc8dC4C7F79165f3bf234AFb4CA266d125cD45Ec",
+    "mesonAddress": "0xAB3F5A89FdaD07e5CEdf005BF8387CcD59c6Af98",
     "tokens": [
-      {
-        "name": "ETH USDT",
-        "symbol": "rUSDT",
-        "decimals": 6,
-        "addr": "0x449055030B552591BF79A58C8441E4F9237b17Fd",
-        "tokenIndex": 1
-      },
       {
         "name": "ETH USDC",
         "symbol": "rUSDC",
         "decimals": 6,
-        "addr": "0x5348c5caC37fC6eB004A4825111c29770c52f6F2",
+        "addr": "0x11F57B99b903aa0274D278c8f69B6937beB1E018",
+        "tokenIndex": 1
+      },
+      {
+        "name": "ETH USDT",
+        "symbol": "rUSDT",
+        "decimals": 6,
+        "addr": "0x3BE8e4A5aC9eb75FE7d29D3C961BBB1537E41C38",
         "tokenIndex": 2
       }
     ]
@@ -50,21 +50,28 @@
       "symbol": "tBNB",
       "decimals": 18
     },
-    "mesonAddress": "0x3078b92e2515141cAAB53e2DF0e7a12fd8670E22",
+    "mesonAddress": "0x811CFCFa71baD1Fa93454C4496094Ab9446f07bD",
     "tokens": [
       {
-        "name": "BNB USDT",
-        "symbol": "bUSDT",
+        "name": "USDC",
+        "symbol": "USDC",
         "decimals": 18,
-        "addr": "0x14c810CF6e357A600B6c12ca676818BA5367fdE6",
-        "tokenIndex": 1
+        "addr": "0x6e86421f4e9667af87BBf4F3c7ec85130880Fa83",
+        "tokenIndex": 33
       },
       {
-        "name": "BNB USDC",
-        "symbol": "bUSDC",
+        "name": "USDT",
+        "symbol": "USDT",
         "decimals": 18,
-        "addr": "0xc3f1585228D02bb9A6Fb9E7E29b8890533048BD7",
-        "tokenIndex": 2
+        "addr": "0xaff1B7dDBD1151F789Cb5b8eD363858CDDC40aBB",
+        "tokenIndex": 34
+      },
+      {
+        "name": "BUSD",
+        "symbol": "BUSD",
+        "decimals": 18,
+        "addr": "0x5a6771B82128E3590D4b9927Eb0Cb58F0660ec7C",
+        "tokenIndex": 35
       }
     ]
   },
@@ -86,25 +93,26 @@
       "symbol": "TRX",
       "decimals": 6
     },
-    "mesonAddress": "TYtGRRt9ZcAtYEEVG4B5vGuxAWsrQ2WTFo",
+    "mesonAddress": "TLp3uheXyLjAKJ8qP8J2Hd4TuPPXscmSBK",
     "tokens": [
-      {
-        "name": "TRX USDT",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t",
-        "link": "token20/TFa74kDVGad7Lhwe2cwqgUQQY6D65odv2t",
-        "tokenIndex": 1
-      },
       {
         "name": "TRX USDC",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5",
-        "link": "token20/TWpuhvz3tivwoQcm16kzaChAZHv2QRGcm5",
+        "addr": "TQTneKAN99SXJvqJug5v7KFWfo9D9YM1ep",
+        "link": "token20/TQTneKAN99SXJvqJug5v7KFWfo9D9YM1ep",
+        "tokenIndex": 1
+      },
+      {
+        "name": "TRX USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "TMM1FFGnKroocSjeaSr1ffb8m9zCcepato",
+        "link": "token20/TMM1FFGnKroocSjeaSr1ffb8m9zCcepato",
         "tokenIndex": 2
       }
-    ]
+    ],
+    "uctAddress": "TPLhxZLJJipHMM9zuwt93G6m79tPfxP7dT"
   },
   {
     "id": "avax-testnet",
@@ -125,20 +133,20 @@
       "symbol": "AVAX",
       "decimals": 18
     },
-    "mesonAddress": "0x0a2641aa123B57d0E18BA9b468326c416B1aA805",
+    "mesonAddress": "0x8454a48799e63d79E9a62aA9db1F067edC59a178",
     "tokens": [
-      {
-        "name": "AVA USDT",
-        "symbol": "aUSDT",
-        "decimals": 6,
-        "addr": "0xa7D481F9e37813A31009cAB32b8D73748F7f8eCA",
-        "tokenIndex": 1
-      },
       {
         "name": "AVA USDC",
         "symbol": "aUSDC",
         "decimals": 6,
-        "addr": "0xDEC36F68b7Ce5EC27cDA7a8c6A764aE00293Fd20",
+        "addr": "0x18DD556D74EcB7E08A67F1EaEf84aa65fed92730",
+        "tokenIndex": 1
+      },
+      {
+        "name": "AVA USDT",
+        "symbol": "aUSDT",
+        "decimals": 6,
+        "addr": "0x6b7011E38877331f461e2c1DA506036aA30c21A2",
         "tokenIndex": 2
       }
     ]
@@ -155,30 +163,31 @@
       "walletconnect"
     ],
     "addressFormat": "hex",
-    "url": "https://rpc-mumbai.matic.today",
+    "url": "https://polygon-testnet.public.blastapi.io",
     "explorer": "https://mumbai.polygonscan.com",
     "nativeCurrency": {
       "name": "MATIC",
       "symbol": "MATIC",
       "decimals": 18
     },
-    "mesonAddress": "0x9e298D59DEd116b8565D6926e00C1E5C7998A08c",
+    "mesonAddress": "0x2B5A7BA27abC02441B5213f08FD0060e5260Cb91",
     "tokens": [
-      {
-        "name": "MATIC USDT",
-        "symbol": "pUSDT",
-        "decimals": 6,
-        "addr": "0xDA351ccb005D8b3f9303A25b75994aA40dD780e6",
-        "tokenIndex": 1
-      },
       {
         "name": "MATIC USDC",
         "symbol": "pUSDC",
         "decimals": 6,
-        "addr": "0x2d53530A5fb37c482E853FF5a7C547CEf3b0230C",
+        "addr": "0xBfA416a6821fcBAa953815E0725eC3DbC208a5B5",
+        "tokenIndex": 1
+      },
+      {
+        "name": "MATIC USDT",
+        "symbol": "pUSDT",
+        "decimals": 6,
+        "addr": "0x5f71e5c6F178515f60efa27FcD80666386A3B745",
         "tokenIndex": 2
       }
-    ]
+    ],
+    "uctAddress": "0xD14a715D5d1CBCBcd9ff9A711723f2F7eFa04542"
   },
   {
     "id": "ftm-testnet",
@@ -199,20 +208,20 @@
       "symbol": "FTM",
       "decimals": 18
     },
-    "mesonAddress": "0x09aeF1AD659C80aA06c94982D3ff10d4C1886F76",
+    "mesonAddress": "0x92fAb2252eB9bF4aB77e65C9c43c43B4D2AE7A62",
     "tokens": [
-      {
-        "name": "FTM USDT",
-        "symbol": "fUSDT",
-        "decimals": 6,
-        "addr": "0x0cB2E738A9eF1f1b21a5b41e5D27bb63EdB075cf",
-        "tokenIndex": 1
-      },
       {
         "name": "FTM USDC",
         "symbol": "fUSDC",
         "decimals": 6,
-        "addr": "0x1F5BD64EA32E64570c78893633A28B8cf27c8A9F",
+        "addr": "0xd42Fdb4E06DB51FE9A03E9AE8825D84DBCC34801",
+        "tokenIndex": 1
+      },
+      {
+        "name": "FTM USDT",
+        "symbol": "fUSDT",
+        "decimals": 6,
+        "addr": "0xC7E8e3D22669C0f6a3feFc2C6b6F0abCce260cEA",
         "tokenIndex": 2
       }
     ]
@@ -239,17 +248,17 @@
     "mesonAddress": "0x5b0A18741533579aD69d2580e8f19a80e0F51895",
     "tokens": [
       {
-        "name": "ONE USDT",
-        "symbol": "oUSDT",
-        "decimals": 6,
-        "addr": "0x26058C8fCF6Ee539738f651C2D555af4448FA91F",
-        "tokenIndex": 1
-      },
-      {
         "name": "ONE USDC",
         "symbol": "oUSDC",
         "decimals": 6,
         "addr": "0xA4B19C7859b3d3b2FD81244817D875a7708Ba5f5",
+        "tokenIndex": 1
+      },
+      {
+        "name": "ONE USDT",
+        "symbol": "oUSDT",
+        "decimals": 6,
+        "addr": "0x26058C8fCF6Ee539738f651C2D555af4448FA91F",
         "tokenIndex": 2
       }
     ]
@@ -276,17 +285,17 @@
     "mesonAddress": "0xCab92f20497802859da374F3B32F21c323f9000B",
     "tokens": [
       {
-        "name": "Aurora USDT",
-        "symbol": "AUSDT",
-        "decimals": 6,
-        "addr": "0x071243a63463322EC14Ce17D51F92A908bf34CDF",
-        "tokenIndex": 1
-      },
-      {
         "name": "Aurora USDC",
         "symbol": "AUSDC",
         "decimals": 6,
         "addr": "0x72F08CC43A7F15E0b1B6ede3aBC1Ca40BAcc1C25",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Aurora USDT",
+        "symbol": "AUSDT",
+        "decimals": 6,
+        "addr": "0x071243a63463322EC14Ce17D51F92A908bf34CDF",
         "tokenIndex": 2
       }
     ]
@@ -313,17 +322,17 @@
     "mesonAddress": "0xd3347F4f48b80a190591db7Abb3F1C44d23229fa",
     "tokens": [
       {
-        "name": "Arb USDT",
-        "symbol": "ArUSDT",
-        "decimals": 6,
-        "addr": "0x6EDB294e430A1d70cc65D5Deb326B76cDc2A7b9D",
-        "tokenIndex": 1
-      },
-      {
         "name": "Arb USDC",
         "symbol": "ArUSDC",
         "decimals": 6,
         "addr": "0x6FEAd53b5A39EcCd0103Ba8cb83219EF896B5165",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Arb USDT",
+        "symbol": "ArUSDT",
+        "decimals": 6,
+        "addr": "0x6EDB294e430A1d70cc65D5Deb326B76cDc2A7b9D",
         "tokenIndex": 2
       }
     ]
@@ -350,17 +359,17 @@
     "mesonAddress": "0x6F2Db76519Ea809122a152Ae643cbC6f499CD5Da",
     "tokens": [
       {
-        "name": "Opt USDT",
-        "symbol": "OpUSDT",
-        "decimals": 6,
-        "addr": "0x21D828269A0A7EF69dC25d257299901f318fBbA8",
-        "tokenIndex": 1
-      },
-      {
         "name": "Opt USDC",
         "symbol": "OpUSDC",
         "decimals": 6,
         "addr": "0xc24424C27Cf43e4403B42721C86dF782f7788B89",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Opt USDT",
+        "symbol": "OpUSDT",
+        "decimals": 6,
+        "addr": "0x21D828269A0A7EF69dC25d257299901f318fBbA8",
         "tokenIndex": 2
       }
     ]
@@ -387,17 +396,17 @@
     "mesonAddress": "0xCF1511622929F4BA960dfA9b24Be84A8Fc620bd5",
     "tokens": [
       {
-        "name": "xDAI USDT",
-        "symbol": "xpUSDT",
-        "decimals": 6,
-        "addr": "0x751DE3875aeF8C18d7FE983c6DeeFe366bed438f",
-        "tokenIndex": 1
-      },
-      {
         "name": "xDAI USDC",
         "symbol": "xpUSDC",
         "decimals": 6,
         "addr": "0x21D828269A0A7EF69dC25d257299901f318fBbA8",
+        "tokenIndex": 1
+      },
+      {
+        "name": "xDAI USDT",
+        "symbol": "xpUSDT",
+        "decimals": 6,
+        "addr": "0x751DE3875aeF8C18d7FE983c6DeeFe366bed438f",
         "tokenIndex": 2
       }
     ]
@@ -424,19 +433,94 @@
     "mesonAddress": "0x27228C05621d3dbe0d1E1cb2269a9a9117D80EB4",
     "tokens": [
       {
-        "name": "tEV USDT",
-        "symbol": "tEVUSDT",
-        "decimals": 6,
-        "addr": "0xF37eE9D96a307608AA65cfBd5D6BF9bd282098BE",
-        "tokenIndex": 1
-      },
-      {
         "name": "tEV USDC",
         "symbol": "tEVUSDC",
         "decimals": 6,
         "addr": "0x5cFB4E7d815c9B7e3bFd56D9B7117E0219cbA8cd",
+        "tokenIndex": 1
+      },
+      {
+        "name": "tEV USDT",
+        "symbol": "tEVUSDT",
+        "decimals": 6,
+        "addr": "0xF37eE9D96a307608AA65cfBd5D6BF9bd282098BE",
         "tokenIndex": 2
       }
     ]
+  },
+  {
+    "id": "eos-testnet",
+    "name": "Trust EVM Testnet",
+    "alias": "EOS",
+    "chainId": "0x3cc3",
+    "slip44": "0x800000c2",
+    "shortSlip44": "0x00c2",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://api.testnet-dev.trust.one",
+    "explorer": "https://trustscan.one",
+    "nativeCurrency": {
+      "name": "EVM",
+      "symbol": "EVM",
+      "decimals": 18
+    },
+    "mesonAddress": "0xE4BBC343174142f5DE8245F43A6C2ea5829965a8",
+    "tokens": [
+      {
+        "name": "EOS USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "tokenIndex": 1,
+        "addr": "0x55336241644EcbCe99F6843fC972De0EF15365fB"
+      },
+      {
+        "name": "EOS USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "tokenIndex": 2,
+        "addr": "0x4769650E1136437b0381970C3a26A77C837EbFC4"
+      }
+    ]
+  },
+  {
+    "id": "zksync-testnet",
+    "name": "zkSync alpha testnet",
+    "alias": "ZKSYNC",
+    "chainId": "0x118",
+    "slip44": "0x00000118",
+    "shortSlip44": "0x0118",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://zksync2-testnet.zksync.dev",
+    "explorer": "https://zksync2-testnet.zkscan.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x8b37e9dB2Aa8EC8C2F80d4947D148A85a57bC911",
+    "tokens": [
+      {
+        "name": "zksync USDC",
+        "symbol": "zkUSDC",
+        "decimals": 6,
+        "tokenIndex": 1,
+        "addr": "0xaA2df237EE7de9045dd36Adbcf8b19Bf63131742"
+      },
+      {
+        "name": "zksync USDT",
+        "symbol": "zkUSDT",
+        "decimals": 6,
+        "tokenIndex": 2,
+        "addr": "0xdf5A60db3B5B228E02B6209175797a996b4e1F31"
+      }
+    ],
+    "uctAddress": "0x88C6C4B902EEB10E192282F74B894bB7AA8B0640"
   }
 ]

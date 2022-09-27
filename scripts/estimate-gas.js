@@ -5,25 +5,22 @@ const {
   SignedSwapRequest,
   SignedSwapRelease,
 } = require('@mesonfi/sdk/src')
-const { wallet } = require('../test/shared/wallet')
+
+const { deployContract, deployMeson } = require('./lib/deploy')
+const { wallet: unconnectedWallet } = require('../test/shared/wallet')
 const { getPartialSwap } = require('../test/shared/meson')
 
 const testnetMode = true
 
-async function main() {
-  // const signer = await hre.ethers.getSigner()
+module.exports = async function main(upgradable) {
+  const wallet = unconnectedWallet.connect(ethers.provider)
   const swapSigner = new EthersWalletSwapSigner(wallet)
 
-  //#####################---deploy contract ---#############################
-  const MockToken = await ethers.getContractFactory('MockToken')
   const totalSupply = ethers.utils.parseUnits('10000', 6)
-  const tokenContract = await MockToken.deploy('Mock Token', 'MT', totalSupply, 6)
-  console.log('MockToken deployed to:', tokenContract.address)
+  const tokenContract = await deployContract('MockToken', wallet, ['Mock Token', 'MT', totalSupply, 6])
 
-  const mesonFactory = await ethers.getContractFactory('Meson')
-  console.log('Deploying Meson...')
-  const mesonContract = await mesonFactory.deploy([tokenContract.address])
-  console.log('Meson deployed to:', mesonContract.address)
+  const tokens = [{ addr: tokenContract.address, tokenIndex: 1 }]
+  const mesonContract = await deployMeson(wallet, !!upgradable, await wallet.getAddress(), tokens)
   const mesonClient = await MesonClient.Create(mesonContract, swapSigner)
 
   // approve
@@ -33,11 +30,11 @@ async function main() {
 
   // deposits
   const amount = ethers.utils.parseUnits('1000', 6)
-  const depositTx1 = await mesonClient.depositAndRegister(mesonClient.token(1), amount, '1')
+  const depositTx1 = await mesonClient.depositAndRegister(mesonClient.tokenAddr(1), amount, '1')
   getUsedGas('first deposit', depositTx1.hash)
   await depositTx1.wait(1)
 
-  const depositTx2 = await mesonClient.deposit(mesonClient.token(1), amount)
+  const depositTx2 = await mesonClient.deposit(mesonClient.tokenAddr(1), amount)
   getUsedGas('another deposit', depositTx2.hash)
   await depositTx2.wait(1)
 
@@ -83,12 +80,8 @@ async function main() {
   getUsedGas('execute', executeTx.hash)
 }
 
-
 function getUsedGas(name, hash) {
   ethers.provider.getTransactionReceipt(hash).then((receipt) => {
-    // console.log('  Hash:', receipt.transactionHash)
     console.log(name, ':', receipt.cumulativeGasUsed.toString())
-  });
+  })
 }
-
-main()

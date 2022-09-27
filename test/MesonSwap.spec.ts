@@ -7,8 +7,6 @@ import {
   SignedSwapRelease,
 } from '@mesonfi/sdk'
 import { MockToken, MesonSwapTest } from '@mesonfi/contract-types'
-import { pack } from '@ethersproject/solidity'
-import { AddressZero } from '@ethersproject/constants'
 
 import { expect } from './shared/expect'
 import { initiator, poolOwner } from './shared/wallet'
@@ -53,6 +51,13 @@ describe('MesonSwap', () => {
 
 
   describe('#postSwap', () => {
+    it('rejects incorrect encoding version', async () => {
+      const swap2 = new SwapWithSigner({ ...swap.toObject(), version: 0 }, swap.swapSigner)
+      const signedRequestData = await swap2.signForRequest(true)
+      const signedRequest = new SignedSwapRequest(signedRequestData)
+
+      await expect(mesonClientForPoolOwner.postSwap(signedRequest)).to.be.revertedWith('Incorrect encoding version')
+    })
     it('rejects incorrect inChain', async () => {
       const swap2 = new SwapWithSigner({ ...swap.toObject(), inChain: '0x0001' }, swap.swapSigner)
       const signedRequestData = await swap2.signForRequest(true)
@@ -101,7 +106,7 @@ describe('MesonSwap', () => {
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
       expect(posted.initiator).to.equal(initiator.address)
       expect(posted.poolOwner).to.equal(poolOwner.address)
-      expect(posted.executed).to.equal(false)
+      expect(posted.exist).to.equal(true)
       
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(amount))
       expect(await token.balanceOf(mesonInstance.address)).to.equal(amount)
@@ -135,7 +140,7 @@ describe('MesonSwap', () => {
         signedRequest.signature[0],
         signedRequest.signature[1],
         signedRequest.signature[2],
-        pack(['address', 'uint40'], [signedRequest.initiator, 0])
+        ethers.utils.solidityPack(['address', 'uint40'], [signedRequest.initiator, 0])
       )
       await expect(mesonInstance.bondSwap(swap.encoded, 1))
         .to.be.revertedWith('Signer should be an authorized address of the given pool')
@@ -147,7 +152,7 @@ describe('MesonSwap', () => {
         signedRequest.signature[0],
         signedRequest.signature[1],
         signedRequest.signature[2],
-        pack(['address', 'uint40'], [signedRequest.initiator, 0])
+        ethers.utils.solidityPack(['address', 'uint40'], [signedRequest.initiator, 0])
       )
       await mesonInstance.connect(poolOwner).bondSwap(swap.encoded, 1)
     })
@@ -176,9 +181,9 @@ describe('MesonSwap', () => {
       await mesonClientForPoolOwner.cancelSwap(swap.encoded)
 
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
-      expect(posted.initiator).to.equal(AddressZero)
-      expect(posted.poolOwner).to.equal(AddressZero)
-      expect(posted.executed).to.equal(false)
+      expect(posted.initiator).to.equal(ethers.constants.AddressZero)
+      expect(posted.poolOwner).to.equal(ethers.constants.AddressZero)
+      expect(posted.exist).to.equal(false)
       
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE)
       expect(await token.balanceOf(mesonInstance.address)).to.equal(0)
@@ -201,9 +206,9 @@ describe('MesonSwap', () => {
       await mesonClientForPoolOwner.executeSwap(signedRelease, true)
 
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
-      expect(posted.initiator).to.equal(AddressZero)
-      expect(posted.poolOwner).to.equal(AddressZero)
-      expect(posted.executed).to.equal(true)
+      expect(posted.initiator).to.equal(ethers.constants.AddressZero)
+      expect(posted.poolOwner).to.equal(ethers.constants.AddressZero)
+      expect(posted.exist).to.equal(true)
 
       expect(await token.balanceOf(initiator.address)).to.equal(TOKEN_BALANCE.sub(amount))
       expect(await token.balanceOf(poolOwner.address)).to.equal(TOKEN_BALANCE)
@@ -229,9 +234,9 @@ describe('MesonSwap', () => {
       await mesonClientForPoolOwner.executeSwap(signedRelease, true)
 
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
-      expect(posted.initiator).to.equal(AddressZero)
-      expect(posted.poolOwner).to.equal(AddressZero)
-      expect(posted.executed).to.equal(false)
+      expect(posted.initiator).to.equal(ethers.constants.AddressZero)
+      expect(posted.poolOwner).to.equal(ethers.constants.AddressZero)
+      expect(posted.exist).to.equal(false)
 
       await ethers.provider.send('evm_increaseTime', [-3600])
     })
@@ -246,7 +251,7 @@ describe('MesonSwap', () => {
       const posted = await mesonInstance.getPostedSwap(swap.encoded)
       expect(posted.initiator).to.equal(initiator.address)
       expect(posted.poolOwner).to.equal(poolOwner.address)
-      expect(posted.executed).to.equal(false)
+      expect(posted.exist).to.equal(true)
     })
   })
 })

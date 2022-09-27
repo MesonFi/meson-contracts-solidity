@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.6;
+pragma solidity 0.8.16;
 
+import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 import "./IERC20Minimal.sol";
 import "./ITransferWithBeneficiary.sol";
-import "../MesonConfig.sol";
+import "./MesonConfig.sol";
 
 /// @title MesonHelpers
 /// @notice The class that provides helper functions for Meson protocol
-contract MesonHelpers is MesonConfig {
-  bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256(bytes("transfer(address,uint256)")));
+contract MesonHelpers is MesonConfig, Context {
+  bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256("transfer(address,uint256)"));
+  bytes4 private constant ERC20_TRANSFER_FROM_SELECTOR = bytes4(keccak256("transferFrom(address,address,uint256)"));
 
-  function _msgSender() internal view returns (address) {
-    return msg.sender;
-  }
-
-  function _msgData() internal pure returns (bytes calldata) {
-    return msg.data;
+  modifier matchProtocolVersion(uint256 encodedSwap) {
+    require(_versionFrom(encodedSwap) == MESON_PROTOCOL_VERSION, "Incorrect encoding version");
+    _;
   }
 
   function getShortCoinType() external pure returns (bytes2) {
@@ -27,18 +27,22 @@ contract MesonHelpers is MesonConfig {
   /// @param token The contract address of the token which will be transferred
   /// @param recipient The recipient of the transfer
   /// @param amount The value of the transfer (always in decimal 6)
-  /// @param isUCT Whether the transferred token is UCT (minted by Meson, see `UCTUpgradeable.sol`)
+  /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
   function _safeTransfer(
     address token,
     address recipient,
     uint256 amount,
-    bool isUCT
+    uint8 tokenIndex
   ) internal {
+    require(Address.isContract(token), "The given token address is not a contract");
+
+    if (_needAdjustAmount(tokenIndex)) {
+      amount *= 1e12;
+    }
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
-      bytes4(0xa9059cbb), // bytes4(keccak256(bytes("transfer(address,uint256)")))
+      ERC20_TRANSFER_SELECTOR,
       recipient,
       amount
-      // isUCT ? amount : amount * 1e12 // need to switch to this line if deploying to BNB Chain or Conflux
     ));
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
 
@@ -51,43 +55,57 @@ contract MesonHelpers is MesonConfig {
   /// @param contractAddr The smart contract address that will receive transferring tokens
   /// @param beneficiary The beneficiary of `transferWithBeneficiary`
   /// @param amount The value of the transfer (always in decimal 6)
-  /// @param isUCT Whether the transferred token is UCT (minted by Meson, see `UCTUpgradeable.sol`)
+  /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
   /// @param data Extra data passed to the contract
   function _transferToContract(
     address token,
     address contractAddr,
     address beneficiary,
     uint256 amount,
-    bool isUCT,
+    uint8 tokenIndex,
     uint64 data
   ) internal {
-    uint256 adjustedAmount = amount;
-    // uint256 adjustedAmount = isUCT ? amount : amount * 1e12; // need to switch to this line if deploying to BNB Chain or Conflux
-    IERC20Minimal(token).increaseAllowance(contractAddr, adjustedAmount);
-    ITransferWithBeneficiary(contractAddr).transferWithBeneficiary(token, adjustedAmount, beneficiary, data);
+    require(Address.isContract(token), "The given token address is not a contract");
+    require(Address.isContract(contractAddr), "The given recipient address is not a contract");
+
+    if (_needAdjustAmount(tokenIndex)) {
+      amount *= 1e12;
+    }
+    IERC20Minimal(token).approve(contractAddr, amount);
+    ITransferWithBeneficiary(contractAddr).transferWithBeneficiary(token, amount, beneficiary, data);
   }
 
   /// @notice Help the senders to transfer their assets to the Meson contract
   /// @param token The contract address of the token which will be transferred
   /// @param sender The sender of the transfer
   /// @param amount The value of the transfer (always in decimal 6)
-  /// @param isUCT Whether the transferred token is UCT (minted by Meson, see `UCTUpgradeable.sol`)
+  /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
   function _unsafeDepositToken(
     address token,
     address sender,
     uint256 amount,
-    bool isUCT
+    uint8 tokenIndex
   ) internal {
     require(token != address(0), "Token not supported");
     require(amount > 0, "Amount must be greater than zero");
+    require(Address.isContract(token), "The given token address is not a contract");
+
+    if (_needAdjustAmount(tokenIndex)) {
+      amount *= 1e12;
+    }
     (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
-      bytes4(0x23b872dd), // bytes4(keccak256(bytes("transferFrom(address,address,uint256)")))
+      ERC20_TRANSFER_FROM_SELECTOR,
       sender,
       address(this),
       amount
-      // isUCT ? amount : amount * 1e12 // need to switch to this line if deploying to BNB Chain or Conflux
     ));
     require(success && (data.length == 0 || abi.decode(data, (bool))), "transferFrom failed");
+  }
+
+  /// @notice Determine if token has decimal 18 and therefore need to adjust amount
+  /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
+  function _needAdjustAmount(uint8 tokenIndex) internal pure returns (bool) {
+    return tokenIndex > 32 && tokenIndex < 255;
   }
 
   /// @notice Calculate `swapId` from `encodedSwap`, `initiator`
@@ -96,25 +114,23 @@ contract MesonHelpers is MesonConfig {
     return keccak256(abi.encodePacked(encodedSwap, initiator));
   }
 
+  /// @notice Decode `version` from `encodedSwap`
+  /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
+  function _versionFrom(uint256 encodedSwap) internal pure returns (uint8) {
+    return uint8(encodedSwap >> 248);
+  }
+
   /// @notice Decode `amount` from `encodedSwap`
   /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _amountFrom(uint256 encodedSwap) internal pure returns (uint256) {
-    return encodedSwap >> 208;
+    return (encodedSwap >> 208) & 0xFFFFFFFFFF;
   }
 
   /// @notice Calculate the service fee from `encodedSwap`
   /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
-    return _amountFrom(encodedSwap) / 1000; // Default to `serviceFee` = 0.1% * `amount`
+    return _amountFrom(encodedSwap) * SERVICE_FEE_RATE / 10000; // Default to `serviceFee` = 0.1% * `amount`
   }
-
-  /// [Suggestion]: mutable service fee points rate
-  // uint public feePointsRate = 10;
-  // modifier onlyOwner() {...}
-  // function setFeePoints(uint newFeePoints) onlyOwner external {...}
-  // function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
-  //   return uint256(encodedSwap >> 208) * feePointsRate / 10000;
-  // }
 
   /// @notice Decode `fee` (the fee for LPs) from `encodedSwap`
   /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
@@ -256,34 +272,19 @@ contract MesonHelpers is MesonConfig {
     require(uint256(s) <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, "Invalid signature");
 
     bool nonTyped = _signNonTyped(encodedSwap);
-
-    if (_inChainFrom(encodedSwap) == 0x00c3) {
-      bytes32 digest = keccak256(abi.encodePacked(
-        nonTyped
-          ? bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33330a)  // HEX of "\x19TRON Signed Message:\n33\n"
-          : bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33320a), // HEX of "\x19TRON Signed Message:\n32\n"
-        encodedSwap
-      ));
-      require(signer == ecrecover(digest, v, r, s), "Invalid signature");
-      return;
-    }
-
-    if (nonTyped) {
-      bytes32 digest = keccak256(abi.encodePacked(
-        bytes28(0x19457468657265756d205369676e6564204d6573736167653a0a3332), // HEX of "\x19Ethereum Signed Message:\n32"
-        encodedSwap
-      ));
-      require(signer == ecrecover(digest, v, r, s), "Invalid signature");
-      return;
-    }
-
-    bytes32 typehash = REQUEST_TYPE_HASH;
     bytes32 digest;
-    assembly {
-      mstore(0, encodedSwap)
-      mstore(32, keccak256(0, 32))
-      mstore(0, typehash)
-      digest := keccak256(0, 64)
+    if (_inChainFrom(encodedSwap) == 0x00c3) {
+      digest = keccak256(abi.encodePacked(nonTyped ? TRON_SIGN_HEADER_33 : TRON_SIGN_HEADER, encodedSwap));
+    } else if (nonTyped) {
+      digest = keccak256(abi.encodePacked(ETH_SIGN_HEADER, encodedSwap));
+    } else {
+      bytes32 typehash = REQUEST_TYPE_HASH;
+      assembly {
+        mstore(0, encodedSwap)
+        mstore(32, keccak256(0, 32))
+        mstore(0, typehash)
+        digest := keccak256(0, 64)
+      }
     }
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }
@@ -310,37 +311,13 @@ contract MesonHelpers is MesonConfig {
     require(uint256(s) <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, "Invalid signature");
 
     bool nonTyped = _signNonTyped(encodedSwap);
-
-    if (_inChainFrom(encodedSwap) == 0x00c3) {
-      bytes32 digest = keccak256(abi.encodePacked(
-        nonTyped
-          ? bytes25(0x1954524f4e205369676e6564204d6573736167653a0a35330a)  // HEX of "\x19TRON Signed Message:\n53\n"
-          : bytes25(0x1954524f4e205369676e6564204d6573736167653a0a33320a), // HEX of "\x19TRON Signed Message:\n32\n"
-        encodedSwap,
-        recipient
-      ));
-      require(signer == ecrecover(digest, v, r, s), "Invalid signature");
-      return;
-    }
-
     bytes32 digest;
-    if (nonTyped) {
-      digest = keccak256(abi.encodePacked(
-        bytes28(0x19457468657265756d205369676e6564204d6573736167653a0a3332), // HEX of "\x19Ethereum Signed Message:\n32"
-        keccak256(abi.encodePacked(encodedSwap, recipient))
-      ));
-    } else if (_outChainFrom(encodedSwap) == 0x00c3) {
-      assembly {
-        mstore(21, recipient)
-        mstore8(32, 0x41)
-        mstore(0, encodedSwap)
-        mstore(32, keccak256(0, 53))
-        // mstore(0, 0xcdd10eb72226dc70c96479571183c7d98ddba64dcc287980e7f6deceaad47c1c) // testnet
-        mstore(0, 0xf6ea10de668a877958d46ed7d53eaf47124fda9bee9423390a28c203556a2e55) // mainnet
-        digest := keccak256(0, 64)
-      }
+    if (_inChainFrom(encodedSwap) == 0x00c3) {
+      digest = keccak256(abi.encodePacked(nonTyped ? TRON_SIGN_HEADER_53 : TRON_SIGN_HEADER, encodedSwap, recipient));
+    } else if (nonTyped) {
+      digest = keccak256(abi.encodePacked(ETH_SIGN_HEADER_52, encodedSwap, recipient));
     } else {
-      bytes32 typehash = RELEASE_TYPE_HASH;
+      bytes32 typehash = _outChainFrom(encodedSwap) == 0x00c3 ? RELEASE_TO_TRON_TYPE_HASH : RELEASE_TYPE_HASH;
       assembly {
         mstore(20, recipient)
         mstore(0, encodedSwap)

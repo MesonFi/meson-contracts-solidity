@@ -1,9 +1,10 @@
-import { pack } from '@ethersproject/solidity'
-import { hexZeroPad, isHexString } from '@ethersproject/bytes'
-import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
+import { BigNumber, BigNumberish, utils } from 'ethers'
+
+const MESON_PROTOCOL_VERSION = 1
 
 const swapStruct = [
-  { name: 'amount', type: 'uint48' },
+  { name: 'version', type: 'uint8' },
+  { name: 'amount', type: 'uint40' },
   { name: 'salt', type: 'uint80' },
   { name: 'fee', type: 'uint40' },
   { name: 'expireTs', type: 'uint40' },
@@ -15,6 +16,7 @@ const swapStruct = [
 
 export interface SwapData {
   encoded?: string,
+  version?: number,
   amount: BigNumberish,
   salt?: string,
   fee: BigNumberish,
@@ -26,6 +28,7 @@ export interface SwapData {
 }
 
 export class Swap implements SwapData {
+  readonly version: number
   readonly amount: BigNumber
   readonly salt: string
   readonly fee: BigNumber
@@ -39,12 +42,13 @@ export class Swap implements SwapData {
 
   static decode (encoded: string | BigNumber): Swap {
     if (typeof encoded !== 'string') {
-      encoded = hexZeroPad(encoded.toHexString(), 32)
+      encoded = utils.hexZeroPad(encoded.toHexString(), 32)
     }
     if (!encoded.startsWith('0x') || encoded.length !== 66) {
       throw new Error('encoded swap should be a hex string of length 66')
     }
-    const amount = BigNumber.from(`0x${encoded.substring(2, 14)}`)
+    const version = parseInt(`0x${encoded.substring(2, 4)}`, 16)
+    const amount = BigNumber.from(`0x${encoded.substring(4, 14)}`)
     const salt = `0x${encoded.substring(14, 34)}`
     const fee = BigNumber.from(`0x${encoded.substring(34, 44)}`)
     const expireTs = parseInt(`0x${encoded.substring(44, 54)}`, 16)
@@ -53,7 +57,7 @@ export class Swap implements SwapData {
     const inChain = `0x${encoded.substring(60, 64)}`
     const inToken = parseInt(`0x${encoded.substring(64, 66)}`, 16)
 
-    return new Swap({ amount, salt, fee, expireTs, inChain, inToken, outChain, outToken })
+    return new Swap({ version, amount, salt, fee, expireTs, inChain, inToken, outChain, outToken })
   }
 
   constructor(data: SwapData) {
@@ -84,6 +88,7 @@ export class Swap implements SwapData {
       throw new Error('Invalid outToken')
     }
 
+    this.version = typeof data.version === 'number' ? data.version : MESON_PROTOCOL_VERSION
     this.salt = this._makeFullSalt(data.salt)
     this.expireTs = data.expireTs
     this.inChain = data.inChain
@@ -94,7 +99,7 @@ export class Swap implements SwapData {
 
   private _makeFullSalt(salt?: string): string {
     if (salt) {
-      if (!isHexString(salt) || salt.length > 22) {
+      if (!utils.isHexString(salt) || salt.length > 22) {
         throw new Error('The given salt is invalid')
       }
       return `${salt}${this._randomHex(22 - salt.length)}`
@@ -107,16 +112,15 @@ export class Swap implements SwapData {
     if (strLength === 0) {
       return ''
     }
-    const max = 2 ** Math.min((strLength * 4), 32)
-    const rnd = BigNumber.from(Math.floor(Math.random() * max))
-    return hexZeroPad(rnd.toHexString(), strLength / 2).replace('0x', '')
+    const randomLength = Math.min((strLength / 2), 4)
+    return utils.hexZeroPad(utils.randomBytes(randomLength), strLength / 2).replace('0x', '')
   }
 
   get encoded(): string {
     if (!this._encoded) {
       const types = swapStruct.map(i => i.type)
       const values = swapStruct.map(i => (this as any)[i.name])
-      this._encoded = pack(types, values)
+      this._encoded = utils.solidityPack(types, values)
     }
     return this._encoded
   }
@@ -148,6 +152,7 @@ export class Swap implements SwapData {
   toObject(): SwapData {
     return {
       encoded: this.encoded,
+      version: this.version,
       amount: this.amount.toNumber(),
       salt: this.salt,
       fee: this.fee.toNumber(),

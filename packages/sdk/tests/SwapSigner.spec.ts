@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import { MockProvider } from 'ethereum-waffle';
-import { pack } from '@ethersproject/solidity'
-import { keccak256 } from '@ethersproject/keccak256'
+import { utils } from 'ethers'
 
 import { SwapSigner, EthersWalletSwapSigner, RemoteSwapSigner } from '../src'
 import { signedSwapRequestData, signedSwapReleaseData } from './shared'
@@ -96,20 +95,20 @@ describe('RemoteSwapSigner', () => {
     getAddress: () => initiator.address,
     signMessage: async msg => {
       const header = '\x19Ethereum Signed Message:\n32'
-      const digest = keccak256(pack(['string', 'bytes32'], [header, msg]))
+      const digest = utils.solidityKeccak256(['string', 'bytes32'], [header, msg])
       const { r, s, v } = initiator._signingKey().signDigest(digest)
-      return pack(['bytes32', 'bytes32', 'uint8'], [r, s, v])
+      return utils.solidityPack(['bytes32', 'bytes32', 'uint8'], [r, s, v])
     },
     signTypedData: async data => {
-      const typeHash = keccak256(pack(
+      const typeHash = utils.solidityKeccak256(
         data.map(() => 'string'),
         data.map(({ type, name }) => `${type} ${name}`)
-      ))
+      )
       const types = data.map(({ type }) => type)
       const values = data.map(({ value }) => value)
-      const digest = keccak256(pack(['bytes32', 'bytes32'], [typeHash, keccak256(pack(types, values))] ))
+      const digest = utils.solidityKeccak256(['bytes32', 'bytes32'], [typeHash, utils.solidityKeccak256(types, values)])
       const { r, s, v } = initiator._signingKey().signDigest(digest)
-      return pack(['bytes32', 'bytes32', 'uint8'], [r, s, v])
+      return utils.solidityPack(['bytes32', 'bytes32', 'uint8'], [r, s, v])
     }
   }
   const swapSigner = new RemoteSwapSigner(remoteSigner)

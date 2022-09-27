@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { BigNumber } from '@ethersproject/bignumber'
+import { BigNumber } from 'ethers'
 
 import { Swap } from '../src'
 import { getSwap } from './shared'
@@ -56,8 +56,9 @@ describe('Swap', () => {
 
     const swapData = getSwap()
     const swap = new Swap(swapData)
-    it('decodes the a valid hex string', () => {
+    it('decodes a valid hex string', () => {
       const decodedSwap = Swap.decode(swap.encoded)
+      expect(decodedSwap.version).to.equal(swap.version)
       expect(decodedSwap.amount).to.equal(swap.amount)
       expect(decodedSwap.salt).to.equal(swap.salt)
       expect(decodedSwap.fee).to.equal(swap.fee)
@@ -68,7 +69,7 @@ describe('Swap', () => {
       expect(decodedSwap.outToken).to.equal(swap.outToken)
     })
 
-    it('decodes the a valid BigNumber', () => {
+    it('decodes a valid BigNumber', () => {
       const decodedSwap = Swap.decode(BigNumber.from(swap.encoded))
       expect(decodedSwap.amount).to.equal(swap.amount)
       expect(decodedSwap.salt).to.equal(swap.salt)

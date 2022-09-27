@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { MockProvider } from 'ethereum-waffle'
-import { Wallet } from '@ethersproject/wallet'
+import { Wallet } from 'ethers'
 
 import { SwapWithSigner, EthersWalletSwapSigner } from '../src'
 import { signedSwapRequestData, signedSwapReleaseData } from './shared'

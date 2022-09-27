@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.6;
+pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
@@ -17,11 +17,12 @@ contract UCTUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
   address private _minter;
   address private _mesonContract;
 
-  function initialize(address minter) public initializer {
+  function initialize(address minter, address mesonContract) public initializer {
     __ERC20_init("USD Coupon Token (https://meson.fi)", "UCT");
     _owner = _msgSender();
     _minter = minter;
-    // _mesonContract = ;
+    require(mesonContract != address(0), "Address of meson contract cannot be zero");
+    _mesonContract = mesonContract;
   }
 
   function decimals() public pure override returns (uint8) {
@@ -39,7 +40,7 @@ contract UCTUpgradeable is UUPSUpgradeable, ERC20Upgradeable {
   function batchMint2(address[] memory targets, uint256[] memory amounts) external onlyMinter {
     require(targets.length > 0, "Target array is empty");
     require(targets.length < 2048, "Target array is too large");
-    require(targets.length == amounts.length, "targets and amounts should have the same length");
+    require(targets.length == amounts.length, "Targets and amounts should have the same length");
     for (uint i = 0; i < targets.length; i++) {
       _mint(targets[i], amounts[i]);
     }

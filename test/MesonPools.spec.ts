@@ -8,7 +8,6 @@ import {
   SignedSwapRelease,
 } from '@mesonfi/sdk/src'
 import { MockToken, MesonPoolsTest } from '@mesonfi/contract-types'
-import { pack } from '@ethersproject/solidity'
 
 import { expect } from './shared/expect'
 import { initiator, poolOwner } from './shared/wallet'
@@ -35,7 +34,7 @@ describe('MesonPools', () => {
     mesonInstance = result.pools.connect(poolOwner) // pool owner is signer
 
     const swapSigner = new EthersWalletSwapSigner(initiator)
-    mesonClientForInitiator = await MesonClient.Create(result.pools as any, swapSigner)
+    mesonClientForInitiator = await MesonClient.Create((result.pools as any).connect(initiator), swapSigner)
     mesonClientForPoolOwner = await MesonClient.Create((mesonInstance as any).connect(poolOwner))
     outChain = mesonClientForPoolOwner.shortCoinType
 
@@ -57,8 +56,8 @@ describe('MesonPools', () => {
   })
 
   describe('#depositAndRegister', () => {
-      const amount = ethers.utils.parseUnits('1000', 6)
-      it('rejects zero pool index', async () => {
+    const amount = ethers.utils.parseUnits('1000', 6)
+    it('rejects zero pool index', async () => {
       await expect(mesonClientForPoolOwner.depositAndRegister(token.address, amount, '0'))
         .to.be.revertedWith('Cannot use 0 as pool index')
     })
@@ -70,7 +69,7 @@ describe('MesonPools', () => {
       await expect(mesonClientForPoolOwner.depositAndRegister(TestAddress, amount, '1'))
         .to.be.rejectedWith('Token not supported')
 
-      const poolTokenIndex = pack(['uint8', 'uint40'], [2, 1])
+      const poolTokenIndex = ethers.utils.solidityPack(['uint8', 'uint40'], [2, 1])
       await expect(mesonInstance.depositAndRegister(1000, poolTokenIndex))
         .to.be.revertedWith('Token not supported')
     })
@@ -117,7 +116,7 @@ describe('MesonPools', () => {
       await expect(mesonClientForPoolOwner.deposit(TestAddress, amount))
         .to.be.rejectedWith('Token not supported')
 
-      const poolTokenIndex = pack(['uint8', 'uint40'], [2, 1])
+      const poolTokenIndex = ethers.utils.solidityPack(['uint8', 'uint40'], [2, 1])
       await expect(mesonInstance.deposit(1000, poolTokenIndex))
         .to.be.revertedWith('Token not supported')
     })
@@ -136,10 +135,65 @@ describe('MesonPools', () => {
     })
   })
 
+  describe('#addAuthorizedAddr', () => {
+    const amount = ethers.utils.parseUnits('1000', 6)
+    it('rejects if pool is not registered', async () => {
+      await expect(mesonInstance.addAuthorizedAddr(TestAddress))
+        .to.be.revertedWith('The signer does not register a pool')
+    })
+    it('accepts a valid call', async () => {
+      await token.approve(mesonInstance.address, amount)
+      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+
+      await mesonInstance.addAuthorizedAddr(TestAddress)
+      expect(await mesonInstance.poolOfAuthorizedAddr(TestAddress)).to.equal(1)
+    })
+    it('rejects if signer is not the pool owner', async () => {
+      await token.approve(mesonInstance.address, amount)
+      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+
+      await mesonInstance.addAuthorizedAddr(initiator.address)
+      await expect(mesonInstance.connect(initiator).addAuthorizedAddr(TestAddress))
+        .to.be.revertedWith('Need the pool owner as the signer')
+    })
+    it('rejects if address is already authorized', async () => {
+      await token.approve(mesonInstance.address, amount)
+      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+
+      await mesonInstance.addAuthorizedAddr(TestAddress)
+      await expect(mesonInstance.addAuthorizedAddr(TestAddress))
+        .to.be.revertedWith('Addr is authorized for another pool')
+    })
+  })
+
+  describe('#removeAuthorizedAddr', () => {
+    const amount = ethers.utils.parseUnits('1000', 6)
+    it('rejects if pool is not registered', async () => {
+      await expect(mesonInstance.removeAuthorizedAddr(TestAddress))
+        .to.be.revertedWith('The signer does not register a pool')
+    })
+    it('accepts a valid call', async () => {
+      await token.approve(mesonInstance.address, amount)
+      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+
+      await mesonInstance.addAuthorizedAddr(TestAddress)
+      await mesonInstance.removeAuthorizedAddr(TestAddress)
+      expect(await mesonInstance.poolOfAuthorizedAddr(TestAddress)).to.equal(0)
+    })
+    it('rejects if signer is not the pool owner', async () => {
+      await token.approve(mesonInstance.address, amount)
+      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+
+      await mesonInstance.addAuthorizedAddr(initiator.address)
+      await expect(mesonInstance.connect(initiator).removeAuthorizedAddr(TestAddress))
+        .to.be.revertedWith('Need the pool owner as the signer')
+    })
+  })
+
   describe('#withdraw', () => {
     const amount = ethers.utils.parseUnits('1000', 6)
     it('rejects if pool not registered', async () => {
-      const poolTokenIndex = pack(['uint8', 'uint40'], [1, 1])
+      const poolTokenIndex = ethers.utils.solidityPack(['uint8', 'uint40'], [1, 1])
       await expect(mesonInstance.withdraw(amount, poolTokenIndex))
         .to.be.revertedWith('Need the pool owner as the signer')
     })
@@ -148,7 +202,7 @@ describe('MesonPools', () => {
       await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
 
       const withdrawAmount = ethers.utils.parseUnits('1001', 6)
-      const poolTokenIndex = pack(['uint8', 'uint40'], [1, 1])
+      const poolTokenIndex = ethers.utils.solidityPack(['uint8', 'uint40'], [1, 1])
       await expect(mesonInstance.withdraw(withdrawAmount, poolTokenIndex))
         .to.be.revertedWith('panic code 0x11')
     })
@@ -157,13 +211,20 @@ describe('MesonPools', () => {
       await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
 
       const withdrawAmount = ethers.utils.parseUnits('1', 6)
-      const poolTokenIndex = pack(['uint8', 'uint40'], [1, 1])
+      const poolTokenIndex = ethers.utils.solidityPack(['uint8', 'uint40'], [1, 1])
       await mesonInstance.withdraw(withdrawAmount, poolTokenIndex)
       expect(await mesonInstance.poolTokenBalance(token.address, poolOwner.address)).to.equal(amount.sub(withdrawAmount))
     })
   })
 
   describe('#lock', async () => {
+    it('rejects incorrect encoding version', async () => {
+      const swap = mesonClientForInitiator.requestSwap({ ...getPartialSwap(), version: 0 }, outChain)
+      const signedRequestData = await swap.signForRequest(true)
+      const signedRequest = new SignedSwapRequest(signedRequestData)
+
+      await expect(mesonClientForPoolOwner.lock(signedRequest)).to.be.revertedWith('Incorrect encoding version')
+    })
     it('rejects if provider not registered', async () => {
       await expect(mesonClientForPoolOwner.lock(signedRequest))
         .to.be.revertedWith('Caller not registered. Call depositAndRegister.')
@@ -194,10 +255,10 @@ describe('MesonPools', () => {
       await mesonClientForPoolOwner.lock(signedRequest)
       
       const poolBalance = amount.sub(swap.amount.sub(swap.fee))
-      expect(await mesonInstance.poolTokenBalance(mesonClientForPoolOwner.token(1), poolOwner.address)).to.equal(poolBalance)
+      expect(await mesonInstance.poolTokenBalance(mesonClientForPoolOwner.tokenAddr(1), poolOwner.address)).to.equal(poolBalance)
       const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
       expect(locked.status).to.equal(LockedSwapStatus.Locked)
-      expect(locked.poolOwner).to.equal(poolOwner.address)
+      expect(locked.poolOwner).to.equal(poolOwner.address.toLowerCase())
     })
     it('rejects if swap already exists', async () => {
       const amount = ethers.utils.parseUnits('2000', 6)
@@ -231,7 +292,7 @@ describe('MesonPools', () => {
       await ethers.provider.send('evm_increaseTime', [3600])
       await mesonClientForPoolOwner.unlock(signedRequest)
 
-      expect(await mesonInstance.poolTokenBalance(mesonClientForPoolOwner.token(1), poolOwner.address)).to.equal(amount)
+      expect(await mesonInstance.poolTokenBalance(mesonClientForPoolOwner.tokenAddr(1), poolOwner.address)).to.equal(amount)
       const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
       expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
       expect(locked.poolOwner).to.be.undefined
@@ -246,6 +307,27 @@ describe('MesonPools', () => {
     })
     it('releases a valid swap', async () => {
       const amount = ethers.utils.parseUnits('2000', 6)
+      await token.approve(mesonInstance.address, amount)
+      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+
+      await mesonClientForPoolOwner.lock(signedRequest)
+      await mesonClientForPoolOwner.release(signedRelease)
+
+      const releaseAmount = swap.amount.sub(swap.amount.div(1000)).sub(swap.fee)
+      expect(await token.balanceOf(TestAddress)).to.equal(releaseAmount)
+      const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
+      expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
+      expect(locked.poolOwner).to.be.undefined
+    })
+
+    it('releases a non-typed swap', async () => {
+      const swap = mesonClientForInitiator.requestSwap({ ...getPartialSwap(), salt: '0x88', recipient: TestAddress }, outChain)
+      const signedRequestData = await swap.signForRequest(true)
+      const signedRequest = new SignedSwapRequest(signedRequestData)
+      const signedReleaseData = await swap.signForRelease(TestAddress, true)
+      const signedRelease = new SignedSwapRelease(signedReleaseData)
+      const amount = ethers.utils.parseUnits('2000', 6)
+
       await token.approve(mesonInstance.address, amount)
       await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
 

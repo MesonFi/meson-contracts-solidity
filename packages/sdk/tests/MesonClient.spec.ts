@@ -2,10 +2,7 @@ import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 
 import { solidity, MockProvider } from 'ethereum-waffle';
-import { parseUnits } from '@ethersproject/units'
-import { Wallet } from '@ethersproject/wallet'
-import { ContractFactory } from '@ethersproject/contracts'
-import { AddressZero } from '@ethersproject/constants'
+import { Wallet, ContractFactory, utils, constants } from 'ethers'
 import { Meson, MockToken } from '@mesonfi/contract-types'
 import { ERC20 as ERC20Abi, Meson as MesonAbi } from '@mesonfi/contract-abis'
 
@@ -21,7 +18,7 @@ import {
 import { getPartialSwap } from './shared'
 
 const outChain = '0x003c'
-const unsupported = AddressZero
+const unsupported = constants.AddressZero
 const TestAddress = '0x7F342A0D04B951e8600dA1eAdD46afe614DaC20B'
 
 chai.use(chaiAsPromised)
@@ -42,12 +39,13 @@ describe('MesonClient', () => {
     const swapSigner = new EthersWalletSwapSigner(initiator)
 
     const tokenFactory = new ContractFactory(ERC20Abi.abi, ERC20Abi.bytecode, wallets[0])
-    token = await tokenFactory.deploy('MockToken', 'MT', parseUnits('10000', 6), 6) as MockToken
-    await token.transfer(initiator.address, parseUnits('3000', 6))
-    await token.transfer(poolOwner.address, parseUnits('5000', 6))
+    token = await tokenFactory.deploy('MockToken', 'MT', utils.parseUnits('10000', 6), 6) as MockToken
+    await token.transfer(initiator.address, utils.parseUnits('3000', 6))
+    await token.transfer(poolOwner.address, utils.parseUnits('5000', 6))
 
     const mesonFactory = new ContractFactory(MesonAbi.abi, MesonAbi.bytecode, wallets[0])
-    mesonInstance = await mesonFactory.deploy([token.address]) as Meson
+    mesonInstance = await mesonFactory.deploy(poolOwner.address) as Meson
+    await mesonInstance.addMultipleSupportedTokens([token.address], [1])
     mesonClientForInitiator = await MesonClient.Create(mesonInstance.connect(initiator), swapSigner)
     mesonClientForPoolOwner = await MesonClient.Create(mesonInstance.connect(poolOwner))
   })
@@ -61,14 +59,14 @@ describe('MesonClient', () => {
 
   describe('#token', () => {
     it('rejects 0 or undefined index', () => {
-      expect(() => mesonClientForInitiator.token()).to.throw('Token index cannot be zero')
-      expect(() => mesonClientForInitiator.token(0)).to.throw('Token index cannot be zero')
+      expect(() => mesonClientForInitiator.tokenAddr()).to.throw('Token index cannot be zero')
+      expect(() => mesonClientForInitiator.tokenAddr(0)).to.throw('Token index cannot be zero')
     })
     it('returns token for an in-range index', () => {
-      expect(mesonClientForInitiator.token(1)).to.equal(token.address.toLowerCase())
+      expect(mesonClientForInitiator.tokenAddr(1)).to.equal(token.address.toLowerCase())
     })
     it('returns undefined for out-of-range index', () => {
-      expect(mesonClientForInitiator.token(2)).to.equal(undefined)
+      expect(mesonClientForInitiator.tokenAddr(2)).to.equal(undefined)
     })
   })
 
@@ -85,7 +83,7 @@ describe('MesonClient', () => {
   })
 
   describe('#depositAndRegister', () => {
-    const amount = parseUnits('100', 6)
+    const amount = utils.parseUnits('100', 6)
     it('rejects unsupported token', async () => {
       await expect(mesonClientForPoolOwner.depositAndRegister(unsupported, amount, '1'))
         .to.be.rejectedWith('Token not supported')
@@ -103,8 +101,8 @@ describe('MesonClient', () => {
     })
 
     it('accepts a supported token deposit', async () => {
-      const amount = parseUnits('10', 6)
-      await token.connect(poolOwner).approve(mesonInstance.address, parseUnits('100', 6))
+      const amount = utils.parseUnits('10', 6)
+      await token.connect(poolOwner).approve(mesonInstance.address, utils.parseUnits('100', 6))
       await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
       await mesonClientForPoolOwner.deposit(token.address, amount)
     })
@@ -114,7 +112,7 @@ describe('MesonClient', () => {
     let signedRequest
 
     beforeEach('prepare for postSwap', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, parseUnits('1000', 6))
+      await token.connect(initiator).approve(mesonInstance.address, utils.parseUnits('1000', 6))
 
       const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
@@ -142,7 +140,7 @@ describe('MesonClient', () => {
       const signedRequestData = await swap.signForRequest(true)
       signedRequest = new SignedSwapRequest(signedRequestData)
 
-      const amount = parseUnits('999', 6)
+      const amount = utils.parseUnits('999', 6)
       await token.connect(poolOwner).approve(mesonInstance.address, amount)
       await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
     })
@@ -160,7 +158,7 @@ describe('MesonClient', () => {
       const signedRequestData = await swap.signForRequest(true)
       signedRequest = new SignedSwapRequest(signedRequestData)
 
-      const amount = parseUnits('999', 6)
+      const amount = utils.parseUnits('999', 6)
       await token.connect(poolOwner).approve(mesonInstance.address, amount)
       await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
     })
@@ -183,7 +181,7 @@ describe('MesonClient', () => {
       const signedReleaseData = await swap.signForRelease(TestAddress, true)
       signedRelease = new SignedSwapRelease(signedReleaseData)
 
-      const amount = parseUnits('999', 6)
+      const amount = utils.parseUnits('999', 6)
       await token.connect(poolOwner).approve(mesonInstance.address, amount)
       await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
     })
@@ -199,7 +197,7 @@ describe('MesonClient', () => {
     let signedRelease
 
     beforeEach('prepare for lock', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, parseUnits('1000', 6))
+      await token.connect(initiator).approve(mesonInstance.address, utils.parseUnits('1000', 6))
 
       const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
@@ -221,7 +219,7 @@ describe('MesonClient', () => {
     let signedRequest
 
     beforeEach('prepare for cancel', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, parseUnits('1000', 6))
+      await token.connect(initiator).approve(mesonInstance.address, utils.parseUnits('1000', 6))
 
       const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
@@ -242,7 +240,7 @@ describe('MesonClient', () => {
     let signedRequest
 
     beforeEach('prepare for getPostedSwap', async () => {
-      await token.connect(initiator).approve(mesonInstance.address, parseUnits('1000', 6))
+      await token.connect(initiator).approve(mesonInstance.address, utils.parseUnits('1000', 6))
 
       const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
@@ -263,7 +261,7 @@ describe('MesonClient', () => {
       const posted = await mesonClientForInitiator.getPostedSwap(signedRequest.encoded)
       expect(posted.status).to.equal(PostedSwapStatus.Bonded)
       expect(posted.initiator).to.equal(initiator.address)
-      expect(posted.poolOwner).to.equal(poolOwner.address)
+      expect(posted.poolOwner).to.equal(poolOwner.address.toLowerCase())
     })
   })
 
@@ -275,7 +273,7 @@ describe('MesonClient', () => {
       const signedRequestData = await swap.signForRequest(true)
       signedRequest = new SignedSwapRequest(signedRequestData)
 
-      const amount = parseUnits('999', 6)
+      const amount = utils.parseUnits('999', 6)
       await token.connect(poolOwner).approve(mesonInstance.address, amount)
       await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
 
@@ -285,7 +283,7 @@ describe('MesonClient', () => {
     it('returns the locked swap', async () => {
       const locked = await mesonClientForInitiator.getLockedSwap(signedRequest.encoded, initiator.address)
       expect(locked.status).to.equal(LockedSwapStatus.Locked)
-      expect(locked.poolOwner).to.equal(poolOwner.address)
+      expect(locked.poolOwner).to.equal(poolOwner.address.toLowerCase())
     })
   })
 })

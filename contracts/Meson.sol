@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.6;
+pragma solidity 0.8.16;
 
-import "./Swap/MesonSwap.sol";
-import "./Pools/MesonPools.sol";
+import "./MesonManager.sol";
 
-contract Meson is MesonSwap, MesonPools {
-  constructor(address[] memory supportedTokens) {
-    for (uint8 i = 0; i < supportedTokens.length; i++) {
-      _addSupportToken(supportedTokens[i], i + 1);
-    }
+/// @title Meson
+/// @notice A plain non-upgradeable Meson
+contract Meson is MesonManager {
+  constructor(address premiumManager) {
+    _transferOwnership(_msgSender());
+    _transferPremiumManager(premiumManager);
   }
 }

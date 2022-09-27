@@ -1,10 +1,13 @@
 {
   "name": "@mesonfi/contract-abis",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-rc.1",
   "description": "",
   "license": "MIT",
   "repository": "https://github.com/MesonFi/meson-contracts-solidity",
   "main": "abis/index.js",
+  "files": [
+    "abis"
+  ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
   }

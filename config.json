@@ -4,12 +4,11 @@
   "framework": "hardhat",
   "npmClient": "yarn",
   "compilers": {
-    "solc": "0.8.6",
+    "solc": "0.8.16",
     "truffle": "",
     "evmVersion": "istanbul",
     "optimizer": {
-      "enabled": true,
-      "runs": 10000
+      "enabled": false
     }
   },
   "linter": "solhint",

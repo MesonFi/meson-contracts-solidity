@@ -1,32 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.6;
+pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "./MesonManager.sol";
 
-import "./Swap/MesonSwap.sol";
-import "./Pools/MesonPools.sol";
-
-contract UpgradableMeson is UUPSUpgradeable, MesonSwap, MesonPools {
-  bool private _initialized;
-  address private _owner;
-
-  function initialize(address[] memory supportedTokens) public {
-    require(!_initialized, "Contract instance has already been initialized");
-    _initialized = true;
-    _owner = _msgSender();
-    _premiumManager = _msgSender();
-
-    for (uint8 i = 0; i < supportedTokens.length; i++) {
-      _addSupportToken(supportedTokens[i], i + 1);
-    }
+contract UpgradableMeson is UUPSUpgradeable, MesonManager {
+  function initialize(address owner, address premiumManager) external initializer {
+    _transferOwnership(owner);
+    _transferPremiumManager(premiumManager);
   }
 
-  function _authorizeUpgrade(address newImplementation) internal override {
-    require(_msgSender() == _owner, "Unauthorized");
-  }
-
-  modifier onlyOwner() {
-    require(_owner == _msgSender(), "Caller is not the owner");
-    _;
-  }
+  function _authorizeUpgrade(address) internal override onlyOwner {}
 }
