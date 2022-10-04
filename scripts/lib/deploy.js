@@ -16,6 +16,8 @@ exports.deployMeson = async function deployMeson(wallet, upgradable, premiumMana
     mesonContract = await deployContract('Meson', wallet, [premiumManager])
   }
 
+  await new Promise(resolve => setTimeout(resolve, 2000))
+
   console.log('Adding supported tokens', tokens)
   const tx = await mesonContract.addMultipleSupportedTokens(tokens.map(t => t.addr), tokens.map(t => t.tokenIndex))
   await tx.wait(1)

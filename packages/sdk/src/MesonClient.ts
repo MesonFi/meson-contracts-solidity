@@ -153,6 +153,10 @@ export class MesonClient {
     return await this.mesonInstance.poolOfAuthorizedAddr(addr, ...overrides)
   }
 
+  async ownerOfPool(poolIndex: number, ...overrides) {
+    return this.#formatAddress(await this.mesonInstance.ownerOfPool(poolIndex, ...overrides))
+  }
+
   async poolTokenBalance(token: string, addr: string, ...overrides) {
     return await this.mesonInstance.poolTokenBalance(token, addr, ...overrides)
   }
@@ -180,7 +184,7 @@ export class MesonClient {
     if (!poolIndex) {
       throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
     }
-    const owner = await this.mesonInstance.ownerOfPool(poolIndex)
+    const owner = await this.ownerOfPool(poolIndex)
     if (owner !== signer) {
       throw new Error(`The signer is not the owner of the LP pool.`)
     }

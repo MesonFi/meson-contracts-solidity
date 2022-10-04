@@ -13,7 +13,7 @@
     "addressFormat": "hex",
     "url": "https://mainnet.infura.io/v3/${INFURA_API_KEY}",
     "explorer": "https://etherscan.io",
-    "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
     "tokens": [
       {
         "name": "USD Coin",
@@ -57,7 +57,7 @@
       "symbol": "BNB",
       "decimals": 18
     },
-    "mesonAddress": "0xFD2236a956BEa85Ba619789Aaf72C789853d49C7",
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
     "tokens": [
       {
         "name": "USD Coin",
@@ -101,7 +101,8 @@
       "symbol": "MATIC",
       "decimals": 18
     },
-    "mesonAddress": "0xc29a08368604567237F8A396428E2bf5332a7686",
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "uctAddress": "0x53BE31942c2113633bdfe34626BDc60C7f1d12b7",
     "tokens": [
       {
         "name": "USD Coin",
@@ -116,36 +117,6 @@
         "decimals": 6,
         "addr": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
         "tokenIndex": 2
-      }
-    ]
-  },
-  {
-    "id": "evmos",
-    "name": "Evmos",
-    "alias": "evmos",
-    "chainId": "0x2329",
-    "slip44": "0x800011bc",
-    "shortSlip44": "0x11bc",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "hex",
-    "url": "https://evmos-mainnet.gateway.pokt.network/v1/lb/627586ddea1b320039c95205",
-    "explorer": "https://evm.evmos.org",
-    "nativeCurrency": {
-      "name": "EVMOS",
-      "symbol": "EVMOS",
-      "decimals": 18
-    },
-    "mesonAddress": "0xd53e9530107a8d8856099d7d80126478d48e06dA",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0x51e44FfaD5C2B122C8b635671FCC8139dc636E82",
-        "tokenIndex": 1
       }
     ]
   },
@@ -168,8 +139,7 @@
       "symbol": "ETH",
       "decimals": 18
     },
-    "mesonAddress": "0xF7c86A5E1323E6EFB954B2e65ebba9c300c40f38",
-    "uctAddress": "0xC9f76f581DE205A9E4aE25D127CA4344aC4A8Bf4",
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
     "tokens": [
       {
         "name": "USD Coin",
@@ -206,7 +176,7 @@
       "symbol": "ETH",
       "decimals": 18
     },
-    "mesonAddress": "0xF7c86A5E1323E6EFB954B2e65ebba9c300c40f38",
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
     "tokens": [
       {
         "name": "USD Coin",
@@ -225,6 +195,104 @@
     ]
   },
   {
+    "id": "avax",
+    "name": "Avalanche",
+    "alias": "AVA",
+    "chainId": "0xa86a",
+    "slip44": "0x80002328",
+    "shortSlip44": "0x2328",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://api.avax.network/ext/bc/C/rpc",
+    "explorer": "https://snowtrace.io",
+    "nativeCurrency": {
+      "name": "Avalanche",
+      "symbol": "AVAX",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC.e",
+        "decimals": 6,
+        "addr": "0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT.e",
+        "decimals": 6,
+        "addr": "0xc7198437980c041c805a1edcba50c1ce5db95118",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "tron",
+    "name": "Tron",
+    "alias": "TRX",
+    "chainId": "tron",
+    "slip44": "0x800000c3",
+    "shortSlip44": "0x00c3",
+    "extensions": [
+      "tronlink"
+    ],
+    "addressFormat": "tron",
+    "url": "https://api.trongrid.io",
+    "explorer": "https://tronscan.org/#",
+    "nativeCurrency": {
+      "name": "TRX",
+      "symbol": "TRX",
+      "decimals": 6
+    },
+    "mesonAddress": "TKWqpzNucNNBMpfaE47F8CLhA8vzfNndH4",
+    "uctAddress": "TH2ZVL3D3AH4SdwCkcamUZVqgBpWfGaJpa",
+    "tokens": [
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+        "link": "token20/TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "ftm",
+    "name": "Fantom",
+    "alias": "FTM",
+    "chainId": "0xfa",
+    "slip44": "0x800003ef",
+    "shortSlip44": "0x03ef",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://rpc.ftm.tools",
+    "explorer": "https://ftmscan.com",
+    "nativeCurrency": {
+      "name": "Fantom",
+      "symbol": "FTM",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x04068da6c83afcfa0e13ba15a6696662335d5b75",
+        "tokenIndex": 1
+      }
+    ]
+  },
+  {
     "id": "aurora",
     "name": "Aurora",
     "alias": "Aurora",
@@ -237,13 +305,13 @@
     ],
     "addressFormat": "hex",
     "url": "https://mainnet.aurora.dev",
-    "explorer": "https://aurorascan.dev",
+    "explorer": "https://explorer.mainnet.aurora.dev",
     "nativeCurrency": {
       "name": "Aurora ETH",
       "symbol": "ETH",
       "decimals": 18
     },
-    "mesonAddress": "0x6B75054748bD46FC33999D2062696209fc159456",
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
     "tokens": [
       {
         "name": "USD Coin",
@@ -280,7 +348,7 @@
       "symbol": "CFX",
       "decimals": 18
     },
-    "mesonAddress": "0xFD2236a956BEa85Ba619789Aaf72C789853d49C7",
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
     "tokens": [
       {
         "name": "USD Coin",
@@ -295,141 +363,6 @@
         "decimals": 18,
         "addr": "0xfe97e85d13abd9c1c33384e796f10b73905637ce",
         "tokenIndex": 34
-      }
-    ]
-  },
-  {
-    "id": "avax",
-    "name": "Avalanche",
-    "alias": "AVA",
-    "chainId": "0xa86a",
-    "slip44": "0x80002328",
-    "shortSlip44": "0x2328",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "hex",
-    "url": "https://api.avax.network/ext/bc/C/rpc",
-    "explorer": "https://snowtrace.io",
-    "nativeCurrency": {
-      "name": "Avalanche",
-      "symbol": "AVAX",
-      "decimals": 18
-    },
-    "mesonAddress": "0x40DbB93F63D69a5Da840F7092988317Cb4C55399",
-    "uctAddress": "0x5F90226BABe816544829d6cDa8eDdaCABb60206a",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "USDC.e",
-        "decimals": 6,
-        "addr": "0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664",
-        "tokenIndex": 1
-      },
-      {
-        "name": "Tether USD",
-        "symbol": "USDT.e",
-        "decimals": 6,
-        "addr": "0xc7198437980c041c805a1edcba50c1ce5db95118",
-        "tokenIndex": 2
-      }
-    ]
-  },
-  {
-    "id": "ftm",
-    "name": "Fantom",
-    "alias": "FTM",
-    "chainId": "0xfa",
-    "slip44": "0x800003ef",
-    "shortSlip44": "0x03ef",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "hex",
-    "url": "https://rpc.ftm.tools",
-    "explorer": "https://ftmscan.com",
-    "nativeCurrency": {
-      "name": "Fantom",
-      "symbol": "FTM",
-      "decimals": 18
-    },
-    "mesonAddress": "0x40DbB93F63D69a5Da840F7092988317Cb4C55399",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0x04068da6c83afcfa0e13ba15a6696662335d5b75",
-        "tokenIndex": 1
-      }
-    ]
-  },
-  {
-    "id": "tron",
-    "name": "Tron",
-    "alias": "TRX",
-    "chainId": "tron",
-    "slip44": "0x800000c3",
-    "shortSlip44": "0x00c3",
-    "extensions": [
-      "tronlink"
-    ],
-    "addressFormat": "tron",
-    "url": "https://api.trongrid.io",
-    "explorer": "https://tronscan.org/#",
-    "nativeCurrency": {
-      "name": "TRX",
-      "symbol": "TRX",
-      "decimals": 6
-    },
-    "mesonAddress": "TSpVXBLbkx5bxox4bRg1Up2e58mzCezQgf",
-    "tokens": [
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
-        "link": "token20/TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
-        "tokenIndex": 2
-      }
-    ]
-  },
-  {
-    "id": "one",
-    "name": "Harmony",
-    "alias": "ONE",
-    "chainId": "0x63564c40",
-    "slip44": "0x800003ff",
-    "shortSlip44": "0x03ff",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "hex",
-    "url": "https://api.harmony.one",
-    "explorer": "https://explorer.harmony.one",
-    "nativeCurrency": {
-      "name": "ONE",
-      "symbol": "ONE",
-      "decimals": 18
-    },
-    "mesonAddress": "0xF7c86A5E1323E6EFB954B2e65ebba9c300c40f38",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "1USDC",
-        "decimals": 6,
-        "addr": "0x985458E523dB3d53125813eD68c274899e9DfAb4",
-        "tokenIndex": 1
-      },
-      {
-        "name": "Tether USD",
-        "symbol": "1USDT",
-        "decimals": 6,
-        "addr": "0x3C2B8Be99c50593081EAA2A724F0B8285F5aba8f",
-        "tokenIndex": 2
       }
     ]
   },
@@ -452,7 +385,7 @@
       "symbol": "MOVR",
       "decimals": 18
     },
-    "mesonAddress": "0xF7c86A5E1323E6EFB954B2e65ebba9c300c40f38",
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
     "tokens": [
       {
         "name": "USD Coin",
@@ -460,6 +393,73 @@
         "decimals": 6,
         "addr": "0xE3F5a90F9cb311505cd691a46596599aA1A0AD7D",
         "tokenIndex": 1
+      }
+    ]
+  },
+  {
+    "id": "evmos",
+    "name": "Evmos",
+    "alias": "evmos",
+    "chainId": "0x2329",
+    "slip44": "0x800011bc",
+    "shortSlip44": "0x11bc",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://evmos-mainnet.gateway.pokt.network/v1/lb/627586ddea1b320039c95205",
+    "explorer": "https://evm.evmos.org",
+    "nativeCurrency": {
+      "name": "EVMOS",
+      "symbol": "EVMOS",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x51e44FfaD5C2B122C8b635671FCC8139dc636E82",
+        "tokenIndex": 1
+      }
+    ]
+  },
+  {
+    "id": "one",
+    "name": "Harmony",
+    "alias": "ONE",
+    "chainId": "0x63564c40",
+    "slip44": "0x800003ff",
+    "shortSlip44": "0x03ff",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://api.harmony.one",
+    "explorer": "https://explorer.harmony.one",
+    "nativeCurrency": {
+      "name": "ONE",
+      "symbol": "ONE",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "1USDC",
+        "decimals": 6,
+        "addr": "0x985458E523dB3d53125813eD68c274899e9DfAb4",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "1USDT",
+        "decimals": 6,
+        "addr": "0x3C2B8Be99c50593081EAA2A724F0B8285F5aba8f",
+        "tokenIndex": 2
       }
     ]
   },
@@ -482,7 +482,7 @@
       "symbol": "GLMR",
       "decimals": 18
     },
-    "mesonAddress": "0x18Fb44c778dBC53F706BF12D9fC40A07E93b7015",
+    "mesonAddress": "",
     "tokens": [
       {
         "name": "USD Coin",
@@ -520,8 +520,7 @@
       "decimals": 18
     },
     "mesonAddress": "",
-    "tokens": [
-    ]
+    "tokens": []
   },
   {
     "id": "zksync",

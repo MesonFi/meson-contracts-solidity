@@ -1,4 +1,4 @@
-import { providers, Wallet } from 'ethers'
+import { providers, Signer } from 'ethers'
 import { Provider as ZkProvider, Wallet as ZkWallet } from 'zksync-web3'
 
 import * as zksync from './zksync'
@@ -18,7 +18,7 @@ export function getWallet (privateKey, provider) {
 export function getContract(address, abi, provider) {
   if (provider instanceof ZkWallet || provider instanceof ZkProvider) {
     return zksync.getContract(address, abi, provider)
-  } else if (provider instanceof Wallet || provider instanceof providers.Provider) {
+  } else if (Signer.isSigner(provider) || provider instanceof providers.Provider) {
     return ether.getContract(address, abi, provider)
   } else {
     return tron.getContract(address, abi, provider)

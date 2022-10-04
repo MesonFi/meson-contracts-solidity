@@ -1,10 +1,12 @@
 const { ethers } = require('hardhat')
-const { adaptor } = require('@mesonfi/sdk')
 const TronWeb = require('tronweb')
+const { adaptor } = require('@mesonfi/sdk')
+const { Meson } = require('@mesonfi/contract-abis')
 
 const { getProvider } = require('./lib/getProvider')
 const { deployContract } = require('./lib/deploy')
 const updatePresets = require('./lib/updatePresets')
+const UCTUpgradeable = require('../artifacts/contracts/Token/UCTUpgradeable.sol/UCTUpgradeable.json')
 
 require('dotenv').config()
 
@@ -16,6 +18,8 @@ const {
 
 module.exports = async function uct(network) {
   await deploy(network)
+  // await addUCT(network)
+
   // await upgrade(network)
 
   // await mint(network, [], '100')
@@ -36,6 +40,15 @@ async function deploy(network) {
 
   network.uctAddress = proxy.address
   updatePresets(network)
+}
+
+async function addUCT(network) {
+  const provider = getProvider(network)
+  const wallet = adaptor.getWallet(PRIVATE_KEY, provider)
+
+  console.log('ADD UCT to Meson...')
+  const meson = adaptor.getContract(network.mesonAddress, Meson.abi, wallet)
+  await meson.addSupportToken(network.uctAddress, 255)
 }
 
 async function upgrade(network) {

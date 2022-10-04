@@ -16,7 +16,7 @@ import mainnets from './mainnets.json'
 import v0_testnets from './v0/testnets.json'
 import v0_mainnets from './v0/mainnets.json'
 
-const v0_networks = [...v0_mainnets, ...v0_testnets]
+const v0_networks = [...v0_mainnets, ...v0_testnets] as PresetNetwork[]
 
 class RpcFallbackProvider extends providers.FallbackProvider {
   async send(method, params) {
@@ -98,7 +98,7 @@ export class MesonPresets {
   }
 
   getAllNetworks(): PresetNetwork[] {
-    return (this._networks ?? mainnets).filter(n => n.url)
+    return (this._networks || mainnets as PresetNetwork[]).filter(n => n.url)
   }
 
   getNetwork(id: string): PresetNetwork {
@@ -137,12 +137,24 @@ export class MesonPresets {
   }
 
   getV0Token(networkId: string, tokenIndex: number): PresetToken {
-    const tokens = v0_networks.find(n => n.id === networkId)?.tokens
-    return tokens?.find(t => t.tokenIndex === tokenIndex)
+    const network = v0_networks.find(n => n.id === networkId)
+    if (!network) {
+      return
+    }
+    if (tokenIndex === 255) {
+      return network.uctAddress && {
+        addr: network.uctAddress,
+        name: 'USD Coupon Token',
+        symbol: 'UCT',
+        decimals: 4,
+        tokenIndex: 255,
+      }
+    }
+    return network.tokens.find(t => t.tokenIndex === tokenIndex)
   }
 
   getNetworkToken(shortCoinType: string, tokenIndex: number, version: number = 1):
-    { network: PresetNetwork; token: any }
+    { network: PresetNetwork; token?: any }
   {
     const network = this.getNetworkFromShortCoinType(shortCoinType)
     if (!network) {
@@ -155,7 +167,7 @@ export class MesonPresets {
       token = this.getToken(network.id, tokenIndex)
     }
     if (!token) {
-      return
+      return { network }
     }
     return { network, token }
   }

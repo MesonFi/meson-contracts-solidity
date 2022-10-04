@@ -6,8 +6,7 @@ export function getWallet(privateKey, tronWeb) {
     fullHost: tronWeb.fullNode.host,
     privateKey
   })
-  newTronWeb.getAddress = () => newTronWeb.defaultAddress.base58
-  return newTronWeb
+  return _polyfillProvider(newTronWeb)
 }
 
 export function getContract(address, abi, tronWeb) {
@@ -48,10 +47,20 @@ export function getContract(address, abi, tronWeb) {
               overrides = args.pop()
             }
             const txID = await target[prop](...args).send(overrides)
-            const tx = await tronWeb.trx.getTransaction(txID)
+            let tx
+            while (!tx) {
+              try {
+                tx = await tronWeb.trx.getTransaction(txID)
+              } catch {
+                await new Promise(resolve => setTimeout(resolve, 1000))
+              }
+            }
             tx.wait = () => new Promise(resolve => {
               const h = setInterval(async () => {
-                const info = await tronWeb.trx.getUnconfirmedTransactionInfo(txID)
+                let info
+                try {
+                  info = await tronWeb.trx.getUnconfirmedTransactionInfo(txID)
+                } catch {}
                 if (Object.keys(info).length) {
                   clearInterval(h)
                   resolve(info)
@@ -70,7 +79,9 @@ export function getContract(address, abi, tronWeb) {
 function _polyfillProvider(tronWeb) {
   return new Proxy(tronWeb, {
     get(target, prop: string) {
-      if (prop === 'detectNetwork') {
+      if (prop === 'getAddress') {
+        return async () => target.defaultAddress.base58
+      } else if (prop === 'detectNetwork') {
         return async () => target.fullNode.isConnected()
       } else if (prop === 'getBlockNumber') {
         return async () => {
@@ -79,6 +90,13 @@ function _polyfillProvider(tronWeb) {
         }
       } else if (prop === 'getBalance') {
         return async addr => BigNumber.from(await target.trx.getBalance(addr))
+      } else if (prop === 'sendTransaction') {
+        return async ({ to, value }) => {
+          const tx = await target.transactionBuilder.sendTrx(to, value.toString())
+          const signed = await target.trx.sign(tx)
+          const receipt = await target.trx.sendRawTransaction(signed)
+          console.log(receipt)
+        }
       } else if (prop === 'send') {
         return _polyfillRpc(target.trx)
       } else if (['on', 'off', 'removeAllListeners'].includes(prop)) {

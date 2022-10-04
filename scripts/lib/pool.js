@@ -61,3 +61,14 @@ exports.send = async function send(symbol, amount, recipient, { network, wallet 
   await tx.wait(1)
   return tx
 }
+
+exports.authorize = async function authorize(addr, { network, wallet }) {
+  const mesonInstance = adaptor.getContract(network.mesonAddress, Meson.abi, wallet)
+
+  const poolIndex = await mesonInstance.poolOfAuthorizedAddr(await wallet.getAddress())
+
+  console.log(`Authorizing ${addr} to pool ${poolIndex}...`)
+  const tx = await mesonInstance.addAuthorizedAddr(addr)
+  await tx.wait(1)
+  return tx
+}

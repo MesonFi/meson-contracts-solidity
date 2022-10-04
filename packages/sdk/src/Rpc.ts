@@ -38,7 +38,8 @@ export class Rpc {
   }
 
   async getBlockByNumber(blockNumber: number, withTransactions: boolean = false): Promise<Block> {
-    return await this.#provider.send('eth_getBlockByNumber', [blockNumber, withTransactions])
+    const hexBlockNumber = `0x${blockNumber.toString(16)}`
+    return await this.#provider.send('eth_getBlockByNumber', [hexBlockNumber, withTransactions])
   }
 
   async getBlockByHash(blockHash: string, withTransactions: boolean = false): Promise<Block> {
