@@ -1,10 +1,13 @@
 const { ethers } = require('hardhat')
+const { AptosClient } = require('aptos')
 const TronWeb = require('tronweb')
 const { Provider } = require('zksync-web3')
 const CustomGasFeeProviderWrapper = require('./CustomGasFeeProviderWrapper')
 
 exports.getProvider = function getProvider (network) {
-  if (network.id.startsWith('tron')) {
+  if (network.id.startsWith('aptos')) {
+    return new AptosClient(network.url)
+  } else if (network.id.startsWith('tron')) {
     return new TronWeb({ fullHost: network.url })
   } else if (network.id.startsWith('zksync')) {
     if (!process.env.ZKSYNC) {

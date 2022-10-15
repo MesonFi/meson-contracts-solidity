@@ -522,5 +522,36 @@
       }
     ],
     "uctAddress": "0x88C6C4B902EEB10E192282F74B894bB7AA8B0640"
+  },
+  {
+    "id": "aptos",
+    "name": "Aptos",
+    "alias": "APT",
+    "chainId": "",
+    "slip44": "0x8000027d",
+    "shortSlip44": "0x027d",
+    "extensions": [
+      "pontem"
+    ],
+    "addressFormat": "aptos",
+    "url": "https://fullnode.devnet.aptoslabs.com",
+    "explorer": "https://explorer.aptoslabs.com",
+    "mesonAddress": "0x6da63440c2f2012b7a7e86f06739621d0ddc1d845bda2a1987f62ae87a6d4579",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x01015ace920c716794445979be68d402d28b2805b7beaae935d7fe369fa7cfa0::aUSDC::TypeUSDC",
+        "tokenIndex": 1
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xaaefd8848cb707617bf82894e2d7af6214b3f3a8e3fc32e91bc026f05f5b10bb::aUSDT::TypeUSDT",
+        "tokenIndex": 2
+      }
+    ]
   }
 ]

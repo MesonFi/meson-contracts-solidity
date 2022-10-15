@@ -1,8 +1,10 @@
 import { providers, Signer } from 'ethers'
 import { Provider as ZkProvider, Wallet as ZkWallet } from 'zksync-web3'
+import { AptosClient } from 'aptos'
 
 import * as zksync from './zksync'
 import * as ether from './ether'
+import * as aptos from './aptos'
 import * as tron from './tron'
 
 export function getWallet (privateKey, provider) {
@@ -10,6 +12,8 @@ export function getWallet (privateKey, provider) {
     return zksync.getWallet(privateKey, provider)
   } else if (provider instanceof providers.Provider) {
     return ether.getWallet(privateKey, provider)
+  } else if (provider instanceof AptosClient) {
+    return aptos.getWallet(privateKey, provider)
   } else {
     return tron.getWallet(privateKey, provider)
   }
@@ -20,7 +24,11 @@ export function getContract(address, abi, provider) {
     return zksync.getContract(address, abi, provider)
   } else if (Signer.isSigner(provider) || provider instanceof providers.Provider) {
     return ether.getContract(address, abi, provider)
+  } else if (provider instanceof aptos.AptosWallet) {
+    return aptos.getContract(address, abi, provider)
   } else {
     return tron.getContract(address, abi, provider)
   }
 }
+
+export const AptosWallet = aptos.AptosWallet
