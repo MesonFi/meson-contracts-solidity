@@ -1,5 +1,5 @@
 import { BigNumber, utils } from 'ethers'
-import { AptosClient, AptosAccount, CoinClient } from 'aptos'
+import { AptosClient, AptosAccount, CoinClient, TxnBuilderTypes, HexString } from 'aptos'
 
 import { Swap } from '../Swap'
 
@@ -24,7 +24,7 @@ export class AptosWallet {
   }
 
   getAddress() {
-    return this.signer.address()
+    return this.signer.address().toString()
   }
 
   async getBalance() {
@@ -33,19 +33,36 @@ export class AptosWallet {
   }
 
   async sendTransaction(payload) {
-    const tx = await this.client.generateTransaction(this.getAddress(), payload)
+    const tx = await this.client.generateTransaction(this.signer.address(), payload)
     const signed = await this.client.signTransaction(this.signer, tx)
     const pending = await this.client.submitTransaction(signed)
 
     return {
       hash: pending.hash,
-      wait: async () => await this.client.waitForTransaction(pending.hash, { checkSuccess: true })
+      wait: () => this.wait(pending.hash)
     }
+  }
+
+  async deploy(module, metadata) {
+    const hash = await this.client.publishPackage(
+      this.signer,
+      new HexString(metadata).toUint8Array(),
+      [new TxnBuilderTypes.Module(new HexString(module).toUint8Array())]
+    )
+
+    return {
+      hash,
+      wait: () => this.wait(hash)
+    }
+  }
+
+  async wait(hash) {
+    await this.client.waitForTransaction(hash, { checkSuccess: true })
   }
 }
 
 export function getWallet(privateKey, client: AptosClient): AptosWallet {
-  const signer = new AptosAccount(utils.arrayify(privateKey))
+  const signer = new AptosAccount(privateKey && utils.arrayify(privateKey))
   return new AptosWallet(client, signer)
 }
 
@@ -69,7 +86,10 @@ export function getContract(address, abi, wallet: AptosWallet) {
         throw new Error('AptosContract.filters not implemented')
       }
 
-      const method = abi.find(item => item.name === prop)
+      let method = abi.find(item => item.name === prop)
+      if (prop === 'initializeTable') {
+        method = { type: 'function', inputs: [{}, {}] }
+      }
       if (method?.type === 'function') {
         if (['view', 'pure'].includes(method.stateMutability)) {
           return async (...args) => {
@@ -115,7 +135,11 @@ export function getContract(address, abi, wallet: AptosWallet) {
               arguments: []
             }
 
-            if (prop === 'depositAndRegister') {
+            if (prop === 'initializeTable') {
+              const [module, tokenIndex] = args
+              payload.function = `${address}::${module}::${prop}`
+              payload.type_arguments = [_getTokenAddr(tokenIndex)]
+            } else if (prop === 'depositAndRegister') {
               const [amount, poolTokenIndex] = args
               const tokenIndex = BigNumber.from(poolTokenIndex).div(2**40).toNumber()
               payload.type_arguments = [_getTokenAddr(tokenIndex)]
@@ -133,29 +157,36 @@ export function getContract(address, abi, wallet: AptosWallet) {
               if (prop === 'postSwap') {
               payload.type_arguments = [_getTokenAddr(swap.inToken)]
                 payload.arguments = [
-                  signer.address(), amount, expireTs, +swap.outChain, +swap.inChain,
+                  [swap.encoded.substring(0, 34), '0x' + swap.encoded.substring(34)],
+                  signer.address(),
                   utils.arrayify(utils.keccak256(swap.encoded))
                 ]
               } else if (prop === 'lock') {
                 payload.type_arguments = [_getTokenAddr(swap.outToken)]
                 payload.arguments = [
-                  '0x01015ace920c716794445979be68d402d28b2805b7beaae935d7fe369fa7cfa0', // recipient
-                  amount, expireTs, +swap.outChain, +swap.inChain,
+                  [swap.encoded.substring(0, 34), '0x' + swap.encoded.substring(34)],
+                  [], // initiator
                   utils.arrayify(utils.keccak256(swap.encoded))
                 ]
               } else if (prop === 'release') {
                 payload.type_arguments = [_getTokenAddr(swap.outToken)]
                 payload.arguments = [
+                  [swap.encoded.substring(0, 34), '0x' + swap.encoded.substring(34)],
+                  [], // initiator
+                  signer.address(), // should change to recipient address
                   utils.arrayify(swap.encoded),
-                  amount, expireTs, +swap.outChain, +swap.inChain,
                   utils.arrayify(utils.keccak256(swap.encoded))
                 ]
+                console.log(signer.address())
               } else if (prop === 'executeSwap') {
                 payload.type_arguments = [_getTokenAddr(swap.inToken)]
                 payload.arguments = [
+                  [swap.encoded.substring(0, 34), '0x' + swap.encoded.substring(34)],
+                  [], // initiator
+                  signer.address(), // should change to recipient address
                   utils.arrayify(swap.encoded),
-                  amount, expireTs, +swap.outChain, +swap.inChain,
-                  utils.arrayify(utils.keccak256(swap.encoded))
+                  utils.arrayify(utils.keccak256(swap.encoded)),
+                  false
                 ]
               }
             }

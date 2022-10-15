@@ -102,7 +102,19 @@ task('pool', 'Perform pool operation')
     await pool(network)
   })
 
-task('to-aptos', 'Perform meson operation')
+task('deploy-aptos', 'Deploy Meson to Aptos')
+  .addParam('prepare', 'Prepare a new account', '')
+  .setAction(async taskArgs => {
+    const scripts = require('./scripts/deploy-aptos')
+    const aptosNetwork = testnets.find(n => n.id.startsWith('aptos'))
+    if (taskArgs.prepare) {
+      await scripts.prepare(aptosNetwork)
+    } else {
+      await scripts.deployAptos(aptosNetwork)
+    }
+  })
+
+task('to-aptos', 'Swap to Aptos')
   .addParam('testnet', 'Testnet network id', 'polygon')
   .setAction(async taskArgs => {
     const { network } = await _switchNetwork(taskArgs)

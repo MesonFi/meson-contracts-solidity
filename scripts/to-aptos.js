@@ -34,13 +34,11 @@ module.exports = async function toAptos(network, aptosNetwork) {
 
   const aptos = getProvider(aptosNetwork)
   const aptosLpWallet = adaptor.getWallet(APTOS_LP_PRIVATE_KEY, aptos)
-  const aptosUserWallet = adaptor.getWallet(APTOS_USER_PRIVATE_KEY, aptos)
   console.log(`Aptos LP address: ${await aptosLpWallet.getAddress()}`)
   console.log(`Balance: ${(await aptosLpWallet.getBalance()).toString()}`)
 
   const aptosMesonInstance = adaptor.getContract(aptosNetwork.mesonAddress, Meson.abi, aptosLpWallet)
   const aptosLpMesonClient = await MesonClient.Create(aptosMesonInstance)
-  const aptosUserMesonClient = await MesonClient.Create(aptosMesonInstance.connect(aptosUserWallet))
 
   const amount = utils.parseUnits('1', 6)
   const swapData = getPartialSwap({ amount, inToken: 1, outToken: 2 })
@@ -49,13 +47,13 @@ module.exports = async function toAptos(network, aptosNetwork) {
   const request = await swap.signForRequest(true) // will be signed by swapSigner (user)
   const signedRequest = new SignedSwapRequest(request)
 
-  const tx1 = await mesonClient.postSwap(signedRequest) // will be posted by lp
-  console.log(`posted: \t${network.explorer}/tx/${tx1.hash}`)
+  // const tx1 = await mesonClient.postSwap(signedRequest) // signed by lp
+  // console.log(`posted: \t${network.explorer}/tx/${tx1.hash}`)
 
-  const tx2 = await aptosLpMesonClient.lock(signedRequest) // will be posted by aptos lp
+  const tx2 = await aptosLpMesonClient.lock(signedRequest) // signed by aptos lp
   console.log(`locked: \t${aptosNetwork.explorer}/txn/${tx2.hash}`)
 
-  await tx1.wait()
+  // await tx1.wait()
   await tx2.wait()
 
 
@@ -64,9 +62,9 @@ module.exports = async function toAptos(network, aptosNetwork) {
   const release = await swap.signForRelease(recipientAddress, true) // will be signed by swapSigner (user)
   const signedRelease = new SignedSwapRelease(release)
 
-  const tx3 = await mesonClient.executeSwap(signedRelease) // will be posted by lp
-  console.log(`executed: \t${network.explorer}/tx/${tx3.hash}`)
+  // const tx3 = await mesonClient.executeSwap(signedRelease) // signed by lp
+  // console.log(`executed: \t${network.explorer}/tx/${tx3.hash}`)
 
-  const tx4 = await aptosUserMesonClient.release(signedRelease) // will be posted by aptos user
+  const tx4 = await aptosLpMesonClient.release(signedRelease) // signed by aptos lp
   console.log(`released: \t${aptosNetwork.explorer}/txn/${tx4.hash}`)
 }
