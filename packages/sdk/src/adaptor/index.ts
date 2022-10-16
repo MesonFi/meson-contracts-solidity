@@ -28,6 +28,6 @@ export function getContract(address, abi, provider) {
   } else if (provider instanceof AptosProvider || provider instanceof AptosClient) {
     return aptos.getContract(address, abi, provider)
   } else {
-    return aptos.getContract(address, abi, provider)
+    return tron.getContract(address, abi, provider)
   }
 }

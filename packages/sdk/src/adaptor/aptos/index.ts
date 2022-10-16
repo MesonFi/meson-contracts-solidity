@@ -1,5 +1,5 @@
 import { BigNumber, utils } from 'ethers'
-import { AptosClient, AptosAccount } from 'aptos'
+import { AptosClient, AptosAccount, BCS } from 'aptos'
 
 import { AptosWallet, AptosProvider } from './classes'
 import { Swap } from '../../Swap'
@@ -41,7 +41,25 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
       } else if (prop === 'signer') {
         return provider
       } else if (prop === 'interface') {
-        return new utils.Interface(abi)
+        return {
+          format: () => abi,
+          encodeFunctionData: () => { throw new Error('Not implemented: encodeFunctionData') },
+          parseTransaction: tx => {
+            const payload = JSON.parse(tx.data)
+            if (payload.type !== 'entry_function_payload') {
+              throw new Error(`Payload type ${payload.type} unsupported`)
+            }
+            const { function: fun, type_arguments, arguments: args } = payload
+            const [addr, module, name] = fun.split('::')
+            const encoded0 = utils.hexZeroPad(BigNumber.from(args[0][0]).toHexString(), 16)
+            const encoded1 = utils.hexZeroPad(BigNumber.from(args[0][1]).toHexString(), 16)
+            const encodedSwap = encoded0 + encoded1.substring(2)
+            return {
+              name,
+              args: { encodedSwap, initiator: args[1] }
+            }
+          }
+        }
       } else if (['queryFilter', 'on', 'removeAllListeners'].includes(prop)) {
         return () => {}
       } else if (prop === 'connect') {
@@ -70,8 +88,15 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
               const result = await provider.client.getAccountResource(account, `0x1::coin::CoinInfo<${address}>`)
               return (result.data as any)[prop]
             } else if (prop === 'balanceOf' || prop === 'allowance') {
-              const result = await provider.client.getAccountResource(args[0], `0x1::coin::CoinStore<${address}>`)
-              return BigNumber.from((result.data as any).coin.value)
+              try {
+                const result = await provider.client.getAccountResource(args[0], `0x1::coin::CoinStore<${address}>`)
+                return BigNumber.from((result.data as any).coin.value)
+              } catch (e) {
+                if (e.errorCode === 'resource_not_found') {
+                  return BigNumber.from(0)
+                }
+                throw e
+              }
             }
             
             // Meson
@@ -86,8 +111,36 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
               return 1
             } else if (prop === 'poolTokenBalance') {
               const [token, poolOwner] = args
-              const result = await provider.client.getAccountResource(poolOwner, `${address}::MesonStates::StakingCoin<${token}>`)
-              return BigNumber.from((result.data as any).value)
+              try {
+                const result = await provider.client.getAccountResource(poolOwner, `${address}::MesonStates::StakingCoin<${token}>`)
+                return BigNumber.from((result.data as any).value)
+              } catch (e) {
+                if (e.errorCode === 'resource_not_found') {
+                  return BigNumber.from(0)
+                }
+                throw e
+              }
+            } else if (prop === 'getLockedSwap') {
+              const swap = Swap.decode(args[0])
+              const result = await provider.client.getAccountResource(address, `${address}::MesonPools::StoredContentOfPools<${tokens[0].addr}>`)
+              const handle = (result.data as any)._lockedSwaps.handle
+
+              try {
+               const result =  await provider.client.getTableItem(handle, {
+                  key_type: 'vector<u8>',
+                  value_type: `${address}::MesonPools::LockedSwap`,
+                  key: swap.encoded // should be swapId
+                })
+                return {
+                  until: Number(result.until),
+                  poolOwner: result.poolOwner
+                }
+              } catch (e) {
+                if (e.errorCode === 'table_item_not_found') {
+                  return { until: 0 }
+                }
+                throw e
+              }
             }
 
             throw new Error(`AptosContract read not implemented (${prop})`)
@@ -137,18 +190,19 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
                   utils.arrayify(utils.keccak256(swap.encoded))
                 ]
               } else if (prop === 'lock') {
+                // signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator
                 payload.type_arguments = [_getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   [swap.encoded.substring(0, 34), '0x' + swap.encoded.substring(34)],
-                  [], // initiator
+                  utils.arrayify(args[4]),
+                  signer.address().toString(), // should change to recipient address
                   utils.arrayify(utils.keccak256(swap.encoded))
                 ]
               } else if (prop === 'release') {
                 payload.type_arguments = [_getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   [swap.encoded.substring(0, 34), '0x' + swap.encoded.substring(34)],
-                  [], // initiator
-                  signer.address(), // should change to recipient address
+                  utils.arrayify(args[4]),
                   utils.arrayify(swap.encoded),
                   utils.arrayify(utils.keccak256(swap.encoded))
                 ]

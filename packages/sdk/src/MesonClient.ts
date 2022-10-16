@@ -332,7 +332,7 @@ export class MesonClient {
     const { poolOwner, until } = await this.mesonInstance.getLockedSwap(encoded, initiator, ...overrides)
     return {
       until,
-      poolOwner: poolOwner.substring(2) === Zero ? undefined : this.#formatAddress(poolOwner)
+      poolOwner: poolOwner && (poolOwner.substring(2) === Zero ? undefined : this.#formatAddress(poolOwner))
     }
   }
 

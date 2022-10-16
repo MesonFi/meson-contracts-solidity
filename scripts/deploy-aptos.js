@@ -28,7 +28,7 @@ exports.prepare = async function prepare(aptosNetwork) {
 
   console.log(key)
 
-  const bal = await wallet.getBalance()
+  const bal = await wallet.getBalance(await wallet.getAddress())
   console.log(`Balance: ${bal.toString()}`)
 }
 
@@ -36,7 +36,7 @@ exports.deployAptos = async function deployAptos(aptosNetwork) {
   const aptos = getProvider(aptosNetwork)
   const wallet = adaptor.getWallet(APTOS_PRIVATE_KEY, aptos)
 
-  const bal = await wallet.getBalance()
+  const bal = await wallet.getBalance(await wallet.getAddress())
   console.log(`Balance: ${bal.toString()}`)
 
   // const tokens = aptosNetwork.tokens

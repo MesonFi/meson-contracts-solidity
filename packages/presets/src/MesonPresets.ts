@@ -183,7 +183,7 @@ export class MesonPresets {
     return { swap, from, to }
   }
 
-  getClient(id: string, provider: providers.Provider | Signer): MesonClient {
+  getClient(id: string, provider: any): MesonClient {
     const network = this.getNetwork(id)
     if (!network) {
       throw new Error(`Unsupported network: ${id}`)

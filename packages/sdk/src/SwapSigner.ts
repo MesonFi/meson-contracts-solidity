@@ -11,7 +11,7 @@ export type Signature = [string, string, number]
 const nonTyped = encoded => parseInt(encoded[15], 16) >= 8
 const fromTron = encoded => encoded.substring(60, 64) === '00c3'
 const toTron = encoded => encoded.substring(54, 58) === '00c3'
-const hexAddress = addr => `0x${TronWeb.address.toHex(addr).substring(2)}`
+const hexAddress = addr => `0x${TronWeb.address.toHex(addr).substring(2)}`.substring(0, 42)
 const noticeRecipient = encoded => toTron(encoded) ? 'Recipient (tron address in hex format)' : 'Recipient'
 
 export class SwapSigner {
@@ -54,7 +54,7 @@ export class SwapSigner {
   static hashRelease(encoded: string, recipient: string, testnet?: boolean): string {
     if (fromTron(encoded)) {
       const header = nonTyped(encoded) ? '\x19TRON Signed Message:\n53\n' : '\x19TRON Signed Message:\n32\n'
-      return utils.solidityKeccak256(['string', 'bytes32', 'address'], [header, encoded, recipient])
+      return utils.solidityKeccak256(['string', 'bytes32', 'address'], [header, encoded, hexAddress(recipient)])
     } else if (nonTyped(encoded)) {
       const header = '\x19Ethereum Signed Message:\n52'
       return utils.solidityKeccak256(['string', 'bytes32', 'address'], [header, encoded, hexAddress(recipient)])
@@ -127,7 +127,7 @@ export class RemoteSwapSigner extends SwapSigner {
   async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<Signature> {
     let signature
     if (fromTron(encoded)) {
-      const message = utils.solidityPack(['bytes32', 'address'], [encoded, recipient]).replace('0x', '0x0a')
+      const message = utils.solidityPack(['bytes32', 'address'], [encoded, hexAddress(recipient)]).replace('0x', '0x0a')
       signature = await this.remoteSigner.signMessage(message)
     } else if (nonTyped(encoded)) {
       const message = utils.solidityPack(['bytes32', 'address'], [encoded, hexAddress(recipient)])
