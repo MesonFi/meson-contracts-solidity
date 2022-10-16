@@ -1,4 +1,5 @@
 import { providers, errors, type Signer } from 'ethers'
+import { AptosClient } from 'aptos'
 import TronWeb from 'tronweb'
 
 import {
@@ -204,7 +205,9 @@ export class MesonPresets {
       let provider
       const providerNetwork = { name: network.name, chainId: Number(network.chainId) }
       
-      if (id.startsWith('tron')) {
+      if (id.startsWith('aptos')) {
+        provider = new AptosClient(url)
+      } else if (id.startsWith('tron')) {
         provider = new TronWeb({ fullHost: url })
       } else if (quorum) {
         const fallbacks = quorum.list.map(({ url, ws, priority, stallTimeout, weight }) => {

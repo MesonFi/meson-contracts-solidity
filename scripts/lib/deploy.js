@@ -31,7 +31,7 @@ async function deployContract(name, wallet, args = []) {
     return await deployZkContract(name, wallet, args)
   } else if (wallet instanceof ethers.Wallet) {
     return await deployEtherContract(name, wallet, args)
-  } else if (wallet instanceof adaptor.AptosWallet) {
+  } else if (wallet.signer && wallet.client) {
     return await deployAptosContract(name, wallet, args)
   } else {
     return await deployTronContract(name, wallet, args)

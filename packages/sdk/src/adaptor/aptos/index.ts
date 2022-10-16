@@ -1,7 +1,8 @@
 import { BigNumber, utils } from 'ethers'
-import { AptosClient, AptosAccount, CoinClient, TxnBuilderTypes, HexString } from 'aptos'
+import { AptosClient, AptosAccount } from 'aptos'
 
-import { Swap } from '../Swap'
+import { AptosWallet, AptosProvider } from './classes'
+import { Swap } from '../../Swap'
 
 const tokens = [
   {
@@ -14,68 +15,31 @@ const tokens = [
   }
 ]
 
-export class AptosWallet {
-  readonly client: AptosClient
-  readonly signer: AptosAccount
-
-  constructor(client: AptosClient, signer: AptosAccount) {
-    this.client = client
-    this.signer = signer
-  }
-
-  getAddress() {
-    return this.signer.address().toString()
-  }
-
-  async getBalance() {
-    const coinClient = new CoinClient(this.client)
-    return BigNumber.from(await coinClient.checkBalance(this.signer))
-  }
-
-  async sendTransaction(payload) {
-    const tx = await this.client.generateTransaction(this.signer.address(), payload)
-    const signed = await this.client.signTransaction(this.signer, tx)
-    const pending = await this.client.submitTransaction(signed)
-
-    return {
-      hash: pending.hash,
-      wait: () => this.wait(pending.hash)
-    }
-  }
-
-  async deploy(module, metadata) {
-    const hash = await this.client.publishPackage(
-      this.signer,
-      new HexString(metadata).toUint8Array(),
-      [new TxnBuilderTypes.Module(new HexString(module).toUint8Array())]
-    )
-
-    return {
-      hash,
-      wait: () => this.wait(hash)
-    }
-  }
-
-  async wait(hash) {
-    await this.client.waitForTransaction(hash, { checkSuccess: true })
-  }
-}
-
 export function getWallet(privateKey, client: AptosClient): AptosWallet {
   const signer = new AptosAccount(privateKey && utils.arrayify(privateKey))
   return new AptosWallet(client, signer)
 }
 
-export function getContract(address, abi, wallet: AptosWallet) {
-  const { client, signer } = wallet
+export function getContract(address, abi, walletOrClient: AptosProvider | AptosClient) {
+  let provider: AptosProvider
+  let signer: AptosAccount
+
+  if (walletOrClient instanceof AptosWallet) {
+    provider = walletOrClient
+    signer = walletOrClient.signer
+  } else if (walletOrClient instanceof AptosProvider) {
+    provider = walletOrClient
+  } else {
+    provider = new AptosProvider(walletOrClient)
+  }
   return new Proxy({}, {
     get(target, prop: string) {
       if (prop === 'address') {
         return address
       } else if (prop === 'provider') {
-        return client
+        return provider
       } else if (prop === 'signer') {
-        return wallet
+        return provider
       } else if (prop === 'interface') {
         return new utils.Interface(abi)
       } else if (['queryFilter', 'on', 'removeAllListeners'].includes(prop)) {
@@ -101,10 +65,13 @@ export function getContract(address, abi, wallet: AptosWallet) {
             // TODO how to read from aptos contract?
 
             // ERC20 like
-            if (prop === 'decimals') {
-              return 6
-            } else if (prop === 'allowance') {
-              return BigNumber.from(10 ** 12)
+            if (['name', 'symbol', 'decimals'].includes(prop)) {
+              const account = address.split('::')[0]
+              const result = await provider.client.getAccountResource(account, `0x1::coin::CoinInfo<${address}>`)
+              return (result.data as any)[prop]
+            } else if (prop === 'balanceOf' || prop === 'allowance') {
+              const result = await provider.client.getAccountResource(args[0], `0x1::coin::CoinStore<${address}>`)
+              return BigNumber.from((result.data as any).coin.value)
             }
             
             // Meson
@@ -117,12 +84,20 @@ export function getContract(address, abi, wallet: AptosWallet) {
               }
             } else if (prop === 'poolOfAuthorizedAddr') {
               return 1
+            } else if (prop === 'poolTokenBalance') {
+              const [token, poolOwner] = args
+              const result = await provider.client.getAccountResource(poolOwner, `${address}::MesonStates::StakingCoin<${token}>`)
+              return BigNumber.from((result.data as any).value)
             }
 
             throw new Error(`AptosContract read not implemented (${prop})`)
           }
         } else {
           return async (...args) => {
+            if (!signer) {
+              throw new Error('No signer given')
+            }
+
             let overrides
             if (args.length > method.inputs.length) {
               overrides = args.pop()
@@ -191,7 +166,7 @@ export function getContract(address, abi, wallet: AptosWallet) {
               }
             }
 
-            return await wallet.sendTransaction(payload)
+            return await (provider as AptosWallet).sendTransaction(payload)
           }
         }
       }

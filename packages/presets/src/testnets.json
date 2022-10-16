@@ -524,18 +524,23 @@
     "uctAddress": "0x88C6C4B902EEB10E192282F74B894bB7AA8B0640"
   },
   {
-    "id": "aptos",
-    "name": "Aptos",
+    "id": "aptos-testnet",
+    "name": "Aptos Devnet",
     "alias": "APT",
-    "chainId": "",
+    "chainId": "0x22",
     "slip44": "0x8000027d",
     "shortSlip44": "0x027d",
     "extensions": [
-      "pontem"
+      "aptos"
     ],
     "addressFormat": "aptos",
     "url": "https://fullnode.devnet.aptoslabs.com",
     "explorer": "https://explorer.aptoslabs.com",
+    "nativeCurrency": {
+      "name": "APT",
+      "symbol": "APT",
+      "decimals": 8
+    },
     "mesonAddress": "0xab3e094b5a516a06276d2d2cf1cddbf2bbf422b33640dbdae00f4a0d59741a6d",
     "tokens": [
       {

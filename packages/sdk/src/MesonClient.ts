@@ -18,7 +18,7 @@ import { SwapWithSigner } from './SwapWithSigner'
 import { SwapSigner } from './SwapSigner'
 import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwap'
 import * as adaptor from './adaptor'
-import { AptosWallet } from './adaptor/aptos'
+import { AptosProvider, AptosWallet } from './adaptor/aptos/classes'
 import { timer } from './utils'
 
 const Zero = constants.AddressZero.substring(2)
@@ -77,7 +77,7 @@ export class MesonClient {
   constructor(mesonInstance: any, shortCoinType: string) {
     if (mesonInstance instanceof Contract) {
       this.#formatAddress = addr => addr.toLowerCase()
-    } else if (mesonInstance instanceof AptosWallet) {
+    } else if (mesonInstance.provider instanceof AptosProvider) {
       this.#formatAddress = addr => addr
     } else {
       this.#formatAddress = addr => TronWeb.address.fromHex(addr)
