@@ -120,6 +120,8 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
                 }
                 throw e
               }
+            } else if (prop === 'ownerOfPool') {
+              return '0x'
             } else if (prop === 'getLockedSwap') {
               const swap = Swap.decode(args[0])
               const result = await provider.client.getAccountResource(address, `${address}::MesonPools::StoredContentOfPools<${tokens[0].addr}>`)
@@ -206,7 +208,6 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
                   utils.arrayify(swap.encoded),
                   utils.arrayify(utils.keccak256(swap.encoded))
                 ]
-                console.log(signer.address())
               } else if (prop === 'executeSwap') {
                 payload.type_arguments = [_getTokenAddr(swap.inToken)]
                 payload.arguments = [
