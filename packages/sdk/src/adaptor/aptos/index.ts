@@ -129,7 +129,7 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
                const result =  await provider.client.getTableItem(handle, {
                   key_type: 'vector<u8>',
                   value_type: `${address}::MesonPools::LockedSwap`,
-                  key: swap.encoded // should be swapId
+                  key: utils.keccak256(swap.encoded) // should be swapId
                 })
                 return {
                   until: Number(result.until),

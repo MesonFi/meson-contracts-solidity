@@ -36,6 +36,7 @@ export class AptosProvider {
 
   async send(method, params) {
     if (method === 'eth_getBlockByNumber') {
+      return null
       if (params[0] === 'latest') {
         const number = await this.getBlockNumber()
         const block = await this.client.getBlockByHeight(number, false)
@@ -49,6 +50,7 @@ export class AptosProvider {
       if (params[0] === 'n/a') {
         return {}
       }
+      return null
       const number = parseInt(params[0])
       const block = await this.client.getBlockByHeight(number, params[1])
       return _wrapAptosBlock(block)
