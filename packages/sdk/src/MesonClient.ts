@@ -235,8 +235,13 @@ export class MesonClient {
     return this.mesonInstance.bondSwap(encoded, poolIndex)
   }
 
-  async lock(signedRequest: SignedSwapRequestData) {
-    return this.mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
+  async lock(signedRequest: SignedSwapRequestData, recipient?: string) {
+    if (recipient) {
+      // this is for aptos
+      return this.mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator, recipient as any)
+    } else {
+      return this.mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
+    }
   }
 
   async unlock(signedRequest: SignedSwapRequestData) {

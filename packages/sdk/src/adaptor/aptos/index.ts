@@ -1,5 +1,5 @@
 import { BigNumber, utils } from 'ethers'
-import { AptosClient, AptosAccount, BCS } from 'aptos'
+import { AptosClient, AptosAccount, HexString } from 'aptos'
 
 import { AptosWallet, AptosProvider } from './classes'
 import { Swap } from '../../Swap'
@@ -156,6 +156,9 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
             let overrides
             if (args.length > method.inputs.length) {
               overrides = args.pop()
+              if (typeof overrides !== 'object') {
+                args.push(overrides)
+              }
             }
 
             const module = _findMesonMethodModule(prop)
@@ -192,12 +195,12 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
                   utils.arrayify(utils.keccak256(swap.encoded))
                 ]
               } else if (prop === 'lock') {
-                // signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator
+                const [_, r, s, v, initiator, recipient] = args
                 payload.type_arguments = [_getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   [swap.encoded.substring(0, 34), '0x' + swap.encoded.substring(34)],
-                  utils.arrayify(args[4]),
-                  signer.address().toString(), // should change to recipient address
+                  utils.arrayify(initiator),
+                  new HexString(recipient),
                   utils.arrayify(utils.keccak256(swap.encoded))
                 ]
               } else if (prop === 'release') {
