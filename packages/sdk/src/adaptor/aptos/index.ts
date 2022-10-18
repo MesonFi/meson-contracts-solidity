@@ -69,9 +69,6 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
       }
 
       let method = abi.find(item => item.name === prop)
-      if (prop === 'initializeTable') {
-        method = { type: 'function', inputs: [{}, {}] }
-      }
       if (method?.type === 'function') {
         if (['view', 'pure'].includes(method.stateMutability)) {
           return async (...args) => {
@@ -168,11 +165,7 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
               arguments: []
             }
 
-            if (prop === 'initializeTable') {
-              const [module, tokenIndex] = args
-              payload.function = `${address}::${module}::${prop}`
-              payload.type_arguments = [_getTokenAddr(tokenIndex)]
-            } else if (prop === 'depositAndRegister') {
+            if (prop === 'depositAndRegister') {
               const [amount, poolTokenIndex] = args
               const tokenIndex = BigNumber.from(poolTokenIndex).div(2**40).toNumber()
               payload.type_arguments = [_getTokenAddr(tokenIndex)]
@@ -184,42 +177,40 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
               payload.arguments = [amount.toBigInt()] // TODO: amount is BigNumberish
             } else {
               const swap = Swap.decode(args[0])
-              const amount = swap.amount.toBigInt()
-              const expireTs = swap.expireTs
-  
               if (prop === 'postSwap') {
-              payload.type_arguments = [_getTokenAddr(swap.inToken)]
+                const [_, r, s, v, postingValue, lpAddress] = args
+                payload.type_arguments = [_getTokenAddr(swap.inToken)]
                 payload.arguments = [
-                  [swap.encoded.substring(0, 34), '0x' + swap.encoded.substring(34)],
-                  signer.address(),
-                  utils.arrayify(utils.keccak256(swap.encoded))
+                  utils.arrayify(swap.encoded),
+                  _getCompactSignature(r, s, v),
+                  utils.arrayify(postingValue.substring(0, 42)), // initiator
+                  lpAddress
                 ]
               } else if (prop === 'lock') {
                 const [_, r, s, v, initiator, recipient] = args
                 payload.type_arguments = [_getTokenAddr(swap.outToken)]
                 payload.arguments = [
-                  [swap.encoded.substring(0, 34), '0x' + swap.encoded.substring(34)],
-                  utils.arrayify(initiator),
-                  new HexString(recipient),
-                  utils.arrayify(utils.keccak256(swap.encoded))
+                  utils.arrayify(swap.encoded),
+                  recipient,
+                  _getCompactSignature(r, s, v),
+                  utils.arrayify(initiator)
                 ]
               } else if (prop === 'release') {
+                const [_, r, s, v, initiator] = args
                 payload.type_arguments = [_getTokenAddr(swap.outToken)]
                 payload.arguments = [
-                  [swap.encoded.substring(0, 34), '0x' + swap.encoded.substring(34)],
-                  utils.arrayify(args[4]),
                   utils.arrayify(swap.encoded),
-                  utils.arrayify(utils.keccak256(swap.encoded))
+                  _getCompactSignature(r, s, v),
+                  utils.arrayify(initiator)
                 ]
               } else if (prop === 'executeSwap') {
+                const [_, r, s, v, recipient, depositToPool] = args
                 payload.type_arguments = [_getTokenAddr(swap.inToken)]
                 payload.arguments = [
-                  [swap.encoded.substring(0, 34), '0x' + swap.encoded.substring(34)],
-                  [], // initiator
-                  signer.address(), // should change to recipient address
                   utils.arrayify(swap.encoded),
-                  utils.arrayify(utils.keccak256(swap.encoded)),
-                  false
+                  _getCompactSignature(r, s, v),
+                  utils.arrayify(recipient.substring(0, 42)),
+                  depositToPool
                 ]
               }
             }
@@ -249,4 +240,11 @@ function _findMesonMethodModule (method) {
 function _getTokenAddr (tokenIndex) {
   const token = tokens.find(t => t.tokenIndex === tokenIndex)
   return token?.addr
+}
+
+function _getCompactSignature(r, s, v) {
+  if (v !== 27 && v !== 28) {
+    throw new Error(`Invalid sig.v: ${v}`)
+  }
+  return utils.arrayify(r + s.replace(/0x\d/, x => (parseInt(x) + (v - 27) * 8).toString(16)))
 }

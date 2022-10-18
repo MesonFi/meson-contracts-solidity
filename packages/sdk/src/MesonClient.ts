@@ -211,19 +211,24 @@ export class MesonClient {
     }, this._signer)
   }
 
-  async postSwap(signedRequest: SignedSwapRequestData) {
+  async postSwap(signedRequest: SignedSwapRequestData, lpAddress?: string) {
     const signer = await this.getSigner()
     const poolIndex = await this.poolOfAuthorizedAddr(signer)
     if (!poolIndex) {
       throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
     }
-    return this.mesonInstance.postSwap(
+    const args = [
       signedRequest.encoded,
       signedRequest.signature[0],
       signedRequest.signature[1],
       signedRequest.signature[2],
       utils.solidityPack(['address', 'uint40'], [signedRequest.initiator, poolIndex])
-    )
+    ]
+    if (lpAddress) {
+      // this is for aptos
+      args.push(lpAddress)
+    }
+    return (this.mesonInstance.postSwap as any)(...args)
   }
 
   async bondSwap(encoded: BigNumberish) {
