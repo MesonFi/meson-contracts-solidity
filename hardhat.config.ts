@@ -102,14 +102,6 @@ task('pool', 'Perform pool operation')
     await pool(network)
   })
 
-task('to-aptos', 'Swap to Aptos')
-  .addParam('testnet', 'Testnet network id', 'polygon')
-  .setAction(async taskArgs => {
-    const { network } = await _switchNetwork(taskArgs)
-    const toAptos = require('./scripts/to-aptos')
-    await toAptos(network, testnets.find(n => n.id.startsWith('aptos')))
-  })
-
 task('uct', 'Run UCT script')
   .addParam('mainnet', 'Mainnet network id', '')
   .addParam('testnet', 'Testnet network id', '')
