@@ -1,5 +1,3 @@
-const fs = require('fs')
-const path = require('path')
 const { ethers } = require('hardhat')
 const { Wallet: ZkWallet } = require('zksync-web3')
 const { Deployer } = require('@matterlabs/hardhat-zksync-deploy')
@@ -31,8 +29,6 @@ async function deployContract(name, wallet, args = []) {
     return await deployZkContract(name, wallet, args)
   } else if (wallet instanceof ethers.Wallet) {
     return await deployEtherContract(name, wallet, args)
-  } else if (wallet.signer && wallet.client) {
-    return await deployAptosContract(name, wallet, args)
   } else {
     return await deployTronContract(name, wallet, args)
   }
@@ -54,24 +50,6 @@ async function deployEtherContract(name, wallet, args) {
   console.log(`${name} deployed to:`, instance.address)
   return instance
 }
-
-async function deployAptosContract(name, wallet, args) {
-  if (!name.startsWith('Meson')) {
-    throw new Error('Not implemented')
-  }
-
-  const projectRoot = path.join(__dirname, '../../../meson-contracts-move')
-
-  // TODO multiple modules?
-  const module = fs.readFileSync(path.join(projectRoot, `build/Meson-Contracts-Move/bytecode_modules/${name}.mv`), 'hex')
-  const metadata = fs.readFileSync(path.join(projectRoot, 'build/Meson-Contracts-Move/package-metadata.bcs'), 'hex')
-
-  const deployed = await wallet.deploy(module, metadata)
-  await deployed.wait()
-
-  console.log(`${name} deployed`)
-}
-exports.deployAptosContract = deployAptosContract
 
 async function deployTronContract(name, wallet, args) {
   const factory = await ethers.getContractFactory(name)
