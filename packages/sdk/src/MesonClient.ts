@@ -18,7 +18,7 @@ import { SwapWithSigner } from './SwapWithSigner'
 import { SwapSigner } from './SwapSigner'
 import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwap'
 import * as adaptor from './adaptor'
-import { AptosProvider, AptosWallet } from './adaptor/aptos/classes'
+import { AptosProvider } from './adaptor/aptos/classes'
 import { timer } from './utils'
 
 const Zero = constants.AddressZero.substring(2)
