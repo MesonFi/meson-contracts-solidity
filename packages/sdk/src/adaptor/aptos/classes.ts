@@ -81,7 +81,7 @@ function _wrapAptosTx(raw) {
     to: raw.payload?.function?.split('::')?.[0] || '',
     value: '0',
     input: JSON.stringify(raw.payload),
-    timestamp: Math.floor(raw.timestamp / 1000).toString(),
+    timestamp: Math.floor(raw.timestamp / 1000_000).toString(),
     status: raw.success ? '0x1' : '0x0'
   }
 }
