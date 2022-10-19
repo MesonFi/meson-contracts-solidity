@@ -1,21 +1,14 @@
-import { BigNumber, utils } from 'ethers'
-import { AptosClient, AptosAccount, HexString } from 'aptos'
+import { BigNumber, BigNumberish, utils } from 'ethers'
+import { AptosClient, AptosAccount } from 'aptos'
+import memoize from 'lodash/memoize'
 
 import { AptosWallet, AptosProvider } from './classes'
 import { Swap } from '../../Swap'
 
-const tokens = [
-  {
-    addr: '0x01015ace920c716794445979be68d402d28b2805b7beaae935d7fe369fa7cfa0::aUSDC::TypeUSDC',
-    tokenIndex: 1,
-  },
-  {
-    addr: '0xaaefd8848cb707617bf82894e2d7af6214b3f3a8e3fc32e91bc026f05f5b10bb::aUSDT::TypeUSDT',
-    tokenIndex: 2,
+export function getWallet(privateKey: string, client: AptosClient): AptosWallet {
+  if (privateKey && !privateKey.startsWith('0x')) {
+    privateKey = '0x' + privateKey
   }
-]
-
-export function getWallet(privateKey, client: AptosClient): AptosWallet {
   const signer = new AptosAccount(privateKey && utils.arrayify(privateKey))
   return new AptosWallet(client, signer)
 }
@@ -23,6 +16,78 @@ export function getWallet(privateKey, client: AptosClient): AptosWallet {
 export function getContract(address, abi, walletOrClient: AptosProvider | AptosClient) {
   let provider: AptosProvider
   let signer: AptosAccount
+
+  const getResource = async (addr: string, type: string) => {
+    try {
+      const result = await provider.client.getAccountResource(addr, type)
+      return result.data as any
+    } catch (e) {
+      if (e.errorCode === 'resource_not_found') {
+        return
+      }
+      throw e
+    }
+  }
+  const memoizedGetResource = memoize(getResource, (addr: string, type: string) => `${addr}|${type}`)
+
+  const readTable = async (handle: string, data: { key_type: string, value_type: string, key: any }) => {
+    try {
+      return await provider.client.getTableItem(handle, data)
+    } catch (e) {
+      if (e.errorCode === 'table_item_not_found') {
+        return
+      }
+      throw e
+    }
+  }
+
+  const getSupportedTokens = memoize(async () => {
+    const data = await memoizedGetResource(address, `${address}::MesonStates::GeneralStore`)
+    const indexes: number[] = []
+    const tokens: string[] = []
+    for (const i of [1, 2, 255]) {
+      const result = await readTable(data.supported_coins.handle, {
+        key_type: 'u8',
+        value_type: '0x1::type_info::TypeInfo',
+        key: i
+      })
+      if (!result) {
+        continue
+      }
+      const { account_address, module_name, struct_name } = result
+      indexes.push(i)
+      tokens.push(`${account_address}:${utils.toUtf8String(module_name)}:${utils.toUtf8String(struct_name)}`)
+    }
+    return { tokens, indexes }
+  })
+
+  const getTokenAddr = async (tokenIndex: number) => {
+    const { tokens, indexes } = await getSupportedTokens()
+    const i = indexes.findIndex(i => i === tokenIndex)
+    if (i === -1) {
+      throw new Error(`Token index ${tokenIndex} not found.`)
+    }
+    return tokens[i]
+  }
+
+  // TODO: What if owner of pool is transferred (although currently unsupported)?
+  const ownerOfPool = memoize(async (poolIndex: BigNumberish) => {
+    const data = await memoizedGetResource(address, `${address}::MesonStates::GeneralStore`)
+    return await readTable(data.pool_owners.handle, {
+      key_type: 'u64',
+      value_type: 'address',
+      key: BigNumber.from(poolIndex).toBigInt()
+    })
+  }, poolIndex => BigNumber.from(poolIndex).toBigInt())
+
+  const poolOfAuthorizedAddr = memoize(async (addr: string) => {
+    const data = await memoizedGetResource(address, `${address}::MesonStates::GeneralStore`)
+    return +await readTable(data.pool_of_authorized_addr.handle, {
+      key_type: 'address',
+      value_type: 'u64',
+      key: addr
+    }) || 0
+  })
 
   if (walletOrClient instanceof AptosWallet) {
     provider = walletOrClient
@@ -82,63 +147,55 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
             // ERC20 like
             if (['name', 'symbol', 'decimals'].includes(prop)) {
               const account = address.split('::')[0]
-              const result = await provider.client.getAccountResource(account, `0x1::coin::CoinInfo<${address}>`)
-              return (result.data as any)[prop]
-            } else if (prop === 'balanceOf' || prop === 'allowance') {
-              try {
-                const result = await provider.client.getAccountResource(args[0], `0x1::coin::CoinStore<${address}>`)
-                return BigNumber.from((result.data as any).coin.value)
-              } catch (e) {
-                if (e.errorCode === 'resource_not_found') {
-                  return BigNumber.from(0)
-                }
-                throw e
-              }
+              const data = await memoizedGetResource(account, `0x1::coin::CoinInfo<${address}>`)
+              return data?.[prop]
+            } else if (prop === 'balanceOf') {
+              const data = await getResource(args[0], `0x1::coin::CoinStore<${address}>`)
+              return BigNumber.from(data?.coin.value || 0)
+            } else if (prop === 'allowance') {
+              return BigNumber.from(2).pow(128).sub(1)
             }
-            
+
             // Meson
             if (prop === 'getShortCoinType') {
               return '0x027d'
             } else if (prop === 'getSupportedTokens') {
-              return {
-                tokens: tokens.map(t => t.addr),
-                indexes: tokens.map(t => t.tokenIndex)
-              }
+              return await getSupportedTokens()
+            } else if (prop === 'ownerOfPool') {
+              return await ownerOfPool(args[0])
             } else if (prop === 'poolOfAuthorizedAddr') {
-              return 1
+              return await poolOfAuthorizedAddr(args[0])
             } else if (prop === 'poolTokenBalance') {
               const [token, poolOwner] = args
-              try {
-                const result = await provider.client.getAccountResource(poolOwner, `${address}::MesonStates::StakingCoin<${token}>`)
-                return BigNumber.from((result.data as any).value)
-              } catch (e) {
-                if (e.errorCode === 'resource_not_found') {
-                  return BigNumber.from(0)
-                }
-                throw e
+              const data = await memoizedGetResource(address, `${address}::MesonStates::StoreForCoin<${token}>`)
+              const result = await readTable(data.in_pool_coins.handle, {
+                key_type: 'u64',
+                value_type: `0x1::coin::Coin<${token}>`,
+                key: (await poolOfAuthorizedAddr(poolOwner)).toString()
+              })
+              return BigNumber.from(result?.value || 0)
+            } else if (prop === 'getPostedSwap') {
+              const data = await memoizedGetResource(address, `${address}::MesonStates::GeneralStore`)
+              const result = await readTable(data.posted_swaps.handle, {
+                key_type: 'vector<u8>',
+                value_type: `${address}::MesonStates::PostedSwap`,
+                key: _getSwapId(Swap.decode(args[0]).encoded, args[1]) // TODO args[1] is undefined
+              })
+              return {
+                initiator: result && args[1],
+                poolOwner: result && await ownerOfPool(result.pool_index),
+                exist: !!result
               }
-            } else if (prop === 'ownerOfPool') {
-              return '0x'
             } else if (prop === 'getLockedSwap') {
-              const swap = Swap.decode(args[0])
-              const result = await provider.client.getAccountResource(address, `${address}::MesonPools::StoredContentOfPools<${tokens[0].addr}>`)
-              const handle = (result.data as any)._lockedSwaps.handle
-
-              try {
-               const result =  await provider.client.getTableItem(handle, {
-                  key_type: 'vector<u8>',
-                  value_type: `${address}::MesonPools::LockedSwap`,
-                  key: utils.keccak256(swap.encoded) // should be swapId
-                })
-                return {
-                  until: Number(result.until),
-                  poolOwner: result.poolOwner
-                }
-              } catch (e) {
-                if (e.errorCode === 'table_item_not_found') {
-                  return { until: 0 }
-                }
-                throw e
+              const data = await memoizedGetResource(address, `${address}::MesonStates::GeneralStore`)
+              const result = await readTable(data.locked_swaps.handle, {
+                key_type: 'vector<u8>',
+                value_type: `${address}::MesonStates::LockedSwap`,
+                key: _getSwapId(Swap.decode(args[0]).encoded, args[1])
+              })
+              return {
+                until: Number(result?.until || 0),
+                poolOwner: result && await ownerOfPool(result.pool_index)
               }
             }
 
@@ -165,52 +222,64 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
               arguments: []
             }
 
-            if (prop === 'depositAndRegister') {
-              const [amount, poolTokenIndex] = args
-              const tokenIndex = BigNumber.from(poolTokenIndex).div(2**40).toNumber()
-              payload.type_arguments = [_getTokenAddr(tokenIndex)]
-              payload.arguments = [amount.toBigInt()] // TODO: amount is BigNumberish
-            } else if (prop === 'deposit') {
-              const [amount, poolTokenIndex] = args
-              const tokenIndex = BigNumber.from(poolTokenIndex).div(2**40).toNumber()
-              payload.type_arguments = [_getTokenAddr(tokenIndex)]
-              payload.arguments = [amount.toBigInt()] // TODO: amount is BigNumberish
+            if (['depositAndRegister', 'deposit', 'withdraw'].includes(prop)) {
+              const poolTokenIndex = BigNumber.from(args[1])
+              const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
+              const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toBigInt()
+              payload.type_arguments = [getTokenAddr(tokenIndex)]
+              payload.arguments = [BigNumber.from(args[0]).toBigInt(), poolIndex]
+            } else if (['addAuthorizedAddr', 'removeAuthorizedAddr'].includes(prop)) {
+              payload.arguments = [args[0]]
             } else {
               const swap = Swap.decode(args[0])
               if (prop === 'postSwap') {
-                const [_, r, s, v, postingValue, lpAddress] = args
-                payload.type_arguments = [_getTokenAddr(swap.inToken)]
+                const [_, r, s, v, postingValue] = args
+                payload.type_arguments = [getTokenAddr(swap.inToken)]
                 payload.arguments = [
                   utils.arrayify(swap.encoded),
                   _getCompactSignature(r, s, v),
                   utils.arrayify(postingValue.substring(0, 42)), // initiator
-                  lpAddress
+                  BigInt(`0x${postingValue.substring(42)}`) // poolIndex
+                ]
+              } else if (prop === 'cancelSwap') {
+                payload.type_arguments = [getTokenAddr(swap.inToken)]
+                payload.arguments = [
+                  utils.arrayify(swap.encoded),
+                  '' // TODO: initiator
+                ]
+              } else if (prop === 'executeSwap') {
+                const [_, r, s, v, recipient, depositToPool] = args
+                payload.type_arguments = [getTokenAddr(swap.inToken)]
+                payload.arguments = [
+                  utils.arrayify(swap.encoded),
+                  _getCompactSignature(r, s, v),
+                  '', // TODO: initiator
+                  utils.arrayify(recipient.substring(0, 42)),
+                  depositToPool
                 ]
               } else if (prop === 'lock') {
                 const [_, r, s, v, initiator, recipient] = args
-                payload.type_arguments = [_getTokenAddr(swap.outToken)]
+                payload.type_arguments = [getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   utils.arrayify(swap.encoded),
-                  recipient,
                   _getCompactSignature(r, s, v),
+                  utils.arrayify(initiator),
+                  recipient
+                ]
+              } else if (prop === 'unlock') {
+                const [_, initiator] = args
+                payload.type_arguments = [getTokenAddr(swap.outToken)]
+                payload.arguments = [
+                  utils.arrayify(swap.encoded),
                   utils.arrayify(initiator)
                 ]
               } else if (prop === 'release') {
                 const [_, r, s, v, initiator] = args
-                payload.type_arguments = [_getTokenAddr(swap.outToken)]
+                payload.type_arguments = [getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   utils.arrayify(swap.encoded),
                   _getCompactSignature(r, s, v),
                   utils.arrayify(initiator)
-                ]
-              } else if (prop === 'executeSwap') {
-                const [_, r, s, v, recipient, depositToPool] = args
-                payload.type_arguments = [_getTokenAddr(swap.inToken)]
-                payload.arguments = [
-                  utils.arrayify(swap.encoded),
-                  _getCompactSignature(r, s, v),
-                  utils.arrayify(recipient.substring(0, 42)),
-                  depositToPool
                 ]
               }
             }
@@ -224,10 +293,19 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
   })
 }
 
-function _findMesonMethodModule (method) {
+function _findMesonMethodModule(method) {
   const moduleMethods = {
-    MesonPools: ['depositAndRegister', 'deposit', 'lock', 'release'],
-    MesonSwap: ['postSwap', 'executeSwap'],
+    MesonPools: [
+      'depositAndRegister',
+      'deposit',
+      'withdraw',
+      'addAuthorizedAddr',
+      'removeAuthorizedAddr',
+      'lock',
+      'unlock',
+      'release'
+    ],
+    MesonSwap: ['postSwap', 'bondSwap', 'cancelSwap', 'executeSwap'],
   }
 
   for (const module of Object.keys(moduleMethods)) {
@@ -237,9 +315,9 @@ function _findMesonMethodModule (method) {
   }
 }
 
-function _getTokenAddr (tokenIndex) {
-  const token = tokens.find(t => t.tokenIndex === tokenIndex)
-  return token?.addr
+function _getSwapId(encoded, initiator) {
+  const packed = utils.solidityPack(['bytes32', 'address'], [encoded, initiator])
+  return utils.keccak256(packed)
 }
 
 function _getCompactSignature(r, s, v) {
