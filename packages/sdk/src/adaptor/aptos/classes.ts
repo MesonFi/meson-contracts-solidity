@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers'
+import { BigNumber, utils } from 'ethers'
 import { AptosClient, AptosAccount, TxnBuilderTypes, HexString } from 'aptos'
 
 export class AptosProvider {
@@ -77,7 +77,7 @@ function _wrapAptosTx(raw) {
     blockHash: 'n/a',
     blockNumber: '',
     hash: raw.hash,
-    from: raw.sender,
+    from: utils.hexZeroPad(raw.sender, 32),
     to: raw.payload?.function?.split('::')?.[0] || '',
     value: '0',
     input: JSON.stringify(raw.payload),

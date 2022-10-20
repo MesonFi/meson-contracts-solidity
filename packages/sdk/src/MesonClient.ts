@@ -211,11 +211,13 @@ export class MesonClient {
     }, this._signer)
   }
 
-  async postSwap(signedRequest: SignedSwapRequestData) {
-    const signer = await this.getSigner()
-    const poolIndex = await this.poolOfAuthorizedAddr(signer)
-    if (!poolIndex) {
-      throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
+  async postSwap(signedRequest: SignedSwapRequestData, poolIndex?: number) {
+    if (typeof poolIndex === 'undefined') {
+      const signer = await this.getSigner()
+      poolIndex = await this.poolOfAuthorizedAddr(signer)
+      if (!poolIndex) {
+        throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
+      }
     }
     return this.mesonInstance.postSwap(
       signedRequest.encoded,
@@ -236,8 +238,7 @@ export class MesonClient {
   }
 
   async lock(signedRequest: SignedSwapRequestData, recipient?: string) {
-    if (recipient) {
-      // this is for aptos
+    if (signedRequest.encoded.substring(54, 58) === '027d') { // to aptos
       return this.mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator, recipient as any)
     } else {
       return this.mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
@@ -251,7 +252,7 @@ export class MesonClient {
   async release(signedRelease: SignedSwapReleaseData) {
     const { encoded, signature, initiator } = signedRelease
     let recipient = signedRelease.recipient
-    if (encoded.substring(54, 58) === '00c3') {
+    if (encoded.substring(54, 58) === '00c3') { // to tron
       recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
     }
     return this.mesonInstance.release(encoded, ...signature, initiator, recipient)
@@ -260,8 +261,10 @@ export class MesonClient {
   async executeSwap(signedRelease: SignedSwapReleaseData, depositToPool: boolean = false) {
     const { encoded, signature } = signedRelease
     let recipient = signedRelease.recipient
-    if (encoded.substring(54, 58) === '00c3') {
+    if (encoded.substring(54, 58) === '00c3') { // to tron
       recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
+    } else if (encoded.substring(54, 58) === '027d') { // to aptos
+      recipient = recipient.substring(0, 42)
     }
     return this.mesonInstance.executeSwap(encoded, ...signature, recipient, depositToPool)
   }

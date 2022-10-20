@@ -56,7 +56,11 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
       }
       const { account_address, module_name, struct_name } = result
       indexes.push(i)
-      tokens.push(`${account_address}:${utils.toUtf8String(module_name)}:${utils.toUtf8String(struct_name)}`)
+      tokens.push([
+        utils.hexZeroPad(account_address, 32),
+        utils.toUtf8String(module_name),
+        utils.toUtf8String(struct_name)
+      ].join('::'))
     }
     return { tokens, indexes }
   })
@@ -76,9 +80,9 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
     return await readTable(data.pool_owners.handle, {
       key_type: 'u64',
       value_type: 'address',
-      key: BigNumber.from(poolIndex).toBigInt()
+      key: BigNumber.from(poolIndex).toString()
     })
-  }, poolIndex => BigNumber.from(poolIndex).toBigInt())
+  }, poolIndex => BigNumber.from(poolIndex).toString())
 
   const poolOfAuthorizedAddr = memoize(async (addr: string) => {
     const data = await memoizedGetResource(address, `${address}::MesonStates::GeneralStore`)
@@ -114,15 +118,36 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
             if (payload.type !== 'entry_function_payload') {
               throw new Error(`Payload type ${payload.type} unsupported`)
             }
-            const { function: fun, type_arguments, arguments: args } = payload
-            const [addr, module, name] = fun.split('::')
-            const encoded0 = utils.hexZeroPad(BigNumber.from(args[0][0]).toHexString(), 16)
-            const encoded1 = utils.hexZeroPad(BigNumber.from(args[0][1]).toHexString(), 16)
-            const encodedSwap = encoded0 + encoded1.substring(2)
-            return {
-              name,
-              args: { encodedSwap, initiator: args[1] }
+            const { function: fun, arguments: rawArgs } = payload
+            const name = fun.split('::')[2]
+            const args: any = { encodedSwap: rawArgs[0] }
+            switch (name) {
+              case 'bondSwap':
+              case 'cancelSwap':
+                break
+              case 'lock':
+                args.initiator = rawArgs[2]
+                break
+              case 'unlock':
+                args.initiator = rawArgs[1]
+                break
+              case 'postSwap':
+                args.postingValue = utils.solidityPack(['address', 'uint40'], [rawArgs[2], rawArgs[3]])
+                break
+              case 'executeSwap':
+                args.recipient = rawArgs[2]
+                break
+              case 'release':
+                args.initiator = rawArgs[2]
+                break
             }
+            if (['postSwap', 'executeSwap', 'release'].includes(name)) {
+              const { r, s, v } = utils.splitSignature(rawArgs[1])
+              args.r = r
+              args.s = s
+              args.v = v
+            }
+            return { name, args }
           }
         }
       } else if (['queryFilter', 'on', 'removeAllListeners'].includes(prop)) {
@@ -179,10 +204,10 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
               const result = await readTable(data.posted_swaps.handle, {
                 key_type: 'vector<u8>',
                 value_type: `${address}::MesonStates::PostedSwap`,
-                key: _getSwapId(Swap.decode(args[0]).encoded, args[1]) // TODO args[1] is undefined
+                key: `${Swap.decode(args[0]).encoded}ff`
               })
               return {
-                initiator: result && args[1],
+                initiator: result && result.initiator,
                 poolOwner: result && await ownerOfPool(result.pool_index),
                 exist: !!result
               }
@@ -226,7 +251,7 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
               const poolTokenIndex = BigNumber.from(args[1])
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
               const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toBigInt()
-              payload.type_arguments = [getTokenAddr(tokenIndex)]
+              payload.type_arguments = [await getTokenAddr(tokenIndex)]
               payload.arguments = [BigNumber.from(args[0]).toBigInt(), poolIndex]
             } else if (['addAuthorizedAddr', 'removeAuthorizedAddr'].includes(prop)) {
               payload.arguments = [args[0]]
@@ -234,32 +259,28 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
               const swap = Swap.decode(args[0])
               if (prop === 'postSwap') {
                 const [_, r, s, v, postingValue] = args
-                payload.type_arguments = [getTokenAddr(swap.inToken)]
+                payload.type_arguments = [await getTokenAddr(swap.inToken)]
                 payload.arguments = [
                   utils.arrayify(swap.encoded),
                   _getCompactSignature(r, s, v),
                   utils.arrayify(postingValue.substring(0, 42)), // initiator
-                  BigInt(`0x${postingValue.substring(42)}`) // poolIndex
+                  BigInt(`0x${postingValue.substring(42)}`) // pool_index
                 ]
               } else if (prop === 'cancelSwap') {
-                payload.type_arguments = [getTokenAddr(swap.inToken)]
-                payload.arguments = [
-                  utils.arrayify(swap.encoded),
-                  '' // TODO: initiator
-                ]
+                payload.type_arguments = [await getTokenAddr(swap.inToken)]
+                payload.arguments = [utils.arrayify(swap.encoded)]
               } else if (prop === 'executeSwap') {
                 const [_, r, s, v, recipient, depositToPool] = args
-                payload.type_arguments = [getTokenAddr(swap.inToken)]
+                payload.type_arguments = [await getTokenAddr(swap.inToken)]
                 payload.arguments = [
                   utils.arrayify(swap.encoded),
                   _getCompactSignature(r, s, v),
-                  '', // TODO: initiator
                   utils.arrayify(recipient.substring(0, 42)),
                   depositToPool
                 ]
               } else if (prop === 'lock') {
                 const [_, r, s, v, initiator, recipient] = args
-                payload.type_arguments = [getTokenAddr(swap.outToken)]
+                payload.type_arguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   utils.arrayify(swap.encoded),
                   _getCompactSignature(r, s, v),
@@ -268,14 +289,14 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
                 ]
               } else if (prop === 'unlock') {
                 const [_, initiator] = args
-                payload.type_arguments = [getTokenAddr(swap.outToken)]
+                payload.type_arguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   utils.arrayify(swap.encoded),
                   utils.arrayify(initiator)
                 ]
               } else if (prop === 'release') {
                 const [_, r, s, v, initiator] = args
-                payload.type_arguments = [getTokenAddr(swap.outToken)]
+                payload.type_arguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   utils.arrayify(swap.encoded),
                   _getCompactSignature(r, s, v),
