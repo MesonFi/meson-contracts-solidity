@@ -94,7 +94,7 @@ export class AptosWallet extends AptosProvider {
     this.signer = signer
   }
 
-  getAddress() {
+  async getAddress() {
     return this.signer.address().toString()
   }
 
@@ -109,7 +109,7 @@ export class AptosWallet extends AptosProvider {
     }
   }
 
-  async deploy(module, metadata) {
+  async deploy(module: string, metadata: string) {
     const hash = await this.client.publishPackage(
       this.signer,
       new HexString(metadata).toUint8Array(),
@@ -120,6 +120,36 @@ export class AptosWallet extends AptosProvider {
       hash,
       wait: () => this.wait(hash)
     }
+  }
+
+  async wait(hash: string) {
+    await this.client.waitForTransaction(hash, { checkSuccess: true })
+  }
+}
+
+export class AptosExtWallet extends AptosWallet {
+  readonly extSigner: any
+
+  constructor(client: AptosClient, extSigner) {
+    super(client, null)
+    this.extSigner = extSigner
+  }
+
+  async getAddress() {
+    return this.extSigner.account() as string
+  }
+
+  async sendTransaction(payload) {
+    const tx = await this.extSigner.signAndSubmit(payload)
+    // TODO: error handling
+    return {
+      hash: tx.result.hash,
+      wait: async () => {}
+    }
+  }
+
+  async deploy(): Promise<any> {
+    throw new Error('Cannot deploy with extention wallet')
   }
 
   async wait(hash) {

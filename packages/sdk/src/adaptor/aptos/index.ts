@@ -2,7 +2,7 @@ import { BigNumber, BigNumberish, utils } from 'ethers'
 import { AptosClient, AptosAccount } from 'aptos'
 import memoize from 'lodash/memoize'
 
-import { AptosWallet, AptosProvider } from './classes'
+import { AptosProvider, AptosWallet, AptosExtWallet } from './classes'
 import { Swap } from '../../Swap'
 
 export function getWallet(privateKey: string, client: AptosClient): AptosWallet {
@@ -13,9 +13,12 @@ export function getWallet(privateKey: string, client: AptosClient): AptosWallet 
   return new AptosWallet(client, signer)
 }
 
+export function getWalletFromExtension(extSigner, client: AptosClient): AptosExtWallet {
+  return new AptosExtWallet(client, extSigner)
+}
+
 export function getContract(address, abi, walletOrClient: AptosProvider | AptosClient) {
   let provider: AptosProvider
-  let signer: AptosAccount
 
   const getResource = async (addr: string, type: string) => {
     try {
@@ -95,7 +98,6 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
 
   if (walletOrClient instanceof AptosWallet) {
     provider = walletOrClient
-    signer = walletOrClient.signer
   } else if (walletOrClient instanceof AptosProvider) {
     provider = walletOrClient
   } else {
@@ -132,7 +134,7 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
                 args.initiator = rawArgs[1]
                 break
               case 'postSwap':
-                args.postingValue = utils.solidityPack(['address', 'uint40'], [rawArgs[2], rawArgs[3]])
+                args.postingValue = BigNumber.from(utils.solidityPack(['address', 'uint40'], [rawArgs[2], rawArgs[3]]))
                 break
               case 'executeSwap':
                 args.recipient = rawArgs[2]
@@ -228,10 +230,6 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
           }
         } else {
           return async (...args) => {
-            if (!signer) {
-              throw new Error('No signer given')
-            }
-
             let overrides
             if (args.length > method.inputs.length) {
               overrides = args.pop()
@@ -250,9 +248,9 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
             if (['depositAndRegister', 'deposit', 'withdraw'].includes(prop)) {
               const poolTokenIndex = BigNumber.from(args[1])
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
-              const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toBigInt()
+              const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toHexString()
               payload.type_arguments = [await getTokenAddr(tokenIndex)]
-              payload.arguments = [BigNumber.from(args[0]).toBigInt(), poolIndex]
+              payload.arguments = [BigNumber.from(args[0]).toHexString(), poolIndex]
             } else if (['addAuthorizedAddr', 'removeAuthorizedAddr'].includes(prop)) {
               payload.arguments = [args[0]]
             } else {
@@ -264,7 +262,7 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
                   utils.arrayify(swap.encoded),
                   _getCompactSignature(r, s, v),
                   utils.arrayify(postingValue.substring(0, 42)), // initiator
-                  BigInt(`0x${postingValue.substring(42)}`) // pool_index
+                  `0x${postingValue.substring(42)}` // pool_index
                 ]
               } else if (prop === 'cancelSwap') {
                 payload.type_arguments = [await getTokenAddr(swap.inToken)]

@@ -331,8 +331,8 @@ export class MesonClient {
     const { initiator, poolOwner, exist } = await this.mesonInstance.getPostedSwap(encoded, ...overrides)
     return {
       exist,
-      initiator: initiator.substring(2) === Zero ? undefined : initiator.replace(/^41/, '0x'), // convert tron hex address
-      poolOwner: poolOwner.substring(2) === Zero ? undefined : this.#formatAddress(poolOwner)
+      initiator: initiator && (initiator.substring(2) === Zero ? undefined : initiator.replace(/^41/, '0x')), // convert tron hex address
+      poolOwner: poolOwner && (poolOwner.substring(2) === Zero ? undefined : this.#formatAddress(poolOwner))
     }
   }
 

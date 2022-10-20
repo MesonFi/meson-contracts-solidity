@@ -1,4 +1,5 @@
-import { utils, type Wallet } from 'ethers'
+import { Wallet, utils } from 'ethers'
+import { HDNode } from "@ethersproject/hdnode";
 import TronWeb from 'tronweb'
 
 const NOTICE_SIGN_REQUEST = 'Sign to request a swap on Meson'
@@ -141,5 +142,40 @@ export class RemoteSwapSigner extends SwapSigner {
       signature = await this.remoteSigner.signTypedData(data)
     }
     return this._separateSignature(signature)
+  }
+}
+
+export class NonEcdsaRemoteSwapSigner extends SwapSigner {
+  readonly remoteSigner: RemoteSigner
+  #initiatorSwapSigner: EthersWalletSwapSigner
+
+  constructor (remoteSigner: RemoteSigner) {
+    super()
+    this.remoteSigner = remoteSigner
+    this.#initiatorSwapSigner = null
+  }
+
+  getAddress(): string {
+    return this.#initiatorSwapSigner.getAddress()
+  }
+
+  private _swapSignerFromSeed(seed: string) {
+    const hdNode = HDNode.fromSeed(seed)
+    const wallet = new Wallet(hdNode)
+    return new EthersWalletSwapSigner(wallet)
+  }
+
+  async signSwapRequest(encoded: string, testnet?: boolean): Promise<Signature> {
+    const signature = await this.remoteSigner.signMessage(encoded)
+    this.#initiatorSwapSigner = this._swapSignerFromSeed(signature)
+    return await this.#initiatorSwapSigner.signSwapRequest(encoded, testnet)
+  }
+
+  async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<Signature> {
+    if (!this.#initiatorSwapSigner) {
+      const signature = await this.remoteSigner.signMessage(encoded)
+      this.#initiatorSwapSigner = this._swapSignerFromSeed(signature)
+    }
+    return await this.#initiatorSwapSigner.signSwapRelease(encoded, recipient, testnet)
   }
 }
