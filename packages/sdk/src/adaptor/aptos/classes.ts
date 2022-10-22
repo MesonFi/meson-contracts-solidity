@@ -76,9 +76,9 @@ function _wrapAptosTx(raw) {
   return {
     blockHash: 'n/a',
     blockNumber: '',
-    hash: raw.hash,
+    hash: utils.hexZeroPad(raw.hash, 32),
     from: utils.hexZeroPad(raw.sender, 32),
-    to: raw.payload?.function?.split('::')?.[0] || '',
+    to: utils.hexZeroPad(raw.payload?.function?.split('::')?.[0] || '0x', 32),
     value: '0',
     input: JSON.stringify(raw.payload),
     timestamp: Math.floor(raw.timestamp / 1000000).toString(),
@@ -104,17 +104,18 @@ export class AptosWallet extends AptosProvider {
     const pending = await this.client.submitTransaction(signed)
 
     return {
-      hash: pending.hash,
+      hash: utils.hexZeroPad(pending.hash, 32),
       wait: () => this.wait(pending.hash)
     }
   }
 
   async deploy(module: string, metadata: string) {
-    const hash = await this.client.publishPackage(
+    let hash = await this.client.publishPackage(
       this.signer,
       new HexString(metadata).toUint8Array(),
       [new TxnBuilderTypes.Module(new HexString(module).toUint8Array())]
     )
+    hash = utils.hexZeroPad(hash, 32)
 
     return {
       hash,
@@ -143,7 +144,7 @@ export class AptosExtWallet extends AptosWallet {
     const tx = await this.extSigner.signAndSubmit(payload)
     // TODO: error handling
     return {
-      hash: tx.result.hash,
+      hash: utils.hexZeroPad(tx.result.hash, 32),
       wait: async () => {}
     }
   }
