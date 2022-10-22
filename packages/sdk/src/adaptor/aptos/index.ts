@@ -208,10 +208,11 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
                 value_type: `${address}::MesonStates::PostedSwap`,
                 key: `${Swap.decode(args[0]).encoded}ff`
               })
+              const exist = !!(result && result.from_address !== '0x0')
               return {
-                initiator: result && result.initiator,
-                poolOwner: result && await ownerOfPool(result.pool_index),
-                exist: !!result
+                initiator: exist ? result.initiator : undefined,
+                poolOwner: exist ? await ownerOfPool(result.pool_index) : undefined,
+                exist
               }
             } else if (prop === 'getLockedSwap') {
               const data = await memoizedGetResource(address, `${address}::MesonStates::GeneralStore`)
@@ -264,6 +265,9 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
                   utils.arrayify(postingValue.substring(0, 42)), // initiator
                   `0x${postingValue.substring(42)}` // pool_index
                 ]
+              } else if (prop === 'bondSwap') {
+                payload.type_arguments = [await getTokenAddr(swap.inToken)]
+                payload.arguments = [utils.arrayify(swap.encoded), args[1].toString()]
               } else if (prop === 'cancelSwap') {
                 payload.type_arguments = [await getTokenAddr(swap.inToken)]
                 payload.arguments = [utils.arrayify(swap.encoded)]
