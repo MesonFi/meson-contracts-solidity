@@ -527,7 +527,7 @@
     "id": "aptos-testnet",
     "name": "Aptos Devnet",
     "alias": "APT",
-    "chainId": "0x22",
+    "chainId": "aptos:0x22",
     "slip44": "0x8000027d",
     "shortSlip44": "0x027d",
     "extensions": [
@@ -541,20 +541,21 @@
       "symbol": "APT",
       "decimals": 8
     },
-    "mesonAddress": "0xe315a8284ebfb02c54fe42a2e49f7296ea9ebf57fd702ac62a094b8d6baca61b",
+    "mesonAddress": "0x09a06455dd64b150701bb957fc9fe9e40d4ebea6c4ef6aa5073f35394af115dc",
+    "uctAddress": "0x09a06455dd64b150701bb957fc9fe9e40d4ebea6c4ef6aa5073f35394af115dc::Coins::UCT",
     "tokens": [
       {
-        "name": "USDC",
+        "name": "USD Coin",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "0x01015ace920c716794445979be68d402d28b2805b7beaae935d7fe369fa7cfa0::aUSDC::TypeUSDC",
+        "addr": "0x09a06455dd64b150701bb957fc9fe9e40d4ebea6c4ef6aa5073f35394af115dc::Coins::USDC",
         "tokenIndex": 1
       },
       {
-        "name": "USDT",
+        "name": "Tether USD",
         "symbol": "USDT",
         "decimals": 6,
-        "addr": "0xaaefd8848cb707617bf82894e2d7af6214b3f3a8e3fc32e91bc026f05f5b10bb::aUSDT::TypeUSDT",
+        "addr": "0x09a06455dd64b150701bb957fc9fe9e40d4ebea6c4ef6aa5073f35394af115dc::Coins::USDT",
         "tokenIndex": 2
       }
     ]

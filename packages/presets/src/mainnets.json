@@ -397,6 +397,43 @@
     ]
   },
   {
+    "id": "aptos",
+    "name": "Aptos",
+    "alias": "APT",
+    "chainId": "aptos:0x1",
+    "slip44": "0x8000027d",
+    "shortSlip44": "0x027d",
+    "extensions": [
+      "aptos"
+    ],
+    "addressFormat": "aptos",
+    "url": "https://fullnode.mainnet.aptoslabs.com",
+    "explorer": "https://explorer.aptoslabs.com",
+    "nativeCurrency": {
+      "name": "Aptos",
+      "symbol": "APT",
+      "decimals": 8
+    },
+    "mesonAddress": "0xc0de4c979914cc543a8b57829b4eca3829a4362791ccaf153d7c8dafc9d5dd37",
+    "uctAddress": "0xc0de4c979914cc543a8b57829b4eca3829a4362791ccaf153d7c8dafc9d5dd37::Coins::UCT",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0xc0de4c979914cc543a8b57829b4eca3829a4362791ccaf153d7c8dafc9d5dd37::Coins::USDC",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xc0de4c979914cc543a8b57829b4eca3829a4362791ccaf153d7c8dafc9d5dd37::Coins::USDT",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
     "id": "evmos",
     "name": "Evmos",
     "alias": "evmos",
