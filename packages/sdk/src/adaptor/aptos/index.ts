@@ -164,12 +164,10 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
       if (method?.type === 'function') {
         if (['view', 'pure'].includes(method.stateMutability)) {
           return async (...args) => {
-            let overrides
+            let options
             if (args.length > method.inputs.length) {
-              overrides = args.pop()
+              options = args.pop()
             }
-
-            // TODO how to read from aptos contract?
 
             // ERC20 like
             if (['name', 'symbol', 'decimals'].includes(prop)) {
@@ -231,12 +229,9 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
           }
         } else {
           return async (...args) => {
-            let overrides
+            let options
             if (args.length > method.inputs.length) {
-              overrides = args.pop()
-              if (typeof overrides !== 'object') {
-                args.push(overrides)
-              }
+              options = args.pop()
             }
 
             const module = _findMesonMethodModule(prop)
@@ -260,9 +255,9 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
                 const [_, r, s, v, postingValue] = args
                 payload.type_arguments = [await getTokenAddr(swap.inToken)]
                 payload.arguments = [
-                  utils.arrayify(swap.encoded),
-                  _getCompactSignature(r, s, v),
-                  utils.arrayify(postingValue.substring(0, 42)), // initiator
+                  Array.from(utils.arrayify(swap.encoded)),
+                  Array.from(_getCompactSignature(r, s, v)),
+                  Array.from(utils.arrayify(postingValue.substring(0, 42))), // initiator
                   `0x${postingValue.substring(42)}` // pool_index
                 ]
               } else if (prop === 'bondSwap') {
@@ -281,7 +276,7 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
                   depositToPool
                 ]
               } else if (prop === 'lock') {
-                const [_, r, s, v, initiator, recipient] = args
+                const [_, r, s, v, { initiator, recipient }] = args
                 payload.type_arguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   utils.arrayify(swap.encoded),
@@ -307,7 +302,7 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
               }
             }
 
-            return await (provider as AptosWallet).sendTransaction(payload)
+            return await (provider as AptosWallet).sendTransaction(payload, options)
           }
         }
       }

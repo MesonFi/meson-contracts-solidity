@@ -41,7 +41,6 @@ export class AptosProvider {
         const block = await this.client.getBlockByHeight(number, false)
         return _wrapAptosBlock(block)
       } else {
-        return null
         const number = parseInt(params[0])
         const block = await this.client.getBlockByHeight(number, params[1])
         return _wrapAptosBlock(block)
@@ -50,7 +49,6 @@ export class AptosProvider {
       if (params[0] === 'n/a') {
         return {}
       }
-      return null
       const number = parseInt(params[0])
       const block = await this.client.getBlockByHeight(number, params[1])
       return _wrapAptosBlock(block)
@@ -67,7 +65,7 @@ function _wrapAptosBlock(raw) {
     hash: '0x' + Number(raw.block_height).toString(16),
     parentHash: '0x' + Number(raw.block_height - 1).toString(16),
     number: raw.block_height,
-    timestamp: Math.floor(raw.block_timestamp / 1000).toString(),
+    timestamp: Math.floor(raw.block_timestamp / 1000000).toString(),
     transactions: raw.transactions?.filter(tx => tx.type === 'user_transaction').map(_wrapAptosTx) || []
   }
 }
@@ -98,8 +96,8 @@ export class AptosWallet extends AptosProvider {
     return this.signer.address().toString()
   }
 
-  async sendTransaction(payload) {
-    const tx = await this.client.generateTransaction(this.signer.address(), payload)
+  async sendTransaction(payload, options) {
+    const tx = await this.client.generateTransaction(this.signer.address(), payload, options)
     const signed = await this.client.signTransaction(this.signer, tx)
     const pending = await this.client.submitTransaction(signed)
 
@@ -140,11 +138,12 @@ export class AptosExtWallet extends AptosWallet {
     return this.extSigner.account() as string
   }
 
-  async sendTransaction(payload) {
-    const tx = await this.extSigner.signAndSubmit(payload)
+  async sendTransaction(payload, options) {
+    // This method is provided by `@manahippo/aptos-wallet-adapter`
+    const tx = await this.extSigner.signAndSubmitTransaction(payload, options)
     // TODO: error handling
     return {
-      hash: utils.hexZeroPad(tx.result.hash, 32),
+      hash: utils.hexZeroPad(tx.hash, 32),
       wait: async () => {}
     }
   }

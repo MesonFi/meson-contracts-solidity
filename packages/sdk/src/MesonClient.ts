@@ -211,7 +211,7 @@ export class MesonClient {
     }, this._signer)
   }
 
-  async postSwap(signedRequest: SignedSwapRequestData, poolIndex?: number) {
+  async postSwap(signedRequest: SignedSwapRequestData, poolIndex?: number, ...overrides) {
     if (typeof poolIndex === 'undefined') {
       const signer = await this.getSigner()
       poolIndex = await this.poolOfAuthorizedAddr(signer)
@@ -224,41 +224,42 @@ export class MesonClient {
       signedRequest.signature[0],
       signedRequest.signature[1],
       signedRequest.signature[2],
-      utils.solidityPack(['address', 'uint40'], [signedRequest.initiator, poolIndex])
+      utils.solidityPack(['address', 'uint40'], [signedRequest.initiator, poolIndex]),
+      ...overrides
     )
   }
 
-  async bondSwap(encoded: BigNumberish) {
+  async bondSwap(encoded: BigNumberish, ...overrides) {
     const signer = await this.getSigner()
     const poolIndex = await this.poolOfAuthorizedAddr(signer)
     if (!poolIndex) {
       throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
     }
-    return this.mesonInstance.bondSwap(encoded, poolIndex)
+    return this.mesonInstance.bondSwap(encoded, poolIndex, ...overrides)
   }
 
-  async lock(signedRequest: SignedSwapRequestData, recipient?: string) {
+  async lock(signedRequest: SignedSwapRequestData, recipient?: string, ...overrides) {
     if (signedRequest.encoded.substring(54, 58) === '027d') { // to aptos
-      return this.mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator, recipient as any)
+      return this.mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, { initiator: signedRequest.initiator, recipient } as any, ...overrides)
     } else {
-      return this.mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator)
+      return this.mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator, ...overrides)
     }
   }
 
-  async unlock(signedRequest: SignedSwapRequestData) {
-    return this.mesonInstance.unlock(signedRequest.encoded, signedRequest.initiator)
+  async unlock(signedRequest: SignedSwapRequestData, ...overrides) {
+    return this.mesonInstance.unlock(signedRequest.encoded, signedRequest.initiator, ...overrides)
   }
 
-  async release(signedRelease: SignedSwapReleaseData) {
+  async release(signedRelease: SignedSwapReleaseData, ...overrides) {
     const { encoded, signature, initiator } = signedRelease
     let recipient = signedRelease.recipient
     if (encoded.substring(54, 58) === '00c3') { // to tron
       recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
     }
-    return this.mesonInstance.release(encoded, ...signature, initiator, recipient)
+    return this.mesonInstance.release(encoded, ...signature, initiator, recipient, ...overrides)
   }
 
-  async executeSwap(signedRelease: SignedSwapReleaseData, depositToPool: boolean = false) {
+  async executeSwap(signedRelease: SignedSwapReleaseData, depositToPool: boolean = false, ...overrides) {
     const { encoded, signature } = signedRelease
     let recipient = signedRelease.recipient
     if (encoded.substring(54, 58) === '00c3') { // to tron
@@ -266,11 +267,11 @@ export class MesonClient {
     } else if (encoded.substring(54, 58) === '027d') { // to aptos
       recipient = recipient.substring(0, 42)
     }
-    return this.mesonInstance.executeSwap(encoded, ...signature, recipient, depositToPool)
+    return this.mesonInstance.executeSwap(encoded, ...signature, recipient, depositToPool, ...overrides)
   }
 
-  async cancelSwap(encodedSwap: string) {
-    return await this.mesonInstance.cancelSwap(encodedSwap)
+  async cancelSwap(encodedSwap: string, ...overrides) {
+    return await this.mesonInstance.cancelSwap(encodedSwap, ...overrides)
   }
 
   async wait(txHash: string, confirmations: number = 1, ms: number = 60_000) {

@@ -147,16 +147,22 @@ export class RemoteSwapSigner extends SwapSigner {
 
 export class NonEcdsaRemoteSwapSigner extends SwapSigner {
   readonly remoteSigner: RemoteSigner
-  #initiatorSwapSigner: EthersWalletSwapSigner
+  #currentInitiator: string
+  #initiatorSwapSigners: Map<string, EthersWalletSwapSigner>
 
   constructor (remoteSigner: RemoteSigner) {
     super()
     this.remoteSigner = remoteSigner
-    this.#initiatorSwapSigner = null
+    this.#currentInitiator = ''
+    this.#initiatorSwapSigners = new Map()
   }
 
-  getAddress(): string {
-    return this.#initiatorSwapSigner.getAddress()
+  getAddress(encoded = ''): string {
+    if (encoded) {
+      return this.#initiatorSwapSigners.get(encoded)?.getAddress()
+    } else {
+      return this.#currentInitiator
+    }
   }
 
   private _swapSignerFromSeed(seed: string) {
@@ -167,15 +173,19 @@ export class NonEcdsaRemoteSwapSigner extends SwapSigner {
 
   async signSwapRequest(encoded: string, testnet?: boolean): Promise<Signature> {
     const signature = await this.remoteSigner.signMessage(encoded)
-    this.#initiatorSwapSigner = this._swapSignerFromSeed(signature)
-    return await this.#initiatorSwapSigner.signSwapRequest(encoded, testnet)
+    const swapSigner = this._swapSignerFromSeed(signature)
+    this.#initiatorSwapSigners.set(encoded, swapSigner)
+    this.#currentInitiator = swapSigner.getAddress()
+    return await swapSigner.signSwapRequest(encoded, testnet)
   }
 
   async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<Signature> {
-    if (!this.#initiatorSwapSigner) {
+    if (!this.#initiatorSwapSigners.has(encoded)) {
       const signature = await this.remoteSigner.signMessage(encoded)
-      this.#initiatorSwapSigner = this._swapSignerFromSeed(signature)
+      const swapSigner = this._swapSignerFromSeed(signature)
+      this.#initiatorSwapSigners.set(encoded, swapSigner)
+      this.#currentInitiator = swapSigner.getAddress()
     }
-    return await this.#initiatorSwapSigner.signSwapRelease(encoded, recipient, testnet)
+    return await this.#initiatorSwapSigners.get(encoded).signSwapRelease(encoded, recipient, testnet)
   }
 }
