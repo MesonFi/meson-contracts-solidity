@@ -127,20 +127,20 @@ export class AptosWallet extends AptosProvider {
 }
 
 export class AptosExtWallet extends AptosWallet {
-  readonly extSigner: any
+  readonly ext: any
 
-  constructor(client: AptosClient, extSigner) {
+  constructor(client: AptosClient, ext) {
     super(client, null)
-    this.extSigner = extSigner
+    this.ext = ext
   }
 
   async getAddress() {
-    return this.extSigner.account() as string
+    return this.ext.signer.account() as string
   }
 
   async sendTransaction(payload, options) {
     // This method is provided by `@manahippo/aptos-wallet-adapter`
-    const tx = await this.extSigner.signAndSubmitTransaction(payload, options)
+    const tx = await this.ext.signer.signAndSubmitTransaction(payload, options)
     // TODO: error handling
     return {
       hash: utils.hexZeroPad(tx.hash, 32),

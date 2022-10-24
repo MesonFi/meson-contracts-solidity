@@ -13,8 +13,8 @@ export function getWallet(privateKey: string, client: AptosClient): AptosWallet 
   return new AptosWallet(client, signer)
 }
 
-export function getWalletFromExtension(extSigner, client: AptosClient): AptosExtWallet {
-  return new AptosExtWallet(client, extSigner)
+export function getWalletFromExtension(ext, client: AptosClient): AptosExtWallet {
+  return new AptosExtWallet(client, ext)
 }
 
 export function getContract(address, abi, walletOrClient: AptosProvider | AptosClient) {
