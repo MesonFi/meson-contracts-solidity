@@ -305,7 +305,7 @@
     ],
     "addressFormat": "hex",
     "url": "https://mainnet.aurora.dev",
-    "explorer": "https://explorer.mainnet.aurora.dev",
+    "explorer": "https://aurorascan.dev",
     "nativeCurrency": {
       "name": "Aurora ETH",
       "symbol": "ETH",
