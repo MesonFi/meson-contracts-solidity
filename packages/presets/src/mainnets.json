@@ -581,14 +581,14 @@
     "mesonAddress": "",
     "tokens": [
       {
-        "name": "USDC",
+        "name": "USD Coin",
         "symbol": "USDC",
         "decimals": 6,
         "tokenIndex": 1,
         "addr": ""
       },
       {
-        "name": "USDT",
+        "name": "Tether USD",
         "symbol": "USDT",
         "decimals": 6,
         "tokenIndex": 2,
