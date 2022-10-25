@@ -1,5 +1,5 @@
-const { adaptor } = require('@mesonfi/sdk')
-const { getProvider } = require('./lib/getProvider')
+const { adaptors } = require('@mesonfi/sdk')
+const { getClient } = require('./lib/getClient')
 const { deposit, withdraw, send, authorize } = require('./lib/pool')
 
 require('dotenv').config()
@@ -11,9 +11,9 @@ const symbol = 'USDC'
 const addr = ''
 
 module.exports = async function pool(network) {
-  const provider = getProvider(network)
+  const client = getClient(network)
 
-  const wallet = adaptor.getWallet(LP_PRIVATE_KEY, provider)
+  const wallet = adaptors.getWallet(LP_PRIVATE_KEY, client)
   console.log(`LP address: ${await wallet.getAddress()}`)
   
   const tx = await deposit(symbol, amount, { network, wallet })
