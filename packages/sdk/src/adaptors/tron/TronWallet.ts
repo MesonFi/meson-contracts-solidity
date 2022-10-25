@@ -1,0 +1,52 @@
+import TronAdaptor from './TronAdaptor'
+
+export default class TronWallet extends TronAdaptor {
+  constructor(tronWeb) {
+    super(tronWeb)
+  }
+
+  get tronWeb () {
+    return this.client
+  }
+
+  async getAddress() {
+    return this.tronWeb.defaultAddress.base58
+  }
+
+  async transfer({ to, value }) {
+    const tx = await this.tronWeb.transactionBuilder.sendTrx(to, value.toString())
+    const signed = await this.tronWeb.trx.sign(tx)
+    const receipt = await this.tronWeb.trx.sendRawTransaction(signed)
+    return {
+      hash: receipt.txID,
+      wait: () => this.wait(receipt.txID)
+    }
+  }
+
+  async deploy() {}
+
+  async getTransaction(hash: string): Promise<any> {
+    while (true) {
+      try {
+        return await this.send('eth_getTransactionByHash', [hash])
+      } catch {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+      }
+    }
+  }
+
+  async wait(hash: string) {
+    return new Promise(resolve => {
+      const h = setInterval(async () => {
+        let info
+        try {
+          info = await this.tronWeb.trx.getUnconfirmedTransactionInfo(hash)
+        } catch {}
+        if (Object.keys(info).length) {
+          clearInterval(h)
+          resolve(info)
+        }
+      }, 1000)
+    })
+  }
+}

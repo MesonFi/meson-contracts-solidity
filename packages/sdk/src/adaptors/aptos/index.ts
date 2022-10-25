@@ -2,7 +2,8 @@ import { BigNumber, BigNumberish, utils } from 'ethers'
 import { AptosClient, AptosAccount } from 'aptos'
 import memoize from 'lodash/memoize'
 
-import { AptosProvider, AptosWallet, AptosExtWallet } from './classes'
+import AptosAdaptor from './AptosAdaptor'
+import AptosWallet, { AptosExtWallet } from './AptosWallet'
 import { Swap } from '../../Swap'
 
 export function getWallet(privateKey: string, client: AptosClient): AptosWallet {
@@ -17,12 +18,19 @@ export function getWalletFromExtension(ext, client: AptosClient): AptosExtWallet
   return new AptosExtWallet(client, ext)
 }
 
-export function getContract(address, abi, walletOrClient: AptosProvider | AptosClient) {
-  let provider: AptosProvider
+export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAdaptor) {
+  let adaptor: AptosAdaptor
+  if (clientOrAdaptor instanceof AptosWallet) {
+    adaptor = clientOrAdaptor
+  } else if (clientOrAdaptor instanceof AptosAdaptor) {
+    adaptor = clientOrAdaptor
+  } else {
+    adaptor = new AptosAdaptor(clientOrAdaptor)
+  }
 
   const getResource = async (addr: string, type: string) => {
     try {
-      const result = await provider.client.getAccountResource(addr, type)
+      const result = await adaptor.client.getAccountResource(addr, type)
       return result.data as any
     } catch (e) {
       if (e.errorCode === 'resource_not_found') {
@@ -35,7 +43,7 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
 
   const readTable = async (handle: string, data: { key_type: string, value_type: string, key: any }) => {
     try {
-      return await provider.client.getTableItem(handle, data)
+      return await adaptor.client.getTableItem(handle, data)
     } catch (e) {
       if (e.errorCode === 'table_item_not_found') {
         return
@@ -96,21 +104,17 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
     }) || 0
   })
 
-  if (walletOrClient instanceof AptosWallet) {
-    provider = walletOrClient
-  } else if (walletOrClient instanceof AptosProvider) {
-    provider = walletOrClient
-  } else {
-    provider = new AptosProvider(walletOrClient)
-  }
   return new Proxy({}, {
     get(target, prop: string) {
       if (prop === 'address') {
         return address
       } else if (prop === 'provider') {
-        return provider
+        return adaptor
       } else if (prop === 'signer') {
-        return provider
+        if (adaptor instanceof AptosWallet) {
+          return adaptor
+        }
+        throw new Error(`AptosContract doesn't have a signer.`)
       } else if (prop === 'interface') {
         return {
           format: () => abi,
@@ -241,6 +245,13 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
               arguments: []
             }
 
+            if (prop === 'transfer') {
+              const [to, amount] = args
+              payload.function = '0x1::coin::transfer'
+              payload.type_arguments = [address]
+              payload.arguments = [to, BigNumber.from(amount).toString()]
+            }
+
             if (['depositAndRegister', 'deposit', 'withdraw'].includes(prop)) {
               const poolTokenIndex = BigNumber.from(args[1])
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
@@ -302,7 +313,7 @@ export function getContract(address, abi, walletOrClient: AptosProvider | AptosC
               }
             }
 
-            return await (provider as AptosWallet).sendTransaction(payload, options)
+            return await (adaptor as AptosWallet).sendTransaction(payload, options)
           }
         }
       }
