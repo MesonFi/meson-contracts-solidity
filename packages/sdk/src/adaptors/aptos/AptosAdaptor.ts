@@ -60,7 +60,7 @@ export default class AptosAdaptor {
     } else if (method === 'eth_getTransactionReceipt') {
       return _wrapAptosTx(await this.client.getTransactionByHash(params[0]))
     }
-  } 
+  }
 }
 
 function _wrapAptosBlock(raw) {

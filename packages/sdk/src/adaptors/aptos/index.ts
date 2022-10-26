@@ -118,7 +118,6 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
       } else if (prop === 'interface') {
         return {
           format: () => abi,
-          encodeFunctionData: () => { throw new Error('Not implemented: encodeFunctionData') },
           parseTransaction: tx => {
             const payload = JSON.parse(tx.data)
             if (payload.type !== 'entry_function_payload') {

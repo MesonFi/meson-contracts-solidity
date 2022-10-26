@@ -65,9 +65,9 @@ export default class TronContract {
     return new TronContract(this.address, this.#contract.abi, providerOrTronWeb)
   }
 
-  queryFilter () {}
-  on () {}
-  removeAllListeners () {}
+  queryFilter() {}
+  on() {}
+  removeAllListeners() {}
 
   async _read(name: string, abi, args: any[]) {
     let overrides
