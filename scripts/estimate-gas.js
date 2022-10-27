@@ -20,7 +20,7 @@ module.exports = async function main(upgradable) {
   const tokenContract = await deployContract('MockToken', wallet, ['Mock Token', 'MT', totalSupply, 6])
 
   const tokens = [{ addr: tokenContract.address, tokenIndex: 1 }]
-  const mesonContract = await deployMeson(wallet, !!upgradable, await wallet.getAddress(), tokens)
+  const mesonContract = await deployMeson(wallet, !!upgradable, wallet.address, tokens)
   const mesonClient = await MesonClient.Create(mesonContract, swapSigner)
 
   // approve

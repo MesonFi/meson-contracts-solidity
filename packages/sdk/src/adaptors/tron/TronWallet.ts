@@ -9,7 +9,7 @@ export default class TronWallet extends TronAdaptor {
     return this.client
   }
 
-  async getAddress() {
+  get address() {
     return this.tronWeb.defaultAddress.base58
   }
 

@@ -15,7 +15,7 @@ exports.deposit = async function deposit(symbol, amount, { network, wallet }) {
   const token = getToken(network, symbol, wallet)
   const decimals = await token.instance.decimals()
   const value = ethers.utils.parseUnits(amount, decimals)
-  const allowance = await token.instance.allowance(await wallet.getAddress(), mesonInstance.address)
+  const allowance = await token.instance.allowance(wallet.address, mesonInstance.address)
   console.log(`Allowance: ${ethers.utils.formatUnits(allowance, decimals)}`)
   if (allowance.lt(value)) {
     console.log(`Approving...`)
@@ -25,7 +25,7 @@ exports.deposit = async function deposit(symbol, amount, { network, wallet }) {
   }
 
   console.log(`Depositing ${amount} ${symbol}...`)
-  const poolIndex = await mesonInstance.poolOfAuthorizedAddr(await wallet.getAddress())
+  const poolIndex = await mesonInstance.poolOfAuthorizedAddr(wallet.address)
   const needRegister = poolIndex == 0
   const poolTokenIndex = token.tokenIndex * 2**40 + (needRegister ? 1 : poolIndex)
 
@@ -44,7 +44,7 @@ exports.withdraw = async function withdraw(symbol, amount, { network, wallet }) 
   const token = getToken(network, symbol, wallet)
 
   console.log(`Withdrawing ${amount} ${symbol}...`)
-  const poolIndex = await mesonInstance.poolOfAuthorizedAddr(await wallet.getAddress())
+  const poolIndex = await mesonInstance.poolOfAuthorizedAddr(wallet.address)
   const poolTokenIndex = token.tokenIndex * 2**40 + poolIndex
 
   // const gasLimit = await mesonInstance.estimateGas.withdraw(ethers.utils.parseUnits(amount, 6), poolTokenIndex)
@@ -65,7 +65,7 @@ exports.send = async function send(symbol, amount, recipient, { network, wallet 
 exports.authorize = async function authorize(addr, { network, wallet }) {
   const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
 
-  const poolIndex = await mesonInstance.poolOfAuthorizedAddr(await wallet.getAddress())
+  const poolIndex = await mesonInstance.poolOfAuthorizedAddr(wallet.address)
 
   console.log(`Authorizing ${addr} to pool ${poolIndex}...`)
   const tx = await mesonInstance.addAuthorizedAddr(addr)

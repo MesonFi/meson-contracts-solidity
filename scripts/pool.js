@@ -14,7 +14,7 @@ module.exports = async function pool(network) {
   const client = getClient(network)
 
   const wallet = adaptors.getWallet(LP_PRIVATE_KEY, client)
-  console.log(`LP address: ${await wallet.getAddress()}`)
+  console.log(`LP address: ${wallet.address}`)
   
   const tx = await deposit(symbol, amount, { network, wallet })
   // const tx = await withdraw(symbol, amount, { network, wallet })

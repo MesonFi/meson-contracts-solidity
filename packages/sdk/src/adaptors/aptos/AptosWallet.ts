@@ -10,7 +10,7 @@ export default class AptosWallet extends AptosAdaptor {
     this.account = account
   }
 
-  async getAddress() {
+  get address() {
     return this.account.address().toString()
   }
 
@@ -48,7 +48,8 @@ export class AptosExtWallet extends AptosWallet {
     this.ext = ext
   }
 
-  async getAddress() {
+  get address() {
+    // TODO: might be different for different exts
     return this.ext.signer.account() as string
   }
 
