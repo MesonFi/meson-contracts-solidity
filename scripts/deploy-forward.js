@@ -1,5 +1,5 @@
-const { adaptor } = require('@mesonfi/sdk')
-const { getProvider } = require('./lib/getProvider')
+const { adaptors } = require('@mesonfi/sdk')
+const { getClient } = require('./lib/getClient')
 const { deployContract } = require('./lib/deploy')
 
 require('dotenv').config()
@@ -7,9 +7,9 @@ require('dotenv').config()
 const { PRIVATE_KEY } = process.env
 
 module.exports = async function deployForwardContract(network) {
-  const provider = getProvider(network)
+  const client = getClient(network)
 
-  const wallet = adaptor.getWallet(PRIVATE_KEY, provider)
+  const wallet = adaptors.getWallet(PRIVATE_KEY, client)
   console.log('Deploying ForwardTokenContract...')
   await deployContract('ForwardTokenContract', wallet)
 }

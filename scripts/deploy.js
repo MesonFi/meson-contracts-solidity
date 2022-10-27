@@ -1,6 +1,6 @@
 const { ethers } = require('hardhat')
-const { adaptor } = require('@mesonfi/sdk')
-const { getProvider } = require('./lib/getProvider')
+const { adaptors } = require('@mesonfi/sdk')
+const { getClient } = require('./lib/getClient')
 const { deployMeson, deployContract } = require('./lib/deploy')
 const { deposit } = require('./lib/pool')
 const updatePresets = require('./lib/updatePresets')
@@ -14,10 +14,10 @@ const {
 } = process.env
 
 module.exports = async function deploy(network, upgradable, testnetMode) {
-  const provider = getProvider(network)
+  const client = getClient(network)
   await hre.run('compile')
 
-  const wallet = adaptor.getWallet(PRIVATE_KEY, provider)
+  const wallet = adaptors.getWallet(PRIVATE_KEY, client)
   const tokens = network.tokens
 
   if (testnetMode) { // only for testnets

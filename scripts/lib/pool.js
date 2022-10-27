@@ -1,17 +1,17 @@
 const { ethers } = require('hardhat')
-const { adaptor } = require('@mesonfi/sdk')
+const { adaptors } = require('@mesonfi/sdk')
 const { Meson, ERC20 } = require('@mesonfi/contract-abis')
 
 function getToken(network, symbol, wallet) {
   const token = symbol.toLowerCase() === 'uct'
     ? { addr: network.uctAddress, tokenIndex: 255 }
     : network.tokens.find(t => t.symbol.toLowerCase().includes(symbol.toLowerCase()))
-  const instance = adaptor.getContract(token.addr, ERC20.abi, wallet)
+  const instance = adaptors.getContract(token.addr, ERC20.abi, wallet)
   return { instance, tokenIndex: token.tokenIndex }
 }
 
 exports.deposit = async function deposit(symbol, amount, { network, wallet }) {
-  const mesonInstance = adaptor.getContract(network.mesonAddress, Meson.abi, wallet)
+  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
   const token = getToken(network, symbol, wallet)
   const decimals = await token.instance.decimals()
   const value = ethers.utils.parseUnits(amount, decimals)
@@ -40,7 +40,7 @@ exports.deposit = async function deposit(symbol, amount, { network, wallet }) {
 }
 
 exports.withdraw = async function withdraw(symbol, amount, { network, wallet }) {
-  const mesonInstance = adaptor.getContract(network.mesonAddress, Meson.abi, wallet)
+  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
   const token = getToken(network, symbol, wallet)
 
   console.log(`Withdrawing ${amount} ${symbol}...`)
@@ -63,7 +63,7 @@ exports.send = async function send(symbol, amount, recipient, { network, wallet 
 }
 
 exports.authorize = async function authorize(addr, { network, wallet }) {
-  const mesonInstance = adaptor.getContract(network.mesonAddress, Meson.abi, wallet)
+  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
 
   const poolIndex = await mesonInstance.poolOfAuthorizedAddr(await wallet.getAddress())
 

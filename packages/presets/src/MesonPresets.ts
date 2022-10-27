@@ -1,4 +1,4 @@
-import { providers, errors, type Signer } from 'ethers'
+import { providers, errors } from 'ethers'
 import { AptosClient } from 'aptos'
 import TronWeb from 'tronweb'
 
@@ -7,7 +7,7 @@ import {
   Swap,
   PostedSwapStatus,
   LockedSwapStatus,
-  adaptor,
+  adaptors,
 } from '@mesonfi/sdk'
 import { Meson } from '@mesonfi/contract-abis'
 
@@ -183,70 +183,64 @@ export class MesonPresets {
     return { swap, from, to }
   }
 
-  getClient(id: string, provider: any): MesonClient {
+  createMesonClient(id: string, client: any): MesonClient {
     const network = this.getNetwork(id)
     if (!network) {
       throw new Error(`Unsupported network: ${id}`)
     }
-    if (!this._cache.get(id)) {
-      const instance = adaptor.getContract(network.mesonAddress, Meson.abi, provider)
-      const client = new MesonClient(instance, network.shortSlip44)
-      this._cache.set(id, client)
-    }
-    return this._cache.get(id)
+    this.disposeMesonClient(id)
+    const instance = adaptors.getContract(network.mesonAddress, Meson.abi, client)
+    const mesonClient = new MesonClient(instance, network.shortSlip44)
+    this._cache.set(id, mesonClient)
+    return mesonClient
   }
 
-  clientFromUrl({ id, url = '', ws = null, quorum }): MesonClient {
+  createNetworkClient({ id, url = '', ws = null, quorum }): providers.Provider {
     const network = this.getNetwork(id)
     if (!network) {
       throw new Error(`Unsupported network: ${id}`)
     }
-    if (!this._cache.get(id)) {
-      let provider
-      const providerNetwork = { name: network.name, chainId: Number(network.chainId) }
-      
-      if (id.startsWith('aptos')) {
-        provider = new AptosClient(url)
-      } else if (id.startsWith('tron')) {
-        provider = new TronWeb({ fullHost: url })
-      } else if (quorum) {
-        const fallbacks = quorum.list.map(({ url, ws, priority, stallTimeout, weight }) => {
-          const provider = ws
-            ? new FailsafeWebSocketProvider(ws, providerNetwork)
-            : new FailsafeStaticJsonRpcProvider(url, providerNetwork)
-          return { provider, priority, stallTimeout, weight}
-        })
-        provider = new RpcFallbackProvider(fallbacks, quorum.threshold)
-      } else if (ws) {
-        provider = new providers.WebSocketProvider(ws, providerNetwork)
-      } else if (url.startsWith('ws')) {
-        provider = new providers.WebSocketProvider(url, providerNetwork)
-      } else {
-        provider = new providers.StaticJsonRpcProvider(url, providerNetwork)
-      }
-
-      const instance = adaptor.getContract(network.mesonAddress, Meson.abi, provider)
-      const client = new MesonClient(instance, network.shortSlip44)
-      this._cache.set(id, client)
+    
+    if (id.startsWith('aptos')) {
+      return new AptosClient(url) as any
+    } else if (id.startsWith('tron')) {
+      return new TronWeb({ fullHost: url })
     }
-    return this._cache.get(id)
+    
+    const providerNetwork = { name: network.name, chainId: Number(network.chainId) }
+    if (quorum) {
+      const fallbacks = quorum.list.map(({ provider: p, url, ws, priority, stallTimeout, weight }) => {
+        const provider = p || (ws
+          ? new FailsafeWebSocketProvider(ws, providerNetwork)
+          : new FailsafeStaticJsonRpcProvider(url, providerNetwork)
+        )
+        return { provider, priority, stallTimeout, weight }
+      })
+      return new RpcFallbackProvider(fallbacks, quorum.threshold)
+    } else if (ws) {
+      return new providers.WebSocketProvider(ws, providerNetwork)
+    } else if (url.startsWith('ws')) {
+      return new providers.WebSocketProvider(url, providerNetwork)
+    } else {
+      return new providers.StaticJsonRpcProvider(url, providerNetwork)
+    }
   }
 
-  disposeClient(id: string) {
-    const client = this._cache.get(id)
-    if (client) {
-      client.dispose()
+  disposeMesonClient(id: string) {
+    const mesonClient = this._cache.get(id)
+    if (mesonClient) {
+      mesonClient.dispose()
       this._cache.delete(id)
     }
   }
 
-  getClientFromShortCoinType(shortCoinType: string) {
+  getMesonClientFromShortCoinType(shortCoinType: string) {
     const network = this.getNetworkFromShortCoinType(shortCoinType)
     if (!network) {
       throw new Error(`No network for shortCoinType: ${shortCoinType}`)
     }
     if (!this._cache.has(network.id)) {
-      throw new Error(`Client ${network.id} not initialized. Call getClient first.`)
+      throw new Error(`Client ${network.id} not initialized. Call createMesonClient first.`)
     }
     return this._cache.get(network.id)
   }
@@ -256,8 +250,8 @@ export class MesonPresets {
     { status: LockedSwapStatus, initiator?: string, provider?: string, until?: number }?
   ]> {
     const swap = Swap.decode(encoded)
-    const fromClient = this.getClientFromShortCoinType(swap.inChain)
-    const toClient = this.getClientFromShortCoinType(swap.outChain)
+    const fromClient = this.getMesonClientFromShortCoinType(swap.inChain)
+    const toClient = this.getMesonClientFromShortCoinType(swap.outChain)
 
     const posted = await fromClient.getPostedSwap(encoded, initiator, options.blockForInChain)
     if ([

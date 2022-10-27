@@ -2,7 +2,7 @@ const { ethers } = require('hardhat')
 const { Wallet: ZkWallet } = require('zksync-web3')
 const { Deployer } = require('@matterlabs/hardhat-zksync-deploy')
 
-const { adaptor } = require('@mesonfi/sdk')
+const { adaptors } = require('@mesonfi/sdk')
 const { Meson } = require('@mesonfi/contract-abis')
 
 exports.deployMeson = async function deployMeson(wallet, upgradable, premiumManager, tokens) {
@@ -10,7 +10,7 @@ exports.deployMeson = async function deployMeson(wallet, upgradable, premiumMana
   if (upgradable) {
     console.log('Deploying ProxyToMeson & UpgradableMeson...')
     const proxy = await deployContract('ProxyToMeson', wallet, [premiumManager])
-    mesonContract = adaptor.getContract(proxy.address, Meson.abi, wallet)
+    mesonContract = adaptors.getContract(proxy.address, Meson.abi, wallet)
   } else {
     console.log('Deploying Meson...')
     mesonContract = await deployContract('Meson', wallet, [premiumManager])
@@ -65,7 +65,7 @@ async function deployTronContract(name, wallet, args) {
     callValue: 0,
     parameters: args
   })
-  const instance = adaptor.getContract(deployed.address, abi, wallet)
+  const instance = adaptors.getContract(deployed.address, abi, wallet)
   console.log(`${name} deployed to:`, instance.address)
   return instance
 }

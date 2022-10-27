@@ -4,7 +4,7 @@ const {
   EthersWalletSwapSigner,
   SignedSwapRequest,
   SignedSwapRelease,
-} = require('@mesonfi/sdk/src')
+} = require('@mesonfi/sdk')
 
 const { deployContract, deployMeson } = require('./lib/deploy')
 const { wallet: unconnectedWallet } = require('../test/shared/wallet')

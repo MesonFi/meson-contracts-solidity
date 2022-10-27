@@ -1,7 +1,7 @@
 import { BigNumber, utils } from 'ethers'
-import { AptosClient, AptosAccount, TxnBuilderTypes, HexString } from 'aptos'
+import { AptosClient, HexString } from 'aptos'
 
-export class AptosProvider {
+export default class AptosAdaptor {
   readonly client: AptosClient
 
   constructor(client: AptosClient) {
@@ -34,6 +34,9 @@ export class AptosProvider {
     }
   }
 
+  on () {}
+  removeAllListeners () {}
+
   async send(method, params) {
     if (method === 'eth_getBlockByNumber') {
       if (params[0] === 'latest') {
@@ -57,7 +60,7 @@ export class AptosProvider {
     } else if (method === 'eth_getTransactionReceipt') {
       return _wrapAptosTx(await this.client.getTransactionByHash(params[0]))
     }
-  } 
+  }
 }
 
 function _wrapAptosBlock(raw) {
@@ -81,78 +84,5 @@ function _wrapAptosTx(raw) {
     input: JSON.stringify(raw.payload),
     timestamp: Math.floor(raw.timestamp / 1000000).toString(),
     status: raw.success ? '0x1' : '0x0'
-  }
-}
-
-export class AptosWallet extends AptosProvider {
-  readonly signer: AptosAccount
-
-  constructor(client: AptosClient, signer: AptosAccount) {
-    super(client)
-    this.signer = signer
-  }
-
-  async getAddress() {
-    return this.signer.address().toString()
-  }
-
-  async sendTransaction(payload, options) {
-    const tx = await this.client.generateTransaction(this.signer.address(), payload, options)
-    const signed = await this.client.signTransaction(this.signer, tx)
-    const pending = await this.client.submitTransaction(signed)
-
-    return {
-      hash: utils.hexZeroPad(pending.hash, 32),
-      wait: () => this.wait(pending.hash)
-    }
-  }
-
-  async deploy(module: string, metadata: string) {
-    let hash = await this.client.publishPackage(
-      this.signer,
-      new HexString(metadata).toUint8Array(),
-      [new TxnBuilderTypes.Module(new HexString(module).toUint8Array())]
-    )
-    hash = utils.hexZeroPad(hash, 32)
-
-    return {
-      hash,
-      wait: () => this.wait(hash)
-    }
-  }
-
-  async wait(hash: string) {
-    await this.client.waitForTransaction(hash, { checkSuccess: true })
-  }
-}
-
-export class AptosExtWallet extends AptosWallet {
-  readonly ext: any
-
-  constructor(client: AptosClient, ext) {
-    super(client, null)
-    this.ext = ext
-  }
-
-  async getAddress() {
-    return this.ext.signer.account() as string
-  }
-
-  async sendTransaction(payload, options) {
-    // This method is provided by `@manahippo/aptos-wallet-adapter`
-    const tx = await this.ext.signer.signAndSubmitTransaction(payload, options)
-    // TODO: error handling
-    return {
-      hash: utils.hexZeroPad(tx.hash, 32),
-      wait: async () => {}
-    }
-  }
-
-  async deploy(): Promise<any> {
-    throw new Error('Cannot deploy with extention wallet')
-  }
-
-  async wait(hash) {
-    await this.client.waitForTransaction(hash, { checkSuccess: true })
   }
 }

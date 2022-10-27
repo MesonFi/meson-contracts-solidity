@@ -4,7 +4,7 @@ const TronWeb = require('tronweb')
 const { Provider } = require('zksync-web3')
 const CustomGasFeeProviderWrapper = require('./CustomGasFeeProviderWrapper')
 
-exports.getProvider = function getProvider (network) {
+exports.getClient = function getClient (network) {
   if (network.id.startsWith('aptos')) {
     return new AptosClient(network.url)
   } else if (network.id.startsWith('tron')) {
