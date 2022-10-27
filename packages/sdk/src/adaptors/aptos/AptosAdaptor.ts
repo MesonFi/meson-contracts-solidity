@@ -61,6 +61,14 @@ export default class AptosAdaptor {
       return _wrapAptosTx(await this.client.getTransactionByHash(params[0]))
     }
   }
+
+  async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
+    const result = await this.client.waitForTransactionWithResult(hash, {
+      checkSuccess: false,
+      timeoutSecs: timeout || 20
+    })
+    return _wrapAptosTx(result)
+  }
 }
 
 function _wrapAptosBlock(raw) {

@@ -19,7 +19,7 @@ export default class TronWallet extends TronAdaptor {
     const receipt = await this.tronWeb.trx.sendRawTransaction(signed)
     return {
       hash: receipt.txID,
-      wait: () => this.wait(receipt.txID)
+      wait: (confirmations: number) => this.waitForTransaction(receipt.txID, confirmations)
     }
   }
 
@@ -33,20 +33,5 @@ export default class TronWallet extends TronAdaptor {
         await new Promise(resolve => setTimeout(resolve, 1000))
       }
     }
-  }
-
-  async wait(hash: string) {
-    return new Promise(resolve => {
-      const h = setInterval(async () => {
-        let info
-        try {
-          info = await this.tronWeb.trx.getUnconfirmedTransactionInfo(hash)
-        } catch {}
-        if (Object.keys(info).length) {
-          clearInterval(h)
-          resolve(info)
-        }
-      }, 1000)
-    })
   }
 }

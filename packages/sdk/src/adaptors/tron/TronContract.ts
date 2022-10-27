@@ -86,7 +86,7 @@ export default class TronContract {
     const tx = await (this.#adaptor as TronWallet).getTransaction(hash)
     return {
       ...tx,
-      wait: async () => await (this.#adaptor as TronWallet).wait(hash)
+      wait: (confirmations: number) => this.#adaptor.waitForTransaction(hash, confirmations)
     }
   }
 }

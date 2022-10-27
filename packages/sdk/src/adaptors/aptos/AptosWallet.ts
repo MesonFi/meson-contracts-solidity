@@ -21,7 +21,7 @@ export default class AptosWallet extends AptosAdaptor {
 
     return {
       hash: utils.hexZeroPad(pending.hash, 32),
-      wait: () => this.wait(pending.hash)
+      wait: () => this.waitForTransaction(pending.hash)
     }
   }
 
@@ -35,12 +35,8 @@ export default class AptosWallet extends AptosAdaptor {
 
     return {
       hash,
-      wait: () => this.wait(hash)
+      wait: () => this.waitForTransaction(hash)
     }
-  }
-
-  async wait(hash: string) {
-    await this.client.waitForTransaction(hash, { checkSuccess: true })
   }
 }
 
@@ -62,15 +58,11 @@ export class AptosExtWallet extends AptosWallet {
     // TODO: error handling
     return {
       hash: utils.hexZeroPad(tx.hash, 32),
-      wait: async () => {}
+      wait: () => this.waitForTransaction(tx.hash)
     }
   }
 
   async deploy(): Promise<any> {
     throw new Error('Cannot deploy with extention wallet')
-  }
-
-  async wait(hash) {
-    await this.client.waitForTransaction(hash, { checkSuccess: true })
   }
 }

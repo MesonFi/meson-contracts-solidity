@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers'
 import TronWeb from 'tronweb'
+import { timer } from '../../utils'
 
 export default class TronAdaptor {
   readonly client
@@ -40,6 +41,32 @@ export default class TronAdaptor {
       return _wrapTronReceipt(await this.client.trx.getUnconfirmedTransactionInfo(params[0]))
     }
     throw new Error(`TronAdaptor: '${method}' unsupported`)
+  }
+
+  async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
+    return new Promise((resolve, reject) => {
+      const h = setInterval(async () => {
+        let info
+        try {
+          if (confirmations > 1) {
+            info = await this.client.trx.getTransactionInfo(hash)
+          } else {
+            info = await this.client.trx.getUnconfirmedTransactionInfo(hash)
+          }
+        } catch {}
+        if (Object.keys(info).length) {
+          clearInterval(h)
+          resolve(_wrapTronReceipt(info))
+        }
+      }, 1000)
+
+      if (timeout) {
+        timer(timeout * 1000).then(() => {
+          clearInterval(h)
+          reject(new Error('Time out'))
+        })
+      }
+    })
   }
 }
 

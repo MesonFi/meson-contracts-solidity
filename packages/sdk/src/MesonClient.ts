@@ -12,14 +12,13 @@ import TronWeb from 'tronweb'
 import type { Meson } from '@mesonfi/contract-types'
 import { ERC20 } from '@mesonfi/contract-abis'
 
-import { Rpc, Receipt } from './Rpc'
+import { Rpc } from './Rpc'
 import { Swap } from './Swap'
 import { SwapWithSigner } from './SwapWithSigner'
 import { SwapSigner } from './SwapSigner'
 import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwap'
 import * as adaptors from './adaptors'
 import AptosAdaptor from './adaptors/aptos/AptosAdaptor'
-import { timer } from './utils'
 
 const Zero = constants.AddressZero.substring(2)
 
@@ -280,60 +279,6 @@ export class MesonClient {
 
   async cancelSwap(encodedSwap: string, ...overrides) {
     return await this.#mesonInstance.cancelSwap(encodedSwap, ...overrides)
-  }
-
-  async wait(txHash: string, confirmations: number = 1, ms: number = 60_000) {
-    if (!txHash) {
-      throw new Error(`Invalid transaction hash: ${txHash}`)
-    } else if (!(confirmations >= 1)) {
-      throw new Error(`Invalid confirmations: ${confirmations}`)
-    }
-
-    let receipt
-    let txBlockNumber
-    const getTxBlockNumber = async () => {
-      try {
-        receipt = await this.rpc.getReceipt(txHash)
-        txBlockNumber = Number(receipt.blockNumber)
-      } catch {}
-    }
-
-    return new Promise<Receipt>((resolve, reject) => {
-      const done = (error?) => {
-        clearInterval(h)
-
-        if (error) {
-          reject(error)
-        } else {
-          resolve(receipt)
-        }
-      }
-
-      const onBlock = async blockNumber => {
-        if (!txBlockNumber) {
-          await getTxBlockNumber()
-        }
-        if (!txBlockNumber) {
-          return
-        }
-        if (confirmations === 1) {
-          return done()
-        }
-        if (blockNumber - txBlockNumber + 1 >= confirmations) {
-          await getTxBlockNumber()
-          if (blockNumber - txBlockNumber + 1 >= confirmations) {
-            return done()
-          }
-        }
-      }
-
-      const h = setInterval(async () => {
-        const block = await this.rpc.getLatestBlock()
-        onBlock(block.number)
-      }, 3_000)
-
-      timer(ms).then(() => done(new Error('Time out')))
-    })
   }
 
   async _getPostedSwap(encoded: string | BigNumber, ...overrides) {
