@@ -5,7 +5,8 @@ import {
   utils,
   type CallOverrides,
   type BigNumber,
-  type BigNumberish
+  type BigNumberish,
+  type Wallet,
 } from 'ethers'
 import TronWeb from 'tronweb'
 
@@ -95,8 +96,8 @@ export class MesonClient {
     return this.#formatAddress(this.#mesonInstance.address)
   }
 
-  async getSigner(): Promise<string> {
-    return await this.#mesonInstance.signer.getAddress()
+  get signerAddress(): string {
+    return this.#formatAddress((this.#mesonInstance.signer as Wallet).address)
   }
 
   setSwapSigner(swapSigner: SwapSigner) {
@@ -189,7 +190,7 @@ export class MesonClient {
     if (!tokenIndex) {
       throw new Error(`Token not supported`)
     }
-    const signer = await this.getSigner()
+    const signer = this.signerAddress
     const poolIndex = await this.poolOfAuthorizedAddr(signer)
     if (!poolIndex) {
       throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
@@ -220,7 +221,7 @@ export class MesonClient {
 
   async postSwap(signedRequest: SignedSwapRequestData, poolIndex?: number, ...overrides) {
     if (typeof poolIndex === 'undefined') {
-      const signer = await this.getSigner()
+      const signer = this.signerAddress
       poolIndex = await this.poolOfAuthorizedAddr(signer)
       if (!poolIndex) {
         throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
@@ -237,7 +238,7 @@ export class MesonClient {
   }
 
   async bondSwap(encoded: BigNumberish, ...overrides) {
-    const signer = await this.getSigner()
+    const signer = this.signerAddress
     const poolIndex = await this.poolOfAuthorizedAddr(signer)
     if (!poolIndex) {
       throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
