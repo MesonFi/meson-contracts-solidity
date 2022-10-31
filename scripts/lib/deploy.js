@@ -58,7 +58,7 @@ async function deployTronContract(name, wallet, args) {
   if (constructor) {
     constructor.stateMutability = constructor.payable ? 'payable' : 'nonpayable'
   }
-  const deployed = await wallet.contract().new({
+  const deployed = await wallet.tronWeb.contract().new({
     abi,
     bytecode: factory.bytecode,
     feeLimit: 5000_000000,
