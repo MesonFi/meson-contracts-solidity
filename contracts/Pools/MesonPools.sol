@@ -197,12 +197,12 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     uint80 lockedSwap = _lockedSwaps[swapId];
-    require(lockedSwap != 0, "Swap does not exist");
+    require(lockedSwap > 1, "Swap does not exist");
     require(recipient != address(0), "Recipient cannot be zero address");
     require(_expireTsFrom(encodedSwap) > block.timestamp, "Cannot release because expired");
 
     _checkReleaseSignature(encodedSwap, recipient, r, s, v, initiator);
-    _lockedSwaps[swapId] = 0;
+    _lockedSwaps[swapId] = 1;
 
     uint8 tokenIndex = _outTokenIndexFrom(encodedSwap);
     
@@ -238,8 +238,13 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   {
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     uint80 lockedSwap = _lockedSwaps[swapId];
-    poolOwner = ownerOfPool[_poolIndexFromLocked(lockedSwap)];
-    until = uint40(_untilFromLocked(lockedSwap));
+    if (lockedSwap == 1) {
+      poolOwner = address(1);
+      until = 0;
+    } else {
+      poolOwner = ownerOfPool[_poolIndexFromLocked(lockedSwap)];
+      until = uint40(_untilFromLocked(lockedSwap));
+    }
   }
 
   modifier forTargetChain(uint256 encodedSwap) {
