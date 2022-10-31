@@ -222,9 +222,14 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                 value_type: `${address}::MesonStates::LockedSwap`,
                 key: _getSwapId(Swap.decode(args[0]).encoded, args[1])
               })
+              if (!result) {
+                return { until: 0 } // never locked
+              } else if (!Number(result.until)) {
+                return { until: 0, poolOwner: '0x1' } // locked & released
+              }
               return {
-                until: Number(result?.until || 0),
-                poolOwner: result && await ownerOfPool(result.pool_index)
+                until: Number(result.until),
+                poolOwner: await ownerOfPool(result.pool_index)
               }
             }
 

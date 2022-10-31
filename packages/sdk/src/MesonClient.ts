@@ -36,7 +36,7 @@ export enum PostedSwapStatus {
 }
 
 export enum LockedSwapStatus {
-  NoneOrAfterRunning = 0, // nothing found on chain
+  None = 0,
   Locked = 0b0001,
   Released = 0b0100,
   Unlocked = 0b0101,
@@ -293,9 +293,18 @@ export class MesonClient {
 
   async _getLockedSwap(encoded: string | BigNumber, initiator: string, ...overrides) {
     const { poolOwner, until } = await this.#mesonInstance.getLockedSwap(encoded, initiator, ...overrides)
+    if (!until) {
+      if (poolOwner && poolOwner.substring(2) !== Zero) {
+        return { status: LockedSwapStatus.Released }
+      } else {
+        return { status: LockedSwapStatus.None }
+      }
+    }
+    
     return {
+      status: until * 1000 < Date.now() ? LockedSwapStatus.ErrorExpired : LockedSwapStatus.Locked,
       until,
-      poolOwner: poolOwner && (poolOwner.substring(2) === Zero ? undefined : this.#formatAddress(poolOwner))
+      poolOwner: this.#formatAddress(poolOwner)
     }
   }
 
@@ -359,14 +368,7 @@ export class MesonClient {
         overrides.blockTag = block
       }
     }
-    const { poolOwner, until } = await this._getLockedSwap(encoded, initiator, overrides)
-    if (!until) {
-      return { status: LockedSwapStatus.NoneOrAfterRunning }
-    } else if (until * 1000 < Date.now()) {
-      return { status: LockedSwapStatus.ErrorExpired, poolOwner, until }
-    } else {
-      return { status: LockedSwapStatus.Locked, poolOwner, until }
-    }
+    return await this._getLockedSwap(encoded, initiator, overrides)
   }
 
   parseTransaction(tx: { input: string, value?: BigNumberish }) {

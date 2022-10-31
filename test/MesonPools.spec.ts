@@ -294,7 +294,7 @@ describe('MesonPools', () => {
 
       expect(await mesonInstance.poolTokenBalance(mesonClientForPoolOwner.tokenAddr(1), poolOwner.address)).to.equal(amount)
       const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
-      expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
+      expect(locked.status).to.equal(LockedSwapStatus.None)
       expect(locked.poolOwner).to.be.undefined
 
       await ethers.provider.send('evm_increaseTime', [-3600])
@@ -316,7 +316,7 @@ describe('MesonPools', () => {
       const releaseAmount = swap.amount.sub(swap.amount.div(1000)).sub(swap.fee)
       expect(await token.balanceOf(TestAddress)).to.equal(releaseAmount)
       const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
-      expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
+      expect(locked.status).to.equal(LockedSwapStatus.Released)
       expect(locked.poolOwner).to.be.undefined
     })
 
@@ -337,7 +337,7 @@ describe('MesonPools', () => {
       const releaseAmount = swap.amount.sub(swap.amount.div(1000)).sub(swap.fee)
       expect(await token.balanceOf(TestAddress)).to.equal(releaseAmount)
       const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
-      expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
+      expect(locked.status).to.equal(LockedSwapStatus.Released)
       expect(locked.poolOwner).to.be.undefined
     })
   })
@@ -367,7 +367,7 @@ describe('MesonPools', () => {
       const releaseAmount = swap.amount.sub(swap.fee)
       expect(await token.balanceOf(TestAddress)).to.equal(releaseAmount)
       const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
-      expect(locked.status).to.equal(LockedSwapStatus.NoneOrAfterRunning)
+      expect(locked.status).to.equal(LockedSwapStatus.Released)
       expect(locked.poolOwner).to.be.undefined
     })
   })
