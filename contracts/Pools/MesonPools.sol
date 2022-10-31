@@ -158,7 +158,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   function unlock(uint256 encodedSwap, address initiator) external {
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     uint80 lockedSwap = _lockedSwaps[swapId];
-    require(lockedSwap != 0, "Swap does not exist");
+    require(lockedSwap > 1, "Swap does not exist");
     require(_untilFromLocked(lockedSwap) < block.timestamp, "Swap still in lock");
 
     uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, _poolIndexFromLocked(lockedSwap));
