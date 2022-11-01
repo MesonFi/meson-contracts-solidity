@@ -23,6 +23,15 @@ export default class TronWallet extends TronAdaptor {
     }
   }
 
+  async sendTransaction(payload, overrides) {
+    const { contract, method, args } = payload
+    const hash = await contract[method](...args).send(overrides)
+    return {
+      hash,
+      wait: (confirmations: number) => this.waitForTransaction(hash, confirmations)
+    }
+  }
+
   async deploy() {}
 
   async getTransaction(hash: string): Promise<any> {

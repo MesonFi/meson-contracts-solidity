@@ -82,11 +82,10 @@ export default class TronContract {
     if (args.length > abi.inputs.length) {
       overrides = args.pop()
     }
-    const hash = await this.#contract[name](...args).send(overrides)
-    const tx = await (this.#adaptor as TronWallet).getTransaction(hash)
-    return {
-      ...tx,
-      wait: (confirmations: number) => this.#adaptor.waitForTransaction(hash, confirmations)
-    }
+    return await (this.#adaptor as TronWallet).sendTransaction({
+      contract: this.#contract,
+      method: name,
+      args,
+    }, overrides)
   }
 }
