@@ -25,7 +25,6 @@
     "testnet:evmos": "hardhat deploy --testnet evmos --upgradable true",
     "testnet:gnosis": "hardhat deploy --testnet gnosis --upgradable true",
     "testnet:eos": "hardhat deploy --testnet eos --upgradable true",
-    "testnet:cronos": "hardhat deploy --testnet cronos --upgradable true",
     "testnet:zksync": "ZKSYNC=true hardhat deploy --testnet zksync --upgradable true",
     "testnet:tron": "hardhat deploy --testnet tron --upgradable true",
     "deploy:eth": "hardhat deploy --mainnet eth --upgradable true",
@@ -42,7 +41,6 @@
     "deploy:movr": "hardhat deploy --mainnet movr --upgradable true",
     "deploy:beam": "hardhat deploy --mainnet beam --upgradable true",
     "deploy:eos": "hardhat deploy --mainnet eos --upgradable true",
-    "deploy:cronos": "hardhat deploy --mainnet cronos --upgradable true",
     "deploy:zksync": "ZKSYNC=true hardhat deploy --mainnet zksync --upgradable true",
     "deploy:tron": "hardhat deploy --mainnet tron --upgradable true"
   },
