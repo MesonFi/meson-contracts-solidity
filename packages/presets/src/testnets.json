@@ -524,6 +524,43 @@
     "uctAddress": "0x88C6C4B902EEB10E192282F74B894bB7AA8B0640"
   },
   {
+    "id": "cronos-testnet",
+    "name": "Cronos Testnet",
+    "alias": "CRO",
+    "chainId": "0x152",
+    "slip44": "0x8000018a",
+    "shortSlip44": "0x018a",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://evm-t3.cronos.org",
+    "explorer": "https://cronos.org/explorer/testnet3",
+    "nativeCurrency": {
+      "name": "Cronos Testnet Native Token",
+      "symbol": "tCRO",
+      "decimals": 18
+    },
+    "mesonAddress": "",
+    "tokens": [
+      {
+        "name": "tUSDC",
+        "symbol": "tUSDC",
+        "decimals": 6,
+        "addr": "",
+        "tokenIndex": 1
+      },
+      {
+        "name": "tUSDT",
+        "symbol": "tUSDT",
+        "decimals": 6,
+        "addr": "",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
     "id": "aptos-testnet",
     "name": "Aptos Devnet",
     "alias": "APT",
