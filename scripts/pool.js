@@ -19,6 +19,6 @@ module.exports = async function pool(network) {
   const tx = await deposit(symbol, amount, { network, wallet })
   // const tx = await withdraw(symbol, amount, { network, wallet })
   // const tx = await send(symbol, amount, addr, { network, wallet })
-  // const tx = await authorize(addr)
+  // const tx = await authorize(addr, { network, wallet })
   console.log(tx)
 }
