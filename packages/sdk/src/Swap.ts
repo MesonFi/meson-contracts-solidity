@@ -149,6 +149,14 @@ export class Swap implements SwapData {
     return this.serviceFee.add(this.fee)
   }
 
+  get expired(): Boolean {
+    return Date.now() / 1000 > this.expireTs
+  }
+
+  get tooLateToLock(): Boolean {
+    return Date.now() / 1000 > this.expireTs - (this.outChain === '0x003c' ? 45 : 25) * 60
+  }
+
   toObject(): SwapData {
     return {
       encoded: this.encoded,

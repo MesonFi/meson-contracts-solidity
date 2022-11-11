@@ -14,7 +14,7 @@ export default class TronContract {
     } else if (clientOrAdaptor instanceof TronAdaptor) {
       this.#adaptor = clientOrAdaptor
     } else {
-      this.#adaptor = new TronAdaptor(clientOrAdaptor)
+      this.#adaptor = new TronWallet(clientOrAdaptor)
     }
     this.#contract = this.#adaptor.client.contract(abi, address)
 

@@ -188,6 +188,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     address initiator,
     address recipient
   ) external {
+    require(_msgSender() == tx.origin, "Cannot be called through contracts");
+
     bool feeWaived = _feeWaived(encodedSwap);
     if (feeWaived) {
       // For swaps that service fee is waived, need the premium manager as the signer

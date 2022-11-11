@@ -270,49 +270,49 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                 const [_, r, s, v, postingValue] = args
                 payload.type_arguments = [await getTokenAddr(swap.inToken)]
                 payload.arguments = [
-                  Array.from(utils.arrayify(swap.encoded)),
-                  Array.from(_getCompactSignature(r, s, v)),
-                  Array.from(utils.arrayify(postingValue.substring(0, 42))), // initiator
+                  _vectorize(swap.encoded),
+                  _getCompactSignature(r, s, v),
+                  _vectorize(postingValue.substring(0, 42)), // initiator
                   `0x${postingValue.substring(42)}` // pool_index
                 ]
               } else if (prop === 'bondSwap') {
                 payload.type_arguments = [await getTokenAddr(swap.inToken)]
-                payload.arguments = [utils.arrayify(swap.encoded), args[1].toString()]
+                payload.arguments = [_vectorize(swap.encoded), args[1].toString()]
               } else if (prop === 'cancelSwap') {
                 payload.type_arguments = [await getTokenAddr(swap.inToken)]
-                payload.arguments = [utils.arrayify(swap.encoded)]
+                payload.arguments = [_vectorize(swap.encoded)]
               } else if (prop === 'executeSwap') {
                 const [_, r, s, v, recipient, depositToPool] = args
                 payload.type_arguments = [await getTokenAddr(swap.inToken)]
                 payload.arguments = [
-                  utils.arrayify(swap.encoded),
+                  _vectorize(swap.encoded),
                   _getCompactSignature(r, s, v),
-                  utils.arrayify(recipient.substring(0, 42)),
+                  _vectorize(recipient.substring(0, 42)),
                   depositToPool
                 ]
               } else if (prop === 'lock') {
                 const [_, r, s, v, { initiator, recipient }] = args
                 payload.type_arguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
-                  utils.arrayify(swap.encoded),
+                  _vectorize(swap.encoded),
                   _getCompactSignature(r, s, v),
-                  utils.arrayify(initiator),
+                  _vectorize(initiator),
                   recipient
                 ]
               } else if (prop === 'unlock') {
                 const [_, initiator] = args
                 payload.type_arguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
-                  utils.arrayify(swap.encoded),
-                  utils.arrayify(initiator)
+                  _vectorize(swap.encoded),
+                  _vectorize(initiator)
                 ]
               } else if (prop === 'release') {
                 const [_, r, s, v, initiator] = args
                 payload.type_arguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
-                  utils.arrayify(swap.encoded),
+                  _vectorize(swap.encoded),
                   _getCompactSignature(r, s, v),
-                  utils.arrayify(initiator)
+                  _vectorize(initiator)
                 ]
               }
             }
@@ -324,6 +324,10 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
       return target[prop]
     }
   })
+}
+
+function _vectorize(hex: string) {
+  return Array.from(utils.arrayify(hex))
 }
 
 function _findMesonMethodModule(method) {
@@ -353,9 +357,9 @@ function _getSwapId(encoded, initiator) {
   return utils.keccak256(packed)
 }
 
-function _getCompactSignature(r, s, v) {
+function _getCompactSignature(r: string, s: string, v: number) {
   if (v !== 27 && v !== 28) {
     throw new Error(`Invalid sig.v: ${v}`)
   }
-  return utils.arrayify(r + s.replace(/0x\d/, x => (parseInt(x) + (v - 27) * 8).toString(16)))
+  return _vectorize(r + s.replace(/0x\d/, x => (parseInt(x) + (v - 27) * 8).toString(16)))
 }
