@@ -397,6 +397,43 @@
     ]
   },
   {
+    "id": "cronos",
+    "name": "Cronos",
+    "alias": "CRO",
+    "chainId": "0x19",
+    "slip44": "0x8000018a",
+    "shortSlip44": "0x018a",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://evm.cronos.org",
+    "explorer": "https://cronoscan.com",
+    "nativeCurrency": {
+      "name": "CRO",
+      "symbol": "CRO",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0xc21223249ca28397b4b6541dffaecc539bff0c59",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x66e428c3f67a68878562e79a0234c1f83c208770",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
     "id": "aptos",
     "name": "Aptos",
     "alias": "APT",
