@@ -96,8 +96,10 @@ export class MesonClient {
     return this.#formatAddress(this.#mesonInstance.address)
   }
 
-  get signerAddress(): string {
-    return this.#formatAddress((this.#mesonInstance.signer as Wallet).address)
+  async getSignerAddress(): Promise<string> {
+    const signer = this.#mesonInstance.signer as Wallet
+    const address = signer.address || await signer.getAddress()
+    return this.#formatAddress(address)
   }
 
   setSwapSigner(swapSigner: SwapSigner) {
@@ -190,7 +192,7 @@ export class MesonClient {
     if (!tokenIndex) {
       throw new Error(`Token not supported`)
     }
-    const signer = this.signerAddress
+    const signer = await this.getSignerAddress()
     const poolIndex = await this.poolOfAuthorizedAddr(signer)
     if (!poolIndex) {
       throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
@@ -221,7 +223,7 @@ export class MesonClient {
 
   async postSwap(signedRequest: SignedSwapRequestData, poolIndex?: number, ...overrides) {
     if (typeof poolIndex === 'undefined') {
-      const signer = this.signerAddress
+      const signer = await this.getSignerAddress()
       poolIndex = await this.poolOfAuthorizedAddr(signer)
       if (!poolIndex) {
         throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
@@ -238,7 +240,7 @@ export class MesonClient {
   }
 
   async bondSwap(encoded: BigNumberish, ...overrides) {
-    const signer = this.signerAddress
+    const signer = await this.getSignerAddress()
     const poolIndex = await this.poolOfAuthorizedAddr(signer)
     if (!poolIndex) {
       throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)

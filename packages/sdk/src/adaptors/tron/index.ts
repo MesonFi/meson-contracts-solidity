@@ -11,6 +11,10 @@ export function getWallet(privateKey, client: TronWeb) {
   }))
 }
 
+export function getWalletFromExtension(client: TronWeb): TronWallet {
+  return new TronWallet(client)
+}
+
 export function getContract(address, abi, clientOrAdaptor: TronWeb | TronAdaptor) {
   return new TronContract(address, abi, clientOrAdaptor)
 }
