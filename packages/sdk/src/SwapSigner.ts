@@ -171,8 +171,12 @@ export class NonEcdsaRemoteSwapSigner extends SwapSigner {
     return new EthersWalletSwapSigner(wallet)
   }
 
+  private _swapMessage(encoded: string) {
+    return `Sign for a swap on Meson:\n${encoded}`
+  }
+
   async signSwapRequest(encoded: string, testnet?: boolean): Promise<Signature> {
-    const signature = await this.remoteSigner.signMessage(encoded)
+    const signature = await this.remoteSigner.signMessage(this._swapMessage(encoded))
     const swapSigner = this._swapSignerFromSeed(signature)
     this.#initiatorSwapSigners.set(encoded, swapSigner)
     this.#currentInitiator = swapSigner.getAddress()
@@ -181,7 +185,7 @@ export class NonEcdsaRemoteSwapSigner extends SwapSigner {
 
   async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<Signature> {
     if (!this.#initiatorSwapSigners.has(encoded)) {
-      const signature = await this.remoteSigner.signMessage(encoded)
+      const signature = await this.remoteSigner.signMessage(this._swapMessage(encoded))
       const swapSigner = this._swapSignerFromSeed(signature)
       this.#initiatorSwapSigners.set(encoded, swapSigner)
       this.#currentInitiator = swapSigner.getAddress()
