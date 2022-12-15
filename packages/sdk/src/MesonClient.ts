@@ -55,11 +55,11 @@ export interface PartialSwapData {
 }
 
 export class MesonClient {
-  #formatAddress: (string) => string
   #mesonInstance: Meson
 
   readonly rpc: Rpc
   readonly shortCoinType: string
+  readonly formatAddress: (string) => string
 
   protected _signer: SwapSigner | null = null
   protected _tokens = []
@@ -76,11 +76,11 @@ export class MesonClient {
 
   constructor(mesonInstance: any, shortCoinType: string) {
     if (mesonInstance instanceof Contract) {
-      this.#formatAddress = addr => addr.toLowerCase()
+      this.formatAddress = addr => utils.getAddress(addr).toLowerCase()
     } else if (mesonInstance.provider instanceof AptosAdaptor) {
-      this.#formatAddress = addr => addr
+      this.formatAddress = addr => utils.hexZeroPad(addr, 32)
     } else {
-      this.#formatAddress = addr => TronWeb.address.fromHex(addr)
+      this.formatAddress = addr => TronWeb.address.fromHex(addr)
     }
 
     this.#mesonInstance = mesonInstance as Meson
@@ -93,13 +93,13 @@ export class MesonClient {
   }
 
   get address(): string {
-    return this.#formatAddress(this.#mesonInstance.address)
+    return this.formatAddress(this.#mesonInstance.address)
   }
 
   async getSignerAddress(): Promise<string> {
     const signer = this.#mesonInstance.signer as Wallet
     const address = signer.address || await signer.getAddress()
-    return this.#formatAddress(address)
+    return this.formatAddress(address)
   }
 
   setSwapSigner(swapSigner: SwapSigner) {
@@ -119,7 +119,7 @@ export class MesonClient {
   }
 
   async getBalance(addr: string) {
-    return await this.provider.getBalance(this.#formatAddress(addr))
+    return await this.provider.getBalance(this.formatAddress(addr))
   }
 
   onEvent(listener: providers.Listener) {
@@ -140,7 +140,7 @@ export class MesonClient {
 
   async _getSupportedTokens(...overrides) {
     const { tokens, indexes } = await this.#mesonInstance.getSupportedTokens(...overrides)
-    this._tokens = tokens.map((addr, i) => ({ tokenIndex: indexes[i], addr: this.#formatAddress(addr) }))
+    this._tokens = tokens.map((addr, i) => ({ tokenIndex: indexes[i], addr: this.formatAddress(addr) }))
   }
 
   getToken(index: number) {
@@ -155,7 +155,7 @@ export class MesonClient {
   }
 
   tokenIndexOf(addr: string) {
-    return this._tokens.find(t => t.addr === this.#formatAddress(addr))?.tokenIndex
+    return this._tokens.find(t => t.addr === this.formatAddress(addr))?.tokenIndex
   }
 
   getTokenContract(tokenAddr: string, provider = this.provider) {
@@ -167,7 +167,7 @@ export class MesonClient {
   }
 
   async ownerOfPool(poolIndex: number, ...overrides) {
-    return this.#formatAddress(await this.#mesonInstance.ownerOfPool(poolIndex, ...overrides))
+    return this.formatAddress(await this.#mesonInstance.ownerOfPool(poolIndex, ...overrides))
   }
 
   async poolTokenBalance(token: string, addr: string, ...overrides) {
@@ -289,7 +289,7 @@ export class MesonClient {
     return {
       exist,
       initiator: initiator && (initiator.substring(2) === Zero ? undefined : initiator.replace(/^41/, '0x')), // convert tron hex address
-      poolOwner: poolOwner && (poolOwner.substring(2) === Zero ? undefined : this.#formatAddress(poolOwner))
+      poolOwner: poolOwner && (poolOwner.substring(2) === Zero ? undefined : this.formatAddress(poolOwner))
     }
   }
 
@@ -306,7 +306,7 @@ export class MesonClient {
     return {
       status: until * 1000 < Date.now() ? LockedSwapStatus.ErrorExpired : LockedSwapStatus.Locked,
       until,
-      poolOwner: this.#formatAddress(poolOwner)
+      poolOwner: this.formatAddress(poolOwner)
     }
   }
 
