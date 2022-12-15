@@ -82,6 +82,10 @@ function _wrapTronBlock(raw) {
 
 function _wrapTronTx(raw) {
   const {
+    ref_block_hash: blockHash,
+    timestamp,
+  } = raw.raw_data || {}
+  const {
     owner_address: from, // hex
     contract_address: to, // hex
     data,
@@ -95,7 +99,7 @@ function _wrapTronTx(raw) {
     to: TronWeb.address.fromHex(to),
     value: '0',
     input: `0x${data}`,
-    timestamp: Math.floor(raw.raw_data?.timestamp / 1000).toString(),
+    timestamp: Math.floor(timestamp / 1000).toString(),
     ...raw,
   }
 }
