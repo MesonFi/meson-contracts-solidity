@@ -132,7 +132,7 @@
       "walletconnect"
     ],
     "addressFormat": "hex",
-    "url": "https://arb1.arbitrum.io/rpc",
+    "url": "https://rpc.ankr.com/arbitrum",
     "explorer": "https://arbiscan.io",
     "nativeCurrency": {
       "name": "ETH",
@@ -315,14 +315,14 @@
     "tokens": [
       {
         "name": "USD Coin",
-        "symbol": "USDC",
+        "symbol": "USDC.e",
         "decimals": 6,
         "addr": "0xB12BFcA5A55806AaF64E99521918A4bf0fC40802",
         "tokenIndex": 1
       },
       {
         "name": "Tether USD",
-        "symbol": "USDT",
+        "symbol": "USDT.e",
         "decimals": 6,
         "addr": "0x4988a896b1227218e4A686fdE5EabdcAbd91571f",
         "tokenIndex": 2
@@ -556,20 +556,13 @@
       "symbol": "GLMR",
       "decimals": 18
     },
-    "mesonAddress": "",
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
     "tokens": [
       {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0x8f552a71EFE5eeFc207Bf75485b356A0b3f01eC9",
-        "tokenIndex": 1
-      },
-      {
         "name": "Tether USD",
-        "symbol": "USDT",
+        "symbol": "xcUSDT",
         "decimals": 6,
-        "addr": "0x8e70cD5B4Ff3f62659049e74b6649c6603A0E594",
+        "addr": "0xFFFFFFfFea09FB06d082fd1275CD48b191cbCD1d",
         "tokenIndex": 2
       }
     ]
