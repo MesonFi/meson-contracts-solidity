@@ -140,11 +140,6 @@ export class Swap implements SwapData {
     return this.willWaiveFee ? BigNumber.from(0) : this.amount.div(1000)
   }
 
-  get platformFee(): BigNumber {
-    // deprecated
-    return this.serviceFee
-  }
-
   get totalFee(): BigNumber {
     return this.serviceFee.add(this.fee)
   }
