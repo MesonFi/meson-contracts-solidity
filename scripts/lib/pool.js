@@ -10,6 +10,15 @@ function getToken(network, symbol, wallet) {
   return { instance, tokenIndex: token.tokenIndex }
 }
 
+exports.addMultipleSupportedTokens = async function addMultipleSupportedTokens(tokens, { network, wallet }) {
+  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
+
+  console.log('Adding supported tokens', tokens)
+  const tx = await mesonInstance.addMultipleSupportedTokens(tokens.map(t => t.addr), tokens.map(t => t.tokenIndex))
+  await tx.wait(1)
+  return tx
+}
+
 exports.deposit = async function deposit(symbol, amount, { network, wallet }) {
   const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
   const token = getToken(network, symbol, wallet)
