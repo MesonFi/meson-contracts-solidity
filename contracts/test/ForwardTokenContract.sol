@@ -2,15 +2,15 @@
 pragma solidity ^0.8.0;
 
 import "../utils/IERC20Minimal.sol";
-import "../utils/ITransferWithBeneficiary.sol";
+import "../utils/IDepositWithBeneficiary.sol";
 
 /// @notice A sample of 3rd-party dapp that interacts with meson
-/// With `transferWithBeneficiary`, the meson contract will be able
+/// With `depositWithBeneficiary`, the meson contract will be able
 /// to deposit cross-chain'ed stablecoins to the 3rd-party dapp contract
 /// on behalf of the user. The user will receive the benefits corresponding
 /// to this deposit.
-contract ForwardTokenContract is ITransferWithBeneficiary {
-  function transferWithBeneficiary(
+contract ForwardTokenContract is IDepositWithBeneficiary {
+  function depositWithBeneficiary(
     address token,
     uint256 amount,
     address beneficiary,

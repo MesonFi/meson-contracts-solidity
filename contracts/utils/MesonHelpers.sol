@@ -4,7 +4,7 @@ pragma solidity 0.8.16;
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./IERC20Minimal.sol";
-import "./ITransferWithBeneficiary.sol";
+import "./IRecipientContract.sol";
 import "./MesonConfig.sol";
 
 /// @title MesonHelpers
@@ -50,10 +50,10 @@ contract MesonHelpers is MesonConfig, Context {
     // IERC20Minimal(token).transfer(recipient, amount);
   }
 
-  /// @notice Transfer tokens to a contract using `transferWithBeneficiary`
+  /// @notice Transfer tokens to a contract using `depositWithBeneficiary`
   /// @param token The contract address of the token which will be transferred
   /// @param contractAddr The smart contract address that will receive transferring tokens
-  /// @param beneficiary The beneficiary of `transferWithBeneficiary`
+  /// @param beneficiary The beneficiary of `depositWithBeneficiary`
   /// @param amount The value of the transfer (always in decimal 6)
   /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
   /// @param data Extra data passed to the contract
@@ -67,12 +67,19 @@ contract MesonHelpers is MesonConfig, Context {
   ) internal {
     require(Address.isContract(token), "The given token address is not a contract");
     require(Address.isContract(contractAddr), "The given recipient address is not a contract");
+    
+    uint8 methodId = _methodIdFromData(data);
+    require(methodId <= 1, "Unknown method id");
 
     if (_needAdjustAmount(tokenIndex)) {
       amount *= 1e12;
     }
     IERC20Minimal(token).approve(contractAddr, amount);
-    ITransferWithBeneficiary(contractAddr).transferWithBeneficiary(token, amount, beneficiary, data);
+    if (methodId == 0) {
+      IRecipientContract(contractAddr).depositWithBeneficiary(token, amount, beneficiary, data);
+    } else if (methodId == 1) {
+      IRecipientContract(contractAddr).deposit(token, amount, beneficiary, uint16(data >> 40));
+    }
   }
 
   /// @notice Help the senders to transfer their assets to the Meson contract
@@ -148,6 +155,11 @@ contract MesonHelpers is MesonConfig, Context {
   /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _saltDataFrom(uint256 encodedSwap) internal pure returns (uint64) {
     return uint64(encodedSwap >> 128);
+  }
+
+  /// @notice Decode method id from `data`
+  function _methodIdFromData(uint64 data) internal pure returns (uint8) {
+    return uint8(data >> 56);
   }
 
   /// @notice Whether the swap should release to a 3rd-party integrated dapp contract
