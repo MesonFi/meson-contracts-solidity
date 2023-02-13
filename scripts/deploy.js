@@ -21,7 +21,7 @@ module.exports = async function deploy(network, upgradable, testnetMode) {
   const tokens = network.tokens
 
   if (testnetMode) { // only for testnets
-    for await (const token of tokens) {
+    for (const token of tokens) {
       console.log(`Deploying ${token.name}...`)
       const totalSupply = ethers.utils.parseUnits('1000000', token.decimals)
       const args = [token.name, token.symbol, totalSupply.toString(), token.decimals]
@@ -39,7 +39,7 @@ module.exports = async function deploy(network, upgradable, testnetMode) {
   }
 
   if (testnetMode && DEPOSIT_ON_DEPLOY) { // only for testnets
-    for await(const token of tokens) {
+    for (const token of tokens) {
       await deposit(token.symbol, DEPOSIT_ON_DEPLOY, { network, wallet })
     }
   }
