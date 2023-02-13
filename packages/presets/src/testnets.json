@@ -596,5 +596,35 @@
         "tokenIndex": 2
       }
     ]
+  },
+  {
+    "id": "sep-testnet",
+    "name": "Sepolia Testnet",
+    "alias": "sep",
+    "chainId": "0xaa36a7",
+    "slip44": "0xaa36a7",
+    "shortSlip44": "0x36a7",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "hex",
+    "url": "https://rpc.sepolia.org",
+    "explorer": "https://sepolia.etherscan.io",
+    "nativeCurrency": {
+      "name": "SEP",
+      "symbol": "SEP",
+      "decimals": 18
+    },
+    "mesonAddress": "0x21D828269A0A7EF69dC25d257299901f318fBbA8",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 18,
+        "addr": "0x6EcdeD0017Ff18c25DD3a37AE101c47EF4D05De4",
+        "tokenIndex": 33
+      }
+    ]
   }
 ]
