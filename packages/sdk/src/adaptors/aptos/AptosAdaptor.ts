@@ -8,6 +8,10 @@ export default class AptosAdaptor {
     this.client = client
   }
 
+  get nodeUrl() {
+    return this.client.nodeUrl
+  }
+
   async detectNetwork(): Promise<any> {
     return await this.client.getLedgerInfo()
   }
@@ -56,9 +60,15 @@ export default class AptosAdaptor {
       const block = await this.client.getBlockByHeight(number, params[1])
       return _wrapAptosBlock(block)
     } else if (method === 'eth_getTransactionByHash') {
-      return _wrapAptosTx(await this.client.getTransactionByHash(params[0]))
+      if (params[0].startsWith('0x')) {
+        return _wrapAptosTx(await this.client.getTransactionByHash(params[0]))
+      }
+      return _wrapAptosTx(await this.client.getTransactionByVersion(params[0]))
     } else if (method === 'eth_getTransactionReceipt') {
-      return _wrapAptosTx(await this.client.getTransactionByHash(params[0]))
+      if (params[0].startsWith('0x')) {
+        return _wrapAptosTx(await this.client.getTransactionByHash(params[0]))
+      }
+      return _wrapAptosTx(await this.client.getTransactionByVersion(params[0]))
     }
   }
 

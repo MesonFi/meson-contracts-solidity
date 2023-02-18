@@ -9,6 +9,10 @@ export default class TronAdaptor {
     this.client = client
   }
 
+  get nodeUrl() {
+    return this.client.fullNode.host
+  }
+
   async detectNetwork(): Promise<any> {
     return this.client.fullNode.isConnected()
   }

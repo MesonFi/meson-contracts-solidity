@@ -76,9 +76,19 @@ export class MesonClient {
 
   constructor(mesonInstance: any, shortCoinType: string) {
     if (mesonInstance instanceof Contract) {
-      this.formatAddress = addr => utils.getAddress(addr).toLowerCase()
+      this.formatAddress = addr => {
+        if (utils.isAddress(addr)) {
+          return utils.getAddress(addr).toLowerCase()
+        } else {
+          return addr
+        }
+      }
     } else if (mesonInstance.provider instanceof AptosAdaptor) {
-      this.formatAddress = addr => utils.hexZeroPad(addr, 32)
+      this.formatAddress = (addrWithModule = '') => {
+        const parts = addrWithModule.split('::')
+        parts[0] = utils.hexZeroPad(parts[0], 32)
+        return parts.join('::')
+      }
     } else {
       this.formatAddress = addr => TronWeb.address.fromHex(addr)
     }
@@ -108,6 +118,16 @@ export class MesonClient {
 
   get provider() {
     return this.#mesonInstance.provider as providers.JsonRpcProvider
+  }
+
+  get nodeUrl(): string {
+    if (this.provider['nodeUrl']) {
+      return this.provider['nodeUrl']
+    } else if (this.provider instanceof providers.WebSocketProvider) {
+      return this.provider._websocket?._url
+    } else {
+      return this.provider.connection?.url
+    }
   }
 
   switchWallet (wallet) {
@@ -154,7 +174,7 @@ export class MesonClient {
     return this.getToken(index)?.addr
   }
 
-  tokenIndexOf(addr: string) {
+  tokenIndexOf(addr: string): number | undefined {
     return this._tokens.find(t => t.addr === this.formatAddress(addr))?.tokenIndex
   }
 

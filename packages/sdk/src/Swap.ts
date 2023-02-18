@@ -126,7 +126,7 @@ export class Swap implements SwapData {
   }
 
   get deprecatedEncoding() : boolean {
-    return this.salt.startsWith('0x00') || this.salt.startsWith('0xff')
+    return this.version < MESON_PROTOCOL_VERSION
   }
 
   get willWaiveFee(): boolean {
