@@ -63,6 +63,7 @@ export interface PresetToken {
   symbol: string
   decimals: number
   tokenIndex: number
+  disabled?: boolean
 }
 
 export interface PresetNetwork {
@@ -117,23 +118,26 @@ export class MesonPresets {
     return networks.find(item => item.chainId === chainId)
   }
 
-  getTokensForNetwork(id: string): PresetToken[] {
+  getTokensForNetwork(id: string, includeDisabled?: boolean): PresetToken[] {
     const networks = this.getAllNetworks()
     const match = networks.find(item => item.id === id)
     if (!match) {
       return []
     }
-    return [...match.tokens, {
-      addr: match.uctAddress,
-      name: 'USD Coupon Token',
-      symbol: 'UCT',
-      decimals: 4,
-      tokenIndex: 255,
-    }].filter(t => t.addr)
+    return [
+      ...match.tokens.filter(t => includeDisabled || !t.disabled),
+      {
+        addr: match.uctAddress,
+        name: 'USD Coupon Token',
+        symbol: 'UCT',
+        decimals: 4,
+        tokenIndex: 255,
+      }
+    ].filter(t => t.addr)
   }
 
   getToken(networkId: string, tokenIndex: number): PresetToken {
-    const tokens = this.getTokensForNetwork(networkId)
+    const tokens = this.getTokensForNetwork(networkId, true)
     return tokens?.find(t => t.tokenIndex === tokenIndex)
   }
 

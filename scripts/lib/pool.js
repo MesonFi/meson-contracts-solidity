@@ -5,7 +5,7 @@ const { Meson, ERC20 } = require('@mesonfi/contract-abis')
 function getToken(network, symbol, wallet) {
   const token = symbol.toLowerCase() === 'uct'
     ? { addr: network.uctAddress, tokenIndex: 255 }
-    : network.tokens.find(t => t.symbol.toLowerCase().includes(symbol.toLowerCase()))
+    : network.tokens.find(t => !t.disabled && t.symbol.toLowerCase().includes(symbol.toLowerCase()))
   const instance = adaptors.getContract(token.addr, ERC20.abi, wallet)
   return { instance, tokenIndex: token.tokenIndex }
 }
