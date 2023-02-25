@@ -608,24 +608,24 @@
   },
   {
     "id": "zksync",
-    "name": "zkSync",
-    "alias": "ZKSYNC",
-    "chainId": "0x118",
-    "slip44": "0x00000118",
-    "shortSlip44": "0x0118",
+    "name": "zkSync Era",
+    "alias": "ZKS",
+    "chainId": "0x144",
+    "slip44": "0x80000324",
+    "shortSlip44": "0x0324",
     "extensions": [
       "metamask",
       "walletconnect"
     ],
     "addressFormat": "hex",
-    "url": "",
-    "explorer": "",
+    "url": "https://zksync2-mainnet.zksync.io",
+    "explorer": "https://explorer.zksync.io",
     "nativeCurrency": {
       "name": "ETH",
       "symbol": "ETH",
       "decimals": 18
     },
-    "mesonAddress": "",
+    "mesonAddress": "0x2DcC88Fa6b6950EE28245C3238B8993BE5feeA42",
     "tokens": [
       {
         "name": "USD Coin",

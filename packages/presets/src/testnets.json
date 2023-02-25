@@ -488,10 +488,10 @@
   {
     "id": "zksync-testnet",
     "name": "zkSync alpha testnet",
-    "alias": "ZKSYNC",
+    "alias": "ZKS",
     "chainId": "0x118",
-    "slip44": "0x00000118",
-    "shortSlip44": "0x0118",
+    "slip44": "0x00000324",
+    "shortSlip44": "0x0324",
     "extensions": [
       "metamask",
       "walletconnect"
