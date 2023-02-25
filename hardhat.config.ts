@@ -16,7 +16,6 @@ import config from './config.json'
 dotenv.config()
 
 const {
-  ZKSYNC,
   INFURA_API_KEY = ''
 } = process.env
 
@@ -25,6 +24,8 @@ const mainnetConnections = Object.fromEntries(
     .filter(item => item.url)
     .map(item => [item.id, {
       url: item.url?.replace('${INFURA_API_KEY}', INFURA_API_KEY),
+      zksync: item.id.startsWith('zksync'),
+      ethNetwork: item.id.startsWith('zksync') && 'eth',
       timeout: 0,
       gas: 'auto',
       gasMultiplier: 1.1,
@@ -35,6 +36,8 @@ const testnetConnections = Object.fromEntries(
     .filter(item => item.url)
     .map(item => [item.id, {
       url: item.url?.replace('${INFURA_API_KEY}', INFURA_API_KEY),
+      zksync: item.id.startsWith('zksync'),
+      ethNetwork: item.id.startsWith('zksync') && 'ropsten',
       timeout: 0,
     }])
 )
@@ -135,24 +138,12 @@ export default {
     },
   },
   zksolc: {
-    version: '1.1.6',
-    compilerSource: 'docker',
-    settings: {
-      experimental: {
-        dockerImage: 'matterlabs/zksolc',
-        tag: 'v1.1.6',
-      },
-    },
-  },
-  zkSyncDeploy: {
-    zkSyncNetwork: 'https://zksync2-testnet.zksync.dev',
-    ethNetwork: 'goerli',
+    version: '1.3.1',
+    compilerSource: 'binary',
+    settings: {},
   },
   defaultNetwork: 'hardhat',
   networks: {
-    hardhat: {
-      zksync: !!ZKSYNC,
-    },
     obsidians: {
       url: 'http://localhost:62743',
       accounts: 'remote',
