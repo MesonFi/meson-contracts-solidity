@@ -4105,7 +4105,7 @@
     "explorers": [
       {
         "name": "Evmos EVM Explorer (Blockscout)",
-        "url": "https://evm.evmos.org",
+        "url": "https://escan.live",
         "standard": "none",
         "icon": "evmos"
       },
@@ -4137,7 +4137,7 @@
     "explorers": [
       {
         "name": "Evmos EVM Explorer (Blockscout)",
-        "url": "https://evm.evmos.org",
+        "url": "https://escan.live",
         "standard": "none",
         "icon": "evmos"
       },

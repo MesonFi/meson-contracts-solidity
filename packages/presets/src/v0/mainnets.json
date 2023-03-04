@@ -118,7 +118,7 @@
     ],
     "addressFormat": "hex",
     "url": "https://eth.bd.evmos.org:8545",
-    "explorer": "https://evm.evmos.org",
+    "explorer": "https://escan.live",
     "nativeCurrency": {
       "name": "EVMOS",
       "symbol": "EVMOS",

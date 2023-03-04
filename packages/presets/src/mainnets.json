@@ -500,7 +500,7 @@
     ],
     "addressFormat": "hex",
     "url": "https://evmos-mainnet.gateway.pokt.network/v1/lb/627586ddea1b320039c95205",
-    "explorer": "https://evm.evmos.org",
+    "explorer": "https://escan.live",
     "nativeCurrency": {
       "name": "EVMOS",
       "symbol": "EVMOS",
