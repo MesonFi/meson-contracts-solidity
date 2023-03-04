@@ -24,7 +24,7 @@ const presets = selected.map(chain => {
     chainId: '0x' + Number(chain.chainId).toString(16),
     slip44: '0x' + Number(0x80000000 + slip44).toString(16),
     extensions: explorer.standard === 'EIP3091' ? ['metamask'] : [],
-    addressFormat: explorer.standard === 'EIP3091' ? 'hex' : 'unknown',
+    addressFormat: explorer.standard === 'EIP3091' ? 'ethers' : 'unknown',
     url: chain.rpc[0],
     explorer: explorer.url,
     nativeCurrency: chain.nativeCurrency,

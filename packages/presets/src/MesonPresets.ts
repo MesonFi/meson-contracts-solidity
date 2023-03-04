@@ -23,7 +23,7 @@ class RpcFallbackProvider extends providers.FallbackProvider {
   async send(method, params) {
     for await (const c of this.providerConfigs) {
       try {
-        return await (c.provider as providers.StaticJsonRpcProvider).send(method, params)
+        return await (<providers.StaticJsonRpcProvider>c.provider).send(method, params)
       } catch (e) {
       }
     }
@@ -156,6 +156,16 @@ export class MesonPresets {
       }
     }
     return network.tokens.find(t => t.tokenIndex === tokenIndex)
+  }
+
+  getTokenByCategory (networkId: string, category = '') {
+    const tokens = this.getTokensForNetwork(networkId)
+    return tokens?.find(t => MesonClient.categoryFromSymbol(t.symbol) === category.toLowerCase())
+  }
+
+  getTokenCategory(networkId: string, tokenIndex: number) {
+    const token = this.getToken(networkId, tokenIndex)
+    return MesonClient.categoryFromSymbol(token?.symbol)
   }
 
   getNetworkToken(shortCoinType: string, tokenIndex: number, version: number = 1):

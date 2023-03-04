@@ -10,7 +10,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://rpc.ankr.com/eth_ropsten",
     "explorer": "https://ropsten.etherscan.io",
     "mesonAddress": "0xAB3F5A89FdaD07e5CEdf005BF8387CcD59c6Af98",
@@ -42,7 +42,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://data-seed-prebsc-1-s1.binance.org:8545",
     "explorer": "https://testnet.bscscan.com",
     "nativeCurrency": {
@@ -125,7 +125,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://api.avax-test.network/ext/bc/C/rpc",
     "explorer": "https://testnet.snowtrace.io",
     "nativeCurrency": {
@@ -162,7 +162,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://polygon-testnet.public.blastapi.io",
     "explorer": "https://mumbai.polygonscan.com",
     "nativeCurrency": {
@@ -200,7 +200,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://rpc.testnet.fantom.network",
     "explorer": "https://testnet.ftmscan.com",
     "nativeCurrency": {
@@ -237,7 +237,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://api.s0.b.hmny.io",
     "explorer": "https://explorer.pops.one",
     "nativeCurrency": {
@@ -274,7 +274,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://testnet.aurora.dev",
     "explorer": "https://explorer.testnet.aurora.dev",
     "nativeCurrency": {
@@ -311,7 +311,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://rinkeby.arbitrum.io/rpc",
     "explorer": "https://testnet.arbiscan.io",
     "nativeCurrency": {
@@ -348,7 +348,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://kovan.optimism.io",
     "explorer": "https://kovan-optimistic.etherscan.io",
     "nativeCurrency": {
@@ -385,7 +385,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://rpc.xdaichain.com",
     "explorer": "https://blockscout.com/xdai/mainnet",
     "nativeCurrency": {
@@ -422,7 +422,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://eth.bd.evmos.dev:8545",
     "explorer": "https://evm.evmos.dev",
     "nativeCurrency": {
@@ -459,7 +459,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://api.testnet-dev.trust.one",
     "explorer": "https://trustscan.one",
     "nativeCurrency": {
@@ -496,7 +496,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://zksync2-testnet.zksync.dev",
     "explorer": "https://zksync2-testnet.zkscan.io",
     "nativeCurrency": {
@@ -534,7 +534,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://evm-t3.cronos.org",
     "explorer": "https://cronos.org/explorer/testnet3",
     "nativeCurrency": {
@@ -608,7 +608,7 @@
       "metamask",
       "walletconnect"
     ],
-    "addressFormat": "hex",
+    "addressFormat": "ethers",
     "url": "https://rpc.sepolia.org",
     "explorer": "https://sepolia.etherscan.io",
     "nativeCurrency": {
