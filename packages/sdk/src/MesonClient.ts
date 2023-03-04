@@ -1,10 +1,10 @@
 import {
+  BigNumber,
   Contract,
   constants,
   providers,
   utils,
   type CallOverrides,
-  type BigNumber,
   type BigNumberish,
   type Wallet,
 } from 'ethers'
@@ -57,9 +57,9 @@ export interface PartialSwapData {
 export class MesonClient {
   #mesonInstance: Meson
 
-  readonly rpc: Rpc
   readonly shortCoinType: string
-  readonly formatAddress: (string) => string
+  readonly addressFormat: adaptors.AddressFormat
+  readonly rpc: Rpc
 
   protected _signer: SwapSigner | null = null
   protected _tokens = []
@@ -74,23 +74,45 @@ export class MesonClient {
     return mesonClient
   }
 
+  static fromValue (value, tokenIndex) {
+    return utils.formatUnits(value || '0', tokenIndex === 255 ? 4 : 6).replace(/\.0*$/, '')
+  }
+
+  static toValue (amount, tokenIndex) {
+    return utils.parseUnits(amount || '0', tokenIndex === 255 ? 4 : 6)
+  }
+
+  static subValue (v1 = '0', v2 = '0') {
+    return BigNumber.from(v1).sub(v2)
+  }
+
+  static initiatorFromAddress (address) {
+    return `0x${TronWeb.address.toHex(address).substring(2)}`
+  }
+
+  static categoryFromSymbol (symbol) {
+    if (!symbol) {
+      return
+    }
+    const lowerCaseSymbol = symbol.toLowerCase()
+    if (lowerCaseSymbol.includes('usdc')) {
+      return 'usdc'
+    } else if (lowerCaseSymbol.includes('usdt')) {
+      return 'usdt'
+    } else if (lowerCaseSymbol.includes('busd')) {
+      return 'busd'
+    } else {
+      return 'uct'
+    }
+  }
+
   constructor(mesonInstance: any, shortCoinType: string) {
     if (mesonInstance instanceof Contract) {
-      this.formatAddress = addr => {
-        if (utils.isAddress(addr)) {
-          return utils.getAddress(addr).toLowerCase()
-        } else {
-          return addr
-        }
-      }
+      this.addressFormat = 'ethers'
     } else if (mesonInstance.provider instanceof AptosAdaptor) {
-      this.formatAddress = (addrWithModule = '') => {
-        const parts = addrWithModule.split('::')
-        parts[0] = utils.hexZeroPad(parts[0], 32)
-        return parts.join('::')
-      }
+      this.addressFormat = 'aptos'
     } else {
-      this.formatAddress = addr => TronWeb.address.fromHex(addr)
+      this.addressFormat = 'tron'
     }
 
     this.#mesonInstance = mesonInstance as Meson
@@ -106,6 +128,14 @@ export class MesonClient {
     return this.formatAddress(this.#mesonInstance.address)
   }
 
+  isAddress(addr: string): boolean {
+    return adaptors.isAddress(this.addressFormat, addr)
+  }
+
+  formatAddress(addr: string): string {
+    return adaptors.formatAddress(this.addressFormat, addr)
+  }
+
   async getSignerAddress(): Promise<string> {
     const signer = this.#mesonInstance.signer as Wallet
     const address = signer.address || await signer.getAddress()
@@ -114,6 +144,10 @@ export class MesonClient {
 
   setSwapSigner(swapSigner: SwapSigner) {
     this._signer = swapSigner
+  }
+
+  switchWallet (wallet) {
+    this.#mesonInstance = this.#mesonInstance.connect(wallet)
   }
 
   get provider() {
@@ -128,10 +162,6 @@ export class MesonClient {
     } else {
       return this.provider.connection?.url
     }
-  }
-
-  switchWallet (wallet) {
-    this.#mesonInstance = this.#mesonInstance.connect(wallet)
   }
 
   async detectNetwork() {
@@ -180,6 +210,48 @@ export class MesonClient {
 
   getTokenContract(tokenAddr: string, provider = this.provider) {
     return adaptors.getContract(tokenAddr, ERC20.abi, provider)
+  }
+
+  async getTokenBalance (owner, tokenIndex) {
+    if (!this._tokens.length) {
+      await this._getSupportedTokens({ from: owner })
+    }
+    const tokenAddr = this.tokenAddr(tokenIndex)
+    if (!tokenAddr) {
+      throw new Error(`No token for index ${tokenIndex}`)
+    }
+    const tokenContract = this.getTokenContract(tokenAddr)
+    const rawValue = await (tokenContract as any).balanceOf(owner, { from: owner })
+    const decimals = await (tokenContract as any).decimals({ from: owner })
+    let value = BigNumber.from(rawValue)
+    if (decimals > 6) {
+      value = value.div(10 ** (decimals - 6))
+    }
+    return {
+      value,
+      display: MesonClient.fromValue(value, tokenIndex)
+    }
+  }
+
+  async getAllowance (owner, tokenIndex) {
+    if (!this._tokens.length) {
+      await this._getSupportedTokens({ from: owner })
+    }
+    const tokenAddr = this.tokenAddr(tokenIndex)
+    if (!tokenAddr) {
+      throw new Error(`No token for index ${tokenIndex}`)
+    }
+    const tokenContract = this.getTokenContract(tokenAddr)
+    const rawValue = await (tokenContract as any).allowance(owner, this.address, { from: owner })
+    const decimals = await (tokenContract as any).decimals({ from: owner })
+    let value = BigNumber.from(rawValue)
+    if (decimals > 6) {
+      value = value.div(10 ** (decimals - 6))
+    }
+    return {
+      value,
+      display: MesonClient.fromValue(value, tokenIndex)
+    }
   }
 
   async poolOfAuthorizedAddr(addr: string, ...overrides) {

@@ -39,31 +39,39 @@ export class SwapSigner {
     return [r, s, v]
   }
 
-  static hashRequest(encoded: string, testnet?: boolean): string {
+  static prehashRequest(encoded: string, testnet?: boolean): string {
     if (fromTron(encoded)) {
       const header = nonTyped(encoded) ? '\x19TRON Signed Message:\n33\n' : '\x19TRON Signed Message:\n32\n'
-      return utils.solidityKeccak256(['string', 'bytes32'], [header, encoded])
+      return utils.solidityPack(['string', 'bytes32'], [header, encoded])
     } else if (nonTyped(encoded)) {
       const header = '\x19Ethereum Signed Message:\n32'
-      return utils.solidityKeccak256(['string', 'bytes32'], [header, encoded])
+      return utils.solidityPack(['string', 'bytes32'], [header, encoded])
     }
     const notice = testnet ? NOTICE_TESTNET_SIGN_REQUEST : NOTICE_SIGN_REQUEST
     const typeHash = utils.solidityKeccak256(['string'], [`bytes32 ${notice}`])
-    return utils.solidityKeccak256(['bytes32', 'bytes32'], [typeHash, utils.keccak256(encoded)])
+    return utils.solidityPack(['bytes32', 'bytes32'], [typeHash, utils.keccak256(encoded)])
   }
 
-  static hashRelease(encoded: string, recipient: string, testnet?: boolean): string {
+  static hashRequest(encoded: string, testnet?: boolean): string {
+    return utils.keccak256(SwapSigner.prehashRequest(encoded, testnet))
+  }
+
+  static prehashRelease(encoded: string, recipient: string, testnet?: boolean): string {
     if (fromTron(encoded)) {
       const header = nonTyped(encoded) ? '\x19TRON Signed Message:\n53\n' : '\x19TRON Signed Message:\n32\n'
-      return utils.solidityKeccak256(['string', 'bytes32', 'address'], [header, encoded, hexAddress(recipient)])
+      return utils.solidityPack(['string', 'bytes32', 'address'], [header, encoded, hexAddress(recipient)])
     } else if (nonTyped(encoded)) {
       const header = '\x19Ethereum Signed Message:\n52'
-      return utils.solidityKeccak256(['string', 'bytes32', 'address'], [header, encoded, hexAddress(recipient)])
+      return utils.solidityPack(['string', 'bytes32', 'address'], [header, encoded, hexAddress(recipient)])
     }
     const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
     const typeHash = utils.solidityKeccak256(['string', 'string'], [`bytes32 ${notice}`, `address ${noticeRecipient(encoded)}`])
     const valueHash = utils.solidityKeccak256(['bytes32', 'address'], [encoded, hexAddress(recipient)])
-    return utils.solidityKeccak256(['bytes32', 'bytes32'], [typeHash, valueHash])
+    return utils.solidityPack(['bytes32', 'bytes32'], [typeHash, valueHash])
+  }
+
+  static hashRelease(encoded: string, recipient: string, testnet?: boolean): string {
+    return utils.keccak256(SwapSigner.prehashRelease(encoded, recipient, testnet))
   }
 }
 
