@@ -380,6 +380,13 @@
         "decimals": 18,
         "addr": "0xfe97e85d13abd9c1c33384e796f10b73905637ce",
         "tokenIndex": 34
+      },
+      {
+        "name": "Proof of Deposit (meson.fi)",
+        "symbol": "PoD",
+        "decimals": 6,
+        "addr": "0xDd3d867db5Ca13E5F055Dd4484648fddDF3248EB",
+        "tokenIndex": 32
       }
     ]
   },

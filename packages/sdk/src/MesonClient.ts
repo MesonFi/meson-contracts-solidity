@@ -101,6 +101,8 @@ export class MesonClient {
       return 'usdt'
     } else if (lowerCaseSymbol.includes('busd')) {
       return 'busd'
+    } else if (lowerCaseSymbol.includes('pod')) {
+      return 'pod'
     } else {
       return 'uct'
     }

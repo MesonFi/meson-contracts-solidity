@@ -10,11 +10,16 @@ function getToken(network, symbol, wallet) {
   return { instance, tokenIndex: token.tokenIndex }
 }
 
-exports.addMultipleSupportedTokens = async function addMultipleSupportedTokens(tokens, { network, wallet }) {
+exports.addSupportedTokens = async function addSupportedTokens(tokens, { network, wallet }) {
   const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
 
   console.log('Adding supported tokens', tokens)
-  const tx = await mesonInstance.addMultipleSupportedTokens(tokens.map(t => t.addr), tokens.map(t => t.tokenIndex))
+  let tx
+  if (tokens.length > 1) {
+    tx = await mesonInstance.addMultipleSupportedTokens(tokens.map(t => t.addr), tokens.map(t => t.tokenIndex))
+  } else {
+    tx = await mesonInstance.addSupportToken(tokens[0].addr, tokens[0].tokenIndex)
+  }
   await tx.wait(1)
   return tx
 }
