@@ -3,8 +3,8 @@ pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "./IERC20Minimal.sol";
-import "./IRecipientContract.sol";
+import "../interfaces/IERC20Minimal.sol";
+import "../interfaces/IRecipientContract.sol";
 import "./MesonConfig.sol";
 
 /// @title MesonHelpers

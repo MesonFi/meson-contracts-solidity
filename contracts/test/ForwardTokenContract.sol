@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../utils/IERC20Minimal.sol";
-import "../utils/IDepositWithBeneficiary.sol";
+import "../interfaces/IERC20Minimal.sol";
+import "../interfaces/IDepositWithBeneficiary.sol";
 
 /// @notice A sample of 3rd-party dapp that interacts with meson
 /// With `depositWithBeneficiary`, the meson contract will be able
