@@ -37,7 +37,7 @@ const testnetConnections = Object.fromEntries(
     .map(item => [item.id, {
       url: item.url?.replace('${INFURA_API_KEY}', INFURA_API_KEY),
       zksync: item.id.startsWith('zksync'),
-      ethNetwork: item.id.startsWith('zksync') && 'ropsten',
+      ethNetwork: item.id.startsWith('zksync') && 'goerli',
       timeout: 0,
     }])
 )

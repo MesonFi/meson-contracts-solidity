@@ -498,27 +498,27 @@
     ],
     "addressFormat": "ethers",
     "url": "https://zksync2-testnet.zksync.dev",
-    "explorer": "https://zksync2-testnet.zkscan.io",
+    "explorer": "https://goerli.explorer.zksync.io",
     "nativeCurrency": {
       "name": "ETH",
       "symbol": "ETH",
       "decimals": 18
     },
-    "mesonAddress": "0x8b37e9dB2Aa8EC8C2F80d4947D148A85a57bC911",
+    "mesonAddress": "0x8f38ccEDd73b0c801B55cf085E0D8182b9e131dC",
     "tokens": [
       {
-        "name": "zksync USDC",
-        "symbol": "zkUSDC",
+        "name": "USDC",
+        "symbol": "USDC",
         "decimals": 6,
         "tokenIndex": 1,
-        "addr": "0xaA2df237EE7de9045dd36Adbcf8b19Bf63131742"
+        "addr": "0x0A7EA13aADf39f00E3965a26798a560324C739B5"
       },
       {
-        "name": "zksync USDT",
-        "symbol": "zkUSDT",
+        "name": "USDT",
+        "symbol": "USDT",
         "decimals": 6,
         "tokenIndex": 2,
-        "addr": "0xdf5A60db3B5B228E02B6209175797a996b4e1F31"
+        "addr": "0x15f006F2F37014F19c0fD1B3B467F0425D51D05b"
       }
     ],
     "uctAddress": "0x88C6C4B902EEB10E192282F74B894bB7AA8B0640"
