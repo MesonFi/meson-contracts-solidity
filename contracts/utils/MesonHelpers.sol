@@ -269,18 +269,17 @@ contract MesonHelpers is MesonConfig, Context {
   /// see how to generate a signautre in class `EthersWalletSwapSigner` method `signSwapRequest`
   /// @param encodedSwap Encoded swap information. See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   /// @param r Part of the signature
-  /// @param s Part of the signature
-  /// @param v Part of the signature
+  /// @param yParityAndS Part of the signature
   /// @param signer The signer for the swap request which is the `initiator`
   function _checkRequestSignature(
     uint256 encodedSwap,
     bytes32 r,
-    bytes32 s,
-    uint8 v,
+    bytes32 yParityAndS,
     address signer
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
-    require(v == 27 || v == 28, "Invalid signature");
+    bytes32 s = yParityAndS & bytes32(0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff);
+    uint8 v = uint8((uint256(yParityAndS) >> 255) + 27);
     require(uint256(s) <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, "Invalid signature");
 
     bool nonTyped = _signNonTyped(encodedSwap);
@@ -307,19 +306,18 @@ contract MesonHelpers is MesonConfig, Context {
   /// @param encodedSwap Encoded swap information. See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   /// @param recipient The recipient address of the swap
   /// @param r Part of the signature
-  /// @param s Part of the signature
-  /// @param v Part of the signature
+  /// @param yParityAndS Part of the signature
   /// @param signer The signer for the swap request which is the `initiator`
   function _checkReleaseSignature(
     uint256 encodedSwap,
     address recipient,
     bytes32 r,
-    bytes32 s,
-    uint8 v,
+    bytes32 yParityAndS,
     address signer
   ) internal pure {
     require(signer != address(0), "Signer cannot be empty address");
-    require(v == 27 || v == 28, "Invalid signature");
+    bytes32 s = yParityAndS & bytes32(0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff);
+    uint8 v = uint8((uint256(yParityAndS) >> 255) + 27);
     require(uint256(s) <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, "Invalid signature");
 
     bool nonTyped = _signNonTyped(encodedSwap);

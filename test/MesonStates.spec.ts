@@ -158,25 +158,25 @@ describe('MesonStates', () => {
 
   describe('#checkRequestSignature', () => {
     it('rejects invalid signature', async () => {
-      const sigs = (await swap.signForRequest(testnetMode)).signature
-      await expect(mesonInstance.checkRequestSignature(swap.encoded, ...sigs, TestAddress))
+      const sig = ethers.utils.splitSignature((await swap.signForRequest(testnetMode)).signature)
+      await expect(mesonInstance.checkRequestSignature(swap.encoded, sig.r, sig.yParityAndS, TestAddress))
         .to.revertedWith('Invalid signature')
     })
     it('accepts a valid signature', async () => {
-      const sigs = (await swap.signForRequest(testnetMode)).signature
-      await mesonInstance.checkRequestSignature(swap.encoded, ...sigs, initiator.address)
+      const sig = ethers.utils.splitSignature((await swap.signForRequest(testnetMode)).signature)
+      await mesonInstance.checkRequestSignature(swap.encoded, sig.r, sig.yParityAndS, initiator.address)
     })
   })
 
   describe('#checkReleaseSignature', () => {
     it('rejects invalid signature', async () => {
-      const sigs = (await swap.signForRelease(TestAddress, testnetMode)).signature
-      await expect(mesonInstance.checkReleaseSignature(swap.encoded, TestAddress, ...sigs, TestAddress))
+      const sig = ethers.utils.splitSignature((await swap.signForRelease(TestAddress, testnetMode)).signature)
+      await expect(mesonInstance.checkReleaseSignature(swap.encoded, TestAddress, sig.r, sig.yParityAndS, TestAddress))
         .to.revertedWith('Invalid signature')
     })
     it('accepts a valid signature', async () => {
-      const sigs = (await swap.signForRelease(TestAddress, testnetMode)).signature
-      await mesonInstance.checkReleaseSignature(swap.encoded, TestAddress, ...sigs, initiator.address)
+      const sig = ethers.utils.splitSignature((await swap.signForRelease(TestAddress, testnetMode)).signature)
+      await mesonInstance.checkReleaseSignature(swap.encoded, TestAddress, sig.r, sig.yParityAndS, initiator.address)
     })
   })
 })

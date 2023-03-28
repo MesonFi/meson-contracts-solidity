@@ -1,6 +1,6 @@
 import { utils } from 'ethers'
 
-import type { Signature } from './SwapSigner'
+import type { CompactSignature } from './SwapSigner'
 import { Swap } from './Swap'
 import { SwapSigner } from './SwapSigner'
 
@@ -8,7 +8,7 @@ export interface SignedSwapRequestData {
   testnet?: boolean,
   encoded: string,
   initiator: string,
-  signature: Signature,
+  signature: CompactSignature,
 }
 
 export interface SignedSwapReleaseData extends SignedSwapRequestData {
@@ -20,7 +20,7 @@ export class SignedSwapRequest implements SignedSwapRequestData {
   readonly swap: Swap
   readonly encoded: string
   readonly initiator: string
-  readonly signature: Signature
+  readonly signature: CompactSignature
 
   constructor (data: SignedSwapRequestData) {
     if (!data.encoded) {
@@ -44,8 +44,7 @@ export class SignedSwapRequest implements SignedSwapRequestData {
   }
 
   checkSignature () {
-    const [r, s, v] = this.signature
-    const recovered = utils.recoverAddress(this.getDigest(), { r, s, v }).toLowerCase()
+    const recovered = utils.recoverAddress(this.getDigest(), this.signature).toLowerCase()
     if (recovered !== this.initiator) {
       throw new Error('Invalid signature')
     }

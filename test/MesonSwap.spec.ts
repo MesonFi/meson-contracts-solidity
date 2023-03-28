@@ -135,11 +135,11 @@ describe('MesonSwap', () => {
     })
     it('rejects if poolIndex is not for signer', async () => {
       await token.connect(initiator).approve(mesonInstance.address, amount)
+      const sig = ethers.utils.splitSignature(signedRequest.signature)
       await mesonInstance.postSwap(
         signedRequest.encoded,
-        signedRequest.signature[0],
-        signedRequest.signature[1],
-        signedRequest.signature[2],
+        sig.r,
+        sig.yParityAndS,
         ethers.utils.solidityPack(['address', 'uint40'], [signedRequest.initiator, 0])
       )
       await expect(mesonInstance.bondSwap(swap.encoded, 1))
@@ -147,11 +147,11 @@ describe('MesonSwap', () => {
     })
     it('bonds a valid swap', async () => {
       await token.connect(initiator).approve(mesonInstance.address, amount)
+      const sig = ethers.utils.splitSignature(signedRequest.signature)
       await mesonInstance.postSwap(
         signedRequest.encoded,
-        signedRequest.signature[0],
-        signedRequest.signature[1],
-        signedRequest.signature[2],
+        sig.r,
+        sig.yParityAndS,
         ethers.utils.solidityPack(['address', 'uint40'], [signedRequest.initiator, 0])
       )
       await mesonInstance.connect(poolOwner).bondSwap(swap.encoded, 1)

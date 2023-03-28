@@ -121,19 +121,17 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @dev Designed to be used by authorized addresses or pool owners
   /// @param encodedSwap Encoded swap information
   /// @param r Part of the signature (the one given by `postSwap` call)
-  /// @param s Part of the signature (the one given by `postSwap` call)
-  /// @param v Part of the signature (the one given by `postSwap` call)
+  /// @param yParityAndS Part of the signature (the one given by `postSwap` call)
   /// @param initiator The swap initiator who created and signed the swap request
   function lock(
     uint256 encodedSwap,
     bytes32 r,
-    bytes32 s,
-    uint8 v,
+    bytes32 yParityAndS,
     address initiator
   ) external matchProtocolVersion(encodedSwap) forTargetChain(encodedSwap) {
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     require(_lockedSwaps[swapId] == 0, "Swap already exists");
-    _checkRequestSignature(encodedSwap, r, s, v, initiator);
+    _checkRequestSignature(encodedSwap, r, yParityAndS, initiator);
 
     uint40 poolIndex = poolOfAuthorizedAddr[_msgSender()];
     require(poolIndex != 0, "Caller not registered. Call depositAndRegister.");
@@ -176,15 +174,13 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @dev Designed to be used by anyone
   /// @param encodedSwap Encoded swap information
   /// @param r Part of the release signature (same as in the `executeSwap` call)
-  /// @param s Part of the release signature (same as in the `executeSwap` call)
-  /// @param v Part of the release signature (same as in the `executeSwap` call)
+  /// @param yParityAndS Part of the release signature (same as in the `executeSwap` call)
   /// @param initiator The swap initiator who created and signed the swap request
   /// @param recipient The recipient address of the swap
   function release(
     uint256 encodedSwap,
     bytes32 r,
-    bytes32 s,
-    uint8 v,
+    bytes32 yParityAndS,
     address initiator,
     address recipient
   ) external {
@@ -203,7 +199,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(recipient != address(0), "Recipient cannot be zero address");
     require(_expireTsFrom(encodedSwap) > block.timestamp, "Cannot release because expired");
 
-    _checkReleaseSignature(encodedSwap, recipient, r, s, v, initiator);
+    _checkReleaseSignature(encodedSwap, recipient, r, yParityAndS, initiator);
     _lockedSwaps[swapId] = 1;
 
     uint8 tokenIndex = _outTokenIndexFrom(encodedSwap);

@@ -7,7 +7,7 @@ const NOTICE_SIGN_RELEASE = 'Sign to release a swap on Meson'
 const NOTICE_TESTNET_SIGN_REQUEST = 'Sign to request a swap on Meson (Testnet)'
 const NOTICE_TESTNET_SIGN_RELEASE = 'Sign to release a swap on Meson (Testnet)'
 
-export type Signature = [string, string, number]
+export type CompactSignature = string
 
 const nonTyped = encoded => parseInt(encoded[15], 16) >= 8
 const fromTron = encoded => encoded.substring(60, 64) === '00c3'
@@ -24,19 +24,12 @@ export class SwapSigner {
     throw new Error('Not implemented')
   }
 
-  async signSwapRequest(encoded: string, testnet?: boolean): Promise<Signature> {
+  async signSwapRequest(encoded: string, testnet?: boolean): Promise<CompactSignature> {
     throw new Error('Not implemented')
   }
 
-  async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<Signature> {
+  async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<CompactSignature> {
     throw new Error('Not implemented')
-  }
-
-  protected _separateSignature(signature: string): Signature {
-    const r = '0x' + signature.substring(2, 66)
-    const s = '0x' + signature.substring(66, 130)
-    const v = parseInt(signature.substring(130, 132), 16)
-    return [r, s, v]
   }
 
   static prehashRequest(encoded: string, testnet?: boolean): string {
@@ -87,16 +80,16 @@ export class EthersWalletSwapSigner extends SwapSigner {
     return this.wallet.address
   }
 
-  async signSwapRequest(encoded: string, testnet?: boolean): Promise<Signature> {
+  async signSwapRequest(encoded: string, testnet?: boolean): Promise<CompactSignature> {
     const digest = SwapSigner.hashRequest(encoded, testnet)
     const signature = await this.wallet._signingKey().signDigest(digest)
-    return [signature.r, signature.s, signature.v]
+    return signature.compact
   }
 
-  async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<Signature> {
+  async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<CompactSignature> {
     const digest = SwapSigner.hashRelease(encoded, recipient, testnet)
     const signature = await this.wallet._signingKey().signDigest(digest)
-    return [signature.r, signature.s, signature.v]
+    return signature.compact
   }
 }
 
@@ -119,7 +112,7 @@ export class RemoteSwapSigner extends SwapSigner {
     return this.remoteSigner.getAddress()
   }
 
-  async signSwapRequest(encoded: string, testnet?: boolean): Promise<Signature> {
+  async signSwapRequest(encoded: string, testnet?: boolean): Promise<CompactSignature> {
     let signature
     if (fromTron(encoded)) {
       signature = await this.remoteSigner.signMessage(encoded.replace('0x', '0x0a'))
@@ -130,10 +123,10 @@ export class RemoteSwapSigner extends SwapSigner {
       const data = [{ type: 'bytes32', name: notice, value: encoded }]
       signature = await this.remoteSigner.signTypedData(data)
     }
-    return this._separateSignature(signature)
+    return utils.splitSignature(signature).compact
   }
 
-  async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<Signature> {
+  async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<CompactSignature> {
     let signature
     if (fromTron(encoded)) {
       const message = utils.solidityPack(['bytes32', 'address'], [encoded, hexAddress(recipient)]).replace('0x', '0x0a')
@@ -149,7 +142,7 @@ export class RemoteSwapSigner extends SwapSigner {
       ]
       signature = await this.remoteSigner.signTypedData(data)
     }
-    return this._separateSignature(signature)
+    return utils.splitSignature(signature).compact
   }
 }
 
@@ -183,7 +176,7 @@ export class NonEcdsaRemoteSwapSigner extends SwapSigner {
     return `Sign for a swap on Meson:\n${encoded}`
   }
 
-  async signSwapRequest(encoded: string, testnet?: boolean): Promise<Signature> {
+  async signSwapRequest(encoded: string, testnet?: boolean): Promise<CompactSignature> {
     const signature = await this.remoteSigner.signMessage(this._swapMessage(encoded))
     const swapSigner = this._swapSignerFromSeed(signature)
     this.#initiatorSwapSigners.set(encoded, swapSigner)
@@ -191,7 +184,7 @@ export class NonEcdsaRemoteSwapSigner extends SwapSigner {
     return await swapSigner.signSwapRequest(encoded, testnet)
   }
 
-  async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<Signature> {
+  async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<CompactSignature> {
     if (!this.#initiatorSwapSigners.has(encoded)) {
       const signature = await this.remoteSigner.signMessage(this._swapMessage(encoded))
       const swapSigner = this._swapSignerFromSeed(signature)

@@ -50,10 +50,9 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @dev Designed to be used by both swap initiators, pool owner, or authorized addresses
   /// @param encodedSwap Encoded swap information; also used as the key of `_postedSwaps`
   /// @param r Part of the signature
-  /// @param s Part of the signature
-  /// @param v Part of the signature
+  /// @param yParityAndS Part of the signature
   /// @param postingValue The value to be written to `_postedSwaps`. See `_postedSwaps` for encoding format
-  function postSwap(uint256 encodedSwap, bytes32 r, bytes32 s, uint8 v, uint200 postingValue)
+  function postSwap(uint256 encodedSwap, bytes32 r, bytes32 yParityAndS, uint200 postingValue)
     external matchProtocolVersion(encodedSwap) forInitialChain(encodedSwap)
   {
     require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
@@ -73,7 +72,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     } // Otherwise, this is posted without bonding to a specific pool. Need to execute `bondSwap` later
 
     address initiator = _initiatorFromPosted(postingValue);
-    _checkRequestSignature(encodedSwap, r, s, v, initiator);
+    _checkRequestSignature(encodedSwap, r, yParityAndS, initiator);
     _postedSwaps[encodedSwap] = postingValue;
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
@@ -120,15 +119,13 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @dev Designed to be used by pool owner or authorized addresses of the current bonding pool
   /// @param encodedSwap Encoded swap information; also used as the key of `_postedSwaps`
   /// @param r Part of the release signature (same as in the `release` call)
-  /// @param s Part of the release signature (same as in the `release` call)
-  /// @param v Part of the release signature (same as in the `release` call)
+  /// @param yParityAndS Part of the release signature (same as in the `release` call)
   /// @param recipient The recipient address of the swap
   /// @param depositToPool Whether to deposit funds to the pool (will save gas)
   function executeSwap(
     uint256 encodedSwap,
     bytes32 r,
-    bytes32 s,
-    uint8 v,
+    bytes32 yParityAndS,
     address recipient,
     bool depositToPool
   ) external {
@@ -145,7 +142,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
       _postedSwaps[encodedSwap] = 1;
     }
 
-    _checkReleaseSignature(encodedSwap, recipient, r, s, v, _initiatorFromPosted(postedSwap));
+    _checkReleaseSignature(encodedSwap, recipient, r, yParityAndS, _initiatorFromPosted(postedSwap));
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
     uint40 poolIndex = _poolIndexFromPosted(postedSwap);

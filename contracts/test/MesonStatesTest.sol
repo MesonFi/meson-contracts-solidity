@@ -91,21 +91,19 @@ contract MesonStatesTest is MesonStates {
   function checkRequestSignature(
     uint256 encodedSwap,
     bytes32 r,
-    bytes32 s,
-    uint8 v,
+    bytes32 yParityAndS,
     address signer
   ) external pure {
-    _checkRequestSignature(encodedSwap, r, s, v, signer);
+    _checkRequestSignature(encodedSwap, r, yParityAndS, signer);
   }
 
   function checkReleaseSignature(
     uint256 encodedSwap,
     address recipient,
     bytes32 r,
-    bytes32 s,
-    uint8 v,
+    bytes32 yParityAndS,
     address signer
   ) external pure {
-    _checkReleaseSignature(encodedSwap, recipient, r, s, v, signer);
+    _checkReleaseSignature(encodedSwap, recipient, r, yParityAndS, signer);
   }
 }

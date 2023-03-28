@@ -146,11 +146,10 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                 args.initiator = rawArgs[2]
                 break
             }
-            if (['postSwap', 'executeSwap', 'release'].includes(name)) {
-              const { r, s, v } = utils.splitSignature(rawArgs[1])
+            if (['postSwap', 'executeSwap', 'lock', 'release'].includes(name)) {
+              const { r, yParityAndS } = utils.splitSignature(rawArgs[1])
               args.r = r
-              args.s = s
-              args.v = v
+              args.yParityAndS = yParityAndS
             }
             return { name, args }
           }
@@ -267,11 +266,11 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
             } else {
               const swap = Swap.decode(args[0])
               if (prop === 'postSwap') {
-                const [_, r, s, v, postingValue] = args
+                const [_, r, yParityAndS, postingValue] = args
                 payload.type_arguments = [await getTokenAddr(swap.inToken)]
                 payload.arguments = [
                   _vectorize(swap.encoded),
-                  _getCompactSignature(r, s, v),
+                  _getCompactSignature(r, yParityAndS),
                   _vectorize(postingValue.substring(0, 42)), // initiator
                   `0x${postingValue.substring(42)}` // pool_index
                 ]
@@ -282,20 +281,20 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                 payload.type_arguments = [await getTokenAddr(swap.inToken)]
                 payload.arguments = [_vectorize(swap.encoded)]
               } else if (prop === 'executeSwap') {
-                const [_, r, s, v, recipient, depositToPool] = args
+                const [_, r, yParityAndS, recipient, depositToPool] = args
                 payload.type_arguments = [await getTokenAddr(swap.inToken)]
                 payload.arguments = [
                   _vectorize(swap.encoded),
-                  _getCompactSignature(r, s, v),
+                  _getCompactSignature(r, yParityAndS),
                   _vectorize(recipient.substring(0, 42)),
                   depositToPool
                 ]
               } else if (prop === 'lock') {
-                const [_, r, s, v, { initiator, recipient }] = args
+                const [_, r, yParityAndS, { initiator, recipient }] = args
                 payload.type_arguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   _vectorize(swap.encoded),
-                  _getCompactSignature(r, s, v),
+                  _getCompactSignature(r, yParityAndS),
                   _vectorize(initiator),
                   recipient
                 ]
@@ -307,11 +306,11 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                   _vectorize(initiator)
                 ]
               } else if (prop === 'release') {
-                const [_, r, s, v, initiator] = args
+                const [_, r, yParityAndS, initiator] = args
                 payload.type_arguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   _vectorize(swap.encoded),
-                  _getCompactSignature(r, s, v),
+                  _getCompactSignature(r, yParityAndS),
                   _vectorize(initiator)
                 ]
               }
@@ -357,9 +356,6 @@ function _getSwapId(encoded, initiator) {
   return utils.keccak256(packed)
 }
 
-function _getCompactSignature(r: string, s: string, v: number) {
-  if (v !== 27 && v !== 28) {
-    throw new Error(`Invalid sig.v: ${v}`)
-  }
-  return _vectorize(r + s.replace(/0x\d/, x => (parseInt(x) + (v - 27) * 8).toString(16)))
+function _getCompactSignature(r: string, yParityAndS: string) {
+  return _vectorize(r + yParityAndS.replace(/^0x/, ''))
 }

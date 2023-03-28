@@ -323,11 +323,11 @@ export class MesonClient {
         throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
       }
     }
+    const sig = utils.splitSignature(signedRequest.signature)
     return this.#mesonInstance.postSwap(
       signedRequest.encoded,
-      signedRequest.signature[0],
-      signedRequest.signature[1],
-      signedRequest.signature[2],
+      sig.r,
+      sig.yParityAndS,
       utils.solidityPack(['address', 'uint40'], [signedRequest.initiator, poolIndex]),
       ...overrides
     )
@@ -343,10 +343,11 @@ export class MesonClient {
   }
 
   async lock(signedRequest: SignedSwapRequestData, recipient?: string, ...overrides) {
+    const sig = utils.splitSignature(signedRequest.signature)
     if (signedRequest.encoded.substring(54, 58) === '027d') { // to aptos
-      return this.#mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, { initiator: signedRequest.initiator, recipient } as any, ...overrides)
+      return this.#mesonInstance.lock(signedRequest.encoded, sig.r, sig.yParityAndS, { initiator: signedRequest.initiator, recipient } as any, ...overrides)
     } else {
-      return this.#mesonInstance.lock(signedRequest.encoded, ...signedRequest.signature, signedRequest.initiator, ...overrides)
+      return this.#mesonInstance.lock(signedRequest.encoded, sig.r, sig.yParityAndS, signedRequest.initiator, ...overrides)
     }
   }
 
@@ -355,23 +356,25 @@ export class MesonClient {
   }
 
   async release(signedRelease: SignedSwapReleaseData, ...overrides) {
-    const { encoded, signature, initiator } = signedRelease
+    const { encoded, initiator } = signedRelease
     let recipient = signedRelease.recipient
     if (encoded.substring(54, 58) === '00c3') { // to tron
       recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
     }
-    return this.#mesonInstance.release(encoded, ...signature, initiator, recipient, ...overrides)
+    const sig = utils.splitSignature(signedRelease.signature)
+    return this.#mesonInstance.release(encoded, sig.r, sig.yParityAndS, initiator, recipient, ...overrides)
   }
 
   async executeSwap(signedRelease: SignedSwapReleaseData, depositToPool: boolean = false, ...overrides) {
-    const { encoded, signature } = signedRelease
+    const { encoded } = signedRelease
     let recipient = signedRelease.recipient
     if (encoded.substring(54, 58) === '00c3') { // to tron
       recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
     } else if (encoded.substring(54, 58) === '027d') { // to aptos
       recipient = recipient.substring(0, 42)
     }
-    return this.#mesonInstance.executeSwap(encoded, ...signature, recipient, depositToPool, ...overrides)
+    const sig = utils.splitSignature(signedRelease.signature)
+    return this.#mesonInstance.executeSwap(encoded, sig.r, sig.yParityAndS, recipient, depositToPool, ...overrides)
   }
 
   async cancelSwap(encodedSwap: string, ...overrides) {
