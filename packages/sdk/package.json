@@ -1,6 +1,6 @@
 {
   "name": "@mesonfi/sdk",
-  "version": "1.6.0-rc.1",
+  "version": "1.7.0",
   "description": "",
   "license": "MIT",
   "repository": "https://github.com/MesonFi/meson-contracts-solidity",
@@ -19,8 +19,8 @@
     "prepare": "yarn build"
   },
   "dependencies": {
-    "@mesonfi/contract-abis": "^1.0.0",
-    "@mesonfi/contract-types": "^1.0.0",
+    "@mesonfi/contract-abis": "^1.7.0",
+    "@mesonfi/contract-types": "^1.7.0",
     "aptos": "^1.3.16",
     "ethers": "^5.7.1",
     "lodash": "^4.17.21",
