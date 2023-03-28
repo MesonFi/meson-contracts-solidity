@@ -324,6 +324,16 @@ export class MesonClient {
       }
     }
     const sig = utils.splitSignature(signedRequest.signature)
+    if (signedRequest.fromContract) {
+      return this.#mesonInstance.postSwapFromContract(
+        signedRequest.encoded,
+        sig.r,
+        sig.yParityAndS,
+        utils.solidityPack(['address', 'uint40'], [signedRequest.initiator, poolIndex]),
+        signedRequest.fromContract,
+        ...overrides
+      )
+    }
     return this.#mesonInstance.postSwap(
       signedRequest.encoded,
       sig.r,

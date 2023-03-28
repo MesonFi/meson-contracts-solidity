@@ -2,6 +2,7 @@
 pragma solidity 0.8.16;
 
 import "./IMesonSwapEvents.sol";
+import "../interfaces/IAuthorizer.sol";
 import "../utils/MesonStates.sol";
 
 /// @title MesonSwap
@@ -77,6 +78,36 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
     _unsafeDepositToken(tokenForIndex[tokenIndex], initiator, amount, tokenIndex);
+
+    emit SwapPosted(encodedSwap);
+  }
+
+  function postSwapFromContract(uint256 encodedSwap, bytes32 r, bytes32 yParityAndS, uint200 postingValue, address contractAddress)
+    external matchProtocolVersion(encodedSwap) forInitialChain(encodedSwap)
+  {
+    require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
+
+    uint256 amount = _amountFrom(encodedSwap);
+    require(amount <= MAX_SWAP_AMOUNT, "For security reason, amount cannot be greater than 100k");
+
+    uint256 delta = _expireTsFrom(encodedSwap) - block.timestamp;
+    // Underflow would trigger "Expire ts too late" error
+    require(delta > MIN_BOND_TIME_PERIOD, "Expire ts too early");
+    require(delta < MAX_BOND_TIME_PERIOD, "Expire ts too late");
+
+    uint40 poolIndex = _poolIndexFromPosted(postingValue);
+    if (poolIndex > 0) {
+      // In pool index is given, the signer should be an authorized address
+      require(poolOfAuthorizedAddr[_msgSender()] == poolIndex, "Signer should be an authorized address of the given pool");
+    } // Otherwise, this is posted without bonding to a specific pool. Need to execute `bondSwap` later
+
+    address initiator = _initiatorFromPosted(postingValue);
+    require(IAuthorizer(contractAddress).isAuthorized(initiator), "Signer not authorized by contract");
+    _checkRequestSignature(encodedSwap, r, yParityAndS, initiator);
+    _postedSwaps[encodedSwap] = postingValue;
+
+    uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
+    _unsafeDepositToken(tokenForIndex[tokenIndex], contractAddress, amount, tokenIndex);
 
     emit SwapPosted(encodedSwap);
   }

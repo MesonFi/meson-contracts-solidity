@@ -8,6 +8,7 @@ export interface SignedSwapRequestData {
   testnet?: boolean,
   encoded: string,
   initiator: string,
+  fromContract?: string,
   signature: CompactSignature,
 }
 
@@ -20,6 +21,7 @@ export class SignedSwapRequest implements SignedSwapRequestData {
   readonly swap: Swap
   readonly encoded: string
   readonly initiator: string
+  readonly fromContract?: string
   readonly signature: CompactSignature
 
   constructor (data: SignedSwapRequestData) {
@@ -36,6 +38,9 @@ export class SignedSwapRequest implements SignedSwapRequestData {
 
     this.encoded = data.encoded
     this.initiator = data.initiator.toLowerCase()
+    if (data.fromContract) {
+      this.fromContract = data.fromContract
+    }
     this.signature = data.signature
   }
 
@@ -55,6 +60,9 @@ export class SignedSwapRequest implements SignedSwapRequestData {
       encoded: this.encoded,
       initiator: this.initiator,
       signature: this.signature,
+    }
+    if (this.fromContract) {
+      data.fromContract = this.fromContract
     }
     if (this.testnet) {
       data.testnet = true
