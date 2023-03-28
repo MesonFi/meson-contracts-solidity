@@ -625,7 +625,7 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://zksync2-mainnet.zksync.io",
+    "url": "https://mainnet.era.zksync.io",
     "explorer": "https://explorer.zksync.io",
     "nativeCurrency": {
       "name": "ETH",
@@ -639,7 +639,7 @@
         "symbol": "USDC",
         "decimals": 6,
         "tokenIndex": 1,
-        "addr": ""
+        "addr": "0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4"
       },
       {
         "name": "Tether USD",
