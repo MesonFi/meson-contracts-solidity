@@ -13,6 +13,7 @@
     "build:packages": "yarn workspace @mesonfi/sdk build && yarn workspace @mesonfi/presets build",
     "build:types": "hardhat chain --testnet ropsten && yarn cleanbuild",
     "test": "hardhat chain --testnet ropsten && hardhat test",
+    "estimate": "hardhat estimate --upgradable true",
     "docgen": "solidity-docgen --solc-module solc -t ./templates",
     "testnet:ropsten": "hardhat deploy --testnet ropsten --upgradable true",
     "testnet:bnb": "hardhat deploy --testnet bnb --upgradable true",

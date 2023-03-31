@@ -77,11 +77,11 @@ module.exports = async function main(upgradable) {
 
   // executeSwap
   const executeTx = await mesonClient.executeSwap(signedRelease, true)
-  getUsedGas('execute', executeTx.hash)
+  await getUsedGas('execute', executeTx.hash)
 }
 
-function getUsedGas(name, hash) {
-  ethers.provider.getTransactionReceipt(hash).then((receipt) => {
+async function getUsedGas(name, hash) {
+  return ethers.provider.getTransactionReceipt(hash).then((receipt) => {
     console.log(name, ':', receipt.cumulativeGasUsed.toString())
   })
 }
