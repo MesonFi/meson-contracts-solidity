@@ -84,7 +84,7 @@
   },
   {
     "id": "polygon",
-    "name": "Polygon",
+    "name": "Polygon PoS",
     "alias": "MATIC",
     "chainId": "0x89",
     "slip44": "0x800003c6",
@@ -647,6 +647,43 @@
         "decimals": 6,
         "tokenIndex": 2,
         "addr": ""
+      }
+    ]
+  },
+  {
+    "id": "zkevm",
+    "name": "Polygon zkEVM",
+    "alias": "ZKEVM",
+    "chainId": "0x44d",
+    "slip44": "0x8000044d",
+    "shortSlip44": "0x044d",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://zkevm-rpc.com",
+    "explorer": "https://zkevm.polygonscan.com",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "tokenIndex": 1,
+        "addr": "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035"
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "tokenIndex": 2,
+        "addr": "0x1E4a5963aBFD975d8c9021ce480b42188849D41d"
       }
     ]
   }

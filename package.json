@@ -45,6 +45,7 @@
     "deploy:eos": "hardhat deploy --mainnet eos --upgradable true",
     "deploy:cronos": "hardhat deploy --mainnet cronos --upgradable true",
     "deploy:zksync": "hardhat deploy --mainnet zksync --network zksync --upgradable true",
+    "deploy:zkevm": "hardhat deploy --mainnet zkevm --upgradable true",
     "deploy:tron": "hardhat deploy --mainnet tron --upgradable true"
   },
   "devDependencies": {
