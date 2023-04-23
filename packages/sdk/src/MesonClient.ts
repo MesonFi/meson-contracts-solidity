@@ -20,6 +20,7 @@ import { SwapSigner } from './SwapSigner'
 import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwap'
 import * as adaptors from './adaptors'
 import AptosAdaptor from './adaptors/aptos/AptosAdaptor'
+import SuiAdaptor from './adaptors/sui/SuiAdaptor'
 
 const Zero = constants.AddressZero.substring(2)
 
@@ -113,6 +114,8 @@ export class MesonClient {
       this.addressFormat = 'ethers'
     } else if (mesonInstance.provider instanceof AptosAdaptor) {
       this.addressFormat = 'aptos'
+    } else if (mesonInstance.provider instanceof SuiAdaptor) {
+      this.addressFormat = 'sui'
     } else {
       this.addressFormat = 'tron'
     }
@@ -210,8 +213,12 @@ export class MesonClient {
     return this._tokens.find(t => t.addr === this.formatAddress(addr))?.tokenIndex
   }
 
+  getContractInstance(addr: string, abi: any, provider = this.provider) {
+    return adaptors.getContract(addr, abi, provider)
+  }
+
   getTokenContract(tokenAddr: string, provider = this.provider) {
-    return adaptors.getContract(tokenAddr, ERC20.abi, provider)
+    return this.getContractInstance(tokenAddr, ERC20.abi, provider)
   }
 
   async getTokenBalance (owner, tokenIndex) {
@@ -354,7 +361,7 @@ export class MesonClient {
 
   async lock(signedRequest: SignedSwapRequestData, recipient?: string, ...overrides) {
     const sig = utils.splitSignature(signedRequest.signature)
-    if (signedRequest.encoded.substring(54, 58) === '027d') { // to aptos
+    if (['027d', '0310'].includes(signedRequest.encoded.substring(54, 58))) { // to aptos or sui
       return this.#mesonInstance.lock(signedRequest.encoded, sig.r, sig.yParityAndS, { initiator: signedRequest.initiator, recipient } as any, ...overrides)
     } else {
       return this.#mesonInstance.lock(signedRequest.encoded, sig.r, sig.yParityAndS, signedRequest.initiator, ...overrides)
@@ -380,7 +387,7 @@ export class MesonClient {
     let recipient = signedRelease.recipient
     if (encoded.substring(54, 58) === '00c3') { // to tron
       recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
-    } else if (encoded.substring(54, 58) === '027d') { // to aptos
+    } else if (['027d', '0310'].includes(encoded.substring(54, 58))) { // to aptos or sui
       recipient = recipient.substring(0, 42)
     }
     const sig = utils.splitSignature(signedRelease.signature)

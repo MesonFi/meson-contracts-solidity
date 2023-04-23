@@ -325,10 +325,6 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
   })
 }
 
-function _vectorize(hex: string) {
-  return Array.from(utils.arrayify(hex))
-}
-
 function _findMesonMethodModule(method) {
   const moduleMethods = {
     MesonPools: [
@@ -349,6 +345,10 @@ function _findMesonMethodModule(method) {
       return module
     }
   }
+}
+
+function _vectorize(hex: string) {
+  return Array.from(utils.arrayify(hex))
 }
 
 function _getSwapId(encoded, initiator) {

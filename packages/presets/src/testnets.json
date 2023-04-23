@@ -598,6 +598,40 @@
     ]
   },
   {
+    "id": "sui-testnet",
+    "name": "Sui Devnet",
+    "alias": "SUI",
+    "chainId": "sui:devnet",
+    "slip44": "0x80000310",
+    "shortSlip44": "0x0310",
+    "extensions": [
+      "sui"
+    ],
+    "addressFormat": "sui",
+    "url": "https://fullnode.devnet.sui.io:443",
+    "explorer": "https://explorer.sui.io",
+    "nativeCurrency": {
+      "name": "SUI",
+      "symbol": "SUI",
+      "decimals": 8
+    },
+    "mesonAddress": "0x3152d4fda9e257eaeabd2704d0354341ee944c6f4aa5f2669965b97297de950f",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x3152d4fda9e257eaeabd2704d0354341ee944c6f4aa5f2669965b97297de950f::USDC::USDC",
+        "link": "object/0x3152d4fda9e257eaeabd2704d0354341ee944c6f4aa5f2669965b97297de950f?module=USDC&network=devnet",
+        "tokenIndex": 1
+      }
+    ],
+    "metadata": {
+      "storeG": "0x3d58a6c6f1768b11a192242aa35d722bba3cdf9fdc6db5b56c43d489beb7b5ba",
+      "adminCap": "0xc7bbed23bc15d3adec7e9dd2c70d9936cb4b6646ecaae7649058f131fd0543ee"
+    }
+  },
+  {
     "id": "sep-testnet",
     "name": "Sepolia Testnet",
     "alias": "sep",

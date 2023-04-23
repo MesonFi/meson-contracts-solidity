@@ -1,5 +1,6 @@
-import { providers, errors } from 'ethers'
+import { providers } from 'ethers'
 import { AptosClient } from 'aptos'
+import { JsonRpcProvider as SuiProvider, Connection as SuiConnection } from '@mysten/sui.js'
 import TronWeb from 'tronweb'
 
 import {
@@ -11,6 +12,13 @@ import {
 } from '@mesonfi/sdk'
 import { Meson } from '@mesonfi/contract-abis'
 
+import {
+  AptosFallbackClient,
+  RpcFallbackProvider,
+  FailsafeStaticJsonRpcProvider,
+  FailsafeWebSocketProvider
+} from './providers'
+
 import testnets from './testnets.json'
 import mainnets from './mainnets.json'
 
@@ -18,44 +26,6 @@ import v0_testnets from './v0/testnets.json'
 import v0_mainnets from './v0/mainnets.json'
 
 const v0_networks = [...v0_mainnets, ...v0_testnets] as PresetNetwork[]
-
-class RpcFallbackProvider extends providers.FallbackProvider {
-  async send(method, params) {
-    for await (const c of this.providerConfigs) {
-      try {
-        return await (<providers.StaticJsonRpcProvider>c.provider).send(method, params)
-      } catch (e) {
-      }
-    }
-    throw new Error('Send rpc call failed for all providers')
-  }
-}
-
-class FailsafeStaticJsonRpcProvider extends providers.StaticJsonRpcProvider {
-  async perform (method, params) {
-    try {
-      return await super.perform(method, params)
-    } catch (e) {
-      if (e.code === errors.CALL_EXCEPTION) {
-        e.code = errors.SERVER_ERROR
-      }
-      throw e
-    }
-  }
-}
-
-class FailsafeWebSocketProvider extends providers.WebSocketProvider {
-  async perform (method, params) {
-    try {
-      return await super.perform(method, params)
-    } catch (e) {
-      if (e.code === errors.CALL_EXCEPTION) {
-        e.code = errors.SERVER_ERROR
-      }
-      throw e
-    }
-  }
-}
 
 export interface PresetToken {
   addr: string
@@ -209,35 +179,55 @@ export class MesonPresets {
     return mesonClient
   }
 
-  createNetworkClient({ id, url = '', ws = null, quorum }): providers.Provider {
+  _getProviderClassAndConstructParams(id: string, urls: string[] = [], opts?) {
     const network = this.getNetwork(id)
     if (!network) {
       throw new Error(`Unsupported network: ${id}`)
     }
-    
+
+    const url = urls[0]
+
     if (id.startsWith('aptos')) {
-      return new AptosClient(url) as any
+      return [AptosFallbackClient, [urls]]
+    } else if (id.startsWith('sui')) {
+      return [SuiProvider, [new SuiConnection({ fullnode: url })]]
     } else if (id.startsWith('tron')) {
-      return new TronWeb({ fullHost: url })
+      return [TronWeb, [{ fullHost: url }]]
+    }
+
+    const providerNetwork = { name: network.name, chainId: Number(network.chainId) }
+    if (urls.length >= 2) {
+      const fallbacks = urls.map(url => {
+        let provider
+        if (url.startsWith('ws')) {
+          if (opts?.WebSocket) {
+            const ws = new opts.WebSocket(url)
+            provider = new FailsafeWebSocketProvider(ws, providerNetwork)
+          } else {
+            provider = new FailsafeWebSocketProvider(url, providerNetwork)
+          }
+        } else {
+          provider = new FailsafeStaticJsonRpcProvider(url, providerNetwork)
+        }
+        return { provider, priority: 1, stallTimeout: 1000, weight: 1 }
+      })
+      return [RpcFallbackProvider, [fallbacks, opts?.threshold || (urls.length > 2 ? 2 : 1)]]
     }
     
-    const providerNetwork = { name: network.name, chainId: Number(network.chainId) }
-    if (quorum) {
-      const fallbacks = quorum.list.map(({ provider: p, url, ws, priority, stallTimeout, weight }) => {
-        const provider = p || (ws
-          ? new FailsafeWebSocketProvider(ws, providerNetwork)
-          : new FailsafeStaticJsonRpcProvider(url, providerNetwork)
-        )
-        return { provider, priority, stallTimeout, weight }
-      })
-      return new RpcFallbackProvider(fallbacks, quorum.threshold)
-    } else if (ws) {
-      return new providers.WebSocketProvider(ws, providerNetwork)
-    } else if (url.startsWith('ws')) {
-      return new providers.WebSocketProvider(url, providerNetwork)
+    if (url.startsWith('ws')) {
+      if (WebSocket) {
+        return [providers.WebSocketProvider, [new WebSocket(url), providerNetwork]]
+      } else {
+        return [providers.WebSocketProvider, [url, providerNetwork]]
+      }
     } else {
-      return new providers.StaticJsonRpcProvider(url, providerNetwork)
+      return [providers.StaticJsonRpcProvider, [url, providerNetwork]]
     }
+  }
+
+  createNetworkClient(id: string, urls: string[] = [], opts?): providers.Provider {
+    const [ProviderClass, constructParams] = this._getProviderClassAndConstructParams(id, urls, opts)
+    return new ProviderClass(...constructParams)
   }
 
   disposeMesonClient(id: string) {
