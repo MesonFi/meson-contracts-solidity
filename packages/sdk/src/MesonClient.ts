@@ -418,7 +418,7 @@ export class MesonClient {
     }
     
     return {
-      status: until * 1000 < Date.now() ? LockedSwapStatus.ErrorExpired : LockedSwapStatus.Locked,
+      status: (until + 120) * 1000 < Date.now() ? LockedSwapStatus.ErrorExpired : LockedSwapStatus.Locked,
       until,
       poolOwner: this.formatAddress(poolOwner)
     }
