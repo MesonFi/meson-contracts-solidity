@@ -34,7 +34,7 @@ export default class SuiWallet extends SuiAdaptor {
         wait: () => this._mockSuiTx(input)
       }
     }
-    const result = await this.signer.signAndExecuteTransactionBlock({ transactionBlock: tx, options })
+    const result = await this.signer.signAndExecuteTransactionBlock({ transactionBlock: tx, options: { showObjectChanges: true, ...options } })
     return {
       hash: result.digest,
       wait: () => this._wrapSuiTx(result)

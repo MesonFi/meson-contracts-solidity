@@ -65,7 +65,7 @@ export default class SuiAdaptor {
   }
 
   async waitForTransaction(digest: string, confirmations?: number, timeout?: number) {
-    const txRes = await this.client.getTransactionBlock({ digest, options: { showInput: true } })
+    const txRes = await this.client.getTransactionBlock({ digest, options: { showInput: true, showObjectChanges: true } })
     return this._wrapSuiTx(txRes)
   }
 
@@ -81,7 +81,8 @@ export default class SuiAdaptor {
       value: '0',
       input: JSON.stringify(moveCalls),
       timestamp: Math.floor(Number(txRes.timestampMs) / 1000).toString(),
-      status: txRes.errors?.length ? '0x0' : '0x1'
+      status: txRes.errors?.length ? '0x0' : '0x1',
+      changes: txRes.objectChanges
     }
   }
 

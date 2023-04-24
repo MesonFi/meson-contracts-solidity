@@ -27,7 +27,7 @@ export function getWalletFromExtension(ext, client: SuiProvider): SuiExtWallet {
   return new SuiExtWallet(client, ext)
 }
 
-export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdaptor) {
+export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdaptor, metadata) {
   let adaptor: SuiAdaptor
   if (clientOrAdaptor instanceof SuiWallet) {
     adaptor = clientOrAdaptor
@@ -38,13 +38,11 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
   }
 
   const getSupportedTokens = memoize(async () => {
-    const indexes: number[] = []
-    const tokens: string[] = []
-    for (const i of [1]) {
-      indexes.push(i)
-      // TODO: temp token on devnet
-      tokens.push(`${address}::usdc::USDC`)
-    }
+    const indexes: number[] = [1, 2]
+    const tokens: string[] = [
+      `0xbae6ea5c9d80e1931563b71c0b97d22babcb1a41900a9bc2422870a78dc1a023::USDC::USDC`,
+      `0xbae6ea5c9d80e1931563b71c0b97d22babcb1a41900a9bc2422870a78dc1a023::USDT::USDT`
+    ]
     return { tokens, indexes }
   })
 
@@ -128,9 +126,17 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
       } else if (['queryFilter', 'on', 'removeAllListeners'].includes(prop)) {
         return () => {}
       } else if (prop === 'connect') {
-        return (wallet: SuiWallet) => getContract(address, abi, wallet)
+        return (wallet: SuiWallet) => getContract(address, abi, wallet, metadata)
       } else if (prop === 'filters') {
         throw new Error('SuiContract.filters not implemented')
+      } else if (prop === 'call') {
+        return async (target, getArguments) => {
+          const txBlock = new TransactionBlock()
+          const { arguments: args = [], typeArguments = [] } = getArguments({ txBlock, metadata }) 
+          const payload = { target, arguments: args, typeArguments }
+          txBlock.moveCall(<any>payload)
+          return await (<SuiWallet>adaptor).sendTransaction(txBlock)
+        }
       }
 
       let method = abi.find(item => item.name === prop)
@@ -144,11 +150,14 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
 
             // ERC20 like
             if (prop === 'name') {
-              return 'USD Coin'
+              const data = await adaptor.client.getCoinMetadata({ coinType: address })
+              return data.name
             } else if (prop === 'symbol') {
-              return 'USDC'
+              const data = await adaptor.client.getCoinMetadata({ coinType: address })
+              return data.symbol
             } else if (prop === 'decimals') {
-              return 6
+              const data = await adaptor.client.getCoinMetadata({ coinType: address })
+              return data.decimals
             } else if (prop === 'balanceOf') {
               const data = await adaptor.client.getBalance({
                 owner: args[0],
@@ -232,18 +241,40 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
 
             if (prop === 'transfer') {
               const [to, amount] = args
-              payload.target = '0x1::coin::transfer'
-              payload.arguments = [to, BigNumber.from(amount).toString()]
             }
 
-            if (['depositAndRegister', 'deposit', 'withdraw'].includes(prop)) {
+            if (prop === 'addSupportToken') {
+              const [tokenAddr, tokenIndex] = args
+              payload.typeArguments = [tokenAddr]
+              payload.arguments = [
+                tx.pure(metadata.adminCap),
+                tx.pure(tokenIndex),
+                tx.pure(metadata.storeG),
+              ]
+            } else if (['depositAndRegister', 'deposit', 'withdraw'].includes(prop)) {
               const poolTokenIndex = BigNumber.from(args[1])
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
               const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toHexString()
-              payload.typeArguments = [await getTokenAddr(tokenIndex)]
+              const tokenAddr = await getTokenAddr(tokenIndex)
+              const signer = (<SuiWallet>adaptor).address
+
+              const coins = await adaptor.client.getCoins({
+                owner: signer,
+                coinType: tokenAddr,
+              })
+              const toDeposit = BigNumber.from(args[0])
+              const picked = coins.data.find(obj => toDeposit.lte(obj.balance))
+              if (!picked) {
+                throw new Error('No coin object has enough balance. Need to merge first.')
+              }
+
+              payload.typeArguments = [tokenAddr]
               payload.arguments = [
-                tx.pure(BigNumber.from(args[0]).toHexString()),
-                tx.pure(poolIndex)
+                tx.pure(toDeposit.toHexString()),
+                tx.pure(poolIndex),
+                tx.object(picked.coinObjectId),
+                tx.object(metadata.storeG),
+                tx.object(metadata.storeC[tokenIndex.toString()]),
               ]
             } else if (['addAuthorizedAddr', 'removeAuthorizedAddr'].includes(prop)) {
               payload.arguments = [args[0]]
@@ -305,10 +336,6 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
             }
 
             tx.moveCall(<any>payload)
-
-            if (prop !== 'release') {
-              options = { mock: true }
-            }
             return await (<SuiWallet>adaptor).sendTransaction(tx, options)
           }
         }
@@ -320,6 +347,7 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
 
 function _findMesonMethodModule(method) {
   const moduleMethods = {
+    MesonStates: ['addSupportToken'],
     MesonPools: [
       'depositAndRegister',
       'deposit',

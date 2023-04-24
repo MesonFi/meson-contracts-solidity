@@ -615,20 +615,36 @@
       "symbol": "SUI",
       "decimals": 8
     },
-    "mesonAddress": "0x3152d4fda9e257eaeabd2704d0354341ee944c6f4aa5f2669965b97297de950f",
+    "mesonAddress": "0xbae6ea5c9d80e1931563b71c0b97d22babcb1a41900a9bc2422870a78dc1a023",
     "tokens": [
       {
         "name": "USD Coin",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "0x3152d4fda9e257eaeabd2704d0354341ee944c6f4aa5f2669965b97297de950f::USDC::USDC",
-        "link": "object/0x3152d4fda9e257eaeabd2704d0354341ee944c6f4aa5f2669965b97297de950f?module=USDC&network=devnet",
+        "addr": "0xbae6ea5c9d80e1931563b71c0b97d22babcb1a41900a9bc2422870a78dc1a023::USDC::USDC",
+        "link": "object/0xbae6ea5c9d80e1931563b71c0b97d22babcb1a41900a9bc2422870a78dc1a023?module=USDC&network=devnet",
         "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xbae6ea5c9d80e1931563b71c0b97d22babcb1a41900a9bc2422870a78dc1a023::USDT::USDT",
+        "link": "object/0xbae6ea5c9d80e1931563b71c0b97d22babcb1a41900a9bc2422870a78dc1a023?module=USDT&network=devnet",
+        "tokenIndex": 2
       }
     ],
     "metadata": {
-      "storeG": "0x3d58a6c6f1768b11a192242aa35d722bba3cdf9fdc6db5b56c43d489beb7b5ba",
-      "adminCap": "0xc7bbed23bc15d3adec7e9dd2c70d9936cb4b6646ecaae7649058f131fd0543ee"
+      "storeG": "0x9eac278b17cc5b073d4bcbdb804d805ecfed06feb87c3572f081e02b347ed3d6",
+      "adminCap": "0x81c3f74ca7de6cc0411e7ef0db7798575771b993adc9f6f5054770083676f95b",
+      "treasuryCap": {
+        "1": "0x37e5927283c033cd6041534fb063a798123119fba8a1f247b4a67946c9d48f6c",
+        "2": "0xee8b4bff65aecdd60954be695df6c266060442432c7a44eab06faafc26a00ceb"
+      },
+      "storeC": {
+        "1": "0x384fdf7f04664d9dbe9623d0391e24226ed220aacb06130710dfa18bd2483fb4",
+        "2": "0x4fde357c4b44231909ff5dad9783d14f395ec5b547086457bb8be2bfbf0b37e4"
+      }
     }
   },
   {

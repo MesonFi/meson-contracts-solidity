@@ -25,20 +25,22 @@ export function getWallet (privateKey, client) {
   } else if (client instanceof providers.Provider) {
     return _ethers.getWallet(privateKey, client)
   } else { // should be a TronWeb instance
+    return _sui.getWallet(privateKey, client)
     return _tron.getWallet(privateKey, client)
   }
 }
 
-export function getContract(address, abi, clientOrAdaptor) {
+export function getContract(address, abi, clientOrAdaptor, metadata?) {
   if (clientOrAdaptor instanceof AptosClient || clientOrAdaptor instanceof AptosAdaptor) {
     return _aptos.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof SuiProvider || clientOrAdaptor instanceof SuiAdaptor) {
-    return _sui.getContract(address, abi, clientOrAdaptor)
+    return _sui.getContract(address, abi, clientOrAdaptor, metadata)
   } else if (clientOrAdaptor instanceof providers.Provider || Signer.isSigner(clientOrAdaptor)) {
     return _ethers.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof ZkProvider || clientOrAdaptor instanceof ZkWallet) {
     return _zksync.getContract(address, abi, clientOrAdaptor)
   } else {
+    return _sui.getContract(address, abi, clientOrAdaptor, metadata)
     return _tron.getContract(address, abi, clientOrAdaptor)
   }
 }
@@ -49,10 +51,8 @@ export function isAddress(format: AddressFormat, addr: string): boolean {
     return utils.isHexString(addr) && utils.isAddress(addr)
   } else if (format === 'tron') {
     return TronWeb.isAddress(addr)
-  } else if (format === 'aptos') {
+  } else if (format === 'aptos' || format === 'sui') {
     return utils.isHexString(addr) && addr.length <= 66 && addr.length > 50
-  } else if (format === 'sui') {
-    return utils.isHexString(addr) && addr.length == 66
   }
 }
 
