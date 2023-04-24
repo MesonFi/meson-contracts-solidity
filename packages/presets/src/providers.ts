@@ -110,9 +110,33 @@ export class RpcFallbackProvider extends providers.FallbackProvider {
       return this._send(method, params)
     }
   }
+
+  async perform(method: string, params: { [name: string]: any }): Promise<any> {
+    if (method === 'sendTransaction') {
+      return Promise.any(
+        this.providerConfigs.map(c => c.provider.sendTransaction(params.signedTransaction))
+      ).then(result => result.hash).catch(({ errors }) => { throw errors[0] })
+    }
+
+    return super.perform(method, params)
+  }
 }
 
 export class FailsafeStaticJsonRpcProvider extends providers.StaticJsonRpcProvider {
+  async sendTransaction (signedTransaction: string | Promise<string>): Promise<providers.TransactionResponse> {
+    return new Promise((resolve, reject) => {
+      const h = setTimeout(() => {
+        console.log('tx_timeout')
+        reject(new Error('Time out'))
+      }, 10_000)
+      
+      super.sendTransaction(signedTransaction).then(res => {
+        clearTimeout(h)
+        resolve(res)
+      }).catch(reject)
+    })
+  }
+
   async perform (method, params) {
     try {
       return await super.perform(method, params)

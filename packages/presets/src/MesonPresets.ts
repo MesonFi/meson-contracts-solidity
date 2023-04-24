@@ -1,5 +1,4 @@
 import { providers } from 'ethers'
-import { AptosClient } from 'aptos'
 import { JsonRpcProvider as SuiProvider, Connection as SuiConnection } from '@mysten/sui.js'
 import TronWeb from 'tronweb'
 
