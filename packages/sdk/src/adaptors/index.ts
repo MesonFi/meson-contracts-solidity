@@ -25,7 +25,6 @@ export function getWallet (privateKey, client) {
   } else if (client instanceof providers.Provider) {
     return _ethers.getWallet(privateKey, client)
   } else { // should be a TronWeb instance
-    return _sui.getWallet(privateKey, client)
     return _tron.getWallet(privateKey, client)
   }
 }
@@ -40,7 +39,6 @@ export function getContract(address, abi, clientOrAdaptor, metadata?) {
   } else if (clientOrAdaptor instanceof ZkProvider || clientOrAdaptor instanceof ZkWallet) {
     return _zksync.getContract(address, abi, clientOrAdaptor)
   } else {
-    return _sui.getContract(address, abi, clientOrAdaptor, metadata)
     return _tron.getContract(address, abi, clientOrAdaptor)
   }
 }
