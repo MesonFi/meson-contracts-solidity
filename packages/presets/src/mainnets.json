@@ -269,6 +269,14 @@
     "uctAddress": "TH2ZVL3D3AH4SdwCkcamUZVqgBpWfGaJpa",
     "tokens": [
       {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8",
+        "link": "token20/TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8",
+        "tokenIndex": 1
+      },
+      {
         "name": "Tether USD",
         "symbol": "USDT",
         "decimals": 6,
