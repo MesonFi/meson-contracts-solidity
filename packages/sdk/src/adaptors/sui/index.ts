@@ -37,12 +37,39 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
     adaptor = new SuiAdaptor(clientOrAdaptor)
   }
 
+  const getObject = async (objectId: string) => {
+    try {
+      const res = await adaptor.client.getObject({ id: objectId, options: { showContent: true } })
+      return res.data?.content?.['fields'] as any
+    } catch (e) {
+      throw e
+    }
+  }
+  const memoizedGetObject = memoize(getObject)
+
+  const getDynamicFields = async (parentId: string) => {
+    try {
+      const res = await adaptor.client.getDynamicFields({ parentId })
+      return res.data
+    } catch (e) {
+      throw e
+    }
+  }
+
+  const getStoreG = memoize(() => memoizedGetObject(metadata.storeG))
+
   const getSupportedTokens = memoize(async () => {
-    const indexes: number[] = [1, 2]
-    const tokens: string[] = [
-      `0xbae6ea5c9d80e1931563b71c0b97d22babcb1a41900a9bc2422870a78dc1a023::USDC::USDC`,
-      `0xbae6ea5c9d80e1931563b71c0b97d22babcb1a41900a9bc2422870a78dc1a023::USDT::USDT`
-    ]
+    const storeG = await getStoreG()
+    const data = await getDynamicFields(storeG.supported_coins.fields.id.id)
+    const sortedData = data.sort((x, y) => x.name.value - y.name.value)
+    const indexes: number[] = []
+    const tokens: string[] = []
+    for (const item of sortedData) {
+      const coinObject = await memoizedGetObject(item.objectId)
+      indexes.push(item.name.value)
+      const [addr, mod, type] = coinObject.value.fields.name.split('::')
+      tokens.push([utils.hexZeroPad(`0x${addr}`, 32), mod, type].join('::'))
+    }
     return { tokens, indexes }
   })
 
@@ -55,16 +82,52 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
     return tokens[i]
   }
 
+  const getTokenIndex = async (tokenAddr: string) => {
+    const { tokens, indexes } = await getSupportedTokens()
+    const i = tokens.findIndex(addr => addr === tokenAddr)
+    if (i === -1) {
+      throw new Error(`Token addr ${tokenAddr} not found.`)
+    }
+    return indexes[i]
+  }
+
   // TODO: What if owner of pool is transferred (although currently unsupported)?
   const ownerOfPool = memoize(async (poolIndex: BigNumberish) => {
-    // TODO: temp on devnet
-    return '0x74f8b6946f43cf869e82a0a60fd61932ca1e868457e4497b46aace23272476ff'
+    if (poolIndex.toString() === '0') {
+      return
+    }
+    const storeG = await getStoreG()
+    const data = await getDynamicFields(storeG.pool_owners.fields.id.id)
+    const match = data.find(item => item.name.value === poolIndex.toString())
+    if (!match) {
+      return
+    }
+    return (await getObject(match.objectId)).value
   }, poolIndex => BigNumber.from(poolIndex).toString())
 
   const poolOfAuthorizedAddr = memoize(async (addr: string) => {
-    // TODO: temp on devnet
-    return 1
+    const storeG = await getStoreG()
+    const data = await getDynamicFields(storeG.pool_of_authorized_addr.fields.id.id)
+    const match = data.find(item => item.name.value === addr)
+    if (!match) {
+      return 0
+    }
+    return Number((await getObject(match.objectId)).value)
   })
+
+  const pickCoinObject = async (tokenAddr: string, amount: BigNumberish) => {
+    const signer = (<SuiWallet>adaptor).address
+    const coins = await adaptor.client.getCoins({
+      owner: signer,
+      coinType: tokenAddr,
+    })
+    const bnAmount = BigNumber.from(amount)
+    const picked = coins.data.find(obj => bnAmount.lte(obj.balance))
+    if (!picked) {
+      throw new Error('No coin object has enough balance. Need to merge first.')
+    }
+    return picked
+  }
 
   return new Proxy({}, {
     get(target, prop: string) {
@@ -179,46 +242,44 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
               return await poolOfAuthorizedAddr(args[0])
             } else if (prop === 'poolTokenBalance') {
               const [token, poolOwner] = args
-              const data = '' // await memoizedGetResource(address, `${address}::MesonStates::StoreForCoin<${token}>`)
-              const result = '' // await readTable(data.in_pool_coins.handle, {
-              //   key_type: 'u64',
-              //   value_type: `0x1::coin::Coin<${token}>`,
-              //   key: (await poolOfAuthorizedAddr(poolOwner)).toString()
-              // })
-              // return BigNumber.from(result?.value || 0)
-              return BigNumber.from(2).pow(128).sub(1)
-            } else if (prop === 'getPostedSwap') {
-              const data = '' // await memoizedGetResource(address, `${address}::MesonStates::GeneralStore`)
-              const result = '' // await readTable(data.posted_swaps.handle, {
-              //   key_type: 'vector<u8>',
-              //   value_type: `${address}::MesonStates::PostedSwap`,
-              //   key: `${Swap.decode(args[0]).encoded}ff`
-              // })
-              // const exist = !!(result && result.from_address !== '0x0')
-              // return {
-              //   initiator: exist ? result.initiator : undefined,
-              //   poolOwner: exist ? await ownerOfPool(result.pool_index) : undefined,
-              //   exist
-              // }
-            } else if (prop === 'getLockedSwap') {
-              // const data = await memoizedGetResource(address, `${address}::MesonStates::GeneralStore`)
-              // const result = await readTable(data.locked_swaps.handle, {
-              //   key_type: 'vector<u8>',
-              //   value_type: `${address}::MesonStates::LockedSwap`,
-              //   key: _getSwapId(Swap.decode(args[0]).encoded, args[1])
-              // })
-              const result = {
-                until: Math.floor(Date.now() / 1000) + 6400,
-                pool_index: '1'
+              const tokenIndex = await getTokenIndex(token)
+              const poolId = await poolOfAuthorizedAddr(poolOwner)
+
+              // TODO: get storeC from contract calls
+              const coinPoolObject = await memoizedGetObject(metadata.storeC[tokenIndex.toString()])
+              const allCoins = await getDynamicFields(coinPoolObject.in_pool_coins.fields.id.id)
+              const coinsInPool = allCoins.filter(item => item.name.value === poolId.toString())
+
+              let balance = BigNumber.from(0)
+              for (const coin of coinsInPool) {
+                const coinObject = await getObject(coin.objectId)
+                balance = balance.add(coinObject.value.fields.balance)
               }
-              // if (!result) {
-              //   return { until: 0 } // never locked
-              // } else if (!Number(result.until)) {
-              //   return { until: 0, poolOwner: '0x1' } // locked & released
-              // }
+              return balance
+            } else if (prop === 'getPostedSwap') {
+              const storeG = await getStoreG()
+              const data = await getDynamicFields(storeG.posted_swaps.fields.id.id)
+              const match = data.find(item => utils.hexlify(item.name.value) === args[0])
+              if (!match) {
+                return { exist: false }
+              }
+              const posted = (await getObject(match.objectId)).value.fields
               return {
-                until: Number(result.until),
-                poolOwner: await ownerOfPool(result.pool_index)
+                initiator: utils.hexlify(posted.initiator),
+                poolOwner: await ownerOfPool(posted.pool_index),
+                exist: true
+              }
+            } else if (prop === 'getLockedSwap') {
+              const storeG = await getStoreG()
+              const data = await getDynamicFields(storeG.locked_swaps.fields.id.id)
+              const match = data.find(item => utils.hexlify(item.name.value) === args[0])
+              if (!match) {
+                return { until: 0 }
+              }
+              const locked = (await getObject(match.objectId)).value.fields
+              return {
+                until: Number(locked.until),
+                poolOwner: await ownerOfPool(locked.pool_index)
               }
             }
 
@@ -241,6 +302,7 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
 
             if (prop === 'transfer') {
               const [to, amount] = args
+              throw new Error('Not implemented')
             }
 
             if (prop === 'addSupportToken') {
@@ -251,28 +313,29 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                 tx.pure(tokenIndex),
                 tx.pure(metadata.storeG),
               ]
-            } else if (['depositAndRegister', 'deposit', 'withdraw'].includes(prop)) {
+            } else if (['depositAndRegister', 'deposit'].includes(prop)) {
               const poolTokenIndex = BigNumber.from(args[1])
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
               const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toHexString()
               const tokenAddr = await getTokenAddr(tokenIndex)
-              const signer = (<SuiWallet>adaptor).address
-
-              const coins = await adaptor.client.getCoins({
-                owner: signer,
-                coinType: tokenAddr,
-              })
-              const toDeposit = BigNumber.from(args[0])
-              const picked = coins.data.find(obj => toDeposit.lte(obj.balance))
-              if (!picked) {
-                throw new Error('No coin object has enough balance. Need to merge first.')
-              }
-
+              const picked = await pickCoinObject(tokenAddr, args[0])
               payload.typeArguments = [tokenAddr]
               payload.arguments = [
-                tx.pure(toDeposit.toHexString()),
+                tx.pure(BigNumber.from(args[0]).toHexString()),
                 tx.pure(poolIndex),
                 tx.object(picked.coinObjectId),
+                tx.object(metadata.storeG),
+                tx.object(metadata.storeC[tokenIndex.toString()]),
+              ]
+            } else if (prop === 'withdraw') {
+              const poolTokenIndex = BigNumber.from(args[1])
+              const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
+              const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toHexString()
+              const tokenAddr = await getTokenAddr(tokenIndex)
+              payload.typeArguments = [tokenAddr]
+              payload.arguments = [
+                tx.pure(BigNumber.from(args[0]).toHexString()),
+                tx.pure(poolIndex),
                 tx.object(metadata.storeG),
                 tx.object(metadata.storeC[tokenIndex.toString()]),
               ]
@@ -282,19 +345,34 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
               const swap = Swap.decode(args[0])
               if (prop === 'postSwap') {
                 const [_, r, yParityAndS, postingValue] = args
-                payload.typeArguments = [await getTokenAddr(swap.inToken)]
+                const tokenAddr = await getTokenAddr(swap.inToken)
+                const picked = await pickCoinObject(tokenAddr, swap.amount)
+                payload.typeArguments = [tokenAddr]
                 payload.arguments = [
                   tx.pure(_vectorize(swap.encoded)),
                   tx.pure(_getCompactSignature(r, yParityAndS)),
                   tx.pure(_vectorize(postingValue.substring(0, 42))), // initiator
-                  tx.pure(`0x${postingValue.substring(42)}`) // pool_index
+                  tx.pure(`0x${postingValue.substring(42)}`), // pool_index
+                  tx.object(picked.coinObjectId),
+                  tx.object('0x6'),
+                  tx.object(metadata.storeG),
+                  tx.object(metadata.storeC[swap.inToken.toString()]),
                 ]
               } else if (prop === 'bondSwap') {
                 payload.typeArguments = [await getTokenAddr(swap.inToken)]
-                payload.arguments = [tx.pure(_vectorize(swap.encoded)), tx.pure(args[1].toString())]
+                payload.arguments = [
+                  tx.pure(_vectorize(swap.encoded)),
+                  tx.pure(args[1].toString()),
+                  tx.object(metadata.storeG),
+                ]
               } else if (prop === 'cancelSwap') {
                 payload.typeArguments = [await getTokenAddr(swap.inToken)]
-                payload.arguments = [tx.pure(_vectorize(swap.encoded))]
+                payload.arguments = [
+                  tx.pure(_vectorize(swap.encoded)),
+                  tx.object(metadata.storeG),
+                  tx.object(metadata.storeC[swap.inToken.toString()]),
+                  tx.object('0x6'),
+                ]
               } else if (prop === 'executeSwap') {
                 const [_, r, yParityAndS, recipient, depositToPool] = args
                 payload.typeArguments = [await getTokenAddr(swap.inToken)]
@@ -302,7 +380,10 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                   tx.pure(_vectorize(swap.encoded)),
                   tx.pure(_getCompactSignature(r, yParityAndS)),
                   tx.pure(_vectorize(recipient.substring(0, 42))),
-                  tx.pure(depositToPool)
+                  tx.pure(depositToPool),
+                  tx.object(metadata.storeG),
+                  tx.object(metadata.storeC[swap.inToken.toString()]),
+                  tx.object('0x6'),
                 ]
               } else if (prop === 'lock') {
                 const [_, r, yParityAndS, { initiator, recipient }] = args
@@ -311,26 +392,31 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                   tx.pure(_vectorize(swap.encoded)),
                   tx.pure(_getCompactSignature(r, yParityAndS)),
                   tx.pure(_vectorize(initiator)),
-                  tx.pure(recipient)
+                  tx.pure(recipient),
+                  tx.object(metadata.storeG),
+                  tx.object(metadata.storeC[swap.outToken.toString()]),
+                  tx.object('0x6'),
                 ]
               } else if (prop === 'unlock') {
                 const [_, initiator] = args
                 payload.typeArguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   tx.pure(_vectorize(swap.encoded)),
-                  tx.pure(_vectorize(initiator))
+                  tx.pure(_vectorize(initiator)),
+                  tx.object(metadata.storeG),
+                  tx.object(metadata.storeC[swap.outToken.toString()]),
+                  tx.object('0x6'),
                 ]
               } else if (prop === 'release') {
-                payload.target = `${address}::usdc::release`
-
                 const [_, r, yParityAndS, initiator] = args
-                // payload.typeArguments = [await getTokenAddr(swap.outToken)]
+                payload.typeArguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   tx.pure(_vectorize(swap.encoded)),
                   tx.pure(_getCompactSignature(r, yParityAndS)),
                   tx.pure(_vectorize(initiator)),
-                  tx.object('0x1214501fc9024b5020725c09f2d687ef91cc833394da158014cd9237fa2eab17'),
-                  tx.object('0xadb80bec1c09d1653fc103d204984c23ae2fd3f0e39a11620f1c8a25f1cd4a89'),
+                  tx.object(metadata.storeG),
+                  tx.object(metadata.storeC[swap.outToken.toString()]),
+                  tx.object('0x6'),
                 ]
               }
             }

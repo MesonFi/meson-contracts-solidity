@@ -24,6 +24,10 @@ export default class SuiWallet extends SuiAdaptor {
     return this.keypair.getPublicKey().toSuiAddress()
   }
 
+  signMessage (msg: string) {
+    return utils.hexlify(this.keypair.signData(utils.toUtf8Bytes(msg)))
+  }
+
   async sendTransaction(tx: TransactionBlock, options?: SuiTransactionBlockResponseOptions) {
     const moveCalls = this._moveCallsFromTx(tx)
     const input = JSON.stringify(moveCalls)

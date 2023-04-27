@@ -615,35 +615,35 @@
       "symbol": "SUI",
       "decimals": 8
     },
-    "mesonAddress": "0xbae6ea5c9d80e1931563b71c0b97d22babcb1a41900a9bc2422870a78dc1a023",
+    "mesonAddress": "0xbc64b6a19a71a10b930615335ce4d341c21e41ceb0c8f87ff741948f802ab308",
     "tokens": [
       {
         "name": "USD Coin",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "0xbae6ea5c9d80e1931563b71c0b97d22babcb1a41900a9bc2422870a78dc1a023::USDC::USDC",
-        "link": "object/0xbae6ea5c9d80e1931563b71c0b97d22babcb1a41900a9bc2422870a78dc1a023?module=USDC&network=devnet",
+        "addr": "0xbc64b6a19a71a10b930615335ce4d341c21e41ceb0c8f87ff741948f802ab308::USDC::USDC",
+        "link": "object/0xbc64b6a19a71a10b930615335ce4d341c21e41ceb0c8f87ff741948f802ab308?module=USDC&network=devnet",
         "tokenIndex": 1
       },
       {
         "name": "Tether USD",
         "symbol": "USDT",
         "decimals": 6,
-        "addr": "0xbae6ea5c9d80e1931563b71c0b97d22babcb1a41900a9bc2422870a78dc1a023::USDT::USDT",
-        "link": "object/0xbae6ea5c9d80e1931563b71c0b97d22babcb1a41900a9bc2422870a78dc1a023?module=USDT&network=devnet",
+        "addr": "0xbc64b6a19a71a10b930615335ce4d341c21e41ceb0c8f87ff741948f802ab308::USDT::USDT",
+        "link": "object/0xbc64b6a19a71a10b930615335ce4d341c21e41ceb0c8f87ff741948f802ab308?module=USDT&network=devnet",
         "tokenIndex": 2
       }
     ],
     "metadata": {
-      "storeG": "0x9eac278b17cc5b073d4bcbdb804d805ecfed06feb87c3572f081e02b347ed3d6",
-      "adminCap": "0x81c3f74ca7de6cc0411e7ef0db7798575771b993adc9f6f5054770083676f95b",
+      "storeG": "0xa650bc98248a77cef7f417e9beb36512244051840b71f15439a71f2e7264fde0",
+      "adminCap": "0x5d1d38852cc845536ce0a2f5744a06347313be2f0e3d1c6003e968a7915f8677",
       "treasuryCap": {
-        "1": "0x37e5927283c033cd6041534fb063a798123119fba8a1f247b4a67946c9d48f6c",
-        "2": "0xee8b4bff65aecdd60954be695df6c266060442432c7a44eab06faafc26a00ceb"
+        "1": "0xb38d6c4e219db7aa56dfab72dc7ecabb978c7557f3aed516473a842b82873665",
+        "2": "0xfe4dbcb24e19b79e18595364aeb590185ec148e70b1af0033363479ac6d888cd"
       },
       "storeC": {
-        "1": "0x384fdf7f04664d9dbe9623d0391e24226ed220aacb06130710dfa18bd2483fb4",
-        "2": "0x4fde357c4b44231909ff5dad9783d14f395ec5b547086457bb8be2bfbf0b37e4"
+        "1": "0x3737a9f4bebd44f105839d02a18c2242b24e83006a39dd6d725c480c71990eb2",
+        "2": "0xe0c8454925d209a5f7bc14b582e233ac69d9a363b08dd9b53bc5fa7152246ac8"
       }
     }
   },

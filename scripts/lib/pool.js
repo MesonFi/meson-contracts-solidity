@@ -11,7 +11,7 @@ function getToken(network, symbol, wallet) {
 }
 
 exports.addSupportedTokens = async function addSupportedTokens(tokens, { network, wallet }) {
-  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
+  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet, network.metadata)
 
   console.log('Adding supported tokens', tokens)
   let tx
@@ -25,7 +25,7 @@ exports.addSupportedTokens = async function addSupportedTokens(tokens, { network
 }
 
 exports.deposit = async function deposit(symbol, amount, { network, wallet }) {
-  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
+  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet, network.metadata)
   const token = getToken(network, symbol, wallet)
   const decimals = await token.instance.decimals()
   const value = ethers.utils.parseUnits(amount, decimals)
@@ -54,7 +54,7 @@ exports.deposit = async function deposit(symbol, amount, { network, wallet }) {
 }
 
 exports.withdraw = async function withdraw(symbol, amount, { network, wallet }) {
-  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
+  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet, network.metadata)
   const token = getToken(network, symbol, wallet)
 
   console.log(`Withdrawing ${amount} ${symbol}...`)
@@ -77,7 +77,7 @@ exports.send = async function send(symbol, amount, recipient, { network, wallet 
 }
 
 exports.authorize = async function authorize(addr, { network, wallet }) {
-  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
+  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet, network.metadata)
 
   const poolIndex = await mesonInstance.poolOfAuthorizedAddr(wallet.address)
 
