@@ -272,7 +272,8 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
             } else if (prop === 'getLockedSwap') {
               const storeG = await getStoreG()
               const data = await getDynamicFields(storeG.locked_swaps.fields.id.id)
-              const match = data.find(item => utils.hexlify(item.name.value) === args[0])
+              const swapId = _getSwapId(Swap.decode(args[0]).encoded, args[1])
+              const match = data.find(item => utils.hexlify(item.name.value) === swapId)
               if (!match) {
                 return { until: 0 }
               }

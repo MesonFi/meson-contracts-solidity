@@ -57,9 +57,6 @@ export default class SuiAdaptor {
       // const block = await this.client.getBlockByHeight(number, params[1])
       return _wrapSuiBlock()
     } else if (method === 'eth_getTransactionByHash' || method === 'eth_getTransactionReceipt') {
-      if (params[0].startsWith('mock-')) {
-        return this._mockSuiTx(utils.toUtf8String(utils.arrayify(params[0].replace('mock-', ''))))
-      }
       return await this.waitForTransaction(params[0])
     }
   }
@@ -76,8 +73,8 @@ export default class SuiAdaptor {
       blockHash: 'n/a',
       blockNumber: '',
       hash: txRes.digest,
-      from: txRes.transaction?.data.sender,
-      to: '0x0f89dc9da6d442eed24e2524ff3d1f31dc76c0e5d0bcaaa913b3530f6a7e9585',
+      from: utils.hexZeroPad(txRes.transaction?.data.sender || '0x', 32),
+      to: moveCalls?.[0]?.package,
       value: '0',
       input: JSON.stringify(moveCalls),
       timestamp: Math.floor(Number(txRes.timestampMs) / 1000).toString(),
@@ -92,13 +89,14 @@ export default class SuiAdaptor {
       return txData.transactions.map(tx => {
         if ('MoveCall' in tx) {
           const {
-            package: packageName,
             module,
             function: functionName,
             arguments: _arguments,
             type_arguments: typeArguments,
           } = tx.MoveCall
+          const packageName = utils.hexZeroPad(tx.MoveCall.package || '0x', 32)
           return {
+            package: packageName,
             target: `${packageName}::${module}::${functionName}`,
             arguments: _arguments.map(arg => {
               if (arg !== 'GasCoin' && 'Input' in arg) {
@@ -120,33 +118,8 @@ export default class SuiAdaptor {
       }).filter(Boolean)
     }
   }
-
-  _mockHash(input: string) {
-    return `mock-${utils.hexlify(utils.toUtf8Bytes(input))}`
-  }
-
-  _mockSuiTx(moveCallsStr: string) {
-    return {
-      blockHash: 'n/a',
-      blockNumber: '',
-      hash: this._mockHash(moveCallsStr),
-      from: '',
-      to: '0x0f89dc9da6d442eed24e2524ff3d1f31dc76c0e5d0bcaaa913b3530f6a7e9585',
-      value: '0',
-      input: moveCallsStr,
-      timestamp: Math.floor(Date.now() / 1000).toString(),
-      status: '0x1'
-    }
-  }
 }
 
 function _wrapSuiBlock() {
   return
-  // return {
-  //   hash: '0x' + Number(raw.block_height).toString(16),
-  //   parentHash: '0x' + Number(raw.block_height - 1).toString(16),
-  //   number: raw.block_height,
-  //   timestamp: Math.floor(raw.block_timestamp / 1000).toString(),
-  //   transactions: raw.transactions?.filter(tx => tx.type === 'user_transaction').map(_wrapAptosTx) || []
-  // }
 }
