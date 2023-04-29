@@ -105,7 +105,7 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
     return (await getObject(match.objectId)).value
   }, poolIndex => BigNumber.from(poolIndex).toString())
 
-  const poolOfAuthorizedAddr = memoize(async (addr: string) => {
+  const poolOfAuthorizedAddr = async (addr: string) => {
     const storeG = await getStoreG()
     const data = await getDynamicFields(storeG.pool_of_authorized_addr.fields.id.id)
     const match = data.find(item => item.name.value === addr)
@@ -113,7 +113,7 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
       return 0
     }
     return Number((await getObject(match.objectId)).value)
-  })
+  }
 
   const pickCoinObject = async (tokenAddr: string, amount: BigNumberish) => {
     const signer = (<SuiWallet>adaptor).address
@@ -326,7 +326,6 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                 tx.pure(poolIndex),
                 tx.object(picked.coinObjectId),
                 tx.object(metadata.storeG),
-                tx.object(metadata.storeC[tokenIndex.toString()]),
               ]
             } else if (prop === 'withdraw') {
               const poolTokenIndex = BigNumber.from(args[1])
@@ -338,7 +337,6 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                 tx.pure(BigNumber.from(args[0]).toHexString()),
                 tx.pure(poolIndex),
                 tx.object(metadata.storeG),
-                tx.object(metadata.storeC[tokenIndex.toString()]),
               ]
             } else if (['addAuthorizedAddr', 'removeAuthorizedAddr'].includes(prop)) {
               payload.arguments = [args[0]]
@@ -357,7 +355,6 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                   tx.object(picked.coinObjectId),
                   tx.object('0x6'),
                   tx.object(metadata.storeG),
-                  tx.object(metadata.storeC[swap.inToken.toString()]),
                 ]
               } else if (prop === 'bondSwap') {
                 payload.typeArguments = [await getTokenAddr(swap.inToken)]
@@ -371,7 +368,6 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                 payload.arguments = [
                   tx.pure(_vectorize(swap.encoded)),
                   tx.object(metadata.storeG),
-                  tx.object(metadata.storeC[swap.inToken.toString()]),
                   tx.object('0x6'),
                 ]
               } else if (prop === 'executeSwap') {
@@ -383,7 +379,6 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                   tx.pure(_vectorize(recipient.substring(0, 42))),
                   tx.pure(depositToPool),
                   tx.object(metadata.storeG),
-                  tx.object(metadata.storeC[swap.inToken.toString()]),
                   tx.object('0x6'),
                 ]
               } else if (prop === 'lock') {
@@ -395,7 +390,6 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                   tx.pure(_vectorize(initiator)),
                   tx.pure(recipient),
                   tx.object(metadata.storeG),
-                  tx.object(metadata.storeC[swap.outToken.toString()]),
                   tx.object('0x6'),
                 ]
               } else if (prop === 'unlock') {
@@ -405,7 +399,6 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                   tx.pure(_vectorize(swap.encoded)),
                   tx.pure(_vectorize(initiator)),
                   tx.object(metadata.storeG),
-                  tx.object(metadata.storeC[swap.outToken.toString()]),
                   tx.object('0x6'),
                 ]
               } else if (prop === 'release') {
@@ -416,7 +409,6 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                   tx.pure(_getCompactSignature(r, yParityAndS)),
                   tx.pure(_vectorize(initiator)),
                   tx.object(metadata.storeG),
-                  tx.object(metadata.storeC[swap.outToken.toString()]),
                   tx.object('0x6'),
                 ]
               }

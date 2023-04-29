@@ -615,35 +615,31 @@
       "symbol": "SUI",
       "decimals": 8
     },
-    "mesonAddress": "0xbc64b6a19a71a10b930615335ce4d341c21e41ceb0c8f87ff741948f802ab308",
+    "mesonAddress": "0x21549b78c55e1e507760187063a396e2b0cd80389ee3f2a07a499165610d9a04",
     "tokens": [
       {
         "name": "USD Coin",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "0xbc64b6a19a71a10b930615335ce4d341c21e41ceb0c8f87ff741948f802ab308::USDC::USDC",
-        "link": "object/0xbc64b6a19a71a10b930615335ce4d341c21e41ceb0c8f87ff741948f802ab308?module=USDC&network=devnet",
+        "addr": "0x21549b78c55e1e507760187063a396e2b0cd80389ee3f2a07a499165610d9a04::USDC::USDC",
+        "link": "object/0x21549b78c55e1e507760187063a396e2b0cd80389ee3f2a07a499165610d9a04?module=USDC&network=devnet",
         "tokenIndex": 1
       },
       {
         "name": "Tether USD",
         "symbol": "USDT",
         "decimals": 6,
-        "addr": "0xbc64b6a19a71a10b930615335ce4d341c21e41ceb0c8f87ff741948f802ab308::USDT::USDT",
-        "link": "object/0xbc64b6a19a71a10b930615335ce4d341c21e41ceb0c8f87ff741948f802ab308?module=USDT&network=devnet",
+        "addr": "0x21549b78c55e1e507760187063a396e2b0cd80389ee3f2a07a499165610d9a04::USDT::USDT",
+        "link": "object/0x21549b78c55e1e507760187063a396e2b0cd80389ee3f2a07a499165610d9a04?module=USDT&network=devnet",
         "tokenIndex": 2
       }
     ],
     "metadata": {
-      "storeG": "0xa650bc98248a77cef7f417e9beb36512244051840b71f15439a71f2e7264fde0",
-      "adminCap": "0x5d1d38852cc845536ce0a2f5744a06347313be2f0e3d1c6003e968a7915f8677",
+      "storeG": "0xac5d4d6db8e058c0a7268ce4e67e196b505814d9acd4dc7dc4d815f98c98004a",
+      "adminCap": "0x77d47380e3c0c6b3efbf9b7f86f5f2a9afc3322897f1e2a9890fe973de0e66b0",
       "treasuryCap": {
-        "1": "0xb38d6c4e219db7aa56dfab72dc7ecabb978c7557f3aed516473a842b82873665",
-        "2": "0xfe4dbcb24e19b79e18595364aeb590185ec148e70b1af0033363479ac6d888cd"
-      },
-      "storeC": {
-        "1": "0x3737a9f4bebd44f105839d02a18c2242b24e83006a39dd6d725c480c71990eb2",
-        "2": "0xe0c8454925d209a5f7bc14b582e233ac69d9a363b08dd9b53bc5fa7152246ac8"
+        "USDC": "0xa507ede70d05136a7ad526bca214b0cc41247c0b43f82d8e9594d1534471e57e",
+        "USDT": "0x74292d17d76a24a6ab3c625f438c2b85909b6ee5fc891a028a13e31d4d3270b4"
       }
     }
   },

@@ -86,23 +86,23 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
   }
 
   // TODO: What if owner of pool is transferred (although currently unsupported)?
-  const ownerOfPool = memoize(async (poolIndex: BigNumberish) => {
+  const ownerOfPool = async (poolIndex: BigNumberish) => {
     const data = await memoizedGetResource(address, `${address}::MesonStates::GeneralStore`)
     return await readTable(data.pool_owners.handle, {
       key_type: 'u64',
       value_type: 'address',
       key: BigNumber.from(poolIndex).toString()
     })
-  }, poolIndex => BigNumber.from(poolIndex).toString())
+  }
 
-  const poolOfAuthorizedAddr = memoize(async (addr: string) => {
+  const poolOfAuthorizedAddr = async (addr: string) => {
     const data = await memoizedGetResource(address, `${address}::MesonStates::GeneralStore`)
     return +await readTable(data.pool_of_authorized_addr.handle, {
       key_type: 'address',
       value_type: 'u64',
       key: addr
     }) || 0
-  })
+  }
 
   return new Proxy({}, {
     get(target, prop: string) {
