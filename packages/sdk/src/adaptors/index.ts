@@ -29,11 +29,11 @@ export function getWallet (privateKey, client) {
   }
 }
 
-export function getContract(address, abi, clientOrAdaptor, metadata?) {
+export function getContract(address, abi, clientOrAdaptor) {
   if (clientOrAdaptor instanceof AptosClient || clientOrAdaptor instanceof AptosAdaptor) {
     return _aptos.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof SuiProvider || clientOrAdaptor instanceof SuiAdaptor) {
-    return _sui.getContract(address, abi, clientOrAdaptor, metadata)
+    return _sui.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof providers.Provider || Signer.isSigner(clientOrAdaptor)) {
     return _ethers.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof ZkProvider || clientOrAdaptor instanceof ZkWallet) {
@@ -63,10 +63,10 @@ export function formatAddress(format: AddressFormat, addr: string): string {
     }
   } else if (format === 'tron') {
     return TronWeb.address.fromHex(addr)
-  } else if (format === 'aptos' || format === 'sui') {
-    const parts = addr.split('::')
-    parts[0] = utils.hexZeroPad(parts[0], 32)
-    return parts.join('::')
+  } else if (format === 'aptos') {
+    return _aptos.formatAddress(addr)
+  } else if (format === 'sui') {
+    return _sui.formatAddress(addr)
   }
 }
 

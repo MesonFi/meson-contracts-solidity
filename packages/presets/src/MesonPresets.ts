@@ -53,7 +53,6 @@ export interface PresetNetwork {
     decimals: number
   }
   tokens: PresetToken[]
-  metadata?: any
 }
 
 export class MesonPresets {
@@ -173,7 +172,7 @@ export class MesonPresets {
       throw new Error(`Unsupported network: ${id}`)
     }
     this.disposeMesonClient(id)
-    const instance = adaptors.getContract(network.mesonAddress, Meson.abi, client, network.metadata)
+    const instance = adaptors.getContract(network.mesonAddress, Meson.abi, client)
     const mesonClient = new MesonClient(instance, network.shortSlip44)
     this._cache.set(id, mesonClient)
     return mesonClient

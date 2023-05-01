@@ -85,7 +85,7 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
     return tokens[i]
   }
 
-  // TODO: What if owner of pool is transferred (although currently unsupported)?
+  // TODO: What if owner of pool is transferred?
   const ownerOfPool = async (poolIndex: BigNumberish) => {
     const data = await memoizedGetResource(address, `${address}::MesonStates::GeneralStore`)
     return await readTable(data.pool_owners.handle, {
@@ -194,11 +194,15 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
               return await poolOfAuthorizedAddr(args[0])
             } else if (prop === 'poolTokenBalance') {
               const [token, poolOwner] = args
+              const poolIndex = await poolOfAuthorizedAddr(poolOwner)
+              if (!poolIndex) {
+                return BigNumber.from(0)
+              }
               const data = await memoizedGetResource(address, `${address}::MesonStates::StoreForCoin<${token}>`)
               const result = await readTable(data.in_pool_coins.handle, {
                 key_type: 'u64',
                 value_type: `0x1::coin::Coin<${token}>`,
-                key: (await poolOfAuthorizedAddr(poolOwner)).toString()
+                key: poolIndex.toString()
               })
               return BigNumber.from(result?.value || 0)
             } else if (prop === 'getPostedSwap') {
@@ -208,11 +212,14 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                 value_type: `${address}::MesonStates::PostedSwap`,
                 key: `${Swap.decode(args[0]).encoded}ff`
               })
-              const exist = !!(result && result.from_address !== '0x0')
+              if (!result) {
+                return { exist: false }
+              }
+              const pending = result.from_address !== '0x0'
               return {
-                initiator: exist ? result.initiator : undefined,
-                poolOwner: exist ? await ownerOfPool(result.pool_index) : undefined,
-                exist
+                initiator: pending ? result.initiator : undefined,
+                poolOwner: pending ? await ownerOfPool(result.pool_index) : undefined,
+                exist: true
               }
             } else if (prop === 'getLockedSwap') {
               const data = await memoizedGetResource(address, `${address}::MesonStates::GeneralStore`)
@@ -359,4 +366,13 @@ function _getSwapId(encoded, initiator) {
 
 function _getCompactSignature(r: string, yParityAndS: string) {
   return _vectorize(r + yParityAndS.replace(/^0x/, ''))
+}
+
+export function formatAddress(addr: string) {
+  const parts = addr.split('::')
+  if (!parts[0].startsWith('0x')) {
+    parts[0] = '0x' + parts[0]
+  }
+  parts[0] = utils.hexZeroPad(parts[0], 32)
+  return parts.join('::')
 }

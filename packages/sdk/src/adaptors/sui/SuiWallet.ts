@@ -28,16 +28,16 @@ export default class SuiWallet extends SuiAdaptor {
     return utils.hexlify(this.keypair.signData(utils.toUtf8Bytes(msg)))
   }
 
-  async sendTransaction(tx: TransactionBlock, options?: SuiTransactionBlockResponseOptions) {
-    const result = await this.signer.signAndExecuteTransactionBlock({ transactionBlock: tx, options: { showObjectChanges: true, ...options } })
+  async sendTransaction(txb: TransactionBlock, options?: SuiTransactionBlockResponseOptions) {
+    const result = await this.signer.signAndExecuteTransactionBlock({ transactionBlock: txb, options: { showObjectChanges: true, ...options } })
     return {
       hash: result.digest,
       wait: () => this._wrapSuiTx(result)
     }
   }
 
-  _moveCallsFromTx (tx: TransactionBlock) {
-    return tx.blockData.transactions.map(tx => {
+  _moveCallsFromTx (txb: TransactionBlock) {
+    return txb.blockData.transactions.map(tx => {
       if (tx.kind === 'MoveCall') {
         return {
           ...tx,

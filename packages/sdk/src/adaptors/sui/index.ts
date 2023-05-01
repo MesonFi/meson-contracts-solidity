@@ -27,7 +27,7 @@ export function getWalletFromExtension(ext, client: SuiProvider): SuiExtWallet {
   return new SuiExtWallet(client, ext)
 }
 
-export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdaptor, metadata) {
+export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdaptor) {
   let adaptor: SuiAdaptor
   if (clientOrAdaptor instanceof SuiWallet) {
     adaptor = clientOrAdaptor
@@ -37,38 +37,57 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
     adaptor = new SuiAdaptor(clientOrAdaptor)
   }
 
+  const getMetadata = memoize(async () => {
+    const obj = await adaptor.client.getObject({ id: address, options: { showPreviousTransaction: true } })
+    const result = await adaptor.client.getTransactionBlock({ digest: obj.data.previousTransaction, options: { showObjectChanges: true } })
+    return {
+      storeG: result.objectChanges.find(obj => obj['objectType'] === `${address}::MesonStates::GeneralStore`)?.['objectId'],
+      adminCap: result.objectChanges.find(obj => obj['objectType'] === `${address}::MesonStates::AdminCap`)?.['objectId'],
+    }
+  })
+
   const getObject = async (objectId: string) => {
     try {
       const res = await adaptor.client.getObject({ id: objectId, options: { showContent: true } })
-      return res.data?.content?.['fields'] as any
+      return (<any>res.data.content).fields
     } catch (e) {
       throw e
     }
   }
   const memoizedGetObject = memoize(getObject)
+  const getStoreG = memoize(async () => memoizedGetObject((await getMetadata()).storeG))
 
-  const getDynamicFields = async (parentId: string) => {
+  const getDynamicFields = async (store: any) => {
     try {
-      const res = await adaptor.client.getDynamicFields({ parentId })
+      const res = await adaptor.client.getDynamicFields({ parentId: store.fields.id.id })
       return res.data
     } catch (e) {
       throw e
     }
   }
 
-  const getStoreG = memoize(() => memoizedGetObject(metadata.storeG))
+  const getDynamicFieldValue = async (store: any, field: { type: string, value?: any }) => {
+    try {
+      const res = await adaptor.client.getDynamicFieldObject({ parentId: store.fields.id.id, name: field })
+      return (<any>res.data.content).fields.value
+    } catch (e) {
+      if (e.cause.message?.includes('Cannot find dynamic field')) {
+        return
+      }
+      throw e
+    }
+  }
 
   const getSupportedTokens = memoize(async () => {
     const storeG = await getStoreG()
-    const data = await getDynamicFields(storeG.supported_coins.fields.id.id)
+    const data = await getDynamicFields(storeG.supported_coins)
     const sortedData = data.sort((x, y) => x.name.value - y.name.value)
     const indexes: number[] = []
     const tokens: string[] = []
     for (const item of sortedData) {
       const coinObject = await memoizedGetObject(item.objectId)
       indexes.push(item.name.value)
-      const [addr, mod, type] = coinObject.value.fields.name.split('::')
-      tokens.push([utils.hexZeroPad(`0x${addr}`, 32), mod, type].join('::'))
+      tokens.push(formatAddress(coinObject.value.fields.name))
     }
     return { tokens, indexes }
   })
@@ -82,37 +101,26 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
     return tokens[i]
   }
 
-  const getTokenIndex = async (tokenAddr: string) => {
-    const { tokens, indexes } = await getSupportedTokens()
-    const i = tokens.findIndex(addr => addr === tokenAddr)
-    if (i === -1) {
-      throw new Error(`Token addr ${tokenAddr} not found.`)
-    }
-    return indexes[i]
-  }
-
-  // TODO: What if owner of pool is transferred (although currently unsupported)?
+  // TODO: What if owner of pool is transferred?
   const ownerOfPool = memoize(async (poolIndex: BigNumberish) => {
     if (poolIndex.toString() === '0') {
       return
     }
     const storeG = await getStoreG()
-    const data = await getDynamicFields(storeG.pool_owners.fields.id.id)
-    const match = data.find(item => item.name.value === poolIndex.toString())
-    if (!match) {
+    const ownerAddr = await getDynamicFieldValue(storeG.pool_owners, { type: 'u64', value: poolIndex.toString() })
+    if (!ownerAddr) {
       return
     }
-    return (await getObject(match.objectId)).value
+    return utils.hexZeroPad(ownerAddr, 32)
   }, poolIndex => BigNumber.from(poolIndex).toString())
 
   const poolOfAuthorizedAddr = async (addr: string) => {
     const storeG = await getStoreG()
-    const data = await getDynamicFields(storeG.pool_of_authorized_addr.fields.id.id)
-    const match = data.find(item => item.name.value === addr)
-    if (!match) {
+    const poolIndex = await getDynamicFieldValue(storeG.pool_of_authorized_addr, { type: 'address', value: addr })
+    if (!poolIndex) {
       return 0
     }
-    return Number((await getObject(match.objectId)).value)
+    return Number(poolIndex)
   }
 
   const pickCoinObjects = async (tokenAddr: string, amount: BigNumberish) => {
@@ -199,16 +207,16 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
       } else if (['queryFilter', 'on', 'removeAllListeners'].includes(prop)) {
         return () => {}
       } else if (prop === 'connect') {
-        return (wallet: SuiWallet) => getContract(address, abi, wallet, metadata)
+        return (wallet: SuiWallet) => getContract(address, abi, wallet)
       } else if (prop === 'filters') {
         throw new Error('SuiContract.filters not implemented')
       } else if (prop === 'call') {
         return async (target, getArguments) => {
-          const txBlock = new TransactionBlock()
-          const { arguments: args = [], typeArguments = [] } = getArguments({ txBlock, metadata }) 
+          const txb = new TransactionBlock()
+          const { arguments: args = [], typeArguments = [] } = getArguments(txb) 
           const payload = { target, arguments: args, typeArguments }
-          txBlock.moveCall(<any>payload)
-          return await (<SuiWallet>adaptor).sendTransaction(txBlock)
+          txb.moveCall(<any>payload)
+          return await (<SuiWallet>adaptor).sendTransaction(txb)
         }
       }
 
@@ -252,45 +260,46 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
               return await poolOfAuthorizedAddr(args[0])
             } else if (prop === 'poolTokenBalance') {
               const [token, poolOwner] = args
-              const tokenIndex = await getTokenIndex(token)
-              const poolId = await poolOfAuthorizedAddr(poolOwner)
-
-              // TODO: get storeC from contract calls
-              const coinPoolObject = await memoizedGetObject(metadata.storeC[tokenIndex.toString()])
-              const allCoins = await getDynamicFields(coinPoolObject.in_pool_coins.fields.id.id)
-              const coinsInPool = allCoins.filter(item => item.name.value === poolId.toString())
-
-              let balance = BigNumber.from(0)
-              for (const coin of coinsInPool) {
-                const coinObject = await getObject(coin.objectId)
-                balance = balance.add(coinObject.value.fields.balance)
+              const poolIndex = await poolOfAuthorizedAddr(poolOwner)
+              if (!poolIndex) {
+                return BigNumber.from(0)
               }
-              return balance
+              const storeG = await getStoreG()
+              const poolsForCoin = await getDynamicFieldValue(storeG.in_pool_coins, { type: '0x1::type_name::TypeName', value: token.replace('0x', '') })
+              if (!poolsForCoin) {
+                return BigNumber.from(0)
+              }
+              const poolCoins = await getDynamicFieldValue(poolsForCoin, { type: 'u64', value: poolIndex.toString() })
+              if (!poolCoins) {
+                return BigNumber.from(0)
+              }
+              return BigNumber.from(poolCoins.fields.balance)
             } else if (prop === 'getPostedSwap') {
               const storeG = await getStoreG()
-              const data = await getDynamicFields(storeG.posted_swaps.fields.id.id)
-              const match = data.find(item => utils.hexlify(item.name.value) === args[0])
-              if (!match) {
+              const swap = Swap.decode(args[0])
+              const result = await getDynamicFieldValue(storeG.posted_swaps, { type: 'vector<u8>', value: _vectorize(swap.encoded + 'ff') })
+              if (!result) {
                 return { exist: false }
               }
-              const posted = (await getObject(match.objectId)).value.fields
+              const pending = BigNumber.from(result.fields.from_address).gt(0)
               return {
-                initiator: utils.hexlify(posted.initiator),
-                poolOwner: await ownerOfPool(posted.pool_index),
+                initiator: pending ? utils.hexlify(result.fields.initiator) : undefined,
+                poolOwner: pending ? await ownerOfPool(result.fields.pool_index) : undefined,
                 exist: true
               }
             } else if (prop === 'getLockedSwap') {
               const storeG = await getStoreG()
-              const data = await getDynamicFields(storeG.locked_swaps.fields.id.id)
-              const swapId = _getSwapId(Swap.decode(args[0]).encoded, args[1])
-              const match = data.find(item => utils.hexlify(item.name.value) === swapId)
-              if (!match) {
-                return { until: 0 }
+              const swap = Swap.decode(args[0])
+              const swapId = _getSwapId(swap.encoded, args[1])
+              const result = await getDynamicFieldValue(storeG.locked_swaps, { type: 'vector<u8>', value: _vectorize(swapId) })
+              if (!result) {
+                return { until: 0 } // never locked
+              } else if (!Number(result.fields.until)) {
+                return { until: 0, poolOwner: '0x1' } // locked & released
               }
-              const locked = (await getObject(match.objectId)).value.fields
               return {
-                until: Number(locked.until),
-                poolOwner: await ownerOfPool(locked.pool_index)
+                until: Number(result.fields.until),
+                poolOwner: await ownerOfPool(result.fields.pool_index)
               }
             }
 
@@ -303,7 +312,7 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
               options = args.pop()
             }
 
-            const tx = new TransactionBlock()
+            const txb = new TransactionBlock()
             const module = _findMesonMethodModule(prop)
             const payload = {
               target: `${address}::${module}::${prop}`,
@@ -317,115 +326,119 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
             }
 
             if (prop === 'addSupportToken') {
+              const metadata = await getMetadata()
               const [tokenAddr, tokenIndex] = args
               payload.typeArguments = [tokenAddr]
               payload.arguments = [
-                tx.pure(metadata.adminCap),
-                tx.pure(tokenIndex),
-                tx.pure(metadata.storeG),
+                txb.pure(metadata.adminCap),
+                txb.pure(tokenIndex),
+                txb.pure(metadata.storeG),
               ]
             } else if (['depositAndRegister', 'deposit'].includes(prop)) {
               const poolTokenIndex = BigNumber.from(args[1])
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
               const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toHexString()
+              const metadata = await getMetadata()
               const tokenAddr = await getTokenAddr(tokenIndex)
               const coinList = await pickCoinObjects(tokenAddr, args[0])
               payload.typeArguments = [tokenAddr]
               payload.arguments = [
-                tx.pure(BigNumber.from(args[0]).toHexString()),
-                tx.pure(poolIndex),
-                tx.makeMoveVec({ objects: coinList.map(obj => tx.object(obj.coinObjectId)) }),
-                tx.object(metadata.storeG),
+                txb.pure(BigNumber.from(args[0]).toHexString()),
+                txb.pure(poolIndex),
+                txb.makeMoveVec({ objects: coinList.map(obj => txb.object(obj.coinObjectId)) }),
+                txb.object(metadata.storeG),
               ]
             } else if (prop === 'withdraw') {
               const poolTokenIndex = BigNumber.from(args[1])
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
               const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toHexString()
+              const metadata = await getMetadata()
               const tokenAddr = await getTokenAddr(tokenIndex)
               payload.typeArguments = [tokenAddr]
               payload.arguments = [
-                tx.pure(BigNumber.from(args[0]).toHexString()),
-                tx.pure(poolIndex),
-                tx.object(metadata.storeG),
+                txb.pure(BigNumber.from(args[0]).toHexString()),
+                txb.pure(poolIndex),
+                txb.object(metadata.storeG),
               ]
             } else if (['addAuthorizedAddr', 'removeAuthorizedAddr', 'transferPoolOwner'].includes(prop)) {
               payload.arguments = [args[0]]
             } else {
               const swap = Swap.decode(args[0])
+              const metadata = await getMetadata()
               if (prop === 'postSwap') {
                 const [_, r, yParityAndS, postingValue] = args
                 const tokenAddr = await getTokenAddr(swap.inToken)
                 const coinList = await pickCoinObjects(tokenAddr, swap.amount)
                 payload.typeArguments = [tokenAddr]
                 payload.arguments = [
-                  tx.pure(_vectorize(swap.encoded)),
-                  tx.pure(_getCompactSignature(r, yParityAndS)),
-                  tx.pure(_vectorize(postingValue.substring(0, 42))), // initiator
-                  tx.pure(`0x${postingValue.substring(42)}`), // pool_index
-                  tx.makeMoveVec({ objects: coinList.map(obj => tx.object(obj.coinObjectId)) }),
-                  tx.object('0x6'),
-                  tx.object(metadata.storeG),
+                  txb.pure(_vectorize(swap.encoded)),
+                  txb.pure(_getCompactSignature(r, yParityAndS)),
+                  txb.pure(_vectorize(postingValue.substring(0, 42))), // initiator
+                  txb.pure(`0x${postingValue.substring(42)}`), // pool_index
+                  txb.makeMoveVec({ objects: coinList.map(obj => txb.object(obj.coinObjectId)) }),
+                  txb.object('0x6'),
+                  txb.object(metadata.storeG),
                 ]
               } else if (prop === 'bondSwap') {
                 payload.typeArguments = [await getTokenAddr(swap.inToken)]
                 payload.arguments = [
-                  tx.pure(_vectorize(swap.encoded)),
-                  tx.pure(args[1].toString()),
-                  tx.object(metadata.storeG),
+                  txb.pure(_vectorize(swap.encoded)),
+                  txb.pure(args[1].toString()),
+                  txb.object(metadata.storeG),
                 ]
               } else if (prop === 'cancelSwap') {
                 payload.typeArguments = [await getTokenAddr(swap.inToken)]
                 payload.arguments = [
-                  tx.pure(_vectorize(swap.encoded)),
-                  tx.object(metadata.storeG),
-                  tx.object('0x6'),
+                  txb.pure(_vectorize(swap.encoded)),
+                  txb.object(metadata.storeG),
+                  txb.object('0x6'),
                 ]
               } else if (prop === 'executeSwap') {
                 const [_, r, yParityAndS, recipient, depositToPool] = args
                 payload.typeArguments = [await getTokenAddr(swap.inToken)]
                 payload.arguments = [
-                  tx.pure(_vectorize(swap.encoded)),
-                  tx.pure(_getCompactSignature(r, yParityAndS)),
-                  tx.pure(_vectorize(recipient.substring(0, 42))),
-                  tx.pure(depositToPool),
-                  tx.object(metadata.storeG),
-                  tx.object('0x6'),
+                  txb.pure(_vectorize(swap.encoded)),
+                  txb.pure(_getCompactSignature(r, yParityAndS)),
+                  txb.pure(_vectorize(recipient.substring(0, 42))),
+                  txb.pure(depositToPool),
+                  txb.object(metadata.storeG),
+                  txb.object('0x6'),
                 ]
               } else if (prop === 'lock') {
                 const [_, r, yParityAndS, { initiator, recipient }] = args
                 payload.typeArguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
-                  tx.pure(_vectorize(swap.encoded)),
-                  tx.pure(_getCompactSignature(r, yParityAndS)),
-                  tx.pure(_vectorize(initiator)),
-                  tx.pure(recipient),
-                  tx.object(metadata.storeG),
-                  tx.object('0x6'),
+                  txb.pure(_vectorize(swap.encoded)),
+                  txb.pure(_getCompactSignature(r, yParityAndS)),
+                  txb.pure(_vectorize(initiator)),
+                  txb.pure(recipient),
+                  txb.object(metadata.storeG),
+                  txb.object('0x6'),
                 ]
               } else if (prop === 'unlock') {
                 const [_, initiator] = args
                 payload.typeArguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
-                  tx.pure(_vectorize(swap.encoded)),
-                  tx.pure(_vectorize(initiator)),
-                  tx.object(metadata.storeG),
-                  tx.object('0x6'),
+                  txb.pure(_vectorize(swap.encoded)),
+                  txb.pure(_vectorize(initiator)),
+                  txb.object(metadata.storeG),
+                  txb.object('0x6'),
                 ]
               } else if (prop === 'release') {
                 const [_, r, yParityAndS, initiator] = args
                 payload.typeArguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
-                  tx.pure(_vectorize(swap.encoded)),
-                  tx.pure(_getCompactSignature(r, yParityAndS)),
-                  tx.pure(_vectorize(initiator)),
-                  tx.object(metadata.storeG),
-                  tx.object('0x6'),
+                  txb.pure(_vectorize(swap.encoded)),
+                  txb.pure(_getCompactSignature(r, yParityAndS)),
+                  txb.pure(_vectorize(initiator)),
+                  txb.object(metadata.storeG),
+                  txb.object('0x6'),
                 ]
               }
             }
 
-            tx.moveCall(<any>payload)
-            return await (<SuiWallet>adaptor).sendTransaction(tx, options)
+            txb.moveCall(<any>payload)
+            return await (<SuiWallet>adaptor).sendTransaction(txb, options)
           }
         }
       }
@@ -469,4 +482,13 @@ function _getSwapId(encoded, initiator) {
 
 function _getCompactSignature(r: string, yParityAndS: string) {
   return _vectorize(r + yParityAndS.replace(/^0x/, ''))
+}
+
+export function formatAddress(addr: string) {
+  const parts = addr.split('::')
+  if (!parts[0].startsWith('0x')) {
+    parts[0] = '0x' + parts[0]
+  }
+  parts[0] = utils.hexZeroPad(parts[0], 32)
+  return parts.join('::')
 }
