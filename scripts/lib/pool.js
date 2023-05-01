@@ -86,3 +86,14 @@ exports.authorize = async function authorize(addr, { network, wallet }) {
   await tx.wait(1)
   return tx
 }
+
+exports.transferOwner = async function transferOwner(addr, { network, wallet }) {
+  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet, network.metadata)
+
+  const poolIndex = await mesonInstance.poolOfAuthorizedAddr(wallet.address)
+
+  console.log(`Transfer owner of pool ${poolIndex} to ${addr}...`)
+  const tx = await mesonInstance.transferPoolOwner(addr)
+  await tx.wait(1)
+  return tx
+}

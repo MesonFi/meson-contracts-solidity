@@ -261,7 +261,7 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
               const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toHexString()
               payload.type_arguments = [await getTokenAddr(tokenIndex)]
               payload.arguments = [BigNumber.from(args[0]).toHexString(), poolIndex]
-            } else if (['addAuthorizedAddr', 'removeAuthorizedAddr'].includes(prop)) {
+            } else if (['addAuthorizedAddr', 'removeAuthorizedAddr', 'transferPoolOwner'].includes(prop)) {
               payload.arguments = [args[0]]
             } else {
               const swap = Swap.decode(args[0])
@@ -333,6 +333,7 @@ function _findMesonMethodModule(method) {
       'withdraw',
       'addAuthorizedAddr',
       'removeAuthorizedAddr',
+      'transferPoolOwner',
       'lock',
       'unlock',
       'release'

@@ -33,6 +33,13 @@ interface IMesonPoolsEvents {
   /// @param addr Authorized address to be removed
   event PoolAuthorizedAddrRemoved(uint40 indexed poolIndex, address addr);
 
+  /// @notice Event when the ownership of a pool was transferred.
+  /// Emit at the end of `transferPoolOwner()` calls.
+  /// @param poolIndex Pool index
+  /// @param prevOwner Previous owner of the pool
+  /// @param newOwner New owner of the pool
+  event PoolOwnerTransferred(uint40 indexed poolIndex, address prevOwner, address newOwner);
+
   /// @notice Event when a swap was locked.
   /// Emit at the end of `lock()` calls.
   /// @param encodedSwap Encoded swap

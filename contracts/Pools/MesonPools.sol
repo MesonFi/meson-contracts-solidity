@@ -113,6 +113,20 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     emit PoolAuthorizedAddrRemoved(poolIndex, addr);
   }
 
+  /// @notice Transfer the ownership of a pool to another address
+  /// @dev Designed to be used by LPs (pool owners)
+  /// @param addr The new address to be the pool owner
+  function transferPoolOwner(address addr) external {
+    address poolOwner = _msgSender();
+    uint40 poolIndex = poolOfAuthorizedAddr[poolOwner];
+    require(poolIndex != 0, "The signer does not register a pool");
+    require(poolOwner == ownerOfPool[poolIndex], "Need the pool owner as the signer");
+    require(poolOfAuthorizedAddr[addr] == poolIndex, "Addr is not authorized for the signer's pool");
+    ownerOfPool[poolIndex] = addr;
+
+    emit PoolOwnerTransferred(poolIndex, poolOwner, addr);
+  }
+
   /// @notice Lock funds to match a swap request. This is step 2️⃣ in a swap.
   /// The authorized address of the bonding pool should call this method with
   /// the same signature given by `postSwap`. This method will lock swapping fund 

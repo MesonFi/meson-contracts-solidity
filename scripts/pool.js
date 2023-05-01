@@ -1,6 +1,6 @@
 const { adaptors } = require('@mesonfi/sdk')
 const { getClient } = require('./lib/getClient')
-const { addSupportedTokens, deposit, withdraw, send, authorize } = require('./lib/pool')
+const { addSupportedTokens, deposit, withdraw, send, authorize, transferOwner } = require('./lib/pool')
 
 require('dotenv').config()
 
@@ -21,5 +21,6 @@ module.exports = async function pool(network) {
   // const tx = await send(symbol, amount, addr, { network, wallet })
   // const tx = await addSupportedTokens(tokens, { network, wallet })
   // const tx = await authorize(addr, { network, wallet })
+  // const tx = await transferOwner(addr, { network, wallet })
   console.log(tx)
 }

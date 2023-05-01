@@ -348,7 +348,7 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                 tx.pure(poolIndex),
                 tx.object(metadata.storeG),
               ]
-            } else if (['addAuthorizedAddr', 'removeAuthorizedAddr'].includes(prop)) {
+            } else if (['addAuthorizedAddr', 'removeAuthorizedAddr', 'transferPoolOwner'].includes(prop)) {
               payload.arguments = [args[0]]
             } else {
               const swap = Swap.decode(args[0])
@@ -443,6 +443,7 @@ function _findMesonMethodModule(method) {
       'withdraw',
       'addAuthorizedAddr',
       'removeAuthorizedAddr',
+      'transferPoolOwner',
       'lock',
       'unlock',
       'release'
