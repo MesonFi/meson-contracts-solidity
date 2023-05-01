@@ -115,18 +115,28 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
     return Number((await getObject(match.objectId)).value)
   }
 
-  const pickCoinObject = async (tokenAddr: string, amount: BigNumberish) => {
+  const pickCoinObjects = async (tokenAddr: string, amount: BigNumberish) => {
     const signer = (<SuiWallet>adaptor).address
     const coins = await adaptor.client.getCoins({
       owner: signer,
       coinType: tokenAddr,
     })
     const bnAmount = BigNumber.from(amount)
-    const picked = coins.data.find(obj => bnAmount.lte(obj.balance))
-    if (!picked) {
-      throw new Error('No coin object has enough balance. Need to merge first.')
+    const enoughCoins = coins.data.find(obj => bnAmount.lte(obj.balance))
+    if (enoughCoins) {
+      return [enoughCoins]
     }
-    return picked
+
+    const pickedCoins = []
+    let mergedAmount = BigNumber.from(0)
+    for (const obj of coins.data) {
+      pickedCoins.push(obj)
+      mergedAmount = mergedAmount.add(obj.balance)
+      if (mergedAmount.gte(bnAmount)) {
+        return pickedCoins
+      }
+    }
+    throw new Error(`Insufficient balance: ${tokenAddr}.`)
   }
 
   return new Proxy({}, {
@@ -319,12 +329,12 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
               const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toHexString()
               const tokenAddr = await getTokenAddr(tokenIndex)
-              const picked = await pickCoinObject(tokenAddr, args[0])
+              const coinList = await pickCoinObjects(tokenAddr, args[0])
               payload.typeArguments = [tokenAddr]
               payload.arguments = [
                 tx.pure(BigNumber.from(args[0]).toHexString()),
                 tx.pure(poolIndex),
-                tx.object(picked.coinObjectId),
+                tx.makeMoveVec({ objects: coinList.map(obj => tx.object(obj.coinObjectId)) }),
                 tx.object(metadata.storeG),
               ]
             } else if (prop === 'withdraw') {
@@ -345,14 +355,14 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
               if (prop === 'postSwap') {
                 const [_, r, yParityAndS, postingValue] = args
                 const tokenAddr = await getTokenAddr(swap.inToken)
-                const picked = await pickCoinObject(tokenAddr, swap.amount)
+                const coinList = await pickCoinObjects(tokenAddr, swap.amount)
                 payload.typeArguments = [tokenAddr]
                 payload.arguments = [
                   tx.pure(_vectorize(swap.encoded)),
                   tx.pure(_getCompactSignature(r, yParityAndS)),
                   tx.pure(_vectorize(postingValue.substring(0, 42))), // initiator
                   tx.pure(`0x${postingValue.substring(42)}`), // pool_index
-                  tx.object(picked.coinObjectId),
+                  tx.makeMoveVec({ objects: coinList.map(obj => tx.object(obj.coinObjectId)) }),
                   tx.object('0x6'),
                   tx.object(metadata.storeG),
                 ]
