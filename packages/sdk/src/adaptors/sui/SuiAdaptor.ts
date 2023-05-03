@@ -17,8 +17,7 @@ export default class SuiAdaptor {
   }
 
   async detectNetwork(): Promise<any> {
-    // TODO
-    return this.client.connection
+    return await this.client.getRpcApiVersion()
   }
 
   async getBlockNumber() {

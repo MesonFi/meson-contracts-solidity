@@ -24,6 +24,17 @@ export default class SuiWallet extends SuiAdaptor {
     return this.keypair.getPublicKey().toSuiAddress()
   }
 
+  async transfer({ to, value }, options?: SuiTransactionBlockResponseOptions) {
+    const txb = new TransactionBlock()
+    const [coin] = txb.splitCoins(txb.gas, [txb.pure(value)])
+    txb.transferObjects([coin], txb.pure(to))
+    const result = await this.signer.signAndExecuteTransactionBlock({ transactionBlock: txb, options: { showObjectChanges: true, ...options } })
+    return {
+      hash: result.digest,
+      wait: () => this._wrapSuiTx(result)
+    }
+  }
+
   signMessage (msg: string) {
     return utils.hexlify(this.keypair.signData(utils.toUtf8Bytes(msg)))
   }
@@ -69,8 +80,16 @@ export class SuiExtWallet extends SuiWallet {
   }
 
   get address() {
-    // TODO
-    return this.ext.signer.account() as string
+    return this.ext.signer.accounts?.[0]?.address as string
+  }
+
+  async sendTransaction(txb: TransactionBlock, options?: SuiTransactionBlockResponseOptions) {
+    const feat = this.ext.signer.features['sui:signAndExecuteTransactionBlock']
+    const result = await feat.signAndExecuteTransactionBlock({ transactionBlock: txb, options: { showObjectChanges: true, ...options } })
+    return {
+      hash: result.digest,
+      wait: () => this._wrapSuiTx(result)
+    }
   }
 
   async deploy(): Promise<any> {

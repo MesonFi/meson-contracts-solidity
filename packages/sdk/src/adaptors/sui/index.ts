@@ -1,6 +1,6 @@
 import { BigNumber, BigNumberish, utils } from 'ethers'
 import {
-  Secp256k1Keypair as SuiKeypair,
+  Ed25519Keypair as SuiKeypair,
   JsonRpcProvider as SuiProvider,
   TransactionBlock,
 } from '@mysten/sui.js'
@@ -69,7 +69,10 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
   const getDynamicFieldValue = async (store: any, field: { type: string, value?: any }) => {
     try {
       const res = await adaptor.client.getDynamicFieldObject({ parentId: store.fields.id.id, name: field })
-      return (<any>res.data.content).fields.value
+      if (res.error?.code === 'dynamicFieldNotFound') {
+        return
+      }
+      return (<any>res?.data.content).fields.value
     } catch (e) {
       if (e.cause.message?.includes('Cannot find dynamic field')) {
         return
@@ -213,7 +216,11 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
       } else if (prop === 'call') {
         return async (target, getArguments) => {
           const txb = new TransactionBlock()
-          const { arguments: args = [], typeArguments = [] } = getArguments(txb) 
+          let metadata
+          if (target.includes('::Meson')) {
+            metadata = await getMetadata()
+          }
+          const { arguments: args = [], typeArguments = [] } = getArguments(txb, metadata)
           const payload = { target, arguments: args, typeArguments }
           txb.moveCall(<any>payload)
           return await (<SuiWallet>adaptor).sendTransaction(txb)
@@ -273,7 +280,7 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
               if (!poolCoins) {
                 return BigNumber.from(0)
               }
-              return BigNumber.from(poolCoins.fields.balance)
+              return BigNumber.from(Math.floor(poolCoins.fields.balance / 100))
             } else if (prop === 'getPostedSwap') {
               const storeG = await getStoreG()
               const swap = Swap.decode(args[0])
@@ -316,17 +323,24 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
             const module = _findMesonMethodModule(prop)
             const payload = {
               target: `${address}::${module}::${prop}`,
-              arguments: [],
-              typeArguments: [],
+              arguments: undefined,
+              typeArguments: undefined,
+            }
+
+            let metadata
+            if (prop !== 'transfer') {
+              metadata = await getMetadata()
             }
 
             if (prop === 'transfer') {
-              const [to, amount] = args
-              throw new Error('Not implemented')
-            }
-
-            if (prop === 'addSupportToken') {
-              const metadata = await getMetadata()
+              const [to, value] = args
+              const coins = await pickCoinObjects(address, value)
+              if (coins.length > 1) {
+                throw new Error('Need to merge coins.')
+              }
+              const [coin] = txb.splitCoins(txb.object(coins[0].coinObjectId), [txb.pure(value)])
+              txb.transferObjects([coin], txb.pure(to))
+            } else if (prop === 'addSupportToken') {
               const [tokenAddr, tokenIndex] = args
               payload.typeArguments = [tokenAddr]
               payload.arguments = [
@@ -338,9 +352,8 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
               const poolTokenIndex = BigNumber.from(args[1])
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
               const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toHexString()
-              const metadata = await getMetadata()
               const tokenAddr = await getTokenAddr(tokenIndex)
-              const coinList = await pickCoinObjects(tokenAddr, args[0])
+              const coinList = await pickCoinObjects(tokenAddr, BigNumber.from(args[0]).mul(100))
               payload.typeArguments = [tokenAddr]
               payload.arguments = [
                 txb.pure(BigNumber.from(args[0]).toHexString()),
@@ -352,7 +365,6 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
               const poolTokenIndex = BigNumber.from(args[1])
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
               const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toHexString()
-              const metadata = await getMetadata()
               const tokenAddr = await getTokenAddr(tokenIndex)
               payload.typeArguments = [tokenAddr]
               payload.arguments = [
@@ -361,14 +373,13 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                 txb.object(metadata.storeG),
               ]
             } else if (['addAuthorizedAddr', 'removeAuthorizedAddr', 'transferPoolOwner'].includes(prop)) {
-              payload.arguments = [args[0]]
+              payload.arguments = [txb.object(args[0]), txb.object(metadata.storeG)]
             } else {
               const swap = Swap.decode(args[0])
-              const metadata = await getMetadata()
               if (prop === 'postSwap') {
                 const [_, r, yParityAndS, postingValue] = args
                 const tokenAddr = await getTokenAddr(swap.inToken)
-                const coinList = await pickCoinObjects(tokenAddr, swap.amount)
+                const coinList = await pickCoinObjects(tokenAddr, swap.amount.mul(100))
                 payload.typeArguments = [tokenAddr]
                 payload.arguments = [
                   txb.pure(_vectorize(swap.encoded)),
@@ -437,7 +448,9 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
               }
             }
 
-            txb.moveCall(<any>payload)
+            if (payload.arguments) {
+              txb.moveCall(<any>payload)
+            }
             return await (<SuiWallet>adaptor).sendTransaction(txb, options)
           }
         }
