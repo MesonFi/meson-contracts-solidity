@@ -39,10 +39,10 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
 
   const getMetadata = memoize(async () => {
     const obj = await adaptor.client.getObject({ id: address, options: { showPreviousTransaction: true } })
-    const result = await adaptor.client.getTransactionBlock({ digest: obj.data.previousTransaction, options: { showObjectChanges: true } })
+    const result = await adaptor.client.getTransactionBlock({ digest: obj.data.previousTransaction, options: { showEffects: true } })
     return {
-      storeG: result.objectChanges.find(obj => obj['objectType'] === `${address}::MesonStates::GeneralStore`)?.['objectId'],
-      adminCap: result.objectChanges.find(obj => obj['objectType'] === `${address}::MesonStates::AdminCap`)?.['objectId'],
+      storeG: result.effects.created.find(obj => !!obj.owner['Shared']).reference.objectId,
+      adminCap: result.effects.created.find(obj => !!obj.owner['AddressOwner']).reference.objectId, // TODO: could also be UpgradeCap
     }
   })
 
@@ -280,7 +280,7 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
               if (!poolCoins) {
                 return BigNumber.from(0)
               }
-              return BigNumber.from(Math.floor(poolCoins.fields.balance / 100))
+              return BigNumber.from(poolCoins.fields.balance)
             } else if (prop === 'getPostedSwap') {
               const storeG = await getStoreG()
               const swap = Swap.decode(args[0])
@@ -353,7 +353,7 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
               const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toHexString()
               const tokenAddr = await getTokenAddr(tokenIndex)
-              const coinList = await pickCoinObjects(tokenAddr, BigNumber.from(args[0]).mul(100))
+              const coinList = await pickCoinObjects(tokenAddr, args[0])
               payload.typeArguments = [tokenAddr]
               payload.arguments = [
                 txb.pure(BigNumber.from(args[0]).toHexString()),
@@ -379,7 +379,7 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
               if (prop === 'postSwap') {
                 const [_, r, yParityAndS, postingValue] = args
                 const tokenAddr = await getTokenAddr(swap.inToken)
-                const coinList = await pickCoinObjects(tokenAddr, swap.amount.mul(100))
+                const coinList = await pickCoinObjects(tokenAddr, swap.amount)
                 payload.typeArguments = [tokenAddr]
                 payload.arguments = [
                   txb.pure(_vectorize(swap.encoded)),

@@ -706,30 +706,30 @@
       "sui"
     ],
     "addressFormat": "sui",
-    "url": "https://mainnet-rpc.sui.chainbase.online",
+    "url": "https://rpc-mainnet.suiscan.xyz:443",
     "explorer": "https://explorer.sui.io",
     "nativeCurrency": {
       "name": "SUI",
       "symbol": "SUI",
       "decimals": 8
     },
-    "mesonAddress": "0x6c67d1b78d39518512c84b88ac817bbec57808f00efb99b5b1a6015172a85043",
+    "mesonAddress": "0x099e8c0dbaea06147fde6a32ab899152c79024a6f52a7f8d9777ca27acac7011",
     "tokens": [
       {
         "name": "USD Coin",
         "symbol": "USDC",
-        "decimals": 8,
-        "addr": "0x909cba62ce96d54de25bec9502de5ca7b4f28901747bbf96b76c2e63ec5f1cba::coin::COIN",
-        "link": "object/0x909cba62ce96d54de25bec9502de5ca7b4f28901747bbf96b76c2e63ec5f1cba?module=coin&network=mainnet",
-        "tokenIndex": 65
+        "decimals": 6,
+        "addr": "0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf::coin::COIN",
+        "link": "object/0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf?module=coin&network=mainnet",
+        "tokenIndex": 1
       },
       {
         "name": "Tether USD",
         "symbol": "USDT",
-        "decimals": 8,
-        "addr": "0x603b488c87e0d1df64560a61418c87238d440a29ee39bbd757b0c92d38a35c7c::coin::COIN",
-        "link": "object/0x603b488c87e0d1df64560a61418c87238d440a29ee39bbd757b0c92d38a35c7c?module=coin&network=mainnet",
-        "tokenIndex": 66
+        "decimals": 6,
+        "addr": "0xc060006111016b8a020ad5b33834984a437aaa7d3c74c18e09a95d48aceab08c::coin::COIN",
+        "link": "object/0xc060006111016b8a020ad5b33834984a437aaa7d3c74c18e09a95d48aceab08c?module=coin&network=mainnet",
+        "tokenIndex": 2
       }
     ]
   }
