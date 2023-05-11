@@ -160,6 +160,17 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
         return (wallet: AptosWallet) => getContract(address, abi, wallet)
       } else if (prop === 'filters') {
         throw new Error('AptosContract.filters not implemented')
+      } else if (prop === 'pendingTokenBalance') {
+        return async tokenIndex => {
+          const tokenAddr = await getTokenAddr(tokenIndex)
+          const data = await memoizedGetResource(address, `${address}::MesonStates::StoreForCoin<${tokenAddr}>`)
+          const result = await readTable(data.pending_coins.handle, {
+            key_type: 'u64',
+            value_type: `0x1::coin::Coin<${tokenAddr}>`,
+            key: '0'
+          })
+          return BigNumber.from(0)
+        }
       }
 
       let method = abi.find(item => item.name === prop)
@@ -203,6 +214,16 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                 key_type: 'u64',
                 value_type: `0x1::coin::Coin<${token}>`,
                 key: poolIndex.toString()
+              })
+              return BigNumber.from(result?.value || 0)
+            } else if (prop === 'serviceFeeCollected') {
+              const [tokenIndex] = args
+              const tokenAddr = await getTokenAddr(tokenIndex)
+              const data = await memoizedGetResource(address, `${address}::MesonStates::StoreForCoin<${tokenAddr}>`)
+              const result = await readTable(data.in_pool_coins.handle, {
+                key_type: 'u64',
+                value_type: `0x1::coin::Coin<${tokenAddr}>`,
+                key: '0'
               })
               return BigNumber.from(result?.value || 0)
             } else if (prop === 'getPostedSwap') {

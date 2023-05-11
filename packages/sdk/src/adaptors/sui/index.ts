@@ -225,6 +225,18 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
           txb.moveCall(<any>payload)
           return await (<SuiWallet>adaptor).sendTransaction(txb)
         }
+      } else if (prop === 'pendingTokenBalance') {
+        return async tokenIndex => {
+          const tokenAddr = await getTokenAddr(tokenIndex)
+          const storeG = await getStoreG()
+          const pendingCoins = await getDynamicFieldValue(storeG.pending_coins, { type: '0x1::type_name::TypeName', value: tokenAddr.replace('0x', '') })
+          if (!pendingCoins) {
+            return BigNumber.from(0)
+          }
+          const coins = await getDynamicFields(pendingCoins)
+          const balances = await Promise.all(coins.map(coin => getObject(coin.objectId)))
+          return balances.reduce((prev, obj) => prev.add(obj.value.fields.balance), BigNumber.from(0))
+        }
       }
 
       let method = abi.find(item => item.name === prop)
@@ -277,6 +289,19 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                 return BigNumber.from(0)
               }
               const poolCoins = await getDynamicFieldValue(poolsForCoin, { type: 'u64', value: poolIndex.toString() })
+              if (!poolCoins) {
+                return BigNumber.from(0)
+              }
+              return BigNumber.from(poolCoins.fields.balance)
+            } else if (prop === 'serviceFeeCollected') {
+              const [tokenIndex] = args
+              const tokenAddr = await getTokenAddr(tokenIndex)
+              const storeG = await getStoreG()
+              const poolsForCoin = await getDynamicFieldValue(storeG.in_pool_coins, { type: '0x1::type_name::TypeName', value: tokenAddr.replace('0x', '') })
+              if (!poolsForCoin) {
+                return BigNumber.from(0)
+              }
+              const poolCoins = await getDynamicFieldValue(poolsForCoin, { type: 'u64', value: '0' })
               if (!poolCoins) {
                 return BigNumber.from(0)
               }

@@ -242,6 +242,31 @@ export class MesonClient {
     }
   }
 
+  async inContractTokenBalance(tokenIndex, ...overrides) {
+    if (!this._tokens.length) {
+      await this._getSupportedTokens(...overrides)
+    }
+    const tokenAddr = this.tokenAddr(tokenIndex)
+    if (!tokenAddr) {
+      throw new Error(`No token for index ${tokenIndex}`)
+    }
+    const tokenContract = this.getTokenContract(tokenAddr)
+    const rawValue = await (tokenContract as any).balanceOf(this.address, ...overrides)
+    const decimals = await (tokenContract as any).decimals(...overrides)
+    let value = BigNumber.from(rawValue)
+    if (decimals > 6) {
+      value = value.div(10 ** (decimals - 6))
+    }
+    return {
+      value,
+      display: MesonClient.fromValue(value, tokenIndex)
+    }
+  }
+
+  async pendingTokenBalance(tokenIndex, ...overrides) {
+    return await (this.#mesonInstance as any).pendingTokenBalance(tokenIndex, ...overrides)
+  }
+
   async getAllowance (owner, tokenIndex) {
     if (!this._tokens.length) {
       await this._getSupportedTokens({ from: owner })
@@ -273,6 +298,17 @@ export class MesonClient {
 
   async poolTokenBalance(token: string, addr: string, ...overrides) {
     return await this.#mesonInstance.poolTokenBalance(token, addr, ...overrides)
+  }
+
+  async serviceFeeCollected(token: string, ...overrides) {
+    if (!this._tokens.length) {
+      await this._getSupportedTokens(...overrides)
+    }
+    const tokenIndex = this.tokenIndexOf(token)
+    if (!tokenIndex) {
+      throw new Error(`Token not supported`)
+    }
+    return await this.#mesonInstance.serviceFeeCollected(tokenIndex, ...overrides)
   }
 
   async depositAndRegister(token: string, amount: BigNumberish, poolIndex: string) {
