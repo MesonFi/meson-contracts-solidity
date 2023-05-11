@@ -601,9 +601,9 @@
   },
   {
     "id": "eos",
-    "name": "Trust EVM",
+    "name": "EOS EVM",
     "alias": "EOS",
-    "chainId": "0x3cc3",
+    "chainId": "0x4571",
     "slip44": "0x800000c2",
     "shortSlip44": "0x00c2",
     "extensions": [
@@ -611,15 +611,23 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "",
-    "explorer": "",
+    "url": "https://api.evm.eosnetwork.com",
+    "explorer": "https://explorer.evm.eosnetwork.com",
     "nativeCurrency": {
-      "name": "EVM",
-      "symbol": "EVM",
+      "name": "EOS",
+      "symbol": "EOS",
       "decimals": 18
     },
-    "mesonAddress": "",
-    "tokens": []
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xfA9343C3897324496A05fC75abeD6bAC29f8A40f",
+        "tokenIndex": 2
+      }
+    ]
   },
   {
     "id": "zksync",
