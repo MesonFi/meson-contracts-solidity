@@ -44,7 +44,7 @@ contract MesonManager is MesonSwap, MesonPools {
   }
 
   function transferPremiumManager(address newPremiumManager) public {
-    _onlyPremiumManager();
+    require(_isPremiumManager(), "Caller is not the premium manager");
     _transferPremiumManager(newPremiumManager);
   }
 
@@ -60,8 +60,8 @@ contract MesonManager is MesonSwap, MesonPools {
     emit OwnerTransferred(prevOwner, newOwner);
   }
 
-  function _onlyPremiumManager() internal view override {
-    require(_premiumManager == _msgSender(), "Caller is not the premium manager");
+  function _isPremiumManager() internal view override(MesonSwap, MesonPools) returns (bool) {
+    return _premiumManager == _msgSender();
   }
 
   function _transferPremiumManager(address newPremiumManager) internal {

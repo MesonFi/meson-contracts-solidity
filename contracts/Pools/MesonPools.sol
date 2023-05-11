@@ -203,7 +203,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     bool feeWaived = _feeWaived(encodedSwap);
     if (feeWaived) {
       // For swaps that service fee is waived, need the premium manager as the signer
-      _onlyPremiumManager();
+      require(_isPremiumManager(), "Caller is not the premium manager");
     }
     // For swaps that charge service fee, anyone can call
 
@@ -264,5 +264,5 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _;
   }
 
-  function _onlyPremiumManager() internal view virtual {}
+  function _isPremiumManager() internal view virtual returns (bool) {}
 }

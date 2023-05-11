@@ -202,4 +202,6 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     require(_inChainFrom(encodedSwap) == SHORT_COIN_TYPE, "Swap not for this chain");
     _;
   }
+
+  function _isPremiumManager() internal view virtual returns (bool) {}
 }

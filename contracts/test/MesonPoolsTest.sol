@@ -11,7 +11,7 @@ contract MesonPoolsTest is MesonPools {
     _premiumManager = premiumManager;
   }
 
-  function _onlyPremiumManager() internal view override {
-    require(_premiumManager == _msgSender(), "Caller is not the premium manager");
+  function _isPremiumManager() internal view override returns (bool) {
+    return _premiumManager == _msgSender();
   }
 }
