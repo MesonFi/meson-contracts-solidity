@@ -40,9 +40,12 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
   const getMetadata = memoize(async () => {
     const obj = await adaptor.client.getObject({ id: address, options: { showPreviousTransaction: true } })
     const result = await adaptor.client.getTransactionBlock({ digest: obj.data.previousTransaction, options: { showEffects: true } })
+    const ownedObjects = await Promise.all(
+      result.effects.created.filter(obj => !!obj.owner['AddressOwner']).map(obj => getObject(obj.reference.objectId))
+    )
     return {
       storeG: result.effects.created.find(obj => !!obj.owner['Shared']).reference.objectId,
-      adminCap: result.effects.created.find(obj => !!obj.owner['AddressOwner']).reference.objectId, // TODO: could also be UpgradeCap
+      adminCap: ownedObjects.find(obj => !obj.total_supply && !obj.package).id.id,
     }
   })
 

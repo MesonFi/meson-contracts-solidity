@@ -1,9 +1,9 @@
 [
   {
-    "id": "ropsten",
-    "name": "Ropsten",
+    "id": "goerli",
+    "name": "Goerli Testnet",
     "alias": "ETH",
-    "chainId": "0x3",
+    "chainId": "0x5",
     "slip44": "0x8000003c",
     "shortSlip44": "0x003c",
     "extensions": [
@@ -11,22 +11,59 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://rpc.ankr.com/eth_ropsten",
-    "explorer": "https://ropsten.etherscan.io",
-    "mesonAddress": "0xAB3F5A89FdaD07e5CEdf005BF8387CcD59c6Af98",
+    "url": "https://rpc.ankr.com/eth_goerli",
+    "explorer": "https://goerli.etherscan.io/",
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
     "tokens": [
       {
-        "name": "ETH USDC",
-        "symbol": "rUSDC",
+        "name": "USD//C",
+        "symbol": "USDC",
         "decimals": 6,
-        "addr": "0x11F57B99b903aa0274D278c8f69B6937beB1E018",
+        "addr": "0x07865c6e87b9f70255377e024ace6630c1eaa37f",
         "tokenIndex": 1
       },
       {
-        "name": "ETH USDT",
-        "symbol": "rUSDT",
+        "name": "Tether USD",
+        "symbol": "USDT",
         "decimals": 6,
-        "addr": "0x3BE8e4A5aC9eb75FE7d29D3C961BBB1537E41C38",
+        "addr": "0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "sepolia",
+    "name": "Sepolia Testnet",
+    "alias": "sep",
+    "chainId": "0xaa36a7",
+    "slip44": "0xaa36a7",
+    "shortSlip44": "0x36a7",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.sepolia.org",
+    "explorer": "https://sepolia.etherscan.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x6f3193f3eBa58f73c69fCF055B4182933faee517",
+        "tokenIndex": 1
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xd53e9530107a8d8856099d7d80126478d48e06dA",
         "tokenIndex": 2
       }
     ]
@@ -50,73 +87,182 @@
       "symbol": "tBNB",
       "decimals": 18
     },
-    "mesonAddress": "0x811CFCFa71baD1Fa93454C4496094Ab9446f07bD",
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
     "tokens": [
       {
         "name": "USDC",
         "symbol": "USDC",
         "decimals": 18,
-        "addr": "0x6e86421f4e9667af87BBf4F3c7ec85130880Fa83",
+        "addr": "0xCEaD5Eb7D8Bbd27BC970c42486fD019A33eA1BB4",
         "tokenIndex": 33
       },
       {
         "name": "USDT",
         "symbol": "USDT",
         "decimals": 18,
-        "addr": "0xaff1B7dDBD1151F789Cb5b8eD363858CDDC40aBB",
+        "addr": "0x68501701Ad6D5fAB8B08cfD6102f11A19F2eE444",
         "tokenIndex": 34
       },
       {
         "name": "BUSD",
         "symbol": "BUSD",
         "decimals": 18,
-        "addr": "0x5a6771B82128E3590D4b9927Eb0Cb58F0660ec7C",
+        "addr": "0xbC0C50aEd4adFc98c16Bc3A83DAB5Df359EEe119",
         "tokenIndex": 35
       }
     ]
   },
   {
-    "id": "tron-testnet",
-    "name": "Tron Testnet",
-    "alias": "TRX",
-    "chainId": "tron-testnet",
-    "slip44": "0x800000c3",
-    "shortSlip44": "0x00c3",
+    "id": "polygon-testnet",
+    "name": "Polygon Mumbai",
+    "alias": "MATIC",
+    "chainId": "0x13881",
+    "slip44": "0x800003c6",
+    "shortSlip44": "0x03c6",
     "extensions": [
-      "tronlink"
+      "metamask",
+      "walletconnect"
     ],
-    "addressFormat": "tron",
-    "url": "https://api.nileex.io",
-    "explorer": "https://nile.tronscan.org/#",
+    "addressFormat": "ethers",
+    "url": "https://rpc.ankr.com/polygon_mumbai",
+    "explorer": "https://mumbai.polygonscan.com",
     "nativeCurrency": {
-      "name": "TRX",
-      "symbol": "TRX",
-      "decimals": 6
+      "name": "MATIC",
+      "symbol": "MATIC",
+      "decimals": 18
     },
-    "mesonAddress": "TLp3uheXyLjAKJ8qP8J2Hd4TuPPXscmSBK",
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
     "tokens": [
       {
-        "name": "TRX USDC",
+        "name": "USDC",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "TQTneKAN99SXJvqJug5v7KFWfo9D9YM1ep",
-        "link": "token20/TQTneKAN99SXJvqJug5v7KFWfo9D9YM1ep",
+        "addr": "0x68501701Ad6D5fAB8B08cfD6102f11A19F2eE444",
         "tokenIndex": 1
       },
       {
-        "name": "TRX USDT",
+        "name": "USDT",
         "symbol": "USDT",
         "decimals": 6,
-        "addr": "TMM1FFGnKroocSjeaSr1ffb8m9zCcepato",
-        "link": "token20/TMM1FFGnKroocSjeaSr1ffb8m9zCcepato",
+        "addr": "0x074a3ba57ae16bf5aa3b5b822e57ab0ec5a7be72",
         "tokenIndex": 2
       }
+    ]
+  },
+  {
+    "id": "arb-goerli",
+    "name": "Arbitrum Goerli",
+    "alias": "ARB",
+    "chainId": "0x66eed",
+    "slip44": "0x80002329",
+    "shortSlip44": "0x2329",
+    "extensions": [
+      "metamask",
+      "walletconnect"
     ],
-    "uctAddress": "TPLhxZLJJipHMM9zuwt93G6m79tPfxP7dT"
+    "addressFormat": "ethers",
+    "url": "https://goerli-rollup.arbitrum.io/rpc",
+    "explorer": "https://goerli-rollup-explorer.arbitrum.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "USD//C",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x8FB1E3fC51F3b789dED7557E680551d93Ea9d892",
+        "tokenIndex": 1
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xB401e876346B3C77DD51781Efba5223d2F1e6697",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "opt-goerli",
+    "name": "Optimistic Goerli",
+    "alias": "OPT",
+    "chainId": "0x1a4",
+    "slip44": "0x80000266",
+    "shortSlip44": "0x0266",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://optimism-goerli.public.blastapi.io",
+    "explorer": "https://goerli-optimism.etherscan.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "USD//C",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x7E07E15D2a87A24492740D16f5bdF58c16db0c4E",
+        "tokenIndex": 1
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x853eb4bA5D0Ba2B77a0A5329Fd2110d5CE149ECE",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "zksync-goerli",
+    "name": "zkSync Goerli",
+    "alias": "ZKS",
+    "chainId": "0x118",
+    "slip44": "0x00000324",
+    "shortSlip44": "0x0324",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://testnet.era.zksync.dev",
+    "explorer": "https://goerli.explorer.zksync.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0xf9D199b4943547345141bA208c22877fABD37625",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "tokenIndex": 1,
+        "addr": "0x0faF6df7054946141266420b43783387A78d82A9"
+      },
+      {
+        "name": "DAI",
+        "symbol": "DAI",
+        "decimals": 18,
+        "tokenIndex": 36,
+        "addr": "0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b"
+      }
+    ]
   },
   {
     "id": "avax-testnet",
-    "name": "Avalanche Testnet",
+    "name": "Avalanche Fuji",
     "alias": "AVA",
     "chainId": "0xa869",
     "slip44": "0x80002328",
@@ -133,436 +279,65 @@
       "symbol": "AVAX",
       "decimals": 18
     },
-    "mesonAddress": "0x8454a48799e63d79E9a62aA9db1F067edC59a178",
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
     "tokens": [
       {
-        "name": "AVA USDC",
-        "symbol": "aUSDC",
-        "decimals": 6,
-        "addr": "0x18DD556D74EcB7E08A67F1EaEf84aa65fed92730",
-        "tokenIndex": 1
-      },
-      {
-        "name": "AVA USDT",
-        "symbol": "aUSDT",
-        "decimals": 6,
-        "addr": "0x6b7011E38877331f461e2c1DA506036aA30c21A2",
-        "tokenIndex": 2
-      }
-    ]
-  },
-  {
-    "id": "polygon-testnet",
-    "name": "Polygon Testnet",
-    "alias": "MATIC",
-    "chainId": "0x13881",
-    "slip44": "0x800003c6",
-    "shortSlip44": "0x03c6",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://polygon-testnet.public.blastapi.io",
-    "explorer": "https://mumbai.polygonscan.com",
-    "nativeCurrency": {
-      "name": "MATIC",
-      "symbol": "MATIC",
-      "decimals": 18
-    },
-    "mesonAddress": "0x2B5A7BA27abC02441B5213f08FD0060e5260Cb91",
-    "tokens": [
-      {
-        "name": "MATIC USDC",
-        "symbol": "pUSDC",
-        "decimals": 6,
-        "addr": "0xBfA416a6821fcBAa953815E0725eC3DbC208a5B5",
-        "tokenIndex": 1
-      },
-      {
-        "name": "MATIC USDT",
-        "symbol": "pUSDT",
-        "decimals": 6,
-        "addr": "0x5f71e5c6F178515f60efa27FcD80666386A3B745",
-        "tokenIndex": 2
-      }
-    ],
-    "uctAddress": "0xD14a715D5d1CBCBcd9ff9A711723f2F7eFa04542"
-  },
-  {
-    "id": "ftm-testnet",
-    "name": "Fantom Testnet",
-    "alias": "FTM",
-    "chainId": "0xfa2",
-    "slip44": "0x800003ef",
-    "shortSlip44": "0x03ef",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://rpc.testnet.fantom.network",
-    "explorer": "https://testnet.ftmscan.com",
-    "nativeCurrency": {
-      "name": "Fantom",
-      "symbol": "FTM",
-      "decimals": 18
-    },
-    "mesonAddress": "0x92fAb2252eB9bF4aB77e65C9c43c43B4D2AE7A62",
-    "tokens": [
-      {
-        "name": "FTM USDC",
-        "symbol": "fUSDC",
-        "decimals": 6,
-        "addr": "0xd42Fdb4E06DB51FE9A03E9AE8825D84DBCC34801",
-        "tokenIndex": 1
-      },
-      {
-        "name": "FTM USDT",
-        "symbol": "fUSDT",
-        "decimals": 6,
-        "addr": "0xC7E8e3D22669C0f6a3feFc2C6b6F0abCce260cEA",
-        "tokenIndex": 2
-      }
-    ]
-  },
-  {
-    "id": "one-testnet",
-    "name": "Harmony Testnet",
-    "alias": "ONE",
-    "chainId": "0x6357d2e0",
-    "slip44": "0x800003ff",
-    "shortSlip44": "0x03ff",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://api.s0.b.hmny.io",
-    "explorer": "https://explorer.pops.one",
-    "nativeCurrency": {
-      "name": "ONE",
-      "symbol": "ONE",
-      "decimals": 18
-    },
-    "mesonAddress": "0x5b0A18741533579aD69d2580e8f19a80e0F51895",
-    "tokens": [
-      {
-        "name": "ONE USDC",
-        "symbol": "oUSDC",
-        "decimals": 6,
-        "addr": "0xA4B19C7859b3d3b2FD81244817D875a7708Ba5f5",
-        "tokenIndex": 1
-      },
-      {
-        "name": "ONE USDT",
-        "symbol": "oUSDT",
-        "decimals": 6,
-        "addr": "0x26058C8fCF6Ee539738f651C2D555af4448FA91F",
-        "tokenIndex": 2
-      }
-    ]
-  },
-  {
-    "id": "aurora-testnet",
-    "name": "Aurora Testnet",
-    "alias": "Aurora",
-    "chainId": "0x4e454153",
-    "slip44": "0x80000a0a",
-    "shortSlip44": "0x0a0a",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://testnet.aurora.dev",
-    "explorer": "https://explorer.testnet.aurora.dev",
-    "nativeCurrency": {
-      "name": "Aurora",
-      "symbol": "AETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0xCab92f20497802859da374F3B32F21c323f9000B",
-    "tokens": [
-      {
-        "name": "Aurora USDC",
-        "symbol": "AUSDC",
-        "decimals": 6,
-        "addr": "0x72F08CC43A7F15E0b1B6ede3aBC1Ca40BAcc1C25",
-        "tokenIndex": 1
-      },
-      {
-        "name": "Aurora USDT",
-        "symbol": "AUSDT",
-        "decimals": 6,
-        "addr": "0x071243a63463322EC14Ce17D51F92A908bf34CDF",
-        "tokenIndex": 2
-      }
-    ]
-  },
-  {
-    "id": "arb-testnet",
-    "name": "Arbitrum Testnet",
-    "alias": "ARB",
-    "chainId": "0x66eeb",
-    "slip44": "0x80002329",
-    "shortSlip44": "0x2329",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://rinkeby.arbitrum.io/rpc",
-    "explorer": "https://testnet.arbiscan.io",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0xd3347F4f48b80a190591db7Abb3F1C44d23229fa",
-    "tokens": [
-      {
-        "name": "Arb USDC",
-        "symbol": "ArUSDC",
-        "decimals": 6,
-        "addr": "0x6FEAd53b5A39EcCd0103Ba8cb83219EF896B5165",
-        "tokenIndex": 1
-      },
-      {
-        "name": "Arb USDT",
-        "symbol": "ArUSDT",
-        "decimals": 6,
-        "addr": "0x6EDB294e430A1d70cc65D5Deb326B76cDc2A7b9D",
-        "tokenIndex": 2
-      }
-    ]
-  },
-  {
-    "id": "opt-testnet",
-    "name": "Optimistic Ethereum (Kovan)",
-    "alias": "OPT",
-    "chainId": "0x45",
-    "slip44": "0x80000266",
-    "shortSlip44": "0x0266",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://kovan.optimism.io",
-    "explorer": "https://kovan-optimistic.etherscan.io",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x6F2Db76519Ea809122a152Ae643cbC6f499CD5Da",
-    "tokens": [
-      {
-        "name": "Opt USDC",
-        "symbol": "OpUSDC",
-        "decimals": 6,
-        "addr": "0xc24424C27Cf43e4403B42721C86dF782f7788B89",
-        "tokenIndex": 1
-      },
-      {
-        "name": "Opt USDT",
-        "symbol": "OpUSDT",
-        "decimals": 6,
-        "addr": "0x21D828269A0A7EF69dC25d257299901f318fBbA8",
-        "tokenIndex": 2
-      }
-    ]
-  },
-  {
-    "id": "gnosis-testnet",
-    "name": "Gnosis Chain (formerly xDai)",
-    "alias": "xdai",
-    "chainId": "0x64",
-    "slip44": "0x800002bc",
-    "shortSlip44": "0x02bc",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://rpc.xdaichain.com",
-    "explorer": "https://blockscout.com/xdai/mainnet",
-    "nativeCurrency": {
-      "name": "xDAI",
-      "symbol": "xDAI",
-      "decimals": 18
-    },
-    "mesonAddress": "0xCF1511622929F4BA960dfA9b24Be84A8Fc620bd5",
-    "tokens": [
-      {
-        "name": "xDAI USDC",
-        "symbol": "xpUSDC",
-        "decimals": 6,
-        "addr": "0x21D828269A0A7EF69dC25d257299901f318fBbA8",
-        "tokenIndex": 1
-      },
-      {
-        "name": "xDAI USDT",
-        "symbol": "xpUSDT",
-        "decimals": 6,
-        "addr": "0x751DE3875aeF8C18d7FE983c6DeeFe366bed438f",
-        "tokenIndex": 2
-      }
-    ]
-  },
-  {
-    "id": "evmos-testnet",
-    "name": "Evmos Testnet",
-    "alias": "evmos",
-    "chainId": "0x2328",
-    "slip44": "0x800011bc",
-    "shortSlip44": "0x11bc",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://eth.bd.evmos.dev:8545",
-    "explorer": "https://evm.evmos.dev",
-    "nativeCurrency": {
-      "name": "tEVMOS",
-      "symbol": "tEVMOS",
-      "decimals": 18
-    },
-    "mesonAddress": "0x27228C05621d3dbe0d1E1cb2269a9a9117D80EB4",
-    "tokens": [
-      {
-        "name": "tEV USDC",
-        "symbol": "tEVUSDC",
-        "decimals": 6,
-        "addr": "0x5cFB4E7d815c9B7e3bFd56D9B7117E0219cbA8cd",
-        "tokenIndex": 1
-      },
-      {
-        "name": "tEV USDT",
-        "symbol": "tEVUSDT",
-        "decimals": 6,
-        "addr": "0xF37eE9D96a307608AA65cfBd5D6BF9bd282098BE",
-        "tokenIndex": 2
-      }
-    ]
-  },
-  {
-    "id": "eos-testnet",
-    "name": "Trust EVM Testnet",
-    "alias": "EOS",
-    "chainId": "0x3cc3",
-    "slip44": "0x800000c2",
-    "shortSlip44": "0x00c2",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://api.testnet-dev.trust.one",
-    "explorer": "https://trustscan.one",
-    "nativeCurrency": {
-      "name": "EVM",
-      "symbol": "EVM",
-      "decimals": 18
-    },
-    "mesonAddress": "0xE4BBC343174142f5DE8245F43A6C2ea5829965a8",
-    "tokens": [
-      {
-        "name": "EOS USDC",
+        "name": "USD//C",
         "symbol": "USDC",
         "decimals": 6,
-        "tokenIndex": 1,
-        "addr": "0x55336241644EcbCe99F6843fC972De0EF15365fB"
-      },
-      {
-        "name": "EOS USDT",
-        "symbol": "USDT",
-        "decimals": 6,
-        "tokenIndex": 2,
-        "addr": "0x4769650E1136437b0381970C3a26A77C837EbFC4"
-      }
-    ]
-  },
-  {
-    "id": "zksync-testnet",
-    "name": "zkSync alpha testnet",
-    "alias": "ZKS",
-    "chainId": "0x118",
-    "slip44": "0x00000324",
-    "shortSlip44": "0x0324",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://zksync2-testnet.zksync.dev",
-    "explorer": "https://goerli.explorer.zksync.io",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x8f38ccEDd73b0c801B55cf085E0D8182b9e131dC",
-    "tokens": [
-      {
-        "name": "USDC",
-        "symbol": "USDC",
-        "decimals": 6,
-        "tokenIndex": 1,
-        "addr": "0x0A7EA13aADf39f00E3965a26798a560324C739B5"
+        "addr": "0x5425890298aed601595a70AB815c96711a31Bc65",
+        "tokenIndex": 1
       },
       {
         "name": "USDT",
         "symbol": "USDT",
         "decimals": 6,
-        "tokenIndex": 2,
-        "addr": "0x15f006F2F37014F19c0fD1B3B467F0425D51D05b"
+        "addr": "0xCEaD5Eb7D8Bbd27BC970c42486fD019A33eA1BB4",
+        "tokenIndex": 2
       }
-    ],
-    "uctAddress": "0x88C6C4B902EEB10E192282F74B894bB7AA8B0640"
+    ]
   },
   {
-    "id": "cronos-testnet",
-    "name": "Cronos Testnet",
-    "alias": "CRO",
-    "chainId": "0x152",
-    "slip44": "0x8000018a",
-    "shortSlip44": "0x018a",
+    "id": "tron-testnet",
+    "name": "Tron Nile Testnet",
+    "alias": "TRX",
+    "chainId": "tron-testnet",
+    "slip44": "0x800000c3",
+    "shortSlip44": "0x00c3",
     "extensions": [
-      "metamask",
-      "walletconnect"
+      "tronlink"
     ],
-    "addressFormat": "ethers",
-    "url": "https://evm-t3.cronos.org",
-    "explorer": "https://cronos.org/explorer/testnet3",
+    "addressFormat": "tron",
+    "url": "https://api.nileex.io",
+    "explorer": "https://nile.tronscan.org/#",
     "nativeCurrency": {
-      "name": "Cronos Testnet Native Token",
-      "symbol": "tCRO",
-      "decimals": 18
+      "name": "TRX",
+      "symbol": "TRX",
+      "decimals": 6
     },
-    "mesonAddress": "",
+    "mesonAddress": "TAp1rBTjC4tefEMR54vT2NDwLEhDL7E7Jo",
     "tokens": [
       {
-        "name": "tUSDC",
-        "symbol": "tUSDC",
+        "name": "USDC",
+        "symbol": "USDC",
         "decimals": 6,
-        "addr": "",
+        "addr": "TNavP4dSwhGssWjX4gR8NvrMsgAQvBWoyY",
+        "link": "token20/TNavP4dSwhGssWjX4gR8NvrMsgAQvBWoyY",
         "tokenIndex": 1
       },
       {
-        "name": "tUSDT",
-        "symbol": "tUSDT",
+        "name": "USDT",
+        "symbol": "USDT",
         "decimals": 6,
-        "addr": "",
+        "addr": "THkCEyw2uaJYPfxb2BNizGuiosCkyAsbWW",
+        "link": "token20/THkCEyw2uaJYPfxb2BNizGuiosCkyAsbWW",
         "tokenIndex": 2
       }
     ]
   },
   {
     "id": "aptos-testnet",
-    "name": "Aptos Devnet",
+    "name": "Aptos Testnet",
     "alias": "APT",
     "chainId": "aptos:0x22",
     "slip44": "0x8000027d",
@@ -571,97 +346,68 @@
       "aptos"
     ],
     "addressFormat": "aptos",
-    "url": "https://fullnode.devnet.aptoslabs.com",
+    "url": "https://fullnode.testnet.aptoslabs.com",
     "explorer": "https://explorer.aptoslabs.com",
     "nativeCurrency": {
       "name": "APT",
       "symbol": "APT",
       "decimals": 8
     },
-    "mesonAddress": "0x09a06455dd64b150701bb957fc9fe9e40d4ebea6c4ef6aa5073f35394af115dc",
-    "uctAddress": "0x09a06455dd64b150701bb957fc9fe9e40d4ebea6c4ef6aa5073f35394af115dc::Coins::UCT",
+    "mesonAddress": "0x72fe5c22e45e4443e0be1ec1f7ab7f42ebd5a2331d93b27d27b02a2df1622372",
     "tokens": [
       {
-        "name": "USD Coin",
+        "name": "USDC",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "0x09a06455dd64b150701bb957fc9fe9e40d4ebea6c4ef6aa5073f35394af115dc::Coins::USDC",
+        "addr": "0x72fe5c22e45e4443e0be1ec1f7ab7f42ebd5a2331d93b27d27b02a2df1622372::Coins::USDC",
+        "link": "account/0x72fe5c22e45e4443e0be1ec1f7ab7f42ebd5a2331d93b27d27b02a2df1622372/modules/code/Coins?network=testnet",
         "tokenIndex": 1
       },
       {
-        "name": "Tether USD",
+        "name": "USDT",
         "symbol": "USDT",
         "decimals": 6,
-        "addr": "0x09a06455dd64b150701bb957fc9fe9e40d4ebea6c4ef6aa5073f35394af115dc::Coins::USDT",
+        "addr": "0x72fe5c22e45e4443e0be1ec1f7ab7f42ebd5a2331d93b27d27b02a2df1622372::Coins::USDT",
+        "link": "account/0x72fe5c22e45e4443e0be1ec1f7ab7f42ebd5a2331d93b27d27b02a2df1622372/modules/code/Coins?network=testnet",
         "tokenIndex": 2
       }
     ]
   },
   {
     "id": "sui-testnet",
-    "name": "Sui Devnet",
+    "name": "Sui Testnet",
     "alias": "SUI",
-    "chainId": "sui:devnet",
+    "chainId": "sui:testnet",
     "slip44": "0x80000310",
     "shortSlip44": "0x0310",
     "extensions": [
       "sui"
     ],
     "addressFormat": "sui",
-    "url": "https://fullnode.devnet.sui.io:443",
+    "url": "https://fullnode.testnet.sui.io:443",
     "explorer": "https://explorer.sui.io",
     "nativeCurrency": {
       "name": "SUI",
       "symbol": "SUI",
       "decimals": 8
     },
-    "mesonAddress": "0x4a3aea48e19c8f9d551deb8e37ceab206decaa280e62d95cb6ef1d4ad98efe24",
+    "mesonAddress": "0x4d3c6980f114f8b4a05aac828dc060234ec755e417c2d2d35f4f181c48ddf4be",
     "tokens": [
       {
-        "name": "USD Coin",
+        "name": "USDC",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "0x4a3aea48e19c8f9d551deb8e37ceab206decaa280e62d95cb6ef1d4ad98efe24::USDC::USDC",
-        "link": "object/0x4a3aea48e19c8f9d551deb8e37ceab206decaa280e62d95cb6ef1d4ad98efe24?module=USDC&network=devnet",
+        "addr": "0x4d3c6980f114f8b4a05aac828dc060234ec755e417c2d2d35f4f181c48ddf4be::USDC::USDC",
+        "link": "object/0x4d3c6980f114f8b4a05aac828dc060234ec755e417c2d2d35f4f181c48ddf4be?module=USDC&network=testnet",
         "tokenIndex": 1
       },
       {
-        "name": "Tether USD",
+        "name": "USDT",
         "symbol": "USDT",
         "decimals": 6,
-        "addr": "0x4a3aea48e19c8f9d551deb8e37ceab206decaa280e62d95cb6ef1d4ad98efe24::USDT::USDT",
-        "link": "object/0x4a3aea48e19c8f9d551deb8e37ceab206decaa280e62d95cb6ef1d4ad98efe24?module=USDT&network=devnet",
+        "addr": "0x4d3c6980f114f8b4a05aac828dc060234ec755e417c2d2d35f4f181c48ddf4be::USDT::USDT",
+        "link": "object/0x4d3c6980f114f8b4a05aac828dc060234ec755e417c2d2d35f4f181c48ddf4be?module=USDT&network=testnet",
         "tokenIndex": 2
-      }
-    ]
-  },
-  {
-    "id": "sep-testnet",
-    "name": "Sepolia Testnet",
-    "alias": "sep",
-    "chainId": "0xaa36a7",
-    "slip44": "0xaa36a7",
-    "shortSlip44": "0x36a7",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://rpc.sepolia.org",
-    "explorer": "https://sepolia.etherscan.io",
-    "nativeCurrency": {
-      "name": "SEP",
-      "symbol": "SEP",
-      "decimals": 18
-    },
-    "mesonAddress": "0x21D828269A0A7EF69dC25d257299901f318fBbA8",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 18,
-        "addr": "0x6EcdeD0017Ff18c25DD3a37AE101c47EF4D05De4",
-        "tokenIndex": 33
       }
     ]
   }

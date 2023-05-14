@@ -281,9 +281,11 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
               payload.function = '0x1::coin::transfer'
               payload.type_arguments = [address]
               payload.arguments = [to, BigNumber.from(amount).toString()]
-            }
-
-            if (['depositAndRegister', 'deposit', 'withdraw'].includes(prop)) {
+            } else if (prop === 'addSupportToken') {
+              const [tokenAddr, tokenIndex] = args
+              payload.type_arguments = [tokenAddr]
+              payload.arguments = [tokenIndex]
+            } else if (['depositAndRegister', 'deposit', 'withdraw'].includes(prop)) {
               const poolTokenIndex = BigNumber.from(args[1])
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
               const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toHexString()
@@ -355,6 +357,7 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
 
 function _findMesonMethodModule(method) {
   const moduleMethods = {
+    MesonStates: ['addSupportToken'],
     MesonPools: [
       'depositAndRegister',
       'deposit',

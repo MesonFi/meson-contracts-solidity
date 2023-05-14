@@ -491,6 +491,7 @@
         "symbol": "USDC",
         "decimals": 6,
         "addr": "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC",
+        "link": "account/0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa/modules/code/asset?network=mainnet",
         "tokenIndex": 1
       },
       {
@@ -498,6 +499,7 @@
         "symbol": "USDT",
         "decimals": 6,
         "addr": "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDT",
+        "link": "account/0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa/modules/code/asset?network=mainnet",
         "tokenIndex": 2
       }
     ]

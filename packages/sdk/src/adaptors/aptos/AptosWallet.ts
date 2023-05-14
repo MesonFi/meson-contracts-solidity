@@ -14,6 +14,10 @@ export default class AptosWallet extends AptosAdaptor {
     return this.account.address().toString()
   }
 
+  signMessage (msg: string) {
+    return this.account.signBuffer(utils.toUtf8Bytes(msg)).hex()
+  }
+
   async sendTransaction(payload, options) {
     const tx = await this.client.generateTransaction(this.account.address(), payload, options)
     const signed = await this.client.signTransaction(this.account, tx)
