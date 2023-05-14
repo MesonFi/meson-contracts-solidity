@@ -22,8 +22,12 @@ module.exports = async function deploy(network, upgradable, testnetMode) {
 
   if (testnetMode) { // only for testnets
     for (const token of tokens) {
+      if (token.addr) {
+        continue
+      }
+
       console.log(`Deploying ${token.name}...`)
-      const totalSupply = ethers.utils.parseUnits('1000000', token.decimals)
+      const totalSupply = ethers.utils.parseUnits('100000000', token.decimals)
       const args = [token.name, token.symbol, totalSupply.toString(), token.decimals]
       const tokenContract = await deployContract('MockToken', wallet, args)
       token.addr = tokenContract.address
