@@ -248,15 +248,17 @@
         "name": "USDC",
         "symbol": "USDC",
         "decimals": 6,
-        "tokenIndex": 1,
-        "addr": "0x0faF6df7054946141266420b43783387A78d82A9"
+        "addr": "0x0faF6df7054946141266420b43783387A78d82A9",
+        "link": "address/0x0faF6df7054946141266420b43783387A78d82A9",
+        "tokenIndex": 1
       },
       {
         "name": "DAI",
         "symbol": "DAI",
         "decimals": 18,
-        "tokenIndex": 36,
-        "addr": "0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b"
+        "addr": "0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b",
+        "link": "address/0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b",
+        "tokenIndex": 36
       }
     ]
   },

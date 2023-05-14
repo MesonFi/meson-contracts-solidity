@@ -656,15 +656,17 @@
         "name": "USD Coin",
         "symbol": "USDC",
         "decimals": 6,
-        "tokenIndex": 1,
-        "addr": "0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4"
+        "addr": "0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
+        "link": "address/0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
+        "tokenIndex": 1
       },
       {
         "name": "Tether USD",
         "symbol": "USDT",
         "decimals": 6,
-        "tokenIndex": 2,
-        "addr": ""
+        "addr": "",
+        "link": "",
+        "tokenIndex": 2
       }
     ]
   },
