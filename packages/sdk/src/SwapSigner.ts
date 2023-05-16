@@ -20,7 +20,7 @@ export class SwapSigner {
 
   constructor() {}
 
-  getAddress(): string {
+  getAddress(encoded?: string): string {
     throw new Error('Not implemented')
   }
 
