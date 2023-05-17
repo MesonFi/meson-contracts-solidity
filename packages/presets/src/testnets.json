@@ -341,7 +341,7 @@
     "id": "aptos-testnet",
     "name": "Aptos Testnet",
     "alias": "APT",
-    "chainId": "aptos:0x22",
+    "chainId": "aptos:0x2",
     "slip44": "0x8000027d",
     "shortSlip44": "0x027d",
     "extensions": [
