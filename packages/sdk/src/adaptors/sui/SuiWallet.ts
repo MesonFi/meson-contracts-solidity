@@ -28,7 +28,7 @@ export default class SuiWallet extends SuiAdaptor {
     const txb = new TransactionBlock()
     const [coin] = txb.splitCoins(txb.gas, [txb.pure(value)])
     txb.transferObjects([coin], txb.pure(to))
-    const result = await this.signer.signAndExecuteTransactionBlock({ transactionBlock: txb, options: { showObjectChanges: true, ...options } })
+    const result = await this.signer.signAndExecuteTransactionBlock({ transactionBlock: txb, options })
     return {
       hash: result.digest,
       wait: () => this._wrapSuiTx(result)
@@ -40,7 +40,7 @@ export default class SuiWallet extends SuiAdaptor {
   }
 
   async sendTransaction(txb: TransactionBlock, options?: SuiTransactionBlockResponseOptions) {
-    const result = await this.signer.signAndExecuteTransactionBlock({ transactionBlock: txb, options: { showObjectChanges: true, ...options } })
+    const result = await this.signer.signAndExecuteTransactionBlock({ transactionBlock: txb, options })
     return {
       hash: result.digest,
       wait: () => this._wrapSuiTx(result)
@@ -85,7 +85,7 @@ export class SuiExtWallet extends SuiWallet {
 
   async sendTransaction(txb: TransactionBlock, options?: SuiTransactionBlockResponseOptions) {
     const feat = this.ext.signer.features['sui:signAndExecuteTransactionBlock']
-    const result = await feat.signAndExecuteTransactionBlock({ transactionBlock: txb, options: { showObjectChanges: true, ...options } })
+    const result = await feat.signAndExecuteTransactionBlock({ transactionBlock: txb, options })
     return {
       hash: result.digest,
       wait: () => this._wrapSuiTx(result)

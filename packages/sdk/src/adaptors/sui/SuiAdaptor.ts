@@ -4,6 +4,8 @@ import {
   type SuiTransactionBlockResponse
 } from '@mysten/sui.js'
 
+const mesonAddress = '0x099e8c0dbaea06147fde6a32ab899152c79024a6f52a7f8d9777ca27acac7011'
+
 export default class SuiAdaptor {
   readonly client: SuiProvider
 
@@ -40,29 +42,40 @@ export default class SuiAdaptor {
   async send(method, params) {
     if (method === 'eth_getBlockByNumber') {
       if (params[0] === 'latest') {
-        // const number = await this.getBlockNumber()
-        // const block = await this.client.getBlockByHeight(number, false)
-        return _wrapSuiBlock()
+        return this._getTransactionBlock(mesonAddress)
       } else {
-        // const number = parseInt(params[0])
-        // const block = await this.client.getBlockByHeight(number, params[1])
-        return _wrapSuiBlock()
+        return
       }
     } else if (method === 'eth_getBlockByHash') {
       if (params[0] === 'n/a') {
         return {}
       }
-      // const number = parseInt(params[0])
-      // const block = await this.client.getBlockByHeight(number, params[1])
-      return _wrapSuiBlock()
+      return this._getTransactionBlock(mesonAddress, params[0])
     } else if (method === 'eth_getTransactionByHash' || method === 'eth_getTransactionReceipt') {
       return await this.waitForTransaction(params[0])
     }
   }
 
   async waitForTransaction(digest: string, confirmations?: number, timeout?: number) {
-    const txRes = await this.client.getTransactionBlock({ digest, options: { showInput: true, showObjectChanges: true } })
+    const txRes = await this.client.getTransactionBlock({ digest, options: { showInput: true } })
     return this._wrapSuiTx(txRes)
+  }
+
+  async _getTransactionBlock(digest: string, cursor = null) {
+    const result = await this.client.queryTransactionBlocks({
+      filter: { InputObject: digest },
+      options: { showInput: true },
+      limit: 2,
+      cursor,
+    })
+    const txbs = result.data || []
+    return {
+      hash: txbs[0]?.digest,
+      parentHash: result.nextCursor,
+      number: '',
+      timestamp: Math.floor(Number(txbs[0]?.timestampMs) / 1000).toString(),
+      transactions: txbs.map(tx => this._wrapSuiTx(tx))
+    }
   }
 
   _wrapSuiTx(txRes: SuiTransactionBlockResponse) {
@@ -78,7 +91,6 @@ export default class SuiAdaptor {
       input: JSON.stringify(moveCalls),
       timestamp: Math.floor(Number(txRes.timestampMs) / 1000).toString(),
       status: txRes.errors?.length ? '0x0' : '0x1',
-      changes: txRes.objectChanges
     }
   }
 
@@ -117,8 +129,4 @@ export default class SuiAdaptor {
       }).filter(Boolean)
     }
   }
-}
-
-function _wrapSuiBlock() {
-  return
 }
