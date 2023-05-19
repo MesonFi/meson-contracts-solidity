@@ -134,10 +134,14 @@ export class Swap implements SwapData {
   }
 
   get serviceFee(): BigNumber {
-    if (this.deprecatedEncoding) {
+    if (this.deprecatedEncoding || this.willWaiveFee) {
       return BigNumber.from(0)
     }
-    return this.willWaiveFee ? BigNumber.from(0) : this.amount.div(1000)
+    if (this.outChain === '0x003c') {
+      const fee = this.amount.div(2000)
+      return fee.gt(500000) ? fee : BigNumber.from(500000)
+    }
+    return this.amount.div(1000)
   }
 
   get totalFee(): BigNumber {
