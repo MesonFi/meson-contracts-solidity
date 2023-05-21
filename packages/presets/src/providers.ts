@@ -94,13 +94,17 @@ export class RpcFallbackProvider extends providers.FallbackProvider {
     return this.#currentProvider
   }
 
+  sampleRpc () {
+    this.#currentProvider = sample(this.providerConfigs).provider as any
+  }
+
   async send(method, params) {
     return await timeout(this._send(method, params), 30_000)
   }
 
   private async _send(method, params) {
     if (!this.#currentProvider) {
-      this.#currentProvider = sample(this.providerConfigs).provider as any
+      this.sampleRpc()
     }
 
     try {
