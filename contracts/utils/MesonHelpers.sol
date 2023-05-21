@@ -136,7 +136,8 @@ contract MesonHelpers is MesonConfig, Context {
   /// @notice Calculate the service fee from `encodedSwap`
   /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
-    return _amountFrom(encodedSwap) * SERVICE_FEE_RATE / 10000; // Default to `serviceFee` = 0.1% * `amount`
+    uint256 fee = _amountFrom(encodedSwap) * SERVICE_FEE_RATE / 10000; // Default to `serviceFee` = 0.05% * `amount`
+    return fee > SERVICE_FEE_MINIMUM ? fee : SERVICE_FEE_MINIMUM;
   }
 
   /// @notice Decode `fee` (the fee for LPs) from `encodedSwap`

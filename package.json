@@ -7,12 +7,11 @@
     "node": "16"
   },
   "scripts": {
-    "build": "hardhat compile --config hardhat.config.ts",
+    "compile": "hardhat compile --config hardhat.config.ts",
+    "build": "hardhat chain --testnet goerli && hardhat clean && yarn compile",
     "postbuild": "cp artifacts/contracts/Meson.sol/Meson.json packages/contract-abis/abis/Meson.json && cp artifacts/contracts/test/MockToken.sol/MockToken.json packages/contract-abis/abis/ERC20.json",
-    "cleanbuild": "hardhat clean && yarn build",
+    "test": "hardhat test",
     "build:packages": "yarn workspace @mesonfi/sdk build && yarn workspace @mesonfi/presets build",
-    "build:types": "hardhat chain --testnet goerli && yarn cleanbuild",
-    "test": "hardhat chain --testnet goerli && hardhat test",
     "estimate": "hardhat estimate --upgradable true",
     "docgen": "solidity-docgen --solc-module solc -t ./templates",
     "testnet:goerli": "hardhat deploy --testnet goerli --upgradable true",

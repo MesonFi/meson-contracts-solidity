@@ -313,7 +313,7 @@ describe('MesonPools', () => {
       await mesonClientForPoolOwner.lock(signedRequest)
       await mesonClientForPoolOwner.release(signedRelease)
 
-      const releaseAmount = swap.amount.sub(swap.amount.div(1000)).sub(swap.fee)
+      const releaseAmount = swap.amount.sub(swap.amount.div(2000)).sub(swap.fee)
       expect(await token.balanceOf(TestAddress)).to.equal(releaseAmount)
       const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
       expect(locked.status).to.equal(LockedSwapStatus.Released)
@@ -334,7 +334,7 @@ describe('MesonPools', () => {
       await mesonClientForPoolOwner.lock(signedRequest)
       await mesonClientForPoolOwner.release(signedRelease)
 
-      const releaseAmount = swap.amount.sub(swap.amount.div(1000)).sub(swap.fee)
+      const releaseAmount = swap.amount.sub(swap.amount.div(2000)).sub(swap.fee)
       expect(await token.balanceOf(TestAddress)).to.equal(releaseAmount)
       const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
       expect(locked.status).to.equal(LockedSwapStatus.Released)
