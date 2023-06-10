@@ -108,7 +108,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(poolIndex != 0, "The signer does not register a pool");
     require(poolOwner == ownerOfPool[poolIndex], "Need the pool owner as the signer");
     require(poolOfAuthorizedAddr[addr] == poolIndex, "Addr is not authorized for the signer's pool");
-    poolOfAuthorizedAddr[addr] = 0;
+    delete poolOfAuthorizedAddr[addr];
 
     emit PoolAuthorizedAddrRemoved(poolIndex, addr);
   }
@@ -127,25 +127,23 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     emit PoolOwnerTransferred(poolIndex, poolOwner, addr);
   }
 
+  function lock(uint256 encodedSwap, bytes32 r, bytes32 yParityAndS, address initiator) external {
+    // deprecated
+    lockSwap(encodedSwap, initiator);
+  }
+
   /// @notice Lock funds to match a swap request. This is step 2️⃣ in a swap.
-  /// The authorized address of the bonding pool should call this method with
-  /// the same signature given by `postSwap`. This method will lock swapping fund 
-  /// on the target chain for `LOCK_TIME_PERIOD` and wait for fund release and 
-  /// execution.
+  /// The authorized address of the bonding pool should call this method,
+  /// which will lock swapping fund on the target chain for `LOCK_TIME_PERIOD`
+  /// and wait for fund release and execution.
   /// @dev Designed to be used by authorized addresses or pool owners
   /// @param encodedSwap Encoded swap information
-  /// @param r Part of the signature (the one given by `postSwap` call)
-  /// @param yParityAndS Part of the signature (the one given by `postSwap` call)
   /// @param initiator The swap initiator who created and signed the swap request
-  function lock(
-    uint256 encodedSwap,
-    bytes32 r,
-    bytes32 yParityAndS,
-    address initiator
-  ) external matchProtocolVersion(encodedSwap) forTargetChain(encodedSwap) {
+  function lockSwap(uint256 encodedSwap, address initiator)
+    public matchProtocolVersion(encodedSwap) forTargetChain(encodedSwap)
+  {
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     require(_lockedSwaps[swapId] == 0, "Swap already exists");
-    _checkRequestSignature(encodedSwap, r, yParityAndS, initiator);
 
     uint40 poolIndex = poolOfAuthorizedAddr[_msgSender()];
     require(poolIndex != 0, "Caller not registered. Call depositAndRegister.");
@@ -156,7 +154,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, poolIndex);
     // Only (amount - lp fee) is locked from the LP pool. The service fee will be charged on release
     _balanceOfPoolToken[poolTokenIndex] -= (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
-    
+
     _lockedSwaps[swapId] = _lockedSwapFrom(until, poolIndex);
 
     emit SwapLocked(encodedSwap);
@@ -176,7 +174,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, _poolIndexFromLocked(lockedSwap));
     // (amount - lp fee) will be returned because only that amount was locked
     _balanceOfPoolToken[poolTokenIndex] += (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
-    _lockedSwaps[swapId] = 0;
+    delete _lockedSwaps[swapId];
 
     emit SwapUnlocked(encodedSwap);
   }
@@ -208,16 +206,13 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     // For swaps that charge service fee, anyone can call
 
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
-    uint80 lockedSwap = _lockedSwaps[swapId];
-    require(lockedSwap > 1, "Swap does not exist");
+    require(_lockedSwaps[swapId] > 1, "Swap does not exist");
     require(recipient != address(0), "Recipient cannot be zero address");
     require(_expireTsFrom(encodedSwap) > block.timestamp, "Cannot release because expired");
 
     _checkReleaseSignature(encodedSwap, recipient, r, yParityAndS, initiator);
     _lockedSwaps[swapId] = 1;
 
-    uint8 tokenIndex = _outTokenIndexFrom(encodedSwap);
-    
     // LP fee will be subtracted from the swap amount
     uint256 releaseAmount = _amountFrom(encodedSwap) - _feeForLp(encodedSwap);
     if (!feeWaived) { // If the swap should pay service fee (charged by Meson protocol)
@@ -231,7 +226,46 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
     }
 
-    _release(encodedSwap, tokenIndex, initiator, recipient, releaseAmount);
+    _release(encodedSwap, _outTokenIndexFrom(encodedSwap), initiator, recipient, releaseAmount);
+
+    emit SwapReleased(encodedSwap);
+  }
+
+  function directRelease(
+    uint256 encodedSwap,
+    bytes32 r,
+    bytes32 yParityAndS,
+    address initiator,
+    address recipient
+  ) external matchProtocolVersion(encodedSwap) forTargetChain(encodedSwap) {
+    require(_msgSender() == tx.origin, "Cannot be called through contracts");
+
+    bool feeWaived = _feeWaived(encodedSwap);
+    if (feeWaived) {
+      require(_isPremiumManager(), "Caller is not the premium manager");
+    }
+
+    bytes32 swapId = _getSwapId(encodedSwap, initiator);
+    require(_lockedSwaps[swapId] == 0, "Swap already exists");
+    require(recipient != address(0), "Recipient cannot be zero address");
+    require(_expireTsFrom(encodedSwap) > block.timestamp, "Cannot release because expired");
+
+    uint40 poolIndex = poolOfAuthorizedAddr[_msgSender()];
+    require(poolIndex != 0, "Caller not registered. Call depositAndRegister.");
+
+    _checkReleaseSignature(encodedSwap, recipient, r, yParityAndS, initiator);
+    _lockedSwaps[swapId] = 1;
+
+    uint256 releaseAmount = _amountFrom(encodedSwap) - _feeForLp(encodedSwap);
+    _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, poolIndex)] -= releaseAmount;
+
+    if (!feeWaived) {
+      uint256 serviceFee = _serviceFee(encodedSwap);
+      releaseAmount -= serviceFee;
+      _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
+    }
+
+    _release(encodedSwap, _outTokenIndexFrom(encodedSwap), initiator, recipient, releaseAmount);
 
     emit SwapReleased(encodedSwap);
   }
@@ -242,6 +276,28 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     } else {
       _safeTransfer(tokenForIndex[tokenIndex], recipient, amount, tokenIndex);
     }
+  }
+
+  function simpleRelease(uint256 encodedSwap, address recipient)
+    external matchProtocolVersion(encodedSwap) forTargetChain(encodedSwap)
+  {
+    require(_isPremiumManager(), "Caller is not the premium manager");
+    require(recipient != address(0), "Recipient cannot be zero address");
+
+    uint256 releaseAmount = _amountFrom(encodedSwap) - _feeForLp(encodedSwap);
+    _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 1)] -= releaseAmount;
+
+    bool feeWaived = _feeWaived(encodedSwap);
+    if (!feeWaived) {
+      uint256 serviceFee = _serviceFee(encodedSwap);
+      releaseAmount -= serviceFee;
+      _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
+    }
+
+    uint8 tokenIndex = _outTokenIndexFrom(encodedSwap);
+    _safeTransfer(tokenForIndex[tokenIndex], recipient, releaseAmount, tokenIndex);
+
+    emit SwapReleased(encodedSwap);
   }
 
   /// @notice Read information for a locked swap

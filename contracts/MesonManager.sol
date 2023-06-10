@@ -48,6 +48,12 @@ contract MesonManager is MesonSwap, MesonPools {
     _transferPremiumManager(newPremiumManager);
   }
 
+  function withdrawServiceFee(uint8 tokenIndex, uint256 amount, uint40 toPoolIndex) external onlyOwner {
+    require(ownerOfPool[toPoolIndex] != address(0), "Pool index not registered");
+    _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, 0)] -= amount;
+    _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, toPoolIndex)] += amount;
+  }
+
   modifier onlyOwner() {
     require(_owner == _msgSender(), "Caller is not the owner");
     _;

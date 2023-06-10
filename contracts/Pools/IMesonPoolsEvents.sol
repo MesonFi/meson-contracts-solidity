@@ -41,7 +41,7 @@ interface IMesonPoolsEvents {
   event PoolOwnerTransferred(uint40 indexed poolIndex, address prevOwner, address newOwner);
 
   /// @notice Event when a swap was locked.
-  /// Emit at the end of `lock()` calls.
+  /// Emit at the end of `lock()` and `lockSwap()` calls.
   /// @param encodedSwap Encoded swap
   event SwapLocked(uint256 indexed encodedSwap);
 
@@ -51,7 +51,7 @@ interface IMesonPoolsEvents {
   event SwapUnlocked(uint256 indexed encodedSwap);
 
   /// @notice Event when a swap was released.
-  /// Emit at the end of `release()` calls.
+  /// Emit at the end of `release()`, `directRelease()` and `simpleRelease()` calls.
   /// @param encodedSwap Encoded swap
   event SwapReleased(uint256 indexed encodedSwap);
 }

@@ -39,15 +39,18 @@ contract MesonHelpers is MesonConfig, Context {
     if (_needAdjustAmount(tokenIndex)) {
       amount *= 1e12;
     }
-    (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
-      ERC20_TRANSFER_SELECTOR,
-      recipient,
-      amount
-    ));
-    require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
 
-    // The above do not support Tron, so need to switch to the next line if deploying to Tron
-    // IERC20Minimal(token).transfer(recipient, amount);
+    if (SHORT_COIN_TYPE == 0x00c3) {
+      IERC20Minimal(token).transfer(recipient, amount);
+    } else {
+      // This doesn't works on Tron
+      (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
+        ERC20_TRANSFER_SELECTOR,
+        recipient,
+        amount
+      ));
+      require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
+    }
   }
 
   /// @notice Transfer tokens to a contract using `depositWithBeneficiary`

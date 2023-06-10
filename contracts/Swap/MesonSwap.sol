@@ -54,18 +54,8 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   /// @param yParityAndS Part of the signature
   /// @param postingValue The value to be written to `_postedSwaps`. See `_postedSwaps` for encoding format
   function postSwap(uint256 encodedSwap, bytes32 r, bytes32 yParityAndS, uint200 postingValue)
-    external matchProtocolVersion(encodedSwap) forInitialChain(encodedSwap)
+    external matchProtocolVersion(encodedSwap) verifyEncodedSwap(encodedSwap)
   {
-    require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
-
-    uint256 amount = _amountFrom(encodedSwap);
-    require(amount <= MAX_SWAP_AMOUNT, "For security reason, amount cannot be greater than 100k");
-
-    uint256 delta = _expireTsFrom(encodedSwap) - block.timestamp;
-    // Underflow would trigger "Expire ts too late" error
-    require(delta > MIN_BOND_TIME_PERIOD, "Expire ts too early");
-    require(delta < MAX_BOND_TIME_PERIOD, "Expire ts too late");
-
     address initiator = _initiatorFromPosted(postingValue);
     uint40 poolIndex = _poolIndexFromPosted(postingValue);
     if (poolIndex > 0 && _msgSender() != initiator) {
@@ -77,37 +67,34 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _postedSwaps[encodedSwap] = postingValue;
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-    _unsafeDepositToken(tokenForIndex[tokenIndex], initiator, amount, tokenIndex);
+    _unsafeDepositToken(tokenForIndex[tokenIndex], initiator, _amountFrom(encodedSwap), tokenIndex);
 
     emit SwapPosted(encodedSwap);
   }
 
-  function postSwapFromContract(uint256 encodedSwap, bytes32 r, bytes32 yParityAndS, uint200 postingValue, address contractAddress)
-    external matchProtocolVersion(encodedSwap) forInitialChain(encodedSwap)
+  function postSwapFromInitiator(uint256 encodedSwap, uint200 postingValue)
+    external matchProtocolVersion(encodedSwap) verifyEncodedSwap(encodedSwap)
   {
-    require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
-
-    uint256 amount = _amountFrom(encodedSwap);
-    require(amount <= MAX_SWAP_AMOUNT, "For security reason, amount cannot be greater than 100k");
-
-    uint256 delta = _expireTsFrom(encodedSwap) - block.timestamp;
-    // Underflow would trigger "Expire ts too late" error
-    require(delta > MIN_BOND_TIME_PERIOD, "Expire ts too early");
-    require(delta < MAX_BOND_TIME_PERIOD, "Expire ts too late");
-
-    uint40 poolIndex = _poolIndexFromPosted(postingValue);
-    if (poolIndex > 0 && _msgSender() != contractAddress) {
-      // If pool index is given, the signer should be `contractAddress` or an authorized address
-      require(poolOfAuthorizedAddr[_msgSender()] == poolIndex, "Signer should be an authorized address of the given pool");
-    } // Otherwise, this is posted without bonding to a specific pool. Need to execute `bondSwap` later
-
     address initiator = _initiatorFromPosted(postingValue);
-    require(IAuthorizer(contractAddress).isAuthorized(initiator), "Signer not authorized by contract");
-    _checkRequestSignature(encodedSwap, r, yParityAndS, initiator);
+    require(_msgSender() == initiator, "Transaction should be sent from initiator");
     _postedSwaps[encodedSwap] = postingValue;
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-    _unsafeDepositToken(tokenForIndex[tokenIndex], contractAddress, amount, tokenIndex);
+    _unsafeDepositToken(tokenForIndex[tokenIndex], initiator, _amountFrom(encodedSwap), tokenIndex);
+
+    emit SwapPosted(encodedSwap);
+  }
+
+  function postSwapFromContract(uint256 encodedSwap, uint200 postingValue, address contractAddress)
+    external matchProtocolVersion(encodedSwap) verifyEncodedSwap(encodedSwap)
+  {
+    address initiator = _initiatorFromPosted(postingValue);
+    require(_msgSender() == contractAddress, "Transaction should be sent from contractAddress");
+    require(IAuthorizer(contractAddress).isAuthorized(initiator), "Not authorized by contract");
+    _postedSwaps[encodedSwap] = postingValue;
+
+    uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
+    _unsafeDepositToken(tokenForIndex[tokenIndex], initiator, _amountFrom(encodedSwap), tokenIndex);
 
     emit SwapPosted(encodedSwap);
   }
@@ -136,7 +123,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     require(postedSwap > 1, "Swap does not exist");
     require(_expireTsFrom(encodedSwap) < block.timestamp, "Swap is still locked");
 
-    _postedSwaps[encodedSwap] = 0; // Swap expired so the same one cannot be posted again
+    delete _postedSwaps[encodedSwap]; // Swap expired so the same one cannot be posted again
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
     _safeTransfer(tokenForIndex[tokenIndex], _initiatorFromPosted(postedSwap), _amountFrom(encodedSwap), tokenIndex);
@@ -167,7 +154,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     if (_expireTsFrom(encodedSwap) < block.timestamp + MIN_BOND_TIME_PERIOD) {
       // The swap cannot be posted again and therefore safe to remove it.
       // LPs who execute in this mode can save ~5000 gas.
-      _postedSwaps[encodedSwap] = 0;
+      delete _postedSwaps[encodedSwap];
     } else {
       // The same swap information can be posted again, so set `_postedSwaps` value to 1 to prevent that.
       _postedSwaps[encodedSwap] = 1;
@@ -182,6 +169,40 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     } else {
       _safeTransfer(tokenForIndex[tokenIndex], ownerOfPool[poolIndex], _amountFrom(encodedSwap), tokenIndex);
     }
+
+    emit SwapExecuted(encodedSwap);
+  }
+
+  function directExecuteSwap(
+    uint256 encodedSwap,
+    bytes32 r,
+    bytes32 yParityAndS,
+    address initiator,
+    address recipient
+  ) external matchProtocolVersion(encodedSwap) verifyEncodedSwap(encodedSwap) {
+    _checkReleaseSignature(encodedSwap, recipient, r, yParityAndS, initiator);
+
+    _postedSwaps[encodedSwap] = 1;
+
+    uint256 amount = _amountFrom(encodedSwap);
+    uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
+    _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, 1)] += amount;
+
+    _unsafeDepositToken(tokenForIndex[tokenIndex], initiator, amount, tokenIndex);
+
+    emit SwapExecuted(encodedSwap);
+  }
+
+  function simpleExecuteSwap(uint256 encodedSwap)
+    external matchProtocolVersion(encodedSwap) verifyEncodedSwap(encodedSwap)
+  {
+    uint256 amount = _amountFrom(encodedSwap);
+    uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
+    _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, 1)] += amount;
+
+    _unsafeDepositToken(tokenForIndex[tokenIndex], _msgSender(), amount, tokenIndex);
+
+    emit SwapExecuted(encodedSwap);
   }
 
   /// @notice Read information for a posted swap
@@ -198,8 +219,16 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     }
   }
 
-  modifier forInitialChain(uint256 encodedSwap) {
+  modifier verifyEncodedSwap(uint256 encodedSwap) {
     require(_inChainFrom(encodedSwap) == SHORT_COIN_TYPE, "Swap not for this chain");
+    require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
+
+    require(_amountFrom(encodedSwap) <= MAX_SWAP_AMOUNT, "For security reason, amount cannot be greater than 100k");
+
+    uint256 delta = _expireTsFrom(encodedSwap) - block.timestamp;
+    require(delta > MIN_BOND_TIME_PERIOD, "Expire ts too early");
+    require(delta < MAX_BOND_TIME_PERIOD, "Expire ts too late");
+
     _;
   }
 
