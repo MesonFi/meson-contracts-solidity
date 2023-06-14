@@ -10,7 +10,7 @@ import {
 } from 'ethers'
 import TronWeb from 'tronweb'
 
-import type { Meson } from '@mesonfi/contract-types'
+import type { Meson, ERC20 as ERC20Contract } from '@mesonfi/contract-types'
 import { ERC20 } from '@mesonfi/contract-abis'
 
 import { Rpc } from './Rpc'
@@ -212,7 +212,7 @@ export class MesonClient {
   }
 
   getTokenContract(tokenAddr: string, provider = this.provider) {
-    return this.getContractInstance(tokenAddr, ERC20.abi, provider)
+    return this.getContractInstance(tokenAddr, ERC20.abi, provider) as ERC20Contract
   }
 
   /// Other utils
@@ -264,16 +264,16 @@ export class MesonClient {
   async getTokenBalance(addr: string, tokenIndex: number) {
     const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: addr })
     const tokenContract = this.getTokenContract(tokenAddr)
-    const rawValue = await (tokenContract as any).balanceOf(addr, { from: addr })
-    const decimals = await (tokenContract as any).decimals({ from: addr })
+    const rawValue = await tokenContract.balanceOf(addr, { from: addr })
+    const decimals = await tokenContract.decimals({ from: addr })
     return this.#formatBalance(rawValue, decimals, tokenIndex)
   }
 
   async getAllowance (addr: string, tokenIndex: number) {
     const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: addr })
     const tokenContract = this.getTokenContract(tokenAddr)
-    const rawValue = await (tokenContract as any).allowance(addr, this.address, { from: addr })
-    const decimals = await (tokenContract as any).decimals({ from: addr })
+    const rawValue = await tokenContract.allowance(addr, this.address, { from: addr })
+    const decimals = await tokenContract.decimals({ from: addr })
     return this.#formatBalance(rawValue, decimals, tokenIndex)
   }
 
@@ -291,8 +291,8 @@ export class MesonClient {
   async inContractTokenBalance(tokenIndex: number, ...overrides: [CallOverrides?]) {
     const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, ...overrides)
     const tokenContract = this.getTokenContract(tokenAddr)
-    const rawValue = await (tokenContract as any).balanceOf(this.address, ...overrides)
-    const decimals = await (tokenContract as any).decimals(...overrides)
+    const rawValue = await tokenContract.balanceOf(this.address, ...overrides)
+    const decimals = await tokenContract.decimals(...overrides)
     return this.#formatBalance(rawValue, decimals, tokenIndex)
   }
 
@@ -304,6 +304,12 @@ export class MesonClient {
 
 
   /// Write methods
+  async transferToken(tokenIndex: number, recipient: string, amount: BigNumberish, ...overrides: [CallOverrides?]) {
+    const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: this.address })
+    const tokenContract = this.getTokenContract(tokenAddr)
+    return tokenContract.transfer(recipient, amount, ...overrides)
+  }
+
   async depositAndRegister(token: string, amount: BigNumberish, poolIndex: string) {
     const tokenIndex = this.tokenIndexOf(token)
     if (!tokenIndex) {
@@ -377,6 +383,14 @@ export class MesonClient {
     )
   }
 
+  async postSwapFromInitiator(encoded: string, initiator: string, poolIndex: number, ...overrides: [CallOverrides?]) {
+    return this.#mesonInstance.postSwapFromInitiator(
+      encoded,
+      utils.solidityPack(['address', 'uint40'], [initiator, poolIndex]),
+      ...overrides
+    )
+  }
+
   async bondSwap(encoded: BigNumberish, ...overrides: [CallOverrides?]) {
     const signer = await this.getSignerAddress()
     const poolIndex = await this.poolOfAuthorizedAddr(signer)
@@ -386,13 +400,16 @@ export class MesonClient {
     return this.#mesonInstance.bondSwap(encoded, poolIndex, ...overrides)
   }
 
-  async lock(signedRequest: SignedSwapRequestData, recipient?: string, ...overrides: [CallOverrides?]) {
-    const sig = utils.splitSignature(signedRequest.signature)
-    if (['027d', '0310'].includes(signedRequest.encoded.substring(54, 58))) { // to aptos or sui
-      return this.#mesonInstance.lock(signedRequest.encoded, sig.r, sig.yParityAndS, { initiator: signedRequest.initiator, recipient } as any, ...overrides)
+  async lockSwap(encoded: string, initiator: string, recipient?: string, ...overrides: [CallOverrides?]) {
+    if (['027d', '0310'].includes(encoded.substring(54, 58))) { // to aptos or sui
+      return this.#mesonInstance.lockSwap(encoded, { initiator, recipient } as any, ...overrides)
     } else {
-      return this.#mesonInstance.lock(signedRequest.encoded, sig.r, sig.yParityAndS, signedRequest.initiator, ...overrides)
+      return this.#mesonInstance.lockSwap(encoded, initiator, ...overrides)
     }
+  }
+
+  async cancelSwap(encodedSwap: string, ...overrides: [CallOverrides?]) {
+    return await this.#mesonInstance.cancelSwap(encodedSwap, ...overrides)
   }
 
   async unlock(signedRequest: SignedSwapRequestData, ...overrides: [CallOverrides?]) {
@@ -421,10 +438,27 @@ export class MesonClient {
     return this.#mesonInstance.executeSwap(encoded, sig.r, sig.yParityAndS, recipient, depositToPool, ...overrides)
   }
 
-  async cancelSwap(encodedSwap: string, ...overrides: [CallOverrides?]) {
-    return await this.#mesonInstance.cancelSwap(encodedSwap, ...overrides)
+  async directExecuteSwap(signedRelease: SignedSwapReleaseData, ...overrides: [CallOverrides?]) {
+    const { encoded, initiator } = signedRelease
+    let recipient = signedRelease.recipient
+    if (encoded.substring(54, 58) === '00c3') { // to tron
+      recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
+    } else if (['027d', '0310'].includes(encoded.substring(54, 58))) { // to aptos or sui
+      recipient = recipient.substring(0, 42)
+    }
+    const sig = utils.splitSignature(signedRelease.signature)
+    return this.#mesonInstance.directExecuteSwap(encoded, sig.r, sig.yParityAndS, initiator, recipient, ...overrides)
   }
 
+  async directRelease(signedRelease: SignedSwapReleaseData, ...overrides: [CallOverrides?]) {
+    const { encoded, initiator } = signedRelease
+    let recipient = signedRelease.recipient
+    if (encoded.substring(54, 58) === '00c3') { // to tron
+      recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
+    }
+    const sig = utils.splitSignature(signedRelease.signature)
+    return this.#mesonInstance.directRelease(encoded, sig.r, sig.yParityAndS, initiator, recipient, ...overrides)
+  }
 
   /// Read methods for swap status
   async _getPostedSwap(encoded: string | BigNumber, ...overrides: [CallOverrides?]) {

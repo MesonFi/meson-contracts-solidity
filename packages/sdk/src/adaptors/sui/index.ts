@@ -183,6 +183,9 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
 
             const args: any = { encodedSwap: rawArgs[0] }
             switch (name) {
+              case 'postSwap':
+                args.postingValue = BigNumber.from(utils.solidityPack(['address', 'uint40'], [rawArgs[2], rawArgs[3]]))
+                break
               case 'bondSwap':
               case 'cancelSwap':
                 break
@@ -191,9 +194,6 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                 break
               case 'unlock':
                 args.initiator = rawArgs[1]
-                break
-              case 'postSwap':
-                args.postingValue = BigNumber.from(utils.solidityPack(['address', 'uint40'], [rawArgs[2], rawArgs[3]]))
                 break
               case 'executeSwap':
                 args.recipient = rawArgs[2]

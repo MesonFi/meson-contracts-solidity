@@ -127,17 +127,15 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
             const name = fun.split('::')[2]
             const args: any = { encodedSwap: rawArgs[0] }
             switch (name) {
+              case 'postSwapFromInitiator':
+                args.postingValue = BigNumber.from(utils.solidityPack(['address', 'uint40'], [rawArgs[1], rawArgs[2]]))
+                break
               case 'bondSwap':
               case 'cancelSwap':
                 break
-              case 'lock':
-                args.initiator = rawArgs[2]
-                break
+              case 'lockSwap':
               case 'unlock':
                 args.initiator = rawArgs[1]
-                break
-              case 'postSwap':
-                args.postingValue = BigNumber.from(utils.solidityPack(['address', 'uint40'], [rawArgs[2], rawArgs[3]]))
                 break
               case 'executeSwap':
                 args.recipient = rawArgs[2]
@@ -146,7 +144,7 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                 args.initiator = rawArgs[2]
                 break
             }
-            if (['postSwap', 'executeSwap', 'lock', 'release'].includes(name)) {
+            if (['executeSwap', 'lock', 'release'].includes(name)) {
               const { r, yParityAndS } = utils.splitSignature(rawArgs[1])
               args.r = r
               args.yParityAndS = yParityAndS
@@ -293,14 +291,17 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
               payload.arguments = [BigNumber.from(args[0]).toHexString(), poolIndex]
             } else if (['addAuthorizedAddr', 'removeAuthorizedAddr', 'transferPoolOwner'].includes(prop)) {
               payload.arguments = [args[0]]
+            } else if (prop === 'withdrawServiceFee') {
+              const [tokenIndex, amount, toPoolIndex] = args
+              payload.type_arguments = [await getTokenAddr(tokenIndex)]
+              payload.arguments = [BigNumber.from(amount).toHexString(), toPoolIndex]
             } else {
               const swap = Swap.decode(args[0])
-              if (prop === 'postSwap') {
-                const [_, r, yParityAndS, postingValue] = args
+              if (prop === 'postSwapFromInitiator') {
+                const [_, postingValue] = args
                 payload.type_arguments = [await getTokenAddr(swap.inToken)]
                 payload.arguments = [
                   _vectorize(swap.encoded),
-                  _getCompactSignature(r, yParityAndS),
                   _vectorize(postingValue.substring(0, 42)), // initiator
                   `0x${postingValue.substring(42)}` // pool_index
                 ]
@@ -319,12 +320,11 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                   _vectorize(recipient.substring(0, 42)),
                   depositToPool
                 ]
-              } else if (prop === 'lock') {
-                const [_, r, yParityAndS, { initiator, recipient }] = args
+              } else if (prop === 'lockSwap') {
+                const [_, { initiator, recipient }] = args
                 payload.type_arguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   _vectorize(swap.encoded),
-                  _getCompactSignature(r, yParityAndS),
                   _vectorize(initiator),
                   recipient
                 ]
@@ -342,6 +342,22 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                   _vectorize(swap.encoded),
                   _getCompactSignature(r, yParityAndS),
                   _vectorize(initiator)
+                ]
+              } else if (prop === 'directRelease') {
+                const [_, r, yParityAndS, initiator, recipient] = args
+                payload.type_arguments = [await getTokenAddr(swap.outToken)]
+                payload.arguments = [
+                  _vectorize(swap.encoded),
+                  _getCompactSignature(r, yParityAndS),
+                  _vectorize(initiator),
+                  recipient
+                ]
+              } else if (prop === 'simpleRelease') {
+                const [_, recipient] = args
+                payload.type_arguments = [await getTokenAddr(swap.outToken)]
+                payload.arguments = [
+                  _vectorize(swap.encoded),
+                  recipient
                 ]
               }
             }
@@ -365,11 +381,14 @@ function _findMesonMethodModule(method) {
       'addAuthorizedAddr',
       'removeAuthorizedAddr',
       'transferPoolOwner',
-      'lock',
+      'withdrawServiceFee',
+      'lockSwap',
       'unlock',
-      'release'
+      'release',
+      'directRelease',
+      'simpleRelease',
     ],
-    MesonSwap: ['postSwap', 'bondSwap', 'cancelSwap', 'executeSwap'],
+    MesonSwap: ['postSwapFromInitiator', 'bondSwap', 'cancelSwap', 'executeSwap'],
   }
 
   for (const module of Object.keys(moduleMethods)) {
