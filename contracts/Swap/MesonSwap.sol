@@ -94,7 +94,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _postedSwaps[encodedSwap] = postingValue;
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-    _unsafeDepositToken(tokenForIndex[tokenIndex], initiator, _amountFrom(encodedSwap), tokenIndex);
+    _unsafeDepositToken(tokenForIndex[tokenIndex], contractAddress, _amountFrom(encodedSwap), tokenIndex);
 
     emit SwapPosted(encodedSwap);
   }

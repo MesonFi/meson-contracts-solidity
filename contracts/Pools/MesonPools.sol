@@ -197,6 +197,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     address recipient
   ) external {
     require(_msgSender() == tx.origin, "Cannot be called through contracts");
+    require(_expireTsFrom(encodedSwap) > block.timestamp, "Cannot release because expired");
+    require(recipient != address(0), "Recipient cannot be zero address");
 
     bool feeWaived = _feeWaived(encodedSwap);
     if (feeWaived) {
@@ -207,8 +209,6 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     require(_lockedSwaps[swapId] > 1, "Swap does not exist");
-    require(recipient != address(0), "Recipient cannot be zero address");
-    require(_expireTsFrom(encodedSwap) > block.timestamp, "Cannot release because expired");
 
     _checkReleaseSignature(encodedSwap, recipient, r, yParityAndS, initiator);
     _lockedSwaps[swapId] = 1;
@@ -239,6 +239,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     address recipient
   ) external matchProtocolVersion(encodedSwap) forTargetChain(encodedSwap) {
     require(_msgSender() == tx.origin, "Cannot be called through contracts");
+    require(_expireTsFrom(encodedSwap) > block.timestamp, "Cannot release because expired");
+    require(recipient != address(0), "Recipient cannot be zero address");
 
     bool feeWaived = _feeWaived(encodedSwap);
     if (feeWaived) {
@@ -247,8 +249,6 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     bytes32 swapId = _getSwapId(encodedSwap, initiator);
     require(_lockedSwaps[swapId] == 0, "Swap already exists");
-    require(recipient != address(0), "Recipient cannot be zero address");
-    require(_expireTsFrom(encodedSwap) > block.timestamp, "Cannot release because expired");
 
     uint40 poolIndex = poolOfAuthorizedAddr[_msgSender()];
     require(poolIndex != 0, "Caller not registered. Call depositAndRegister.");
