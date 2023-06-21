@@ -306,7 +306,11 @@ export class MesonClient {
   /// Write methods
   async transferToken(tokenIndex: number, recipient: string, amount: BigNumberish, ...overrides: [CallOverrides?]) {
     const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: this.address })
-    const tokenContract = this.getTokenContract(tokenAddr)
+    const tokenContract = this.getTokenContract(tokenAddr).connect(this.#mesonInstance.signer)
+    const decimals = await tokenContract.decimals()
+    if (decimals > 6) {
+      amount = BigNumber.from(amount).mul(10 ** (decimals - 6))
+    }
     return tokenContract.transfer(recipient, amount, ...overrides)
   }
 

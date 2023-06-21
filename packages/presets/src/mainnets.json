@@ -11,7 +11,7 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://mainnet.infura.io/v3/${INFURA_API_KEY}",
+    "url": "https://rpc.ankr.com/eth",
     "explorer": "https://etherscan.io",
     "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
     "tokens": [
@@ -50,7 +50,7 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://bsc-dataseed1.binance.org",
+    "url": "https://rpc.ankr.com/bsc",
     "explorer": "https://bscscan.com",
     "nativeCurrency": {
       "name": "Binance Chain Native Token",
@@ -169,7 +169,7 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://mainnet.optimism.io",
+    "url": "https://rpc.ankr.com/optimism",
     "explorer": "https://optimistic.etherscan.io",
     "nativeCurrency": {
       "name": "ETH",
@@ -614,7 +614,7 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://evmos-mainnet.gateway.pokt.network/v1/lb/627586ddea1b320039c95205",
+    "url": "",
     "explorer": "https://escan.live",
     "nativeCurrency": {
       "name": "EVMOS",
@@ -644,7 +644,7 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://api.harmony.one",
+    "url": "",
     "explorer": "https://explorer.harmony.one",
     "nativeCurrency": {
       "name": "ONE",
@@ -724,9 +724,9 @@
     "nativeCurrency": {
       "name": "SUI",
       "symbol": "SUI",
-      "decimals": 8
+      "decimals": 9
     },
-    "mesonAddress": "0x099e8c0dbaea06147fde6a32ab899152c79024a6f52a7f8d9777ca27acac7011",
+    "mesonAddress": "0x371a30d40fcc357a37d412c4750a57303d58c9482e5f51886e46f7bf774028f3",
     "tokens": [
       {
         "name": "USD Coin",

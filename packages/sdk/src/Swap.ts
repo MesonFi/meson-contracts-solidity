@@ -137,9 +137,6 @@ export class Swap implements SwapData {
     if (this.deprecatedEncoding || this.willWaiveFee) {
       return BigNumber.from(0)
     }
-    if (['0x027d', '0x0310'].includes(this.outChain)) {
-      return this.amount.div(1000)
-    }
     const fee = this.amount.div(2000)
     return fee.gt(500000) ? fee : BigNumber.from(500000)
   }

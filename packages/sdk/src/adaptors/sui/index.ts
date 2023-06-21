@@ -183,15 +183,13 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
 
             const args: any = { encodedSwap: rawArgs[0] }
             switch (name) {
-              case 'postSwap':
-                args.postingValue = BigNumber.from(utils.solidityPack(['address', 'uint40'], [rawArgs[2], rawArgs[3]]))
+              case 'postSwapFromInitiator':
+                args.postingValue = BigNumber.from(utils.solidityPack(['address', 'uint40'], [rawArgs[1], rawArgs[2]]))
                 break
               case 'bondSwap':
               case 'cancelSwap':
                 break
-              case 'lock':
-                args.initiator = rawArgs[2]
-                break
+              case 'lockSwap':
               case 'unlock':
                 args.initiator = rawArgs[1]
                 break
@@ -202,7 +200,7 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                 args.initiator = rawArgs[2]
                 break
             }
-            if (['postSwap', 'executeSwap', 'lock', 'release'].includes(name)) {
+            if (['executeSwap', 'release'].includes(name)) {
               const { r, yParityAndS } = utils.splitSignature(rawArgs[1])
               args.r = r
               args.yParityAndS = yParityAndS
@@ -402,16 +400,24 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
               ]
             } else if (['addAuthorizedAddr', 'removeAuthorizedAddr', 'transferPoolOwner'].includes(prop)) {
               payload.arguments = [txb.object(args[0]), txb.object(metadata.storeG)]
+            } else if (prop === 'withdrawServiceFee') {
+              const [tokenIndex, amount, toPoolIndex] = args
+              payload.typeArguments = [await getTokenAddr(tokenIndex)]
+              payload.arguments = [
+                txb.pure(metadata.adminCap),
+                txb.pure(BigNumber.from(amount).toHexString()),
+                txb.pure(toPoolIndex),
+                txb.object(metadata.storeG),
+              ]
             } else {
               const swap = Swap.decode(args[0])
-              if (prop === 'postSwap') {
-                const [_, r, yParityAndS, postingValue] = args
+              if (prop === 'postSwapFromInitiator') {
+                const [_, postingValue] = args
                 const tokenAddr = await getTokenAddr(swap.inToken)
                 const coinList = await pickCoinObjects(tokenAddr, swap.amount)
                 payload.typeArguments = [tokenAddr]
                 payload.arguments = [
                   txb.pure(_vectorize(swap.encoded)),
-                  txb.pure(_getCompactSignature(r, yParityAndS)),
                   txb.pure(_vectorize(postingValue.substring(0, 42))), // initiator
                   txb.pure(`0x${postingValue.substring(42)}`), // pool_index
                   txb.makeMoveVec({ objects: coinList.map(obj => txb.object(obj.coinObjectId)) }),
@@ -443,12 +449,11 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                   txb.object(metadata.storeG),
                   txb.object('0x6'),
                 ]
-              } else if (prop === 'lock') {
-                const [_, r, yParityAndS, { initiator, recipient }] = args
+              } else if (prop === 'lockSwap') {
+                const [_, { initiator, recipient }] = args
                 payload.typeArguments = [await getTokenAddr(swap.outToken)]
                 payload.arguments = [
                   txb.pure(_vectorize(swap.encoded)),
-                  txb.pure(_getCompactSignature(r, yParityAndS)),
                   txb.pure(_vectorize(initiator)),
                   txb.pure(recipient),
                   txb.object(metadata.storeG),
@@ -472,6 +477,25 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
                   txb.pure(_vectorize(initiator)),
                   txb.object(metadata.storeG),
                   txb.object('0x6'),
+                ]
+              } else if (prop === 'directRelease') {
+                const [_, r, yParityAndS, initiator, recipient] = args
+                payload.typeArguments = [await getTokenAddr(swap.outToken)]
+                payload.arguments = [
+                  txb.pure(_vectorize(swap.encoded)),
+                  txb.pure(_getCompactSignature(r, yParityAndS)),
+                  txb.pure(_vectorize(initiator)),
+                  txb.pure(recipient),
+                  txb.object(metadata.storeG),
+                  txb.object('0x6'),
+                ]
+              } else if (prop === 'simpleRelease') {
+                const [_, recipient] = args
+                payload.typeArguments = [await getTokenAddr(swap.outToken)]
+                payload.arguments = [
+                  txb.pure(_vectorize(swap.encoded)),
+                  txb.pure(recipient),
+                  txb.object(metadata.storeG),
                 ]
               }
             }
@@ -498,11 +522,14 @@ function _findMesonMethodModule(method) {
       'addAuthorizedAddr',
       'removeAuthorizedAddr',
       'transferPoolOwner',
-      'lock',
+      'withdrawServiceFee',
+      'lockSwap',
       'unlock',
-      'release'
+      'release',
+      'directRelease',
+      'simpleRelease',
     ],
-    MesonSwap: ['postSwap', 'bondSwap', 'cancelSwap', 'executeSwap'],
+    MesonSwap: ['postSwapFromInitiator', 'bondSwap', 'cancelSwap', 'executeSwap'],
   }
 
   for (const module of Object.keys(moduleMethods)) {

@@ -391,7 +391,7 @@
     "nativeCurrency": {
       "name": "SUI",
       "symbol": "SUI",
-      "decimals": 8
+      "decimals": 9
     },
     "mesonAddress": "0x4d3c6980f114f8b4a05aac828dc060234ec755e417c2d2d35f4f181c48ddf4be",
     "tokens": [

@@ -4,7 +4,7 @@ import {
   type SuiTransactionBlockResponse
 } from '@mysten/sui.js'
 
-const mesonAddress = '0x099e8c0dbaea06147fde6a32ab899152c79024a6f52a7f8d9777ca27acac7011'
+const mesonAddress = '0x371a30d40fcc357a37d412c4750a57303d58c9482e5f51886e46f7bf774028f3'
 
 export default class SuiAdaptor {
   readonly client: SuiProvider

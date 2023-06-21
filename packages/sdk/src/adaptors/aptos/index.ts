@@ -144,7 +144,7 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                 args.initiator = rawArgs[2]
                 break
             }
-            if (['executeSwap', 'lock', 'release'].includes(name)) {
+            if (['executeSwap', 'release'].includes(name)) {
               const { r, yParityAndS } = utils.splitSignature(rawArgs[1])
               args.r = r
               args.yParityAndS = yParityAndS
