@@ -143,8 +143,12 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
               case 'release':
                 args.initiator = rawArgs[2]
                 break
+              case 'directRelease':
+                args.initiator = rawArgs[2]
+                args.recipient = rawArgs[3]
+                break
             }
-            if (['executeSwap', 'release'].includes(name)) {
+            if (['executeSwap', 'release', 'directRelease'].includes(name)) {
               const { r, yParityAndS } = utils.splitSignature(rawArgs[1])
               args.r = r
               args.yParityAndS = yParityAndS
