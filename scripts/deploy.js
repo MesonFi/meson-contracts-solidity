@@ -17,6 +17,10 @@ module.exports = async function deploy(network, upgradable, testnetMode) {
   const client = getClient(network)
   await hre.run('compile')
 
+  if (upgradable && network.id.startsWith('skale')) {
+    upgradable = 2 // deploy Proxy2ToMeson
+  }
+
   const wallet = adaptors.getWallet(PRIVATE_KEY, client)
   const tokens = network.tokens
 

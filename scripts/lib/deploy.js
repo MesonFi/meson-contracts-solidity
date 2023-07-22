@@ -7,7 +7,12 @@ const { Meson } = require('@mesonfi/contract-abis')
 
 exports.deployMeson = async function deployMeson(wallet, upgradable, premiumManager, tokens) {
   let mesonContract
-  if (upgradable) {
+  if (upgradable === 2) {
+    console.log('Deploying Proxy2ToMeson & UpgradableMeson...')
+    const impl = await deployContract('UpgradableMeson', wallet, [])
+    const proxy = await deployContract('Proxy2ToMeson', wallet, [impl.address, premiumManager])
+    mesonContract = adaptors.getContract(proxy.address, Meson.abi, wallet)
+  } else if (upgradable) {
     console.log('Deploying ProxyToMeson & UpgradableMeson...')
     const proxy = await deployContract('ProxyToMeson', wallet, [premiumManager])
     mesonContract = adaptors.getContract(proxy.address, Meson.abi, wallet)

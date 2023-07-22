@@ -23,6 +23,7 @@
     "testnet:zksync": "hardhat deploy --testnet zksync --network zksync-goerli --upgradable true",
     "testnet:avax": "hardhat deploy --testnet avax --upgradable true",
     "testnet:tron": "hardhat deploy --testnet tron --upgradable true",
+    "testnet:skale": "hardhat deploy --testnet skale --upgradable true",
     "deploy:eth": "hardhat deploy --mainnet eth --upgradable true",
     "deploy:bnb": "hardhat deploy --mainnet bnb --upgradable true",
     "deploy:polygon": "hardhat deploy --mainnet polygon --upgradable true",

@@ -412,5 +412,41 @@
         "tokenIndex": 2
       }
     ]
+  },
+  {
+    "id": "skale-testnet",
+    "name": "SKALE Testnet (Europa)",
+    "alias": "sFUEL",
+    "chainId": "0x1c6199cc",
+    "slip44": "0x1c6199cc",
+    "shortSlip44": "0x99cc",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://staging-v3.skalenodes.com/v1/staging-legal-crazy-castor",
+    "explorer": "https://staging-legal-crazy-castor.explorer.staging-v3.skalenodes.com",
+    "nativeCurrency": {
+      "name": "sFUEL",
+      "symbol": "sFUEL",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0A718e8bb8826683f1E911F82bdF32db885D35e1",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x5d42495D417fcd9ECf42F3EA8a55FcEf44eD9B33",
+        "tokenIndex": 1
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xa388F9783d8E5B0502548061c3b06bf4300Fc0E1",
+        "tokenIndex": 2
+      }
+    ]
   }
 ]
