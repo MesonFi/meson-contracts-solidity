@@ -414,6 +414,71 @@
     ]
   },
   {
+    "id": "linea-goerli",
+    "name": "Linea Goerli",
+    "alias": "LINEA",
+    "chainId": "0xe704",
+    "slip44": "0x8000e704",
+    "shortSlip44": "0xe704",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.goerli.linea.build",
+    "explorer": "https://goerli.lineascan.build",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0xf56dc6695cF1f5c364eDEbC7Dc7077ac9B586068",
+        "tokenIndex": 1
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x1990BC6dfe2ef605Bfc08f5A23564dB75642Ad73",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "scroll-testnet",
+    "name": "Scroll Testnet",
+    "alias": "SCROLL",
+    "chainId": "0x82751",
+    "slip44": "0x80002751",
+    "shortSlip44": "0x2751",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://alpha-rpc.scroll.io/l2",
+    "explorer": "https://blockscout.scroll.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x67aE69Fd63b4fc8809ADc224A9b82Be976039509",
+        "tokenIndex": 1
+      }
+    ]
+  },
+  {
     "id": "skale-testnet",
     "name": "SKALE Testnet (Europa)",
     "alias": "sFUEL",
