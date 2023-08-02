@@ -80,7 +80,7 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://data-seed-prebsc-1-s1.binance.org:8545",
+    "url": "https://bsc-testnet.public.blastapi.io",
     "explorer": "https://testnet.bscscan.com",
     "nativeCurrency": {
       "name": "Binance Chain Native Token",
