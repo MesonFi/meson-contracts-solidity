@@ -611,6 +611,35 @@
     ]
   },
   {
+    "id": "linea",
+    "name": "Linea",
+    "alias": "LINEA",
+    "chainId": "0xe708",
+    "slip44": "0x8000e708",
+    "shortSlip44": "0xe708",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.linea.build",
+    "explorer": "https://lineascan.build",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x176211869cA2b568f2A7D4EE941E073a821EE1ff",
+        "tokenIndex": 1
+      }
+    ]
+  },
+  {
     "id": "evmos",
     "name": "Evmos",
     "alias": "evmos",

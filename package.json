@@ -43,7 +43,8 @@
     "deploy:cronos": "hardhat deploy --mainnet cronos --upgradable true",
     "deploy:zksync": "hardhat deploy --mainnet zksync --network zksync --upgradable true",
     "deploy:zkevm": "hardhat deploy --mainnet zkevm --upgradable true",
-    "deploy:tron": "hardhat deploy --mainnet tron --upgradable true"
+    "deploy:tron": "hardhat deploy --mainnet tron --upgradable true",
+    "deploy:linea": "hardhat deploy --mainnet linea --upgradable true"
   },
   "devDependencies": {
     "@matterlabs/hardhat-zksync-deploy": "^0.6.2",

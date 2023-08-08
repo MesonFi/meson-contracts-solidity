@@ -418,8 +418,8 @@
     "name": "Linea Goerli",
     "alias": "LINEA",
     "chainId": "0xe704",
-    "slip44": "0x8000e704",
-    "shortSlip44": "0xe704",
+    "slip44": "0x8000e708",
+    "shortSlip44": "0xe708",
     "extensions": [
       "metamask"
     ],
