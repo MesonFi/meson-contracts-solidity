@@ -67,26 +67,26 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _postedSwaps[encodedSwap] = postingValue;
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-    _unsafeDepositToken(tokenForIndex[tokenIndex], initiator, _amountFrom(encodedSwap), tokenIndex);
+    _unsafeDepositToken(tokenIndex, initiator, _amountFrom(encodedSwap));
 
     emit SwapPosted(encodedSwap);
   }
 
   function postSwapFromInitiator(uint256 encodedSwap, uint200 postingValue)
-    external matchProtocolVersion(encodedSwap) verifyEncodedSwap(encodedSwap)
+    payable external matchProtocolVersion(encodedSwap) verifyEncodedSwap(encodedSwap)
   {
     address initiator = _initiatorFromPosted(postingValue);
     require(_msgSender() == initiator, "Transaction should be sent from initiator");
     _postedSwaps[encodedSwap] = postingValue;
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-    _unsafeDepositToken(tokenForIndex[tokenIndex], initiator, _amountFrom(encodedSwap), tokenIndex);
+    _unsafeDepositToken(tokenIndex, initiator, _amountFrom(encodedSwap));
 
     emit SwapPosted(encodedSwap);
   }
 
   function postSwapFromContract(uint256 encodedSwap, uint200 postingValue, address contractAddress)
-    external matchProtocolVersion(encodedSwap) verifyEncodedSwap(encodedSwap)
+    payable external matchProtocolVersion(encodedSwap) verifyEncodedSwap(encodedSwap)
   {
     address initiator = _initiatorFromPosted(postingValue);
     require(_msgSender() == contractAddress, "Transaction should be sent from contractAddress");
@@ -94,7 +94,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     _postedSwaps[encodedSwap] = postingValue;
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-    _unsafeDepositToken(tokenForIndex[tokenIndex], contractAddress, _amountFrom(encodedSwap), tokenIndex);
+    _unsafeDepositToken(tokenIndex, contractAddress, _amountFrom(encodedSwap));
 
     emit SwapPosted(encodedSwap);
   }
@@ -126,7 +126,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     delete _postedSwaps[encodedSwap]; // Swap expired so the same one cannot be posted again
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
-    _safeTransfer(tokenForIndex[tokenIndex], _initiatorFromPosted(postedSwap), _amountFrom(encodedSwap), tokenIndex);
+    _safeTransfer(tokenIndex, _initiatorFromPosted(postedSwap), _amountFrom(encodedSwap));
 
     emit SwapCancelled(encodedSwap);
   }
@@ -167,7 +167,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     if (depositToPool) {
       _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, poolIndex)] += _amountFrom(encodedSwap);
     } else {
-      _safeTransfer(tokenForIndex[tokenIndex], ownerOfPool[poolIndex], _amountFrom(encodedSwap), tokenIndex);
+      _safeTransfer(tokenIndex, ownerOfPool[poolIndex], _amountFrom(encodedSwap));
     }
 
     emit SwapExecuted(encodedSwap);
@@ -188,7 +188,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
     _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, 1)] += amount;
 
-    _unsafeDepositToken(tokenForIndex[tokenIndex], initiator, amount, tokenIndex);
+    _unsafeDepositToken(tokenIndex, initiator, amount);
 
     emit SwapExecuted(encodedSwap);
   }
@@ -200,7 +200,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
     _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, 1)] += amount;
 
-    _unsafeDepositToken(tokenForIndex[tokenIndex], _msgSender(), amount, tokenIndex);
+    _unsafeDepositToken(tokenIndex, _msgSender(), amount);
 
     emit SwapExecuted(encodedSwap);
   }
@@ -221,6 +221,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
   modifier verifyEncodedSwap(uint256 encodedSwap) {
     require(_inChainFrom(encodedSwap) == SHORT_COIN_TYPE, "Swap not for this chain");
+    require((_inTokenIndexFrom(encodedSwap) >= 254) == (_outTokenIndexFrom(encodedSwap) >= 254), "Swap tokens do not match");
     require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
 
     require(_amountFrom(encodedSwap) <= MAX_SWAP_AMOUNT, "For security reason, amount cannot be greater than 100k");

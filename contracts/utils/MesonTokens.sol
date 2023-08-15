@@ -7,7 +7,7 @@ contract MesonTokens {
   /// @notice The whitelist of supported tokens in Meson
   /// Meson use a whitelist for supported stablecoins, which is specified on first deployment
   /// or added through `_addSupportToken` Only modify this mapping through `_addSupportToken`.
-  /// key: `tokenIndex` in range of 1-255; zero means unsupported
+  /// key: `tokenIndex` in range of 1-255; zero means unsupported; 255 means ETH; 254 means WETH
   /// value: the supported token's contract address
   mapping(uint8 => address) public tokenForIndex;
 
@@ -15,7 +15,7 @@ contract MesonTokens {
   /// @notice The mapping to get `tokenIndex` from a supported token's address
   /// Only modify this mapping through `_addSupportToken`.
   /// key: the supported token's contract address
-  /// value: `tokenIndex` in range of 1-255; zero means unsupported
+  /// value: `tokenIndex` in range of 1-255; zero means unsupported; 255 means ETH; 254 means WETH
   mapping(address => uint8) public indexOfToken;
 
   /// @dev This empty reserved space is put in place to allow future versions to
@@ -50,7 +50,18 @@ contract MesonTokens {
     require(token != address(0), "Cannot use zero address");
     require(indexOfToken[token] == 0, "Token has been added before");
     require(tokenForIndex[index] == address(0), "Index has been used");
+    if (index == 255) {
+      require(token == address(0x1), "Token index 255 (ETH) requires adddress(0x1)");
+    }
     indexOfToken[token] = index;
     tokenForIndex[index] = token;
+  }
+
+  function _removeSupportToken(uint8 index) internal {
+    require(index != 0, "Cannot use 0 as token index");
+    address token = tokenForIndex[index];
+    require(token != address(0), "Token for the index does not exist");
+    delete indexOfToken[token];
+    delete tokenForIndex[index];
   }
 }

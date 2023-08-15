@@ -1,12 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.16;
 
+import "@openzeppelin/contracts/utils/Address.sol";
+import "../interfaces/IERC20Minimal.sol";
+import "../interfaces/IRecipientContract.sol";
 import "./MesonTokens.sol";
 import "./MesonHelpers.sol";
 
 /// @title MesonStates
 /// @notice The class that keeps track of LP pool states
 contract MesonStates is MesonTokens, MesonHelpers {
+  bytes4 private constant ERC20_TRANSFER_SELECTOR = bytes4(keccak256("transfer(address,uint256)"));
+  bytes4 private constant ERC20_TRANSFER_FROM_SELECTOR = bytes4(keccak256("transferFrom(address,address,uint256)"));
+
   /// @notice The mapping from *authorized addresses* to LP pool indexes.
   /// See `ownerOfPool` to understand how pool index is defined and used.
   ///
@@ -64,5 +70,126 @@ contract MesonStates is MesonTokens, MesonHelpers {
   /// @param tokenIndex The index of a supported token. See `tokenForIndex` in `MesonTokens.sol`
   function serviceFeeCollected(uint8 tokenIndex) external view returns (uint256) {
     return _balanceOfPoolToken[_poolTokenIndexFrom(tokenIndex, 0)];
+  }
+
+  /// @notice Help the senders to transfer their assets to the Meson contract
+  /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
+  /// @param sender The sender of the transfer
+  /// @param amount The value of the transfer (always in decimal 6)
+  function _unsafeDepositToken(
+    uint8 tokenIndex,
+    address sender,
+    uint256 amount
+  ) internal {
+    require(amount > 0, "Amount must be greater than zero");
+
+    if (tokenIndex == 255) {
+      // ETH
+      require(amount * 1e12 == msg.value, "ETH value does not match the amount");
+    } else {
+      // Stablecoins
+      address token = tokenForIndex[tokenIndex];
+
+      require(token != address(0), "Token not supported");
+      require(Address.isContract(token), "The given token address is not a contract");
+
+      if (_needAdjustAmount(tokenIndex)) {
+        amount *= 1e12;
+      }
+      (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
+        ERC20_TRANSFER_FROM_SELECTOR,
+        sender,
+        address(this),
+        amount
+      ));
+      require(success && (data.length == 0 || abi.decode(data, (bool))), "transferFrom failed");
+    }
+  }
+
+  /// @notice Safe transfers tokens from Meson contract to a recipient
+  /// for interacting with ERC20 tokens that do not consistently return true/false
+  /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
+  /// @param recipient The recipient of the transfer
+  /// @param amount The value of the transfer (always in decimal 6)
+  function _safeTransfer(
+    uint8 tokenIndex,
+    address recipient,
+    uint256 amount
+  ) internal {
+    if (tokenIndex == 255) {
+      // ETH
+      (bool success, ) = recipient.call{value: amount * 1e12}("");
+      require(success, "Transfer failed");
+    } else {
+      // Stablecoins
+      address token = tokenForIndex[tokenIndex];
+
+      require(Address.isContract(token), "The given token address is not a contract");
+
+      if (_needAdjustAmount(tokenIndex)) {
+        amount *= 1e12;
+      }
+
+      if (SHORT_COIN_TYPE == 0x00c3) {
+        IERC20Minimal(token).transfer(recipient, amount);
+      } else {
+        // Stablecoins
+        address token = tokenForIndex[tokenIndex];
+
+        // This doesn't works on Tron
+        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
+          ERC20_TRANSFER_SELECTOR,
+          recipient,
+          amount
+        ));
+        require(success && (data.length == 0 || abi.decode(data, (bool))), "transfer failed");
+      }
+    }
+  }
+
+  /// @notice Transfer tokens to a contract using `depositWithBeneficiary`
+  /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
+  /// @param contractAddr The smart contract address that will receive transferring tokens
+  /// @param beneficiary The beneficiary of `depositWithBeneficiary`
+  /// @param amount The value of the transfer (always in decimal 6)
+  /// @param data Extra data passed to the contract
+  function _transferToContract(
+    uint8 tokenIndex,
+    address contractAddr,
+    address beneficiary,
+    uint256 amount,
+    uint64 data
+  ) internal {
+    if (tokenIndex == 255) {
+      // ETH
+      (bool success, ) = beneficiary.call{value: amount * 1e12}("");
+      require(success, "Transfer failed");
+      // TODO: call contract
+    } else {
+      // Stablecoins
+      address token = tokenForIndex[tokenIndex];
+
+      require(Address.isContract(token), "The given token address is not a contract");
+      require(Address.isContract(contractAddr), "The given recipient address is not a contract");
+      
+      uint8 methodId = _methodIdFromData(data);
+      require(methodId <= 1, "Unknown method id");
+
+      if (_needAdjustAmount(tokenIndex)) {
+        amount *= 1e12;
+      }
+      IERC20Minimal(token).approve(contractAddr, amount);
+      if (methodId == 0) {
+        IRecipientContract(contractAddr).depositWithBeneficiary(token, amount, beneficiary, data);
+      } else if (methodId == 1) {
+        IRecipientContract(contractAddr).deposit(token, amount, beneficiary, uint16(data >> 40));
+      }
+    }
+  }
+
+  /// @notice Determine if token has decimal 18 and therefore need to adjust amount
+  /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
+  function _needAdjustAmount(uint8 tokenIndex) private pure returns (bool) {
+    return tokenIndex > 32;
   }
 }

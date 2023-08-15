@@ -31,6 +31,11 @@ contract MesonManager is MesonSwap, MesonPools {
     _addSupportToken(token, index);
   }
 
+  /// @notice The owner will also have the permission to remove a supported tokens
+  function removeSupportToken(uint8 index) external onlyOwner {
+    _removeSupportToken(index);
+  }
+
   /// @notice Add multiple tokens
   function addMultipleSupportedTokens(address[] memory tokens, uint8[] memory indexes) external onlyOwner {
     require(tokens.length == indexes.length, "Tokens and indexes should have the same length");

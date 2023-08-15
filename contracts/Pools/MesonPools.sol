@@ -29,7 +29,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @dev Designed to be used by a new address who wants to be an LP and register a pool index
   /// @param amount The amount of tokens to be added to the pool
   /// @param poolTokenIndex In format of `tokenIndex:uint8|poolIndex:uint40`. See `_balanceOfPoolToken` in `MesonStates.sol` for more information.
-  function depositAndRegister(uint256 amount, uint48 poolTokenIndex) external {
+  function depositAndRegister(uint256 amount, uint48 poolTokenIndex) payable external {
     require(amount > 0, "Amount must be positive");
 
     address poolOwner = _msgSender();
@@ -42,7 +42,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     _balanceOfPoolToken[poolTokenIndex] += amount;
     uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
-    _unsafeDepositToken(tokenForIndex[tokenIndex], poolOwner, amount, tokenIndex);
+    _unsafeDepositToken(tokenIndex, poolOwner, amount);
 
     emit PoolRegistered(poolIndex, poolOwner);
     emit PoolDeposited(poolTokenIndex, amount);
@@ -55,7 +55,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   /// @dev Designed to be used by addresses authorized to a pool
   /// @param amount The amount of tokens to be added to the pool
   /// @param poolTokenIndex In format of `tokenIndex:uint8|poolIndex:uint40`. See `_balanceOfPoolToken` in `MesonStates.sol` for more information.
-  function deposit(uint256 amount, uint48 poolTokenIndex) external {
+  function deposit(uint256 amount, uint48 poolTokenIndex) payable external {
     require(amount > 0, "Amount must be positive");
 
     uint40 poolIndex = _poolIndexFrom(poolTokenIndex);
@@ -63,7 +63,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(poolIndex == poolOfAuthorizedAddr[_msgSender()], "Need an authorized address as the signer");
     _balanceOfPoolToken[poolTokenIndex] += amount;
     uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
-    _unsafeDepositToken(tokenForIndex[tokenIndex], _msgSender(), amount, tokenIndex);
+    _unsafeDepositToken(tokenIndex, _msgSender(), amount);
 
     emit PoolDeposited(poolTokenIndex, amount);
   }
@@ -80,7 +80,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(ownerOfPool[poolIndex] == _msgSender(), "Need the pool owner as the signer");
     _balanceOfPoolToken[poolTokenIndex] -= amount;
     uint8 tokenIndex = _tokenIndexFrom(poolTokenIndex);
-    _safeTransfer(tokenForIndex[tokenIndex], _msgSender(), amount, tokenIndex);
+    _safeTransfer(tokenIndex, _msgSender(), amount);
 
     emit PoolWithdrawn(poolTokenIndex, amount);
   }
@@ -272,9 +272,9 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
   function _release(uint256 encodedSwap, uint8 tokenIndex, address initiator, address recipient, uint256 amount) private {
     if (_willTransferToContract(encodedSwap)) {
-      _transferToContract(tokenForIndex[tokenIndex], recipient, initiator, amount, tokenIndex, _saltDataFrom(encodedSwap));
+      _transferToContract(tokenIndex, recipient, initiator, amount, _saltDataFrom(encodedSwap));
     } else {
-      _safeTransfer(tokenForIndex[tokenIndex], recipient, amount, tokenIndex);
+      _safeTransfer(tokenIndex, recipient, amount);
     }
   }
 
@@ -295,7 +295,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     }
 
     uint8 tokenIndex = _outTokenIndexFrom(encodedSwap);
-    _safeTransfer(tokenForIndex[tokenIndex], recipient, releaseAmount, tokenIndex);
+    _safeTransfer(tokenIndex, recipient, releaseAmount);
 
     emit SwapReleased(encodedSwap);
   }
