@@ -4,7 +4,7 @@ import { MesonStatesTest } from '@mesonfi/contract-types'
 
 import { expect } from './shared/expect'
 import { initiator } from './shared/wallet'
-import { getSwap, TestAddress, TestAddress2 } from './shared/meson'
+import { getSwap, TestAddress, TestAddress2, AddressOne } from './shared/meson'
 
 describe('MesonStates', () => {
   const testnetMode = true
@@ -31,6 +31,10 @@ describe('MesonStates', () => {
     it('rejects zero address', async () => {
       await expect(mesonInstance.addSupportToken(ethers.constants.AddressZero, 1))
         .to.revertedWith('Cannot use zero address')
+    })
+    it('rejects token index 255 for address other than 0x1', async () => {
+      await expect(mesonInstance.addSupportToken(TestAddress, 255))
+        .to.revertedWith('Token index 255 (ETH) requires adddress(0x1)')
     })
     it('accepts non-zero index', async () => {
       await mesonInstance.addSupportToken(TestAddress, 1)
@@ -66,10 +70,11 @@ describe('MesonStates', () => {
   describe('#getSupportedTokens', () => {
     it('returns the array of supported tokens', async () => {
       await mesonInstance.addSupportToken(TestAddress, 1)
-      await mesonInstance.addSupportToken(TestAddress2, 255)
+      await mesonInstance.addSupportToken(TestAddress2, 128)
+      await mesonInstance.addSupportToken(AddressOne, 255)
       const { tokens, indexes } = await mesonInstance.getSupportedTokens()
-      expect(tokens).to.deep.equal([TestAddress, TestAddress2])
-      expect(indexes).to.deep.equal([1, 255])
+      expect(tokens).to.deep.equal([TestAddress, TestAddress2, AddressOne])
+      expect(indexes).to.deep.equal([1, 128, 255])
     })
   })
 

@@ -4,6 +4,7 @@ import { PartialSwapData, SwapData } from '@mesonfi/sdk'
 
 export const TestAddress = '0x7F342A0D04B951e8600dA1eAdD46afe614DaC20B'
 export const TestAddress2 = '0x2eF8a51F8fF129DBb874A0efB021702F59C1b211'
+export const AddressOne = '0x0000000000000000000000000000000000000001'
 
 export function getPartialSwap({
   amount = ethers.utils.parseUnits('1000', 6) as BigNumberish,

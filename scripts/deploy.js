@@ -48,7 +48,7 @@ module.exports = async function deploy(network, upgradable, testnetMode) {
 
   if (testnetMode && DEPOSIT_ON_DEPLOY) { // only for testnets
     for (const token of tokens) {
-      await deposit(token.symbol, DEPOSIT_ON_DEPLOY, { network, wallet })
+      await deposit(token.tokenIndex, DEPOSIT_ON_DEPLOY, { network, wallet })
     }
   }
 

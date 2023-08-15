@@ -23,6 +23,7 @@ import AptosAdaptor from './adaptors/aptos/AptosAdaptor'
 import SuiAdaptor from './adaptors/sui/SuiAdaptor'
 
 const Zero = constants.AddressZero.substring(2)
+const AddressOne = '0x0000000000000000000000000000000000000001'
 
 export enum PostedSwapStatus {
   NoneOrAfterRunning = 0, // nothing found on chain
@@ -75,12 +76,12 @@ export class MesonClient {
     return mesonClient
   }
 
-  static fromValue (value: BigNumberish, tokenIndex?: number) {
-    return utils.formatUnits(value || '0', tokenIndex === 255 ? 4 : 6).replace(/\.0*$/, '')
+  static fromSwapValue (value: BigNumberish) {
+    return utils.formatUnits(value || '0', 6).replace(/\.0*$/, '')
   }
 
-  static toValue (amount: string, tokenIndex?: number) {
-    return utils.parseUnits(amount || '0', tokenIndex === 255 ? 4 : 6)
+  static toSwapValue (amount: string) {
+    return utils.parseUnits(amount || '0', 6)
   }
 
   static subValue (v1 = '0', v2 = '0') {
@@ -96,7 +97,9 @@ export class MesonClient {
       return
     }
     const lowerCaseSymbol = symbol.toLowerCase()
-    if (lowerCaseSymbol.includes('usdc')) {
+    if (lowerCaseSymbol.includes('eth')) {
+      return 'eth'
+    } else if (lowerCaseSymbol.includes('usdc')) {
       return 'usdc'
     } else if (lowerCaseSymbol.includes('usdt')) {
       return 'usdt'
@@ -241,14 +244,14 @@ export class MesonClient {
     return this.formatAddress(await this.#mesonInstance.ownerOfPool(poolIndex, ...overrides))
   }
 
-  #formatBalance(raw: BigNumberish, decimals = 6, tokenIndex?: number) {
+  #formatBalance(raw: BigNumberish, decimals = 6) {
     let value = BigNumber.from(raw)
     if (decimals > 6) {
       value = value.div(10 ** (decimals - 6))
     }
     return {
       value,
-      display: MesonClient.fromValue(value, tokenIndex)
+      display: MesonClient.fromSwapValue(value)
     }
   }
 
@@ -262,91 +265,110 @@ export class MesonClient {
   }
 
   async getTokenBalance(addr: string, tokenIndex: number) {
+    if (tokenIndex === 255) {
+      const rawValue = await this.getBalance(addr)
+      return this.#formatBalance(rawValue, 18)
+    }
     const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: addr })
     const tokenContract = this.getTokenContract(tokenAddr)
     const rawValue = await tokenContract.balanceOf(addr, { from: addr })
     const decimals = await tokenContract.decimals({ from: addr })
-    return this.#formatBalance(rawValue, decimals, tokenIndex)
+    return this.#formatBalance(rawValue, decimals)
   }
 
   async getAllowance (addr: string, tokenIndex: number) {
+    if (tokenIndex === 255) {
+      return this.#formatBalance(BigNumber.from(2).pow(128).sub(1))
+    }
     const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: addr })
     const tokenContract = this.getTokenContract(tokenAddr)
     const rawValue = await tokenContract.allowance(addr, this.address, { from: addr })
     const decimals = await tokenContract.decimals({ from: addr })
-    return this.#formatBalance(rawValue, decimals, tokenIndex)
+    return this.#formatBalance(rawValue, decimals)
   }
 
   async getBalanceInPool(owner: string, tokenIndex: number) {
     const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: owner })
     const rawValue = await this.#mesonInstance.poolTokenBalance(tokenAddr, owner, { from: owner })
-    return this.#formatBalance(rawValue, 6, tokenIndex)
+    return this.#formatBalance(rawValue, 6)
   }
 
   async serviceFeeCollected(tokenIndex: number, ...overrides: [CallOverrides?]) {
     const rawValue = await this.#mesonInstance.serviceFeeCollected(tokenIndex, ...overrides)
-    return this.#formatBalance(rawValue, 6, tokenIndex)
+    return this.#formatBalance(rawValue, 6)
   }
 
   async inContractTokenBalance(tokenIndex: number, ...overrides: [CallOverrides?]) {
+    if (tokenIndex === 255) {
+      const rawValue = await this.getBalance(this.address)
+      return this.#formatBalance(rawValue, 18)
+    }
     const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, ...overrides)
     const tokenContract = this.getTokenContract(tokenAddr)
     const rawValue = await tokenContract.balanceOf(this.address, ...overrides)
     const decimals = await tokenContract.decimals(...overrides)
-    return this.#formatBalance(rawValue, decimals, tokenIndex)
+    return this.#formatBalance(rawValue, decimals)
   }
 
   // only for aptos & sui
   async pendingTokenBalance(tokenIndex: number) {
     const rawValue = await (this.#mesonInstance as any).pendingTokenBalance(tokenIndex)
-    return this.#formatBalance(rawValue, 6, tokenIndex)
+    return this.#formatBalance(rawValue, 6)
   }
 
 
   /// Write methods
-  async transferToken(tokenIndex: number, recipient: string, amount: BigNumberish, ...overrides: [CallOverrides?]) {
+  async transferToken(tokenIndex: number, recipient: string, value: BigNumberish, ...overrides: [CallOverrides?]) {
+    if (tokenIndex === 255) {
+      return this.#mesonInstance.signer.sendTransaction({
+        ...overrides[0],
+        to: recipient,
+        value: BigNumber.from(value).mul(1e12)
+      })
+    }
     const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: this.address })
     const tokenContract = this.getTokenContract(tokenAddr).connect(this.#mesonInstance.signer)
     const decimals = await tokenContract.decimals()
     if (decimals > 6) {
-      amount = BigNumber.from(amount).mul(10 ** (decimals - 6))
+      value = BigNumber.from(value).mul(10 ** (decimals - 6))
     }
-    return tokenContract.transfer(recipient, amount, ...overrides)
+    return tokenContract.transfer(recipient, value, ...overrides)
   }
 
-  async depositAndRegister(token: string, amount: BigNumberish, poolIndex: string) {
-    const tokenIndex = this.tokenIndexOf(token)
-    if (!tokenIndex) {
-      throw new Error(`Token not supported`)
+  async approveToken(tokenIndex: number, spender: string, value: BigNumberish, ...overrides: [CallOverrides?]) {
+    if (tokenIndex === 255) {
+      return
     }
-    return this.#depositAndRegister(amount, tokenIndex, poolIndex)
+    const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: this.address })
+    const tokenContract = this.getTokenContract(tokenAddr).connect(this.#mesonInstance.signer)
+    const decimals = await tokenContract.decimals()
+    if (decimals > 6) {
+      value = BigNumber.from(value).mul(10 ** (decimals - 6))
+    }
+    return tokenContract.approve(spender, value, ...overrides)
   }
 
-  async #depositAndRegister(amount: BigNumberish, tokenIndex: number, poolIndex: string) {
+  async depositAndRegister(tokenIndex: number, value: BigNumberish, poolIndex: string) {
     const poolTokenIndex = utils.solidityPack(['uint8', 'uint40'], [tokenIndex, poolIndex])
-    return this.#mesonInstance.depositAndRegister(amount, poolTokenIndex)
+    const opt: CallOverrides = {}
+    if (tokenIndex === 255) {
+      opt.value = BigNumber.from(value).mul(1e12)
+    }
+    return this.#mesonInstance.depositAndRegister(value, poolTokenIndex)
   }
 
-  async deposit(token: string, amount: BigNumberish) {
-    const tokenIndex = this.tokenIndexOf(token)
-    if (!tokenIndex) {
-      throw new Error(`Token not supported`)
-    }
+  async deposit(tokenIndex: number, value: BigNumberish) {
     const signer = await this.getSignerAddress()
     const poolIndex = await this.poolOfAuthorizedAddr(signer)
     if (!poolIndex) {
       throw new Error(`Address ${signer} not registered. Please call depositAndRegister first.`)
     }
-    const owner = await this.ownerOfPool(poolIndex)
-    if (owner !== signer) {
-      throw new Error(`The signer is not the owner of the LP pool.`)
-    }
-    return this.#deposit(amount, tokenIndex, poolIndex)
-  }
-
-  async #deposit(amount: BigNumberish, tokenIndex: number, poolIndex: number) {
     const poolTokenIndex = utils.solidityPack(['uint8', 'uint40'], [tokenIndex, poolIndex])
-    return this.#mesonInstance.deposit(amount, poolTokenIndex)
+    const opt: CallOverrides = {}
+    if (tokenIndex === 255) {
+      opt.value = BigNumber.from(value).mul(1e12)
+    }
+    return this.#mesonInstance.deposit(value, poolTokenIndex, opt)
   }
 
   requestSwap(swap: PartialSwapData, outChain: string, lockPeriod: number = 5400) {
@@ -387,11 +409,16 @@ export class MesonClient {
     )
   }
 
-  async postSwapFromInitiator(encoded: string, initiator: string, poolIndex: number, ...overrides: [CallOverrides?]) {
+  async postSwapFromInitiator(encoded: string, initiator: string, poolIndex: number, overrides?: CallOverrides) {
+    const opt: CallOverrides = { ...overrides }
+    const swap = Swap.decode(encoded)
+    if (swap.inToken === 255) {
+      opt.value = BigNumber.from(swap.amount).mul(1e12)
+    }
     return this.#mesonInstance.postSwapFromInitiator(
       encoded,
       utils.solidityPack(['address', 'uint40'], [initiator, poolIndex]),
-      ...overrides
+      opt
     )
   }
 

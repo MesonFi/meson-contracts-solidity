@@ -18,7 +18,7 @@ import {
 import { getPartialSwap } from './shared'
 
 const outChain = '0x003c'
-const unsupported = constants.AddressZero
+const unsupportedTokenIndex = 2
 const TestAddress = '0x7F342A0D04B951e8600dA1eAdD46afe614DaC20B'
 
 chai.use(chaiAsPromised)
@@ -28,6 +28,7 @@ describe('MesonClient', () => {
   let initiator: Wallet
   let poolOwner: Wallet
   let token: MockToken
+  let tokenIndex: number
   let mesonInstance: Meson
   let mesonClientForInitiator: MesonClient
   let mesonClientForPoolOwner: MesonClient
@@ -38,6 +39,7 @@ describe('MesonClient', () => {
     poolOwner = wallets[2]
     const swapSigner = new EthersWalletSwapSigner(initiator)
 
+    tokenIndex = 1
     const tokenFactory = new ContractFactory(ERC20Abi.abi, ERC20Abi.bytecode, wallets[0])
     token = await tokenFactory.deploy('MockToken', 'MT', utils.parseUnits('10000', 6), 6) as MockToken
     await token.transfer(initiator.address, utils.parseUnits('3000', 6))
@@ -45,7 +47,7 @@ describe('MesonClient', () => {
 
     const mesonFactory = new ContractFactory(MesonAbi.abi, MesonAbi.bytecode, wallets[0])
     mesonInstance = await mesonFactory.deploy(poolOwner.address) as Meson
-    await mesonInstance.addMultipleSupportedTokens([token.address], [1])
+    await mesonInstance.addMultipleSupportedTokens([token.address], [tokenIndex])
     mesonClientForInitiator = await MesonClient.Create(mesonInstance.connect(initiator), swapSigner)
     mesonClientForPoolOwner = await MesonClient.Create(mesonInstance.connect(poolOwner))
   })
@@ -85,26 +87,29 @@ describe('MesonClient', () => {
   describe('#depositAndRegister', () => {
     const amount = utils.parseUnits('100', 6)
     it('rejects unsupported token', async () => {
-      await expect(mesonClientForPoolOwner.depositAndRegister(unsupported, amount, '1'))
+      await expect(mesonClientForPoolOwner.depositAndRegister(unsupportedTokenIndex, amount, '1'))
         .to.be.rejectedWith('Token not supported')
-    })
+  })
     it('accepts a supported token deposit', async () => {
       await token.connect(poolOwner).approve(mesonInstance.address, amount)
-      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+      await mesonClientForPoolOwner.depositAndRegister(tokenIndex, amount, '1')
     })
   })
 
   describe('#deposit', () => {
+    const amount = utils.parseUnits('100', 6)
     it('rejects unsupported token', async () => {
-      await expect(mesonClientForPoolOwner.deposit(unsupported, '1'))
+      await token.connect(poolOwner).approve(mesonInstance.address, amount)
+      await mesonClientForPoolOwner.depositAndRegister(tokenIndex, amount, '1')
+      await expect(mesonClientForPoolOwner.deposit(unsupportedTokenIndex, '1'))
         .to.be.rejectedWith('Token not supported')
     })
 
     it('accepts a supported token deposit', async () => {
       const amount = utils.parseUnits('10', 6)
       await token.connect(poolOwner).approve(mesonInstance.address, utils.parseUnits('100', 6))
-      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
-      await mesonClientForPoolOwner.deposit(token.address, amount)
+      await mesonClientForPoolOwner.depositAndRegister(tokenIndex, amount, '1')
+      await mesonClientForPoolOwner.deposit(tokenIndex, amount)
     })
   })
 
@@ -119,7 +124,7 @@ describe('MesonClient', () => {
       signedRequest = new SignedSwapRequest(signedRequestData)
 
       await token.connect(poolOwner).approve(mesonInstance.address, 1)
-      await mesonClientForPoolOwner.depositAndRegister(token.address, '1', '1')
+      await mesonClientForPoolOwner.depositAndRegister(tokenIndex, '1', '1')
     })
 
     it('rejects unregistered pool owner', async () => {
@@ -132,62 +137,59 @@ describe('MesonClient', () => {
     })
   })
 
-  describe('#lock', () => {
-    let signedRequest
+  describe('#lockSwap', () => {
+    let swap
 
     beforeEach('prepare for lock', async () => {
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
-      const signedRequestData = await swap.signForRequest(true)
-      signedRequest = new SignedSwapRequest(signedRequestData)
+      swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
 
       const amount = utils.parseUnits('999', 6)
       await token.connect(poolOwner).approve(mesonInstance.address, amount)
-      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+      await mesonClientForPoolOwner.depositAndRegister(tokenIndex, amount, '1')
     })
 
     it('locks a swap', async () => {
-      await mesonClientForPoolOwner.lock(signedRequest)
+      await mesonClientForPoolOwner.lockSwap(swap.encoded, initiator.address)
     })
   })
 
   describe('#unlock', () => {
+    let swap
     let signedRequest
 
     beforeEach('prepare for unlock', async () => {
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
+      swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
       signedRequest = new SignedSwapRequest(signedRequestData)
 
       const amount = utils.parseUnits('999', 6)
       await token.connect(poolOwner).approve(mesonInstance.address, amount)
-      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+      await mesonClientForPoolOwner.depositAndRegister(tokenIndex, amount, '1')
     })
 
     it('tries to unlock a swap', async () => {
-      await mesonClientForPoolOwner.lock(signedRequest)
+      await mesonClientForPoolOwner.lockSwap(swap.encoded, initiator.address)
       await expect(mesonClientForPoolOwner.unlock(signedRequest))
         .to.be.revertedWith('Swap still in lock')
     })
   })
 
   describe('#release', () => {
-    let signedRequest
+    let swap
     let signedRelease
 
     beforeEach('prepare for release', async () => {
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
-      const signedRequestData = await swap.signForRequest(true)
-      signedRequest = new SignedSwapRequest(signedRequestData)
+      swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedReleaseData = await swap.signForRelease(TestAddress, true)
       signedRelease = new SignedSwapRelease(signedReleaseData)
 
       const amount = utils.parseUnits('999', 6)
       await token.connect(poolOwner).approve(mesonInstance.address, amount)
-      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+      await mesonClientForPoolOwner.depositAndRegister(tokenIndex, amount, '1')
     })
 
     it('releases a swap', async () => {
-      await mesonClientForPoolOwner.lock(signedRequest)
+      await mesonClientForPoolOwner.lockSwap(swap.encoded, initiator.address)
       await mesonClientForPoolOwner.release(signedRelease)
     })
   })
@@ -206,7 +208,7 @@ describe('MesonClient', () => {
       signedRelease = new SignedSwapRelease(signedReleaseData)
 
       await token.connect(poolOwner).approve(mesonInstance.address, 1)
-      await mesonClientForPoolOwner.depositAndRegister(token.address, '1', '1')
+      await mesonClientForPoolOwner.depositAndRegister(tokenIndex, '1', '1')
     })
 
     it('executes a swap', async () => {
@@ -216,38 +218,40 @@ describe('MesonClient', () => {
   })
 
   describe('#cancelSwap', () => {
+    let swap
     let signedRequest
 
     beforeEach('prepare for cancel', async () => {
       await token.connect(initiator).approve(mesonInstance.address, utils.parseUnits('1000', 6))
 
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
+      swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
       signedRequest = new SignedSwapRequest(signedRequestData)
 
       await token.connect(poolOwner).approve(mesonInstance.address, 1)
-      await mesonClientForPoolOwner.depositAndRegister(token.address, '1', '1')
+      await mesonClientForPoolOwner.depositAndRegister(tokenIndex, '1', '1')
     })
 
     it('tries to cancel a swap', async () => {
       await mesonClientForPoolOwner.postSwap(signedRequest)
-      await expect(mesonClientForPoolOwner.cancelSwap(signedRequest.encoded))
+      await expect(mesonClientForPoolOwner.cancelSwap(swap.encoded))
         .to.be.revertedWith('Swap is still locked')
     })
   })
 
   describe('#getPostedSwap', () => {
+    let swap
     let signedRequest
 
     beforeEach('prepare for getPostedSwap', async () => {
       await token.connect(initiator).approve(mesonInstance.address, utils.parseUnits('1000', 6))
 
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
+      swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
       const signedRequestData = await swap.signForRequest(true)
       signedRequest = new SignedSwapRequest(signedRequestData)
 
       await token.connect(poolOwner).approve(mesonInstance.address, 1)
-      await mesonClientForPoolOwner.depositAndRegister(token.address, '1', '1')
+      await mesonClientForPoolOwner.depositAndRegister(tokenIndex, '1', '1')
 
       await mesonClientForPoolOwner.postSwap(signedRequest)
     })
@@ -258,7 +262,7 @@ describe('MesonClient', () => {
     })
 
     it('returns the posted swap', async () => {
-      const posted = await mesonClientForInitiator.getPostedSwap(signedRequest.encoded)
+      const posted = await mesonClientForInitiator.getPostedSwap(swap.encoded)
       expect(posted.status).to.equal(PostedSwapStatus.Bonded)
       expect(posted.initiator).to.equal(initiator.address)
       expect(posted.poolOwner).to.equal(poolOwner.address.toLowerCase())
@@ -266,22 +270,20 @@ describe('MesonClient', () => {
   })
 
   describe('#getLockedSwap', () => {
-    let signedRequest
+    let swap
 
     beforeEach('prepare for getLockedSwap', async () => {
-      const swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
-      const signedRequestData = await swap.signForRequest(true)
-      signedRequest = new SignedSwapRequest(signedRequestData)
+      swap = mesonClientForInitiator.requestSwap(getPartialSwap(), outChain)
 
       const amount = utils.parseUnits('999', 6)
       await token.connect(poolOwner).approve(mesonInstance.address, amount)
-      await mesonClientForPoolOwner.depositAndRegister(token.address, amount, '1')
+      await mesonClientForPoolOwner.depositAndRegister(tokenIndex, amount, '1')
 
-      await mesonClientForPoolOwner.lock(signedRequest)
+      await mesonClientForPoolOwner.lockSwap(swap.encoded, initiator.address)
     })
 
     it('returns the locked swap', async () => {
-      const locked = await mesonClientForInitiator.getLockedSwap(signedRequest.encoded, initiator.address)
+      const locked = await mesonClientForInitiator.getLockedSwap(swap.encoded, initiator.address)
       expect(locked.status).to.equal(LockedSwapStatus.Locked)
       expect(locked.poolOwner).to.equal(poolOwner.address.toLowerCase())
     })

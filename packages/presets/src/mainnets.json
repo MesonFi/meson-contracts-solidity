@@ -35,6 +35,13 @@
         "decimals": 18,
         "addr": "0x4fabb145d64652a948d72533023f6e7a623c7c53",
         "tokenIndex": 35
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },
@@ -162,6 +169,13 @@
         "decimals": 6,
         "addr": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
         "tokenIndex": 9
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },
@@ -199,6 +213,13 @@
         "decimals": 6,
         "addr": "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
         "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },
@@ -358,6 +379,13 @@
         "decimals": 6,
         "addr": "0x4988a896b1227218e4A686fdE5EabdcAbd91571f",
         "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },
@@ -570,6 +598,13 @@
         "link": "",
         "tokenIndex": 2,
         "disabled": true
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },
@@ -607,6 +642,13 @@
         "decimals": 6,
         "tokenIndex": 2,
         "addr": "0x1E4a5963aBFD975d8c9021ce480b42188849D41d"
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },
@@ -643,6 +685,13 @@
         "decimals": 6,
         "addr": "0xA219439258ca9da29E9Cc4cE5596924745e12B93",
         "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },

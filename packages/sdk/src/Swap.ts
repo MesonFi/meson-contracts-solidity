@@ -125,8 +125,26 @@ export class Swap implements SwapData {
     return this._encoded
   }
 
-  get deprecatedEncoding() : boolean {
+  get deprecatedEncoding(): boolean {
     return this.version < MESON_PROTOCOL_VERSION
+  }
+
+  _isUCT(forOutToken: boolean = false): boolean {
+    if (forOutToken) {
+      return this.expireTs < 1691700000 && this.outToken === 255
+    } else {
+      return this.expireTs < 1691700000 && this.inToken === 255
+    }
+  }
+
+  v(forOutToken: boolean = false): string {
+    if (this.version === 0) {
+      return 'v0'
+    } else if (this._isUCT(forOutToken)) {
+      return 'v1_uct'
+    } else {
+      return `v${this.version}`
+    }
   }
 
   get willWaiveFee(): boolean {
@@ -137,8 +155,9 @@ export class Swap implements SwapData {
     if (this.deprecatedEncoding || this.willWaiveFee) {
       return BigNumber.from(0)
     }
+    const minFee = BigNumber.from(this.inToken >= 254 ? 500 : 500_000)
     const fee = this.amount.div(2000)
-    return fee.gt(500000) ? fee : BigNumber.from(500000)
+    return fee.gt(minFee) ? fee : minFee
   }
 
   get totalFee(): BigNumber {

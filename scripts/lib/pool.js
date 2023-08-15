@@ -1,13 +1,13 @@
-const { ethers } = require('hardhat')
-const { adaptors } = require('@mesonfi/sdk')
-const { Meson, ERC20 } = require('@mesonfi/contract-abis')
+const { MesonClient, adaptors } = require('@mesonfi/sdk')
+const { Meson } = require('@mesonfi/contract-abis')
 
-function getToken(network, symbol, wallet) {
-  const token = symbol.toLowerCase() === 'uct'
-    ? { addr: network.uctAddress, tokenIndex: 255 }
-    : network.tokens.find(t => !t.disabled && t.symbol.toLowerCase().includes(symbol.toLowerCase()))
-  const instance = adaptors.getContract(token.addr, ERC20.abi, wallet)
-  return { instance, tokenIndex: token.tokenIndex }
+function getTokenIndex(network, symbol) {
+  if (symbol.toLowerCase() === 'uct') {
+    return 255
+  }
+
+  const token = network.tokens.find(t => !t.disabled && t.symbol.toLowerCase().includes(symbol.toLowerCase()))
+  return token.tokenIndex
 }
 
 exports.addSupportedTokens = async function addSupportedTokens(tokens, { network, wallet }) {
@@ -24,30 +24,40 @@ exports.addSupportedTokens = async function addSupportedTokens(tokens, { network
   return tx
 }
 
+exports.removeSupportToken = async function removeSupportToken(tokenIndex, { network, wallet }) {
+  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
+
+  console.log('Removing supported token', tokenIndex)
+  const tx = await mesonInstance.removeSupportToken(tokenIndex)
+  await tx.wait(1)
+  return tx
+}
+
 exports.deposit = async function deposit(symbol, amount, { network, wallet }) {
   const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
-  const token = getToken(network, symbol, wallet)
-  const decimals = await token.instance.decimals()
-  const value = ethers.utils.parseUnits(amount, decimals)
-  const allowance = await token.instance.allowance(wallet.address, mesonInstance.address)
-  console.log(`Allowance: ${ethers.utils.formatUnits(allowance, decimals)}`)
-  if (allowance.lt(value)) {
+  const mesonClient = await MesonClient.Create(mesonInstance)
+  const tokenIndex = getTokenIndex(network, symbol)
+
+  const allowance = await mesonClient.getAllowance(wallet.address, tokenIndex)
+  console.log(`Allowance: ${allowance.display}`)
+  const value = MesonClient.toSwapValue(amount)
+  if (allowance.value.lt(value)) {
     console.log(`Approving...`)
-    const allowance = ethers.utils.parseUnits('1000000000', decimals) // 1B
-    const tx = await token.instance.approve(mesonInstance.address, allowance)
+    const toApprove = MesonClient.toSwapValue('1000000000') // 1B
+    const tx = await mesonClient.approveToken(tokenIndex, mesonInstance.address, toApprove)
     await tx.wait(1)
   }
 
   console.log(`Depositing ${amount} ${symbol}...`)
   const poolIndex = await mesonInstance.poolOfAuthorizedAddr(wallet.address)
   const needRegister = poolIndex == 0
-  const poolTokenIndex = token.tokenIndex * 2**40 + (needRegister ? 1 : poolIndex)
+  const poolTokenIndex = tokenIndex * 2**40 + (needRegister ? 1 : poolIndex)
 
   let tx
   if (needRegister) {
-    tx = await mesonInstance.depositAndRegister(ethers.utils.parseUnits(amount, 6), poolTokenIndex)
+    tx = await mesonClient.depositAndRegister(tokenIndex, value, poolTokenIndex)
   } else {
-    tx = await mesonInstance.deposit(ethers.utils.parseUnits(amount, 6), poolTokenIndex)
+    tx = await mesonClient.deposit(tokenIndex, value, poolTokenIndex)
   }
   await tx.wait(1)
   return tx
@@ -55,34 +65,36 @@ exports.deposit = async function deposit(symbol, amount, { network, wallet }) {
 
 exports.withdraw = async function withdraw(symbol, amount, { network, wallet }) {
   const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
-  const token = getToken(network, symbol, wallet)
+  const tokenIndex = getTokenIndex(network, symbol)
 
   console.log(`Withdrawing ${amount} ${symbol}...`)
   const poolIndex = await mesonInstance.poolOfAuthorizedAddr(wallet.address)
-  const poolTokenIndex = token.tokenIndex * 2**40 + poolIndex
+  const poolTokenIndex = tokenIndex * 2**40 + poolIndex
 
-  // const gasLimit = await mesonInstance.estimateGas.withdraw(ethers.utils.parseUnits(amount, 6), poolTokenIndex)
-  const tx = await mesonInstance.withdraw(ethers.utils.parseUnits(amount, 6), poolTokenIndex)
+  // const gasLimit = await mesonInstance.estimateGas.withdraw(MesonClient.toSwapValue(amount), poolTokenIndex)
+  const tx = await mesonInstance.withdraw(MesonClient.toSwapValue(amount), poolTokenIndex)
   await tx.wait(1)
   return tx
 }
 
 exports.withdrawServiceFee = async function withdraw(symbol, amount, { network, wallet }) {
   const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
-  const token = getToken(network, symbol, wallet)
+  const tokenIndex = getTokenIndex(network, symbol)
 
   console.log(`Withdrawing Service Fee ${amount} ${symbol}...`)
 
-  const tx = await mesonInstance.withdrawServiceFee(token.tokenIndex, ethers.utils.parseUnits(amount, 6), 1)
+  const tx = await mesonInstance.withdrawServiceFee(tokenIndex, MesonClient.toSwapValue(amount), 1)
   await tx.wait(1)
   return tx
 }
 
 exports.send = async function send(symbol, amount, recipient, { network, wallet }) {
-  const token = getToken(network, symbol, wallet)
-  const decimals = await token.instance.decimals()
+  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
+  const mesonClient = await MesonClient.Create(mesonInstance)
+  const tokenIndex = getTokenIndex(network, symbol)
+
   console.log(`Sending ${amount} ${symbol} to ${recipient}...`)
-  const tx = await token.instance.transfer(recipient, ethers.utils.parseUnits(amount, decimals))
+  const tx = await mesonClient.transferToken(tokenIndex, recipient, MesonClient.toSwapValue(amount))
   await tx.wait(1)
   return tx
 }

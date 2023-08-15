@@ -93,16 +93,7 @@ export class MesonPresets {
     if (!match) {
       return []
     }
-    return [
-      ...match.tokens.filter(t => includeDisabled || !t.disabled),
-      {
-        addr: match.uctAddress,
-        name: 'USD Coupon Token',
-        symbol: 'UCT',
-        decimals: 4,
-        tokenIndex: 255,
-      }
-    ].filter(t => t.addr)
+    return match.tokens.filter(t => t.addr && (includeDisabled || !t.disabled))
   }
 
   getToken(networkId: string, tokenIndex: number): PresetToken {
@@ -110,7 +101,7 @@ export class MesonPresets {
     return tokens?.find(t => t.tokenIndex === tokenIndex)
   }
 
-  getV0Token(networkId: string, tokenIndex: number): PresetToken {
+  _getV0Token(networkId: string, tokenIndex: number): PresetToken {
     const network = v0_networks.find(n => n.id === networkId)
     if (!network) {
       return
@@ -127,6 +118,23 @@ export class MesonPresets {
     return network.tokens.find(t => t.tokenIndex === tokenIndex)
   }
 
+  _getTokenWithDeprecated(networkId: string, tokenIndex: number, v: string = 'v1') {
+    if (v === 'v0') {
+      return this._getV0Token(networkId, tokenIndex)
+    } else if (v === 'v1_uct') {
+      const network = this.getNetwork(networkId)
+      return network?.uctAddress && {
+        addr: network.uctAddress,
+        name: 'USD Coupon Token',
+        symbol: 'UCT',
+        decimals: 4,
+        tokenIndex: 255,
+      }
+    } else {
+      return this.getToken(networkId, tokenIndex)
+    }
+  }
+
   getTokenByCategory (networkId: string, category = '') {
     const tokens = this.getTokensForNetwork(networkId)
     return tokens?.find(t => MesonClient.categoryFromSymbol(t.symbol) === category.toLowerCase())
@@ -137,19 +145,14 @@ export class MesonPresets {
     return MesonClient.categoryFromSymbol(token?.symbol)
   }
 
-  getNetworkToken(shortCoinType: string, tokenIndex: number, version: number = 1):
+  getNetworkToken(shortCoinType: string, tokenIndex: number, v: string = 'v1'):
     { network: PresetNetwork; token?: any }
   {
     const network = this.getNetworkFromShortCoinType(shortCoinType)
     if (!network) {
       return
     }
-    let token
-    if (version === 0) {
-      token = this.getV0Token(network.id, tokenIndex)
-    } else {
-      token = this.getToken(network.id, tokenIndex)
-    }
+    const token = this._getTokenWithDeprecated(network.id, tokenIndex, v)
     if (!token) {
       return { network }
     }
@@ -161,8 +164,8 @@ export class MesonPresets {
       return {}
     }
     const swap = Swap.decode(encoded)
-    const from = this.getNetworkToken(swap.inChain, swap.inToken, swap.version)
-    const to = this.getNetworkToken(swap.outChain, swap.outToken, swap.version)
+    const from = this.getNetworkToken(swap.inChain, swap.inToken, swap.v(false))
+    const to = this.getNetworkToken(swap.outChain, swap.outToken, swap.v(true))
     return { swap, from, to }
   }
 
