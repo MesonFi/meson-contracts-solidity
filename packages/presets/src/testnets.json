@@ -28,6 +28,13 @@
         "decimals": 6,
         "addr": "0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49",
         "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },
@@ -65,6 +72,13 @@
         "decimals": 6,
         "addr": "0xd53e9530107a8d8856099d7d80126478d48e06dA",
         "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },
@@ -183,6 +197,13 @@
         "decimals": 6,
         "addr": "0xB401e876346B3C77DD51781Efba5223d2F1e6697",
         "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },
@@ -220,6 +241,13 @@
         "decimals": 6,
         "addr": "0x853eb4bA5D0Ba2B77a0A5329Fd2110d5CE149ECE",
         "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },
@@ -259,6 +287,13 @@
         "addr": "0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b",
         "link": "address/0x3e7676937A7E96CFB7616f255b9AD9FF47363D4b",
         "tokenIndex": 36
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },
@@ -446,22 +481,29 @@
         "decimals": 6,
         "addr": "0x1990BC6dfe2ef605Bfc08f5A23564dB75642Ad73",
         "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },
   {
-    "id": "scroll-testnet",
-    "name": "Scroll Testnet",
+    "id": "scroll-sepolia",
+    "name": "Scroll Sepolia",
     "alias": "SCROLL",
-    "chainId": "0x82751",
-    "slip44": "0x80002751",
-    "shortSlip44": "0x2751",
+    "chainId": "0x8274f",
+    "slip44": "0x80002750",
+    "shortSlip44": "0x2750",
     "extensions": [
       "metamask"
     ],
     "addressFormat": "ethers",
-    "url": "https://alpha-rpc.scroll.io/l2",
-    "explorer": "https://blockscout.scroll.io",
+    "url": "https://sepolia-rpc.scroll.io",
+    "explorer": "https://sepolia-blockscout.scroll.io",
     "nativeCurrency": {
       "name": "ETH",
       "symbol": "ETH",
@@ -470,11 +512,11 @@
     "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
     "tokens": [
       {
-        "name": "USDC",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0x67aE69Fd63b4fc8809ADc224A9b82Be976039509",
-        "tokenIndex": 1
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },

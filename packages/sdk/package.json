@@ -1,6 +1,6 @@
 {
   "name": "@mesonfi/sdk",
-  "version": "1.11.0-alpha.2",
+  "version": "1.11.0",
   "description": "",
   "license": "MIT",
   "repository": "https://github.com/MesonFi/meson-contracts-solidity",

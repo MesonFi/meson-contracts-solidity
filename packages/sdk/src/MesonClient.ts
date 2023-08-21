@@ -99,7 +99,7 @@ export class MesonClient {
     const lowerCaseSymbol = symbol.toLowerCase()
     if (lowerCaseSymbol.includes('eth')) {
       return 'eth'
-    } else if (lowerCaseSymbol.includes('usdc')) {
+    } else if (lowerCaseSymbol.includes('usdc') || lowerCaseSymbol.includes('usdbc')) {
       return 'usdc'
     } else if (lowerCaseSymbol.includes('usdt')) {
       return 'usdt'

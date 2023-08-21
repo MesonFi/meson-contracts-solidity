@@ -763,6 +763,42 @@
     ]
   },
   {
+    "id": "base",
+    "name": "Base",
+    "alias": "base",
+    "chainId": "0x2105",
+    "slip44": "0x80002105",
+    "shortSlip44": "0x2105",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://mainnet.base.org",
+    "explorer": "https://basescan.org",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Base Coin",
+        "symbol": "USDbC",
+        "decimals": 6,
+        "addr": "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA",
+        "tokenIndex": 4
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
     "id": "aptos",
     "name": "Aptos",
     "alias": "APT",
