@@ -523,7 +523,7 @@
   {
     "id": "skale-testnet",
     "name": "SKALE Testnet (Europa)",
-    "alias": "sFUEL",
+    "alias": "SKALE",
     "chainId": "0x1c6199cc",
     "slip44": "0x1c6199cc",
     "shortSlip44": "0x99cc",
@@ -553,6 +553,35 @@
         "decimals": 6,
         "addr": "0xa388F9783d8E5B0502548061c3b06bf4300Fc0E1",
         "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "ancient8-sepolia",
+    "name": "Ancient8 Sepolia",
+    "alias": "A8",
+    "chainId": "0xaaaaaaab",
+    "slip44": "0xaaaaaaaa",
+    "shortSlip44": "0xaaaa",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc-testnet.ancient8.gg",
+    "explorer": "https://testnet.a8scan.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   }
