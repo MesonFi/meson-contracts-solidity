@@ -50,14 +50,12 @@ exports.deposit = async function deposit(symbol, amount, { network, wallet }) {
 
   console.log(`Depositing ${amount} ${symbol}...`)
   const poolIndex = await mesonInstance.poolOfAuthorizedAddr(wallet.address)
-  const needRegister = poolIndex == 0
-  const poolTokenIndex = tokenIndex * 2**40 + (needRegister ? 1 : poolIndex)
 
   let tx
-  if (needRegister) {
-    tx = await mesonClient.depositAndRegister(tokenIndex, value, poolTokenIndex)
+  if (poolIndex == 0) {
+    tx = await mesonClient.depositAndRegister(tokenIndex, value, 1)
   } else {
-    tx = await mesonClient.deposit(tokenIndex, value, poolTokenIndex)
+    tx = await mesonClient.deposit(tokenIndex, value)
   }
   await tx.wait(1)
   return tx

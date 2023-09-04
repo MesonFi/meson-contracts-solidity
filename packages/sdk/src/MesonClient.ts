@@ -354,7 +354,7 @@ export class MesonClient {
     if (tokenIndex === 255) {
       opt.value = BigNumber.from(value).mul(1e12)
     }
-    return this.#mesonInstance.depositAndRegister(value, poolTokenIndex)
+    return this.#mesonInstance.depositAndRegister(value, poolTokenIndex, opt)
   }
 
   async deposit(tokenIndex: number, value: BigNumberish) {
