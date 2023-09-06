@@ -584,5 +584,34 @@
         "tokenIndex": 255
       }
     ]
+  },
+  {
+    "id": "manta-goerli",
+    "name": "Manta Goerli",
+    "alias": "MANTA",
+    "chainId": "0x34816d",
+    "slip44": "0x8034816d",
+    "shortSlip44": "0x816d",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://manta-testnet.calderachain.xyz/http",
+    "explorer": "https://pacific-explorer.manta.network",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
   }
 ]

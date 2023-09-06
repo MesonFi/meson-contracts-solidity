@@ -27,6 +27,7 @@
     "testnet:scroll": "hardhat deploy --testnet scroll --upgradable true",
     "testnet:skale": "hardhat deploy --testnet skale --upgradable true",
     "testnet:a8": "hardhat deploy --testnet ancient8 --upgradable true",
+    "testnet:manta": "hardhat deploy --testnet manta --upgradable true",
     "deploy:eth": "hardhat deploy --mainnet eth --upgradable true",
     "deploy:bnb": "hardhat deploy --mainnet bnb --upgradable true",
     "deploy:polygon": "hardhat deploy --mainnet polygon --upgradable true",
