@@ -577,6 +577,13 @@
     "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
     "tokens": [
       {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x292bd500724F87819E28b9643c43f43E6765E1ef",
+        "tokenIndex": 1
+      },
+      {
         "name": "ETH",
         "symbol": "ETH",
         "decimals": 18,
