@@ -799,6 +799,71 @@
     ]
   },
   {
+    "id": "metis",
+    "name": "Metis",
+    "alias": "metis",
+    "chainId": "0x440",
+    "slip44": "0x80000440",
+    "shortSlip44": "0x0440",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://andromeda.metis.io/?owner=1088",
+    "explorer": "https://andromeda-explorer.metis.io",
+    "nativeCurrency": {
+      "name": "METIS",
+      "symbol": "METIS",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "m.USDC",
+        "decimals": 6,
+        "addr": "0xEA32A96608495e54156Ae48931A7c20f0dcc1a21",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "m.USDT",
+        "decimals": 6,
+        "addr": "0xbB06DCA3AE6887fAbF931640f67cab3e3a16F4dC",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "kava",
+    "name": "Kava",
+    "alias": "kava",
+    "chainId": "0x8ae",
+    "slip44": "0x800008ae",
+    "shortSlip44": "0x08ae",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://evm.kava.io",
+    "explorer": "https://kavascan.com",
+    "nativeCurrency": {
+      "name": "KAVA",
+      "symbol": "KAVA",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x919C1c267BC06a7039e03fcc2eF738525769109c",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
     "id": "aptos",
     "name": "Aptos",
     "alias": "APT",

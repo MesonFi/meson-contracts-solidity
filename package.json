@@ -47,7 +47,9 @@
     "deploy:zkevm": "hardhat deploy --mainnet zkevm --upgradable true",
     "deploy:tron": "hardhat deploy --mainnet tron --upgradable true",
     "deploy:linea": "hardhat deploy --mainnet linea --upgradable true",
-    "deploy:base": "hardhat deploy --mainnet base --upgradable true"
+    "deploy:base": "hardhat deploy --mainnet base --upgradable true",
+    "deploy:metis": "hardhat deploy --mainnet metis --upgradable true",
+    "deploy:kava": "hardhat deploy --mainnet kava --upgradable true"
   },
   "devDependencies": {
     "@matterlabs/hardhat-zksync-deploy": "^0.6.2",
