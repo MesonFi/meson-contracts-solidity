@@ -49,7 +49,9 @@
     "deploy:linea": "hardhat deploy --mainnet linea --upgradable true",
     "deploy:base": "hardhat deploy --mainnet base --upgradable true",
     "deploy:metis": "hardhat deploy --mainnet metis --upgradable true",
-    "deploy:kava": "hardhat deploy --mainnet kava --upgradable true"
+    "deploy:kava": "hardhat deploy --mainnet kava --upgradable true",
+    "deploy:skale-europa": "hardhat deploy --mainnet skale-europa --upgradable true",
+    "deploy:skale-nebula": "hardhat deploy --mainnet skale-nebula --upgradable true"
   },
   "devDependencies": {
     "@matterlabs/hardhat-zksync-deploy": "^0.6.2",

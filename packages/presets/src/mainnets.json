@@ -939,5 +939,70 @@
         "tokenIndex": 2
       }
     ]
+  },
+  {
+    "id": "skale-europa",
+    "name": "SKALE Europa",
+    "alias": "SKALE",
+    "chainId": "0x79f99296",
+    "slip44": "0x79f99296",
+    "shortSlip44": "0x9296",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://mainnet.skalenodes.com/v1/elated-tan-skat",
+    "explorer": "https://elated-tan-skat.explorer.mainnet.skalenodes.com",
+    "nativeCurrency": {
+      "name": "sFUEL",
+      "symbol": "sFUEL",
+      "decimals": 18
+    },
+    "mesonAddress": "0x529c2945c257CC737A15733d43a1fD1cBBe79C67",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x5F795bb52dAC3085f578f4877D450e2929D2F13d",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x1c0491E3396AD6a35f061c62387a95d7218FC515",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "skale-nebula",
+    "name": "SKALE Nebula",
+    "alias": "SKALE",
+    "chainId": "0x585eb4b1",
+    "slip44": "0x585eb4b1",
+    "shortSlip44": "0xb4b1",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://mainnet.skalenodes.com/v1/green-giddy-denebola",
+    "explorer": "https://green-giddy-denebola.explorer.mainnet.skalenodes.com",
+    "nativeCurrency": {
+      "name": "sFUEL",
+      "symbol": "sFUEL",
+      "decimals": 18
+    },
+    "mesonAddress": "0x4c2F26ba59cD10C605b669add14966547CA93d02",
+    "tokens": [
+      {
+        "name": "Europa USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0xCC205196288B7A26f6D43bBD68AaA98dde97276d",
+        "tokenIndex": 1
+      }
+    ]
   }
 ]
