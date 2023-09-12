@@ -597,8 +597,8 @@
     "name": "Manta Goerli",
     "alias": "MANTA",
     "chainId": "0x34816d",
-    "slip44": "0x8034816d",
-    "shortSlip44": "0x816d",
+    "slip44": "0x80000263",
+    "shortSlip44": "0x0263",
     "extensions": [
       "metamask"
     ],

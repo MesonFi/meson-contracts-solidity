@@ -864,6 +864,35 @@
     ]
   },
   {
+    "id": "manta",
+    "name": "Manta",
+    "alias": "MANTA",
+    "chainId": "0xa9",
+    "slip44": "0x80000263",
+    "shortSlip44": "0x0263",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://manta-pacific.calderachain.xyz/http",
+    "explorer": "https://manta-pacific.calderaexplorer.xyz",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
     "id": "aptos",
     "name": "Aptos",
     "alias": "APT",

@@ -50,6 +50,7 @@
     "deploy:base": "hardhat deploy --mainnet base --upgradable true",
     "deploy:metis": "hardhat deploy --mainnet metis --upgradable true",
     "deploy:kava": "hardhat deploy --mainnet kava --upgradable true",
+    "deploy:manta": "hardhat deploy --mainnet manta --upgradable true",
     "deploy:skale-europa": "hardhat deploy --mainnet skale-europa --upgradable true",
     "deploy:skale-nebula": "hardhat deploy --mainnet skale-nebula --upgradable true"
   },
