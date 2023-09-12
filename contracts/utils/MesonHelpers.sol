@@ -83,6 +83,29 @@ contract MesonHelpers is MesonConfig, Context {
     return (encodedSwap & 0x0800000000000000000000000000000000000000000000000000) > 0;
   }
 
+  function _swapForCoreToken(uint256 encodedSwap) internal pure returns (bool) {
+    return !_willTransferToContract(encodedSwap) &&
+      ((encodedSwap & 0x0400000000000000000000000000000000000000000000000000) > 0);
+  }
+
+  function _amountForCoreTokenFrom(uint256 encodedSwap) internal pure returns (uint256) {
+    if (_swapForCoreToken(encodedSwap)) {
+      return ((encodedSwap >> 160) & 0x00000FFF) * 1e5;
+    }
+    return 0;
+  }
+
+  function _coreTokenAmount(uint256 encodedSwap) internal pure returns (uint256) {
+    if (_swapForCoreToken(encodedSwap)) {
+      return _amountForCoreTokenFrom(encodedSwap) * 10 / ((encodedSwap >> 172) & 0xFFFFF);
+    }
+    return 0;
+  }
+
+  function _amountToLock(uint256 encodedSwap) internal pure returns (uint256) {
+    return _amountFrom(encodedSwap) - _feeForLp(encodedSwap) - _amountForCoreTokenFrom(encodedSwap);
+  }
+
   /// @notice Decode `expireTs` from `encodedSwap`
   /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _expireTsFrom(uint256 encodedSwap) internal pure returns (uint256) {

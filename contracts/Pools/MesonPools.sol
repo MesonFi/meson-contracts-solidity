@@ -152,8 +152,12 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(until < _expireTsFrom(encodedSwap) - 5 minutes, "Cannot lock because expireTs is soon.");
 
     uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, poolIndex);
-    // Only (amount - lp fee) is locked from the LP pool. The service fee will be charged on release
-    _balanceOfPoolToken[poolTokenIndex] -= (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
+    _balanceOfPoolToken[poolTokenIndex] -= _amountToLock(encodedSwap); // The service fee will be charged on release
+
+    uint256 coreAmount = _coreTokenAmount(encodedSwap);
+    if (coreAmount > 0) {
+      _balanceOfPoolToken[_poolTokenIndexFrom(255, poolIndex)] -= coreAmount;
+    }
 
     _lockedSwaps[swapId] = _lockedSwapFrom(until, poolIndex);
 
@@ -171,9 +175,15 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(lockedSwap > 1, "Swap does not exist");
     require(_untilFromLocked(lockedSwap) < block.timestamp, "Swap still in lock");
 
-    uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, _poolIndexFromLocked(lockedSwap));
-    // (amount - lp fee) will be returned because only that amount was locked
-    _balanceOfPoolToken[poolTokenIndex] += (_amountFrom(encodedSwap) - _feeForLp(encodedSwap));
+    uint40 poolIndex = _poolIndexFromLocked(lockedSwap);
+    uint48 poolTokenIndex = _poolTokenIndexForOutToken(encodedSwap, poolIndex);
+    _balanceOfPoolToken[poolTokenIndex] += _amountToLock(encodedSwap);
+
+    uint256 coreAmount = _coreTokenAmount(encodedSwap);
+    if (coreAmount > 0) {
+      _balanceOfPoolToken[_poolTokenIndexFrom(255, poolIndex)] += coreAmount;
+    }
+
     delete _lockedSwaps[swapId];
 
     emit SwapUnlocked(encodedSwap);
@@ -214,7 +224,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _lockedSwaps[swapId] = 1;
 
     // LP fee will be subtracted from the swap amount
-    uint256 releaseAmount = _amountFrom(encodedSwap) - _feeForLp(encodedSwap);
+    uint256 releaseAmount = _amountToLock(encodedSwap);
     if (!feeWaived) { // If the swap should pay service fee (charged by Meson protocol)
       uint256 serviceFee = _serviceFee(encodedSwap);
       // Subtract service fee from the release amount
@@ -226,6 +236,10 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
     }
 
+    uint256 coreAmount = _coreTokenAmount(encodedSwap);
+    if (coreAmount > 0) {
+      _safeTransfer(255, recipient, coreAmount);
+    }
     _release(encodedSwap, _outTokenIndexFrom(encodedSwap), initiator, recipient, releaseAmount);
 
     emit SwapReleased(encodedSwap);
@@ -256,7 +270,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     _checkReleaseSignature(encodedSwap, recipient, r, yParityAndS, initiator);
     _lockedSwaps[swapId] = 1;
 
-    uint256 releaseAmount = _amountFrom(encodedSwap) - _feeForLp(encodedSwap);
+    uint256 releaseAmount = _amountToLock(encodedSwap);
     _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, poolIndex)] -= releaseAmount;
 
     if (!feeWaived) {
@@ -265,6 +279,11 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
     }
 
+    uint256 coreAmount = _coreTokenAmount(encodedSwap);
+    if (coreAmount > 0) {
+      _balanceOfPoolToken[_poolTokenIndexFrom(255, poolIndex)] -= coreAmount;
+      _safeTransfer(255, recipient, coreAmount);
+    }
     _release(encodedSwap, _outTokenIndexFrom(encodedSwap), initiator, recipient, releaseAmount);
 
     emit SwapReleased(encodedSwap);
@@ -284,7 +303,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     require(_isPremiumManager(), "Caller is not the premium manager");
     require(recipient != address(0), "Recipient cannot be zero address");
 
-    uint256 releaseAmount = _amountFrom(encodedSwap) - _feeForLp(encodedSwap);
+    uint256 releaseAmount = _amountToLock(encodedSwap);
     _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 1)] -= releaseAmount;
 
     bool feeWaived = _feeWaived(encodedSwap);
@@ -294,8 +313,12 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
     }
 
-    uint8 tokenIndex = _outTokenIndexFrom(encodedSwap);
-    _safeTransfer(tokenIndex, recipient, releaseAmount);
+    uint256 coreAmount = _coreTokenAmount(encodedSwap);
+    if (coreAmount > 0) {
+      _balanceOfPoolToken[_poolTokenIndexFrom(255, 1)] -= coreAmount;
+      _safeTransfer(255, recipient, coreAmount);
+    }
+    _safeTransfer(_outTokenIndexFrom(encodedSwap), recipient, releaseAmount);
 
     emit SwapReleased(encodedSwap);
   }
@@ -317,6 +340,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
   modifier forTargetChain(uint256 encodedSwap) {
     require(_outChainFrom(encodedSwap) == SHORT_COIN_TYPE, "Swap not for this chain");
+    require(_outTokenIndexFrom(encodedSwap) < 254 || IS_CORE_ETH, "Swap for core token not available");
     _;
   }
 

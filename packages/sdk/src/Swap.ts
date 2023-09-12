@@ -19,6 +19,10 @@ export interface SwapData {
   version?: number,
   amount: BigNumberish,
   salt?: string,
+  saltHeader?: string,
+  saltData?: string,
+  amountForCoreToken?: BigNumberish,
+  coreTokenPrice?: number,
   fee: BigNumberish,
   expireTs: number,
   inChain: string,
@@ -49,7 +53,8 @@ export class Swap implements SwapData {
     }
     const version = parseInt(`0x${encoded.substring(2, 4)}`, 16)
     const amount = BigNumber.from(`0x${encoded.substring(4, 14)}`)
-    const salt = `0x${encoded.substring(14, 34)}`
+    const saltHeader = `0x${encoded.substring(14, 18)}`
+    const saltData = `0x${encoded.substring(18, 34)}`
     const fee = BigNumber.from(`0x${encoded.substring(34, 44)}`)
     const expireTs = parseInt(`0x${encoded.substring(44, 54)}`, 16)
     const outChain = `0x${encoded.substring(54, 58)}`
@@ -57,7 +62,7 @@ export class Swap implements SwapData {
     const inChain = `0x${encoded.substring(60, 64)}`
     const inToken = parseInt(`0x${encoded.substring(64, 66)}`, 16)
 
-    return new Swap({ version, amount, salt, fee, expireTs, inChain, inToken, outChain, outToken })
+    return new Swap({ version, amount, saltHeader, saltData, fee, expireTs, inChain, inToken, outChain, outToken })
   }
 
   constructor(data: SwapData) {
@@ -89,7 +94,7 @@ export class Swap implements SwapData {
     }
 
     this.version = typeof data.version === 'number' ? data.version : MESON_PROTOCOL_VERSION
-    this.salt = this._makeFullSalt(data.salt)
+    this.salt = this._makeFullSalt(data)
     this.expireTs = data.expireTs
     this.inChain = data.inChain
     this.inToken = data.inToken
@@ -97,14 +102,33 @@ export class Swap implements SwapData {
     this.outToken = data.outToken
   }
 
-  private _makeFullSalt(salt?: string): string {
+  private _makeFullSalt(data: SwapData): string {
+    const { salt, saltHeader, saltData = '0x', amountForCoreToken, coreTokenPrice } = data
     if (salt) {
       if (!utils.isHexString(salt) || salt.length > 22) {
         throw new Error('The given salt is invalid')
       }
       return `${salt}${this._randomHex(22 - salt.length)}`
     }
-
+    if (saltHeader) {
+      if (saltData !== '0x') {
+        return `${saltHeader}${saltData.substring(2)}${this._randomHex(18 - saltData.length)}`
+      }
+      if ((parseInt(saltHeader[3], 16) & 4) === 4) {
+        const saltData1 = BigNumber.from((coreTokenPrice || 0) * 10)
+          .toHexString().substring(2).padStart(5, '0')
+        if (saltData1.length > 5) {
+          throw new Error('Invalid coreTokenPrice; overflow')
+        }
+        const saltData2 = BigNumber.from(amountForCoreToken || 0).div(1e5)
+          .toHexString().substring(2).padStart(3, '0')
+        if (saltData2.length > 3) {
+          throw new Error('Invalid amountForCoreToken; overflow')
+        }
+        return `${saltHeader}${saltData1}${saltData2}${this._randomHex(8)}`
+      }
+      return `${saltHeader}${this._randomHex(16)}`
+    }
     return `0x0000${this._randomHex(16)}`
   }
 
@@ -147,8 +171,12 @@ export class Swap implements SwapData {
     }
   }
 
+  get willTransferToContract(): boolean {
+    return (parseInt(this.salt[2], 16) & 8) === 0
+  }
+
   get willWaiveFee(): boolean {
-    return (parseInt(this.salt[2], 16) % 8) >= 4
+    return (parseInt(this.salt[2], 16) & 4) === 4
   }
 
   get serviceFee(): BigNumber {
@@ -162,6 +190,35 @@ export class Swap implements SwapData {
 
   get totalFee(): BigNumber {
     return this.serviceFee.add(this.fee)
+  }
+
+  get swapForCoreToken(): boolean {
+    return !this.willTransferToContract && ((parseInt(this.salt[3], 16) & 4) === 4)
+  }
+
+  get amountForCoreToken(): BigNumber {
+    if (!this.swapForCoreToken) {
+      return BigNumber.from(0)
+    }
+    return BigNumber.from(parseInt(this.salt.slice(11, 14), 16)).mul(1e5)
+  }
+
+  get receive(): BigNumber {
+    return this.amount.sub(this.totalFee).sub(this.amountForCoreToken)
+  }
+
+  get coreTokenPrice(): number {
+    if (!this.swapForCoreToken) {
+      return
+    }
+    return parseInt(this.salt.slice(6, 11), 16) / 10
+  }
+
+  get coreTokenAmount(): BigNumber {
+    if (this.amountForCoreToken.eq(0)) {
+      return BigNumber.from(0)
+    }
+    return this.amountForCoreToken.mul(10).div(this.coreTokenPrice * 10)
   }
 
   get expired(): Boolean {

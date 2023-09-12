@@ -17,7 +17,10 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   ///   salt: The salt value of this swap, carrying some information below:
   ///     salt & 0x80000000000000000000 == true => will release to an owa address, otherwise a smart contract;
   ///     salt & 0x40000000000000000000 == true => will waive *service fee*;
+  ///     salt & 0x20000000000000000000 == true => meson.to;
+  ///     salt & 0x10000000000000000000 == true => API;
   ///     salt & 0x08000000000000000000 == true => use *non-typed signing* (some wallets such as hardware wallets don't support EIP-712v1);
+  ///     salt & 0x04000000000000000000 == true => swap for core token (n/a for releasing to contract);
   ///     salt & 0x0000ffffffffffffffff: customized data that can be passed to integrated 3rd-party smart contract;
   ///   fee: The fee given to LPs (liquidity providers). An extra service fee maybe charged afterwards;
   ///   expireTs: The expiration time of this swap on the initial chain. The LP should `executeSwap` and receive his funds before `expireTs`;
@@ -221,6 +224,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
   modifier verifyEncodedSwap(uint256 encodedSwap) {
     require(_inChainFrom(encodedSwap) == SHORT_COIN_TYPE, "Swap not for this chain");
+    require(_inTokenIndexFrom(encodedSwap) < 254 || IS_CORE_ETH, "Swap for core token not available");
     require((_inTokenIndexFrom(encodedSwap) >= 254) == (_outTokenIndexFrom(encodedSwap) >= 254), "Swap tokens do not match");
     require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
 

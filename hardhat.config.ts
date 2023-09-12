@@ -129,6 +129,7 @@ export default {
     settings: {
       optimizer: config.compilers.optimizer,
       evmVersion: config.compilers.evmVersion,
+      viaIR: true,
       metadata: {
         // do not include the metadata hash, since this is machine dependent
         // and we want all generated code to be deterministic
