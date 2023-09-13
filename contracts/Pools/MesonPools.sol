@@ -294,7 +294,24 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       _transferToContract(tokenIndex, recipient, initiator, amount, _saltDataFrom(encodedSwap));
     } else {
       _safeTransfer(tokenIndex, recipient, amount);
+      if ((SHORT_COIN_TYPE == 0x9296 || SHORT_COIN_TYPE == 0xb4b1) && _swapForCoreToken(encodedSwap)) {
+        _callSkaleFaucet(recipient);
+      }
     }
+  }
+
+  function _callSkaleFaucet(address recipient) private {
+    if (SHORT_COIN_TYPE == 0x9296) {
+      // SKALE Europa
+      bytes memory data = abi.encodeWithSelector(bytes4(0x6a627842), recipient);
+      (bool success, ) = address(0x2B267A3e49b351DEdac892400a530ABb2f899d23).call(data);
+      require(success, "Call faucet not successful");
+    } else if (SHORT_COIN_TYPE == 0xb4b1) {
+      // SKALE Nebula
+      bytes memory data = abi.encodeWithSelector(bytes4(0x0c11dedd), recipient);
+      (bool success, ) = address(0x5a6869ef5b81DCb58EBF51b8F893c31f5AFE3Fa8).call(data);
+      require(success, "Call faucet not successful");
+    } 
   }
 
   function simpleRelease(uint256 encodedSwap, address recipient)

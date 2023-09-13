@@ -133,9 +133,6 @@ contract MesonStates is MesonTokens, MesonHelpers {
       if (SHORT_COIN_TYPE == 0x00c3) {
         IERC20Minimal(token).transfer(recipient, amount);
       } else {
-        // Stablecoins
-        address token = tokenForIndex[tokenIndex];
-
         // This doesn't works on Tron
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
           ERC20_TRANSFER_SELECTOR,

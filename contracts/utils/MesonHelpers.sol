@@ -96,8 +96,9 @@ contract MesonHelpers is MesonConfig, Context {
   }
 
   function _coreTokenAmount(uint256 encodedSwap) internal pure returns (uint256) {
-    if (_swapForCoreToken(encodedSwap)) {
-      return _amountForCoreTokenFrom(encodedSwap) * 10 / ((encodedSwap >> 172) & 0xFFFFF);
+    uint256 amountForCore = _amountForCoreTokenFrom(encodedSwap);
+    if (amountForCore > 0) {
+      return amountForCore * 10 / ((encodedSwap >> 172) & 0xFFFFF);
     }
     return 0;
   }
