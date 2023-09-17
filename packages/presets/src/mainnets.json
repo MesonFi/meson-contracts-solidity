@@ -893,6 +893,42 @@
     ]
   },
   {
+    "id": "mnt",
+    "name": "Mantle",
+    "alias": "MNT",
+    "chainId": "0x1388",
+    "slip44": "0x80001388",
+    "shortSlip44": "0x1388",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.mantle.xyz",
+    "explorer": "https://explorer.mantle.xyz",
+    "nativeCurrency": {
+      "name": "MNT",
+      "symbol": "MNT",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
     "id": "aptos",
     "name": "Aptos",
     "alias": "APT",
@@ -1031,6 +1067,42 @@
         "decimals": 6,
         "addr": "0xCC205196288B7A26f6D43bBD68AaA98dde97276d",
         "tokenIndex": 1
+      }
+    ]
+  },
+  {
+    "id": "naut",
+    "name": "Nautilus",
+    "alias": "NAUT",
+    "chainId": "0x56ce",
+    "slip44": "0x800056ce",
+    "shortSlip44": "0x56ce",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://api.nautilus.nautchain.xyz",
+    "explorer": "https://nautscan.com",
+    "nativeCurrency": {
+      "name": "ZBC",
+      "symbol": "ZBC",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 18,
+        "addr": "0xB2723928400AE5778f6A3C69D7Ca9e90FC430180",
+        "tokenIndex": 33
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 18,
+        "addr": "0xBDa330Ea8F3005C421C8088e638fBB64fA71b9e0",
+        "tokenIndex": 34
       }
     ]
   }
