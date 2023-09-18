@@ -84,7 +84,7 @@ contract MesonHelpers is MesonConfig, Context {
   }
 
   function _swapForCoreToken(uint256 encodedSwap) internal pure returns (bool) {
-    return !_willTransferToContract(encodedSwap) &&
+    return !_willTransferToContract(encodedSwap) && (_outTokenIndexFrom(encodedSwap) < 254) &&
       ((encodedSwap & 0x0400000000000000000000000000000000000000000000000000) > 0);
   }
 
