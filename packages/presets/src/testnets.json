@@ -620,5 +620,34 @@
         "tokenIndex": 255
       }
     ]
+  },
+  {
+    "id": "taiko-sepolia",
+    "name": "Taiko Sepolia",
+    "alias": "TAIKO",
+    "chainId": "0x28c5f",
+    "slip44": "0x800028c5",
+    "shortSlip44": "0x28c5",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.jolnir.taiko.xyz",
+    "explorer": "https://explorer.jolnir.taiko.xyz",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
   }
 ]
