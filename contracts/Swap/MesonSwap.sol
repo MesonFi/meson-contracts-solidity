@@ -134,6 +134,22 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     emit SwapCancelled(encodedSwap);
   }
 
+  function cancelSwapTo(uint256 encodedSwap, address recipient, bytes32 r, bytes32 yParityAndS) external {
+    uint200 postedSwap = _postedSwaps[encodedSwap];
+    require(postedSwap > 1, "Swap does not exist");
+    require(_expireTsFrom(encodedSwap) < block.timestamp, "Swap is still locked");
+
+    bytes32 digest = keccak256(abi.encodePacked(encodedSwap, recipient));
+    _checkSignature(digest, r, yParityAndS, _initiatorFromPosted(postedSwap));
+
+    delete _postedSwaps[encodedSwap]; // Swap expired so the same one cannot be posted again
+
+    uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
+    _safeTransfer(tokenIndex, recipient, _amountFrom(encodedSwap));
+
+    emit SwapCancelled(encodedSwap);
+  }
+
   /// @notice Execute the swap by providing a release signature. This is step 4️⃣ in a swap.
   /// Once the signature is verified, the current bonding pool will receive funds deposited 
   /// by the swap initiator.
@@ -224,8 +240,8 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
   modifier verifyEncodedSwap(uint256 encodedSwap) {
     require(_inChainFrom(encodedSwap) == SHORT_COIN_TYPE, "Swap not for this chain");
-    require(_inTokenIndexFrom(encodedSwap) < 254 || IS_CORE_ETH, "Swap for core token not available");
-    require((_inTokenIndexFrom(encodedSwap) >= 254) == (_outTokenIndexFrom(encodedSwap) >= 254), "Swap tokens do not match");
+    require(_inTokenIndexFrom(encodedSwap) < 255 || IS_CORE_ETH, "Swap from core token not available");
+    require((_inTokenIndexFrom(encodedSwap) >= 241) == (_outTokenIndexFrom(encodedSwap) >= 241), "Swap tokens do not match");
     require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
 
     require(_amountFrom(encodedSwap) <= MAX_SWAP_AMOUNT, "For security reason, amount cannot be greater than 100k");

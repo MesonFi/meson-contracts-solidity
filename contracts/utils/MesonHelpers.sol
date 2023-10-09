@@ -37,7 +37,7 @@ contract MesonHelpers is MesonConfig, Context {
   /// @notice Calculate the service fee from `encodedSwap`
   /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
-    uint256 minFee = _inTokenIndexFrom(encodedSwap) >= 254 ? SERVICE_FEE_MINIMUM_ETH : SERVICE_FEE_MINIMUM;
+    uint256 minFee = _inTokenIndexFrom(encodedSwap) >= 241 ? SERVICE_FEE_MINIMUM_ETH : SERVICE_FEE_MINIMUM;
     // Default to `serviceFee` = 0.05% * `amount`
     uint256 fee = _amountFrom(encodedSwap) * SERVICE_FEE_RATE / 10000;
     return fee > minFee ? fee : minFee;
@@ -84,7 +84,7 @@ contract MesonHelpers is MesonConfig, Context {
   }
 
   function _swapForCoreToken(uint256 encodedSwap) internal pure returns (bool) {
-    return !_willTransferToContract(encodedSwap) && (_outTokenIndexFrom(encodedSwap) < 254) &&
+    return !_willTransferToContract(encodedSwap) && (_outTokenIndexFrom(encodedSwap) < 241) &&
       ((encodedSwap & 0x0400000000000000000000000000000000000000000000000000) > 0);
   }
 
@@ -264,6 +264,15 @@ contract MesonHelpers is MesonConfig, Context {
         digest := keccak256(0, 64)
       }
     }
+    require(signer == ecrecover(digest, v, r, s), "Invalid signature");
+  }
+
+  function _checkSignature(bytes32 digest, bytes32 r, bytes32 yParityAndS, address signer) internal pure {
+    require(signer != address(0), "Signer cannot be empty address");
+    bytes32 s = yParityAndS & bytes32(0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff);
+    uint8 v = uint8((uint256(yParityAndS) >> 255) + 27);
+    require(uint256(s) <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, "Invalid signature");
+
     require(signer == ecrecover(digest, v, r, s), "Invalid signature");
   }
 }

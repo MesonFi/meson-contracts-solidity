@@ -7,7 +7,12 @@ contract MesonTokens {
   /// @notice The whitelist of supported tokens in Meson
   /// Meson use a whitelist for supported stablecoins, which is specified on first deployment
   /// or added through `_addSupportToken` Only modify this mapping through `_addSupportToken`.
-  /// key: `tokenIndex` in range of 1-255; zero means unsupported; 255 means ETH; 254 means WETH
+  /// key: `tokenIndex` in range of 1-255
+  ///     0:       unsupported
+  ///     1-32:    stablecoins with decimals 6
+  ///     33-240:  stablecoins with decimals 18
+  ///     241-254: ETH equivalent
+  ///     255:     core token (mostly ETH)
   /// value: the supported token's contract address
   mapping(uint8 => address) public tokenForIndex;
 
@@ -15,7 +20,12 @@ contract MesonTokens {
   /// @notice The mapping to get `tokenIndex` from a supported token's address
   /// Only modify this mapping through `_addSupportToken`.
   /// key: the supported token's contract address
-  /// value: `tokenIndex` in range of 1-255; zero means unsupported; 255 means ETH; 254 means WETH
+  /// value: `tokenIndex` in range of 1-255
+  ///     0:       unsupported
+  ///     1-32:    stablecoins with decimals 6
+  ///     33-240:  stablecoins with decimals 18
+  ///     241-254: ETH equivalent
+  ///     255:     core token (mostly ETH)
   mapping(address => uint8) public indexOfToken;
 
   /// @dev This empty reserved space is put in place to allow future versions to

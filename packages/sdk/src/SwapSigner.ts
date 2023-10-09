@@ -9,11 +9,11 @@ const NOTICE_TESTNET_SIGN_RELEASE = 'Sign to release a swap on Meson (Testnet)'
 
 export type CompactSignature = string
 
-const nonTyped = encoded => parseInt(encoded[15], 16) >= 8
-const fromTron = encoded => encoded.substring(60, 64) === '00c3'
-const toTron = encoded => encoded.substring(54, 58) === '00c3'
-const hexAddress = addr => `0x${TronWeb.address.toHex(addr).substring(2)}`.substring(0, 42)
-const noticeRecipient = encoded => toTron(encoded) ? 'Recipient (tron address in hex format)' : 'Recipient'
+const nonTyped = (encoded: string) => parseInt(encoded[15], 16) >= 8
+const fromTron = (encoded: string) => encoded.substring(60, 64) === '00c3'
+const toTron = (encoded: string) => encoded.substring(54, 58) === '00c3'
+const hexAddress = (addr: string) => `0x${TronWeb.address.toHex(addr).substring(2)}`.substring(0, 42)
+const noticeRecipient = (encoded: string) => toTron(encoded) ? 'Recipient (tron address in hex format)' : 'Recipient'
 
 export class SwapSigner {
   readonly signer: any
@@ -29,6 +29,10 @@ export class SwapSigner {
   }
 
   async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<CompactSignature> {
+    throw new Error('Not implemented')
+  }
+
+  async signWithdraw(encoded: string, recipient: string): Promise<CompactSignature> {
     throw new Error('Not implemented')
   }
 
@@ -66,6 +70,10 @@ export class SwapSigner {
   static hashRelease(encoded: string, recipient: string, testnet?: boolean): string {
     return utils.keccak256(SwapSigner.prehashRelease(encoded, recipient, testnet))
   }
+
+  static hashWithdraw(encoded: string, recipient: string): string {
+    return utils.keccak256(utils.solidityPack(['bytes32', 'address'], [encoded, hexAddress(recipient)]))
+  }
 }
 
 export class EthersWalletSwapSigner extends SwapSigner {
@@ -88,6 +96,12 @@ export class EthersWalletSwapSigner extends SwapSigner {
 
   async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<CompactSignature> {
     const digest = SwapSigner.hashRelease(encoded, recipient, testnet)
+    const signature = await this.wallet._signingKey().signDigest(digest)
+    return signature.compact
+  }
+
+  async signWithdraw(encoded: string, recipient: string): Promise<CompactSignature> {
+    const digest = SwapSigner.hashWithdraw(encoded, recipient)
     const signature = await this.wallet._signingKey().signDigest(digest)
     return signature.compact
   }
@@ -192,5 +206,15 @@ export class NonEcdsaRemoteSwapSigner extends SwapSigner {
       this.#currentInitiator = swapSigner.getAddress()
     }
     return await this.#initiatorSwapSigners.get(encoded).signSwapRelease(encoded, recipient, testnet)
+  }
+
+  async signWithdraw(encoded: string, recipient: string): Promise<CompactSignature> {
+    if (!this.#initiatorSwapSigners.has(encoded)) {
+      const signature = await this.remoteSigner.signMessage(this._swapMessage(encoded))
+      const swapSigner = this._swapSignerFromSeed(signature)
+      this.#initiatorSwapSigners.set(encoded, swapSigner)
+      this.#currentInitiator = swapSigner.getAddress()
+    }
+    return await this.#initiatorSwapSigners.get(encoded).signWithdraw(encoded, recipient)
   }
 }

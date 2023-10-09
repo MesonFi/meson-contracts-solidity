@@ -289,7 +289,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     emit SwapReleased(encodedSwap);
   }
 
-  function _release(uint256 encodedSwap, uint8 tokenIndex, address initiator, address recipient, uint256 amount) private {
+  function _release(uint256 encodedSwap, uint8 tokenIndex, address initiator, address recipient, uint256 amount) internal {
     if (_willTransferToContract(encodedSwap)) {
       _transferToContract(tokenIndex, recipient, initiator, amount, _saltDataFrom(encodedSwap));
     } else {
@@ -357,7 +357,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
   modifier forTargetChain(uint256 encodedSwap) {
     require(_outChainFrom(encodedSwap) == SHORT_COIN_TYPE, "Swap not for this chain");
-    require(_outTokenIndexFrom(encodedSwap) < 254 || IS_CORE_ETH, "Swap for core token not available");
+    require(_outTokenIndexFrom(encodedSwap) < 255 || IS_CORE_ETH, "Swap for core token not available");
     _;
   }
 

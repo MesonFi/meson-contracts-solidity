@@ -81,4 +81,25 @@ contract MesonManager is MesonSwap, MesonPools {
     _premiumManager = newPremiumManager;
     emit PremiumManagerTransferred(prevPremiumManager, newPremiumManager);
   }
+
+  function directSwap(uint256 encodedSwap, address recipient, bytes32 r, bytes32 yParityAndS)
+    external matchProtocolVersion(encodedSwap) verifyEncodedSwap(encodedSwap) forTargetChain(encodedSwap)
+  {
+    require(recipient != address(0), "Recipient cannot be zero address");
+
+    bytes32 digest = keccak256(abi.encodePacked(encodedSwap, recipient));
+    _checkSignature(digest, r, yParityAndS, _premiumManager);
+
+    uint256 amount = _amountFrom(encodedSwap);
+    uint8 inTokenIndex = _inTokenIndexFrom(encodedSwap);
+    uint256 releaseAmount = amount - _feeForLp(encodedSwap);
+
+    _balanceOfPoolToken[_poolTokenIndexFrom(inTokenIndex, 1)] += amount;
+    _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 1)] -= releaseAmount;
+
+    _unsafeDepositToken(inTokenIndex, _msgSender(), amount);
+    _release(encodedSwap, _outTokenIndexFrom(encodedSwap), _msgSender(), recipient, releaseAmount);
+
+    emit SwapReleased(encodedSwap);
+  }
 }
