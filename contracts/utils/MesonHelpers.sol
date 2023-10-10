@@ -61,11 +61,6 @@ contract MesonHelpers is MesonConfig, Context {
     return uint64(encodedSwap >> 128);
   }
 
-  /// @notice Decode method id from `data`
-  function _methodIdFromData(uint64 data) internal pure returns (uint8) {
-    return uint8(data >> 56);
-  }
-
   /// @notice Whether the swap should release to a 3rd-party integrated dapp contract
   /// See method `release` in `MesonPools.sol` for more details
   function _willTransferToContract(uint256 encodedSwap) internal pure returns (bool) {

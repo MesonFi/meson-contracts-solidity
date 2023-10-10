@@ -9,5 +9,6 @@ interface IDepositWithBeneficiary {
   /// @param beneficiary The address that will receive benefits of this transfer
   /// @param data Extra data passed to the contract
   /// @return Returns true for a successful transfer.
-  function depositWithBeneficiary(address token, uint256 amount, address beneficiary, uint64 data) external returns (bool);
+  function depositWithBeneficiary(address token, uint256 amount, address beneficiary, uint64 data)
+    payable external returns (bool);
 }

@@ -15,10 +15,15 @@ contract ForwardTokenContract is IDepositWithBeneficiary {
     uint256 amount,
     address beneficiary,
     uint64 data
-  ) external override returns (bool) {
-    // Required. Take cross-chain'ed token to dapp's contract
-    IERC20Minimal(token).transferFrom(msg.sender, address(this), amount);
-
+  ) payable external override returns (bool) {
+    if (token == address(0)) {
+      // ETH
+      // No need to take ETH since it is transferred in msg.value
+    } else {
+      // Stablecoins
+      // Required. Take cross-chain'ed token to dapp's contract
+      IERC20Minimal(token).transferFrom(msg.sender, address(this), amount);
+    }
 
     // The dapp can do it's own logic with depositing tokens
     // e.g. exchange for other tokens, mint NFTs, etc.
@@ -27,7 +32,14 @@ contract ForwardTokenContract is IDepositWithBeneficiary {
 
     // Send benefits to the user. Here as an example we just transfer
     // deposited tokens to the user.
-    IERC20Minimal(token).transfer(beneficiary, amount);
+    if (token == address(0)) {
+      // ETH
+      (bool success, ) = beneficiary.call{value: amount}("");
+      require(success, "Transfer failed");
+    } else {
+      // Stablecoins
+      IERC20Minimal(token).transfer(beneficiary, amount);
+    }
 
     return true;
   }

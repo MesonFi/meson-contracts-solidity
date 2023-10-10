@@ -3,7 +3,7 @@ pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "../interfaces/IERC20Minimal.sol";
-import "../interfaces/IRecipientContract.sol";
+import "../interfaces/IDepositWithBeneficiary.sol";
 import "./MesonTokens.sol";
 import "./MesonHelpers.sol";
 
@@ -157,30 +157,31 @@ contract MesonStates is MesonTokens, MesonHelpers {
     uint256 amount,
     uint64 data
   ) internal {
+    require(Address.isContract(contractAddr), "The given recipient address is not a contract");
+    if (_needAdjustAmount(tokenIndex)) {
+      amount *= 1e12;
+    }
+
     if (tokenIndex == 255) {
       // ETH
-      (bool success, ) = beneficiary.call{value: amount * 1e12}("");
-      require(success, "Transfer failed");
-      // TODO: call contract
+      IDepositWithBeneficiary(contractAddr).depositWithBeneficiary{value: amount}(
+        address(0),
+        amount,
+        beneficiary,
+        data
+      );
     } else {
       // Stablecoins
       address token = tokenForIndex[tokenIndex];
-
       require(Address.isContract(token), "The given token address is not a contract");
-      require(Address.isContract(contractAddr), "The given recipient address is not a contract");
       
-      uint8 methodId = _methodIdFromData(data);
-      require(methodId <= 1, "Unknown method id");
-
-      if (_needAdjustAmount(tokenIndex)) {
-        amount *= 1e12;
-      }
       IERC20Minimal(token).approve(contractAddr, amount);
-      if (methodId == 0) {
-        IRecipientContract(contractAddr).depositWithBeneficiary(token, amount, beneficiary, data);
-      } else if (methodId == 1) {
-        IRecipientContract(contractAddr).deposit(token, amount, beneficiary, uint16(data >> 40));
-      }
+      IDepositWithBeneficiary(contractAddr).depositWithBeneficiary(
+        token,
+        amount,
+        beneficiary,
+        data
+      );
     }
   }
 
