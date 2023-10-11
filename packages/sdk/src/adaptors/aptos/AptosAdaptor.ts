@@ -38,6 +38,11 @@ export default class AptosAdaptor {
     }
   }
 
+  async getCode(addr) {
+    // TODO
+    return
+  }
+
   on () {}
   removeAllListeners () {}
 

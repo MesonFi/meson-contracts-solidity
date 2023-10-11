@@ -183,9 +183,19 @@ export class Swap implements SwapData {
     if (this.deprecatedEncoding || this.willWaiveFee) {
       return BigNumber.from(0)
     }
-    const minFee = BigNumber.from(this.inToken >= 241 ? 500 : 500_000)
+    const minFee = BigNumber.from(Swap.minServiceFee(this.inToken))
     const fee = this.amount.div(2000)
     return fee.gt(minFee) ? fee : minFee
+  }
+
+  static minServiceFee(tokenIndex: number): number {
+    if (tokenIndex >= 252) {
+      return 500 // 0.0005 ETH
+    } else if (tokenIndex >= 191) {
+      return 5000 // 0.005 BNB or other
+    } else {
+      return 500_000 // $0.5
+    }
   }
 
   get totalFee(): BigNumber {

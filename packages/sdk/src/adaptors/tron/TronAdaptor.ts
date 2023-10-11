@@ -26,6 +26,11 @@ export default class TronAdaptor {
     return BigNumber.from(await this.client.trx.getBalance(addr))
   }
 
+  async getCode(addr) {
+    const account = await this.client.trx.getAccount(addr)
+    return account.type === 'Contract' ? '0x1' : '0x'
+  }
+
   on () {}
   removeAllListeners () {}
 

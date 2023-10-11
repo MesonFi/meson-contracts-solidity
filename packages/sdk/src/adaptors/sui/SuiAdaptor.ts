@@ -36,6 +36,11 @@ export default class SuiAdaptor {
     return BigNumber.from(data.totalBalance)
   }
 
+  async getCode(addr) {
+    // TODO
+    return
+  }
+
   on () {}
   removeAllListeners () {}
 

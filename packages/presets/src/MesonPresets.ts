@@ -26,6 +26,8 @@ import v0_mainnets from './v0/mainnets.json'
 
 const v0_networks = [...v0_mainnets, ...v0_testnets] as PresetNetwork[]
 
+const ADDRESS_ONE = '0x0000000000000000000000000000000000000001'
+
 export interface PresetToken {
   addr: string
   name?: string
@@ -87,13 +89,12 @@ export class MesonPresets {
     return networks.find(item => item.chainId === chainId)
   }
 
-  getTokensForNetwork(id: string, includeDisabled?: boolean): PresetToken[] {
-    const networks = this.getAllNetworks()
-    const match = networks.find(item => item.id === id)
-    if (!match) {
+  getTokensForNetwork(networkId: string, includeDisabled?: boolean): PresetToken[] {
+    const network = this.getNetwork(networkId)
+    if (!network) {
       return []
     }
-    return match.tokens.filter(t => t.addr && (includeDisabled || !t.disabled))
+    return network.tokens.filter(t => t.addr && (includeDisabled || !t.disabled))
   }
 
   getToken(networkId: string, tokenIndex: number): PresetToken {
@@ -143,6 +144,11 @@ export class MesonPresets {
   getTokenCategory(networkId: string, tokenIndex: number) {
     const token = this.getToken(networkId, tokenIndex)
     return MesonClient.categoryFromSymbol(token?.symbol)
+  }
+
+  getCoreSymbol(networkId: string) {
+    const tokens = this.getTokensForNetwork(networkId)
+    return tokens?.find(t => t.addr === ADDRESS_ONE)?.symbol
   }
 
   getNetworkToken(shortCoinType: string, tokenIndex: number, v: string = 'v1'):

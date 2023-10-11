@@ -92,6 +92,20 @@ export class MesonClient {
     return `0x${TronWeb.address.toHex(address).substring(2)}`
   }
 
+  static tokenType (tokenIndex: number) {
+    if (tokenIndex >= 252) {
+      return 'eth'
+    } else if (tokenIndex >= 248) {
+      return 'bnb'
+    } else if (tokenIndex === 191) {
+      return 'gas-token'
+    } else if (tokenIndex <= 64) {
+      return 'stablecoins'
+    } else {
+      return 'unknown'
+    }
+  }
+
   static categoryFromSymbol (symbol: string) {
     if (!symbol) {
       return
@@ -99,6 +113,8 @@ export class MesonClient {
     const lowerCaseSymbol = symbol.toLowerCase()
     if (lowerCaseSymbol.includes('eth')) {
       return 'eth'
+    } else if (lowerCaseSymbol.includes('bnb')) {
+      return 'bnb'
     } else if (lowerCaseSymbol.includes('usdc') || lowerCaseSymbol.includes('usdbc')) {
       return 'usdc'
     } else if (lowerCaseSymbol.includes('usdt')) {
@@ -209,6 +225,10 @@ export class MesonClient {
     return this._tokens.find(t => t.addr === this.formatAddress(addr))?.tokenIndex
   }
 
+  isCoreToken(tokenIndex: number) {
+    return (tokenIndex > 190) && ((tokenIndex % 4) === 3)
+  }
+
   /// Contract instance
   getContractInstance(addr: string, abi: any, provider = this.provider) {
     return adaptors.getContract(addr, abi, provider)
@@ -265,7 +285,7 @@ export class MesonClient {
   }
 
   async getTokenBalance(addr: string, tokenIndex: number) {
-    if (tokenIndex === 255) {
+    if (this.isCoreToken(tokenIndex)) {
       const rawValue = await this.getBalance(addr)
       return this.#formatBalance(rawValue, 18)
     }
@@ -277,7 +297,7 @@ export class MesonClient {
   }
 
   async getAllowance (addr: string, tokenIndex: number) {
-    if (tokenIndex === 255) {
+    if (this.isCoreToken(tokenIndex)) {
       return this.#formatBalance(BigNumber.from(2).pow(128).sub(1))
     }
     const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: addr })
@@ -299,7 +319,7 @@ export class MesonClient {
   }
 
   async inContractTokenBalance(tokenIndex: number, ...overrides: [CallOverrides?]) {
-    if (tokenIndex === 255) {
+    if (this.isCoreToken(tokenIndex)) {
       const rawValue = await this.getBalance(this.address)
       return this.#formatBalance(rawValue, 18)
     }
@@ -319,7 +339,7 @@ export class MesonClient {
 
   /// Write methods
   async transferToken(tokenIndex: number, recipient: string, value: BigNumberish, ...overrides: [CallOverrides?]) {
-    if (tokenIndex === 255) {
+    if (this.isCoreToken(tokenIndex)) {
       return this.#mesonInstance.signer.sendTransaction({
         ...overrides[0],
         to: recipient,
@@ -336,7 +356,7 @@ export class MesonClient {
   }
 
   async approveToken(tokenIndex: number, spender: string, value: BigNumberish, ...overrides: [CallOverrides?]) {
-    if (tokenIndex === 255) {
+    if (this.isCoreToken(tokenIndex)) {
       return
     }
     const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: this.address })
@@ -351,7 +371,7 @@ export class MesonClient {
   async depositAndRegister(tokenIndex: number, value: BigNumberish, poolIndex: string) {
     const poolTokenIndex = utils.solidityPack(['uint8', 'uint40'], [tokenIndex, poolIndex])
     const opt: CallOverrides = {}
-    if (tokenIndex === 255) {
+    if (this.isCoreToken(tokenIndex)) {
       opt.value = BigNumber.from(value).mul(1e12)
     }
     return this.#mesonInstance.depositAndRegister(value, poolTokenIndex, opt)
@@ -365,7 +385,7 @@ export class MesonClient {
     }
     const poolTokenIndex = utils.solidityPack(['uint8', 'uint40'], [tokenIndex, poolIndex])
     const opt: CallOverrides = {}
-    if (tokenIndex === 255) {
+    if (this.isCoreToken(tokenIndex)) {
       opt.value = BigNumber.from(value).mul(1e12)
     }
     return this.#mesonInstance.deposit(value, poolTokenIndex, opt)
@@ -412,7 +432,7 @@ export class MesonClient {
   async postSwapFromInitiator(encoded: string, initiator: string, poolIndex: number, overrides?: CallOverrides) {
     const opt: CallOverrides = { ...overrides }
     const swap = Swap.decode(encoded)
-    if (swap.inToken === 255) {
+    if (this.isCoreToken(swap.inToken)) {
       opt.value = BigNumber.from(swap.amount).mul(1e12)
     }
     return this.#mesonInstance.postSwapFromInitiator(

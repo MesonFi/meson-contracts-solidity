@@ -65,6 +65,7 @@
       "decimals": 18
     },
     "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "minCoreFee": "5000; // min 0.005 BNB ~ $1",
     "tokens": [
       {
         "name": "USD Coin",
@@ -86,6 +87,13 @@
         "decimals": 18,
         "addr": "0xe9e7cea3dedca5984780bafc599bd69add087d56",
         "tokenIndex": 35
+      },
+      {
+        "name": "BNB",
+        "symbol": "BNB",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 251
       }
     ]
   },
@@ -113,7 +121,7 @@
     "tokens": [
       {
         "name": "USD Coin",
-        "symbol": "USDC",
+        "symbol": "USDC.e",
         "decimals": 6,
         "addr": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
         "tokenIndex": 1
@@ -202,7 +210,7 @@
     "tokens": [
       {
         "name": "USD Coin",
-        "symbol": "USDC",
+        "symbol": "USDC.e",
         "decimals": 6,
         "addr": "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
         "tokenIndex": 1
@@ -1117,6 +1125,43 @@
         "decimals": 18,
         "addr": "0xBDa330Ea8F3005C421C8088e638fBB64fA71b9e0",
         "tokenIndex": 34
+      }
+    ]
+  },
+  {
+    "id": "opbnb",
+    "name": "opBNB",
+    "alias": "opbnb",
+    "chainId": "0xcc",
+    "slip44": "0x800000cc",
+    "shortSlip44": "0x00cc",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://opbnb-mainnet-rpc.bnbchain.org",
+    "explorer": "https://opbnbscan.com",
+    "nativeCurrency": {
+      "name": "BNB",
+      "symbol": "BNB",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "minCoreFee": "5000; // min 0.005 BNB ~ $1",
+    "tokens": [
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 18,
+        "addr": "0x9e5aac1ba1a2e6aed6b32689dfcf62a509ca96f3",
+        "tokenIndex": 34
+      },
+      {
+        "name": "BNB",
+        "symbol": "BNB",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 251
       }
     ]
   }

@@ -1,6 +1,6 @@
 {
   "name": "meson-contracts-solidity",
-  "version": "1.9.0",
+  "version": "1.13.0",
   "main": "index.js",
   "private": true,
   "engines": {
@@ -55,7 +55,8 @@
     "deploy:mnt": "hardhat deploy --mainnet mnt --upgradable true",
     "deploy:skale-europa": "hardhat deploy --mainnet skale-europa --upgradable true",
     "deploy:skale-nebula": "hardhat deploy --mainnet skale-nebula --upgradable true",
-    "deploy:naut": "hardhat deploy --mainnet naut --upgradable true"
+    "deploy:naut": "hardhat deploy --mainnet naut --upgradable true",
+    "deploy:opbnb": "hardhat deploy --mainnet opbnb --upgradable true"
   },
   "devDependencies": {
     "@matterlabs/hardhat-zksync-deploy": "^0.6.2",
