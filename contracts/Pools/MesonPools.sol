@@ -156,7 +156,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     uint256 coreAmount = _coreTokenAmount(encodedSwap);
     if (coreAmount > 0) {
-      _balanceOfPoolToken[_poolTokenIndexFrom(255, poolIndex)] -= coreAmount;
+      _balanceOfPoolToken[_poolTokenIndexFrom(indexOfToken[address(1)], poolIndex)] -= coreAmount;
     }
 
     _lockedSwaps[swapId] = _lockedSwapFrom(until, poolIndex);
@@ -181,7 +181,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     uint256 coreAmount = _coreTokenAmount(encodedSwap);
     if (coreAmount > 0) {
-      _balanceOfPoolToken[_poolTokenIndexFrom(255, poolIndex)] += coreAmount;
+      _balanceOfPoolToken[_poolTokenIndexFrom(indexOfToken[address(1)], poolIndex)] += coreAmount;
     }
 
     delete _lockedSwaps[swapId];
@@ -238,7 +238,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     uint256 coreAmount = _coreTokenAmount(encodedSwap);
     if (coreAmount > 0) {
-      _safeTransfer(255, recipient, coreAmount);
+      _transferCoreToken(recipient, coreAmount);
     }
     _release(encodedSwap, _outTokenIndexFrom(encodedSwap), initiator, recipient, releaseAmount);
 
@@ -281,8 +281,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     uint256 coreAmount = _coreTokenAmount(encodedSwap);
     if (coreAmount > 0) {
-      _balanceOfPoolToken[_poolTokenIndexFrom(255, poolIndex)] -= coreAmount;
-      _safeTransfer(255, recipient, coreAmount);
+      _balanceOfPoolToken[_poolTokenIndexFrom(indexOfToken[address(1)], poolIndex)] -= coreAmount;
+      _transferCoreToken(recipient, coreAmount);
     }
     _release(encodedSwap, _outTokenIndexFrom(encodedSwap), initiator, recipient, releaseAmount);
 
@@ -332,8 +332,8 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
     uint256 coreAmount = _coreTokenAmount(encodedSwap);
     if (coreAmount > 0) {
-      _balanceOfPoolToken[_poolTokenIndexFrom(255, 1)] -= coreAmount;
-      _safeTransfer(255, recipient, coreAmount);
+      _balanceOfPoolToken[_poolTokenIndexFrom(indexOfToken[address(1)], 1)] -= coreAmount;
+      _transferCoreToken(recipient, coreAmount);
     }
     _safeTransfer(_outTokenIndexFrom(encodedSwap), recipient, releaseAmount);
 
@@ -357,7 +357,6 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
 
   modifier forTargetChain(uint256 encodedSwap) {
     require(_outChainFrom(encodedSwap) == SHORT_COIN_TYPE, "Swap not for this chain");
-    require(_outTokenIndexFrom(encodedSwap) < 255 || IS_CORE_ETH, "Swap for core token not available");
     _;
   }
 

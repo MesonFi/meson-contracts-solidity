@@ -10,9 +10,29 @@ contract MesonTokens {
   /// key: `tokenIndex` in range of 1-255
   ///     0:       unsupported
   ///     1-32:    stablecoins with decimals 6
-  ///     33-240:  stablecoins with decimals 18
-  ///     241-254: ETH equivalent
-  ///     255:     core token (mostly ETH)
+  ///       1, 9:    USDC, USDC.e
+  ///       2, 10:   USDT, USDT.e
+  ///       3:       BUSD, USDT.e
+  ///       17:      PoD USDC
+  ///       18:      PoD USDT
+  ///       19:      PoD BUSD
+  ///       32:      PoD
+  ///     33-64:   stablecoins with decimals 18
+  ///       33:      USDC
+  ///       34:      USDT
+  ///       35:      BUSD
+  ///     65-128:  (Unspecified)
+  ///     129-190: (Unspecified)
+  ///     191:     No-swap core
+  ///     192-247: (Unspecified)
+  ///     248-251: BNB & BNB equivalent
+  ///       248:     PoD BNB
+  ///       250:     (reserved for ERC20 BNB)
+  ///       251:     BNB as core
+  ///     252-255: ETH & ETH equivalent
+  ///       252:     PoD ETH
+  ///       254:     (reserved for ERC20 ETH like WETH)
+  ///       255:     ETH as core
   /// value: the supported token's contract address
   mapping(uint8 => address) public tokenForIndex;
 
@@ -21,17 +41,16 @@ contract MesonTokens {
   /// Only modify this mapping through `_addSupportToken`.
   /// key: the supported token's contract address
   /// value: `tokenIndex` in range of 1-255
-  ///     0:       unsupported
-  ///     1-32:    stablecoins with decimals 6
-  ///     33-240:  stablecoins with decimals 18
-  ///     241-254: ETH equivalent
-  ///     255:     core token (mostly ETH)
   mapping(address => uint8) public indexOfToken;
 
   /// @dev This empty reserved space is put in place to allow future versions to
   /// add new variables without shifting down storage in the inheritance chain.
   /// See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
   uint256[50] private __gap;
+
+  function _isCoreToken(uint8 tokenIndex) internal returns (bool) {
+    return (tokenIndex > 190) && ((tokenIndex % 4) == 3);
+  }
 
   /// @notice Return all supported token addresses in an array ordered by `tokenIndex`
   /// This method will only return tokens with consecutive token indexes.
@@ -60,8 +79,8 @@ contract MesonTokens {
     require(token != address(0), "Cannot use zero address");
     require(indexOfToken[token] == 0, "Token has been added before");
     require(tokenForIndex[index] == address(0), "Index has been used");
-    if (index == 255) {
-      require(token == address(0x1), "Token index 255 (ETH) requires adddress(0x1)");
+    if (_isCoreToken(index)) {
+      require(token == address(0x1), "Core token requires adddress(0x1)");
     }
     indexOfToken[token] = index;
     tokenForIndex[index] = token;

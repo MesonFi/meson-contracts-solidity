@@ -37,7 +37,7 @@ contract MesonHelpers is MesonConfig, Context {
   /// @notice Calculate the service fee from `encodedSwap`
   /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
-    uint256 minFee = _inTokenIndexFrom(encodedSwap) >= 241 ? SERVICE_FEE_MINIMUM_ETH : SERVICE_FEE_MINIMUM;
+    uint256 minFee = _inTokenIndexFrom(encodedSwap) >= 191 ? SERVICE_FEE_MINIMUM_CORE : SERVICE_FEE_MINIMUM;
     // Default to `serviceFee` = 0.05% * `amount`
     uint256 fee = _amountFrom(encodedSwap) * SERVICE_FEE_RATE / 10000;
     return fee > minFee ? fee : minFee;
@@ -79,7 +79,7 @@ contract MesonHelpers is MesonConfig, Context {
   }
 
   function _swapForCoreToken(uint256 encodedSwap) internal pure returns (bool) {
-    return !_willTransferToContract(encodedSwap) && (_outTokenIndexFrom(encodedSwap) < 241) &&
+    return !_willTransferToContract(encodedSwap) && (_outTokenIndexFrom(encodedSwap) < 191) &&
       ((encodedSwap & 0x0400000000000000000000000000000000000000000000000000) > 0);
   }
 
@@ -131,6 +131,17 @@ contract MesonHelpers is MesonConfig, Context {
   /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _outTokenIndexFrom(uint256 encodedSwap) internal pure returns (uint8) {
     return uint8(encodedSwap >> 24);
+  }
+
+  function _tokenType(uint8 tokenIndex) internal pure returns (uint8) {
+    if (tokenIndex >= 192) {
+      // Non stablecoins
+      return tokenIndex / 4;
+    } else if (tokenIndex < 65) {
+      // Stablecoins
+      return 0;
+    }
+    revert("Token index not allowed for swapping");
   }
 
   /// @notice Decode `outToken` from `encodedSwap`, and encode it with `poolIndex` to `poolTokenIndex`.

@@ -240,8 +240,10 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
 
   modifier verifyEncodedSwap(uint256 encodedSwap) {
     require(_inChainFrom(encodedSwap) == SHORT_COIN_TYPE, "Swap not for this chain");
-    require(_inTokenIndexFrom(encodedSwap) < 255 || IS_CORE_ETH, "Swap from core token not available");
-    require((_inTokenIndexFrom(encodedSwap) >= 241) == (_outTokenIndexFrom(encodedSwap) >= 241), "Swap tokens do not match");
+    require(
+      _tokenType(_inTokenIndexFrom(encodedSwap)) == _tokenType(_outTokenIndexFrom(encodedSwap)),
+      "In & out token categories do not match"
+    );
     require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
 
     require(_amountFrom(encodedSwap) <= MAX_SWAP_AMOUNT, "For security reason, amount cannot be greater than 100k");

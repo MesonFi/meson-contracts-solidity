@@ -83,9 +83,9 @@ contract MesonStates is MesonTokens, MesonHelpers {
   ) internal {
     require(amount > 0, "Amount must be greater than zero");
 
-    if (tokenIndex == 255) {
-      // ETH
-      require(amount * 1e12 == msg.value, "ETH value does not match the amount");
+    if (_isCoreToken(tokenIndex)) {
+      // Core tokens (e.g. ETH or BNB)
+      require(amount * 1e12 == msg.value, "msg.value does not match the amount");
     } else {
       // Stablecoins
       address token = tokenForIndex[tokenIndex];
@@ -116,10 +116,9 @@ contract MesonStates is MesonTokens, MesonHelpers {
     address recipient,
     uint256 amount
   ) internal {
-    if (tokenIndex == 255) {
-      // ETH
-      (bool success, ) = recipient.call{value: amount * 1e12}("");
-      require(success, "Transfer failed");
+    if (_isCoreToken(tokenIndex)) {
+      // Core tokens (e.g. ETH or BNB)
+      _transferCoreToken(recipient, amount);
     } else {
       // Stablecoins
       address token = tokenForIndex[tokenIndex];
@@ -144,6 +143,11 @@ contract MesonStates is MesonTokens, MesonHelpers {
     }
   }
 
+  function _transferCoreToken(address recipient, uint256 amount) internal {
+    (bool success, ) = recipient.call{value: amount * 1e12}("");
+    require(success, "Transfer failed");
+  }
+
   /// @notice Transfer tokens to a contract using `depositWithBeneficiary`
   /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
   /// @param contractAddr The smart contract address that will receive transferring tokens
@@ -162,8 +166,8 @@ contract MesonStates is MesonTokens, MesonHelpers {
       amount *= 1e12;
     }
 
-    if (tokenIndex == 255) {
-      // ETH
+    if (_isCoreToken(tokenIndex)) {
+      // Core tokens (e.g. ETH or BNB)
       IDepositWithBeneficiary(contractAddr).depositWithBeneficiary{value: amount}(
         address(0),
         amount,
