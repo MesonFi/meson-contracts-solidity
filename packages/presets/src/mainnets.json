@@ -1164,5 +1164,34 @@
         "tokenIndex": 251
       }
     ]
+  },
+  {
+    "id": "scroll",
+    "name": "Scroll",
+    "alias": "SCROLL",
+    "chainId": "0x82750",
+    "slip44": "0x80082750",
+    "shortSlip44": "0x2750",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.scroll.io",
+    "explorer": "https://blockscout.scroll.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
   }
 ]

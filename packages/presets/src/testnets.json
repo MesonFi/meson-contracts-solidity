@@ -496,7 +496,7 @@
     "name": "Scroll Sepolia",
     "alias": "SCROLL",
     "chainId": "0x8274f",
-    "slip44": "0x80002750",
+    "slip44": "0x80082750",
     "shortSlip44": "0x2750",
     "extensions": [
       "metamask"
