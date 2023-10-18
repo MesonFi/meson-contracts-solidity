@@ -123,6 +123,8 @@ export class MesonClient {
       return 'busd'
     } else if (lowerCaseSymbol.includes('dai')) {
       return 'dai'
+    } else if (lowerCaseSymbol.includes('cusd')) {
+      return 'cusd'
     } else if (lowerCaseSymbol.includes('pod')) {
       return 'pod'
     } else {
@@ -226,7 +228,7 @@ export class MesonClient {
   }
 
   isCoreToken(tokenIndex: number) {
-    return (tokenIndex > 190) && ((tokenIndex % 4) === 3)
+    return (tokenIndex === 52) || ((tokenIndex > 190) && ((tokenIndex % 4) === 3))
   }
 
   /// Contract instance

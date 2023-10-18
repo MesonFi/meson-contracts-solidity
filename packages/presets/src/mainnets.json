@@ -565,7 +565,15 @@
         "symbol": "USDT",
         "decimals": 6,
         "addr": "0xfA9343C3897324496A05fC75abeD6bAC29f8A40f",
-        "tokenIndex": 2
+        "tokenIndex": 2,
+        "disabled": true
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x33B57dC70014FD7AA6e1ed3080eeD2B619632B8e",
+        "tokenIndex": 10
       }
     ]
   },
@@ -1186,11 +1194,83 @@
     "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
     "tokens": [
       {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df",
+        "tokenIndex": 2
+      },
+      {
         "name": "ETH",
         "symbol": "ETH",
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 255
+      }
+    ]
+  },
+  {
+    "id": "celo",
+    "name": "Celo",
+    "alias": "CELO",
+    "chainId": "0xa4ec",
+    "slip44": "0x8000ce10",
+    "shortSlip44": "0xce10",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://1rpc.io/celo",
+    "explorer": "https://celoscan.io",
+    "nativeCurrency": {
+      "name": "CELO",
+      "symbol": "CELO",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "Celo Dollar",
+        "symbol": "cUSD",
+        "decimals": 18,
+        "addr": "0x765DE816845861e75A25fCA122bb6898B8B1282a",
+        "tokenIndex": 37
+      }
+    ]
+  },
+  {
+    "id": "gnosis",
+    "name": "Gnosis",
+    "alias": "XDAI",
+    "chainId": "0x64",
+    "slip44": "0x800002bc",
+    "shortSlip44": "0x02bc",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.gnosischain.com",
+    "explorer": "https://gnosisscan.io",
+    "nativeCurrency": {
+      "name": "XDAI",
+      "symbol": "XDAI",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "XDAI",
+        "symbol": "XDAI",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 52
       }
     ]
   }

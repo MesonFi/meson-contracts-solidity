@@ -21,6 +21,9 @@ contract MesonTokens {
   ///       33:      USDC
   ///       34:      USDT
   ///       35:      BUSD
+  ///       36:      (reserved for DAI)
+  ///       37:      cUSD (Celo)
+  ///       52:      XDAI
   ///     65-128:  (Unspecified)
   ///     129-190: (Unspecified)
   ///     191:     No-swap core
@@ -49,7 +52,7 @@ contract MesonTokens {
   uint256[50] private __gap;
 
   function _isCoreToken(uint8 tokenIndex) internal returns (bool) {
-    return (tokenIndex > 190) && ((tokenIndex % 4) == 3);
+    return (tokenIndex == 52) || ((tokenIndex > 190) && ((tokenIndex % 4) == 3));
   }
 
   /// @notice Return all supported token addresses in an array ordered by `tokenIndex`
