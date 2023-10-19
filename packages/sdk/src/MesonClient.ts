@@ -92,7 +92,7 @@ export class MesonClient {
     return `0x${TronWeb.address.toHex(address).substring(2)}`
   }
 
-  static tokenType (tokenIndex: number) {
+  static tokenType (tokenIndex: number, pod?: boolean) {
     if (tokenIndex >= 252) {
       return 'eth'
     } else if (tokenIndex >= 248) {
@@ -100,6 +100,9 @@ export class MesonClient {
     } else if (tokenIndex === 191) {
       return 'gas-token'
     } else if (tokenIndex <= 64) {
+      if (pod && tokenIndex <= 32 && tokenIndex > 16) {
+        return 'pod'
+      }
       return 'stablecoins'
     } else {
       return 'unknown'
@@ -128,7 +131,7 @@ export class MesonClient {
     } else if (lowerCaseSymbol.includes('pod')) {
       return 'pod'
     } else {
-      return 'uct'
+      return lowerCaseSymbol
     }
   }
 

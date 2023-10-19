@@ -1119,6 +1119,7 @@
       "decimals": 18
     },
     "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "coreTokenPriceFactor": 1000,
     "tokens": [
       {
         "name": "USD Coin",
@@ -1133,6 +1134,13 @@
         "decimals": 18,
         "addr": "0xBDa330Ea8F3005C421C8088e638fBB64fA71b9e0",
         "tokenIndex": 34
+      },
+      {
+        "name": "ZBC",
+        "symbol": "ZBC",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 191
       }
     ]
   },

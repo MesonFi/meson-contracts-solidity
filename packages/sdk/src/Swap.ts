@@ -94,12 +94,12 @@ export class Swap implements SwapData {
     }
 
     this.version = typeof data.version === 'number' ? data.version : MESON_PROTOCOL_VERSION
-    this.salt = this._makeFullSalt(data)
     this.expireTs = data.expireTs
     this.inChain = data.inChain
     this.inToken = data.inToken
     this.outChain = data.outChain
     this.outToken = data.outToken
+    this.salt = this._makeFullSalt(data)
   }
 
   private _makeFullSalt(data: SwapData): string {
@@ -115,7 +115,7 @@ export class Swap implements SwapData {
         return `${saltHeader}${saltData.substring(2)}${this._randomHex(18 - saltData.length)}`
       }
       if ((parseInt(saltHeader[3], 16) & 4) === 4) {
-        const saltData1 = BigNumber.from((coreTokenPrice || 0) * 10)
+        const saltData1 = BigNumber.from((coreTokenPrice || 0) * this._pFactor)
           .toHexString().substring(2).padStart(5, '0')
         if (saltData1.length > 5) {
           throw new Error('Invalid coreTokenPrice; overflow')
@@ -221,14 +221,22 @@ export class Swap implements SwapData {
     if (!this.swapForCoreToken) {
       return
     }
-    return parseInt(this.salt.slice(6, 11), 16) / 10
+    return parseInt(this.salt.slice(6, 11), 16) / this._pFactor
   }
 
   get coreTokenAmount(): BigNumber {
     if (this.amountForCoreToken.eq(0)) {
       return BigNumber.from(0)
     }
-    return this.amountForCoreToken.mul(10).div(this.coreTokenPrice * 10)
+    return this.amountForCoreToken.mul(this._pFactor).div(this.coreTokenPrice * this._pFactor)
+  }
+
+  get _pFactor() : number {
+    if (this.outChain === '0x56ce') {
+      return 1000
+    } else {
+      return 10
+    }
   }
 
   get expired(): Boolean {
