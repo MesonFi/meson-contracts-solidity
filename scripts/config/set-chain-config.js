@@ -32,6 +32,7 @@ module.exports = async function setChainConfig(networkId, testnetMode) {
     .replace('CONFIG_BLOCKCHAIN_NAME', `${network.name}`)
     .replace('CONFIG_COIN_TYPE', network.shortSlip44)
     .replace('CONFIG_MIN_CORE_FEE', network.minCoreFee || '500; // min 0.0005 ETH ~ $1')
+    .replace('CONFIG_CORE_TOKEN_PRICE_FACTOR', network.coreTokenPriceFactor || '10')
 
   if (network.shortSlip44 === '0x003c') {
     config = config.replace('CONFIG_LOCK_TIME', '40 minutes')

@@ -14,6 +14,8 @@ contract MesonConfig {
   uint256 constant SERVICE_FEE_MINIMUM = 500_000; // min $0.5
   uint256 constant SERVICE_FEE_MINIMUM_CORE = CONFIG_MIN_CORE_FEE
 
+  uint256 constant CORE_TOKEN_PRICE_FACTOR = CONFIG_CORE_TOKEN_PRICE_FACTOR;
+
   uint256 constant MIN_BOND_TIME_PERIOD = 1 hours;
   uint256 constant MAX_BOND_TIME_PERIOD = 2 hours;
   uint256 constant LOCK_TIME_PERIOD = CONFIG_LOCK_TIME;
