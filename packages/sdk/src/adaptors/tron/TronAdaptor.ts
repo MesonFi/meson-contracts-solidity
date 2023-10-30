@@ -117,6 +117,11 @@ function _wrapTronReceipt(raw) {
   return {
     status: raw.receipt?.result === 'SUCCESS' ? '1' : '0',
     blockNumber: raw.blockNumber,
-    timestamp: Math.floor(raw.blockTimeStamp / 1000).toString()
+    timestamp: Math.floor(raw.blockTimeStamp / 1000).toString(),
+    logs: raw.log?.map(log => ({
+        address: TronWeb.address.fromHex(`0x${log.address}`),
+        topics: log.topics.map(topic => `0x${topic}`),
+        data: `0x${log.data || ''}`
+    })),
   }
 }
