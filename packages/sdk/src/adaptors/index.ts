@@ -4,12 +4,14 @@ global.fetch = fetch
 import { AptosClient } from 'aptos'
 import { providers, Signer, utils } from 'ethers'
 import { JsonRpcProvider as SuiProvider } from '@mysten/sui.js'
+import sol from '@solana/web3.js'
 import TronWeb from 'tronweb'
 import { Provider as ZkProvider, Wallet as ZkWallet } from 'zksync-web3'
 
 import * as _aptos from './aptos'
 import * as _ethers from './ethers'
 import * as _sui from './sui'
+import * as _solana from './solana'
 import * as _tron from './tron'
 import * as _zksync from './zksync'
 import AptosAdaptor from './aptos/AptosAdaptor'
@@ -20,6 +22,8 @@ export function getWallet (privateKey, client) {
     return _aptos.getWallet(privateKey, client)
   } else if (client instanceof SuiProvider) {
     return _sui.getWallet(privateKey, client)
+  } else if (client instanceof sol.Connection) {
+    return _solana.getWallet(privateKey, client)
   } else if (client instanceof ZkProvider) {
     return _zksync.getWallet(privateKey, client)
   } else if (client instanceof providers.Provider) {
@@ -73,5 +77,6 @@ export function formatAddress(format: AddressFormat, addr: string): string {
 export const aptos = _aptos
 export const ethers = _ethers
 export const sui = _sui
+export const solana = _solana
 export const tron = _tron
 export const zksync = _zksync

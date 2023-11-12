@@ -649,5 +649,26 @@
         "tokenIndex": 255
       }
     ]
+  },
+  {
+    "id": "solana-testnet",
+    "name": "Solana Testnet",
+    "alias": "SOL",
+    "chainId": "solana:0x2",
+    "slip44": "0x800001f5",
+    "shortSlip44": "0x01f5",
+    "extensions": [
+      "solana"
+    ],
+    "addressFormat": "solana",
+    "url": "https://api.testnet.solana.com",
+    "explorer": "https://explorer.solana.com",
+    "nativeCurrency": {
+      "name": "Solana",
+      "symbol": "SOL",
+      "decimals": 9
+    },
+    "mesonAddress": "",
+    "tokens": []
   }
 ]

@@ -12,7 +12,7 @@ import SuiWallet, { SuiExtWallet } from './SuiWallet'
 import { Swap } from '../../Swap'
 
 export function getWallet(privateKey: string, client: SuiProvider): SuiWallet {
-  let keypair
+  let keypair: SuiKeypair
   if (!privateKey) {
     keypair = SuiKeypair.generate()
   } else if (privateKey.startsWith('0x')) {
