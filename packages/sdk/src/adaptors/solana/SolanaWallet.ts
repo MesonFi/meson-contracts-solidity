@@ -1,4 +1,6 @@
+import { utils } from 'ethers'
 import sol from '@solana/web3.js'
+import nacl from 'tweetnacl'
 import SolanaAdaptor from './SolanaAdaptor'
 
 export default class SolanaWallet extends SolanaAdaptor {
@@ -18,14 +20,22 @@ export default class SolanaWallet extends SolanaAdaptor {
   }
 
   signMessage (msg: string) {
-    // TODO
+    let signData: Uint8Array
+    if (utils.isHexString(msg)) {
+      signData = utils.arrayify(msg)
+    } else {
+      signData = utils.toUtf8Bytes(msg)
+    }
+    const signature = nacl.sign.detached(signData, this.keypair.secretKey)
+    return utils.hexlify(signature)
   }
 
-  async sendTransaction(tx, options) {
-    // return {
-    //   hash: '',
-    //   wait: () => this.waitForTransaction(pending.hash)
-    // }
+  async sendTransaction(tx: sol.Transaction, options?) {
+    const hash = await sol.sendAndConfirmTransaction(this.client, tx, [this.keypair])
+    return {
+      hash,
+      wait: () => this.waitForTransaction(hash)
+    }
   }
 
   async deploy(module: string, metadata: string) {
@@ -44,7 +54,12 @@ export class SolanaExtWallet extends SolanaWallet {
     return ''
   }
 
-  async sendTransaction(payload, options) {
+  async sendTransaction(tx: sol.Transaction, options?) {
+    const hash = ''
+    return {
+      hash,
+      wait: () => this.waitForTransaction(hash)
+    }
   }
 
   async deploy(): Promise<any> {

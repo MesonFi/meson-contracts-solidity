@@ -1,6 +1,7 @@
 const { ethers } = require('hardhat')
 const { AptosClient } = require('aptos')
 const { JsonRpcProvider: SuiProvider, Connection: SuiConnection } = require('@mysten/sui.js')
+const sol = require('@solana/web3.js')
 const TronWeb = require('tronweb')
 const { Provider } = require('zksync-web3')
 const CustomGasFeeProviderWrapper = require('./CustomGasFeeProviderWrapper')
@@ -14,6 +15,8 @@ exports.getClient = function getClient (network) {
       faucet: 'https://faucet.devnet.sui.io/gas',
     })
     return new SuiProvider(connection)
+  } else if (network.id.startsWith('solana')) {
+    return new sol.Connection(network.url, 'confirmed')
   } else if (network.id.startsWith('tron')) {
     return new TronWeb({ fullHost: network.url })
   } else if (network.id.startsWith('zksync')) {

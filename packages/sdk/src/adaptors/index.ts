@@ -16,6 +16,7 @@ import * as _tron from './tron'
 import * as _zksync from './zksync'
 import AptosAdaptor from './aptos/AptosAdaptor'
 import SuiAdaptor from './sui/SuiAdaptor'
+import SolanaAdaptor from './solana/SolanaAdaptor'
 
 export function getWallet (privateKey, client) {
   if (client instanceof AptosClient) {
@@ -38,6 +39,8 @@ export function getContract(address, abi, clientOrAdaptor) {
     return _aptos.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof SuiProvider || clientOrAdaptor instanceof SuiAdaptor) {
     return _sui.getContract(address, abi, clientOrAdaptor)
+  } else if (clientOrAdaptor instanceof sol.Connection || clientOrAdaptor instanceof SolanaAdaptor) {
+    return _solana.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof providers.Provider || Signer.isSigner(clientOrAdaptor)) {
     return _ethers.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof ZkProvider || clientOrAdaptor instanceof ZkWallet) {
@@ -47,7 +50,7 @@ export function getContract(address, abi, clientOrAdaptor) {
   }
 }
 
-export type AddressFormat = 'ethers' | 'tron' | 'aptos' | 'sui'
+export type AddressFormat = 'ethers' | 'tron' | 'aptos' | 'sui' | 'solana'
 export function isAddress(format: AddressFormat, addr: string): boolean {
   if (format === 'ethers') {
     return utils.isHexString(addr) && utils.isAddress(addr)
@@ -55,6 +58,8 @@ export function isAddress(format: AddressFormat, addr: string): boolean {
     return TronWeb.isAddress(addr)
   } else if (format === 'aptos' || format === 'sui') {
     return utils.isHexString(addr) && addr.length <= 66 && addr.length > 50
+  } else if (format === 'solana') {
+    return !!_solana.formatAddress(addr)
   }
 }
 
@@ -71,6 +76,8 @@ export function formatAddress(format: AddressFormat, addr: string): string {
     return _aptos.formatAddress(addr)
   } else if (format === 'sui') {
     return _sui.formatAddress(addr)
+  } else if (format === 'solana') {
+    return _solana.formatAddress(addr)
   }
 }
 

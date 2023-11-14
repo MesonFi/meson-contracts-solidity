@@ -661,14 +661,22 @@
       "solana"
     ],
     "addressFormat": "solana",
-    "url": "https://api.testnet.solana.com",
+    "url": "https://api.devnet.solana.com",
     "explorer": "https://explorer.solana.com",
     "nativeCurrency": {
       "name": "Solana",
       "symbol": "SOL",
       "decimals": 9
     },
-    "mesonAddress": "",
-    "tokens": []
+    "mesonAddress": "FR1SDyLUj7PrMbtkUCkDrBymk5eWrRmr3UvWFb5Kjbmd",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "FNvR95kFBmLPWPXY2hbw48Y6yvfGss6ac1vraCFKg3Lq",
+        "tokenIndex": 1
+      }
+    ]
   }
 ]

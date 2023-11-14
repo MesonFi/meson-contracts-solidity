@@ -58,21 +58,14 @@ export default class AptosAdaptor {
       const block = await this.client.getBlock(number, params[1])
       return _wrapSolanaBlock(block)
     } else if (method === 'eth_getTransactionByHash') {
-      if (params[0].startsWith('0x')) {
-        return _wrapSolanaTx(await this.client.getTransaction(params[0]))
-      }
-      return _wrapSolanaTx(await this.client.getTransaction(params[0]))
+      return this.waitForTransaction(params[0])
     } else if (method === 'eth_getTransactionReceipt') {
-      if (params[0].startsWith('0x')) {
-        return _wrapSolanaTx(await this.client.getTransaction(params[0]))
-      }
-      return _wrapSolanaTx(await this.client.getTransaction(params[0]))
+      return this.waitForTransaction(params[0])
     }
   }
 
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
-    const result = await this.client.getTransaction(hash, {
-    })
+    const result = await this.client.getTransaction(hash, { commitment: 'finalized', maxSupportedTransactionVersion: 0 })
     return _wrapSolanaTx(result)
   }
 }
@@ -88,6 +81,7 @@ function _wrapSolanaBlock(raw) {
 }
 
 function _wrapSolanaTx(raw) {
+  return raw
   return {
     blockHash: 'n/a',
     blockNumber: '',

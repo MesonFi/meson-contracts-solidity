@@ -21,6 +21,7 @@ import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwap'
 import * as adaptors from './adaptors'
 import AptosAdaptor from './adaptors/aptos/AptosAdaptor'
 import SuiAdaptor from './adaptors/sui/SuiAdaptor'
+import SolanaAdaptor from './adaptors/solana/SolanaAdaptor'
 
 const Zero = constants.AddressZero.substring(2)
 const AddressOne = '0x0000000000000000000000000000000000000001'
@@ -142,6 +143,8 @@ export class MesonClient {
       this.addressFormat = 'aptos'
     } else if (mesonInstance.provider instanceof SuiAdaptor) {
       this.addressFormat = 'sui'
+    } else if (mesonInstance.provider instanceof SolanaAdaptor) {
+      this.addressFormat = 'solana'
     } else {
       this.addressFormat = 'tron'
     }
@@ -457,7 +460,7 @@ export class MesonClient {
   }
 
   async lockSwap(encoded: string, initiator: string, recipient?: string, ...overrides: [CallOverrides?]) {
-    if (['027d', '0310'].includes(encoded.substring(54, 58))) { // to aptos or sui
+    if (['027d', '0310', '01f5'].includes(encoded.substring(54, 58))) { // to aptos or sui
       return this.#mesonInstance.lockSwap(encoded, { initiator, recipient } as any, ...overrides)
     } else {
       return this.#mesonInstance.lockSwap(encoded, initiator, ...overrides)
@@ -487,7 +490,7 @@ export class MesonClient {
     let recipient = signedRelease.recipient
     if (encoded.substring(54, 58) === '00c3') { // to tron
       recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
-    } else if (['027d', '0310'].includes(encoded.substring(54, 58))) { // to aptos or sui
+    } else if (['027d', '0310'].includes(encoded.substring(54, 58))) { // to aptos, sui
       recipient = recipient.substring(0, 42)
     }
     const sig = utils.splitSignature(signedRelease.signature)
@@ -499,7 +502,7 @@ export class MesonClient {
     let recipient = signedRelease.recipient
     if (encoded.substring(54, 58) === '00c3') { // to tron
       recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
-    } else if (['027d', '0310'].includes(encoded.substring(54, 58))) { // to aptos or sui
+    } else if (['027d', '0310'].includes(encoded.substring(54, 58))) { // to aptos, sui
       recipient = recipient.substring(0, 42)
     }
     const sig = utils.splitSignature(signedRelease.signature)
