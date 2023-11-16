@@ -623,7 +623,7 @@
   },
   {
     "id": "taiko-sepolia",
-    "name": "Taiko Sepolia",
+    "name": "Taiko Jolnir",
     "alias": "TAIKO",
     "chainId": "0x28c5f",
     "slip44": "0x800028c5",
@@ -661,7 +661,7 @@
       "solana"
     ],
     "addressFormat": "solana",
-    "url": "https://api.devnet.solana.com",
+    "url": "https://api.testnet.solana.com",
     "explorer": "https://explorer.solana.com",
     "nativeCurrency": {
       "name": "Solana",
@@ -674,8 +674,17 @@
         "name": "USDC",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "FNvR95kFBmLPWPXY2hbw48Y6yvfGss6ac1vraCFKg3Lq",
+        "addr": "CAgsMKPSKFtqPDQqGwMrnekuNZFgje1vUFpVcpKKEXQM",
+        "link": "address/CAgsMKPSKFtqPDQqGwMrnekuNZFgje1vUFpVcpKKEXQM?network=testnet",
         "tokenIndex": 1
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "4iEra9v5uBqmWTaKSZaWeJJNaRcgagveW1yqXKCNNz86",
+        "link": "address/4iEra9v5uBqmWTaKSZaWeJJNaRcgagveW1yqXKCNNz86?network=testnet",
+        "tokenIndex": 2
       }
     ]
   }

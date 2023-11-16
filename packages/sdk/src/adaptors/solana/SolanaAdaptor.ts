@@ -1,10 +1,17 @@
 import { BigNumber, utils } from 'ethers'
-import sol from '@solana/web3.js'
+import {
+  Connection as SolConnection,
+  PublicKey as SolPublicKey,
+  BlockResponse,
+  TransactionResponse,
+} from '@solana/web3.js'
+import bs58 from 'bs58'
+import { timer } from '../../utils'
 
 export default class AptosAdaptor {
-  readonly client: sol.Connection
+  readonly client: SolConnection
 
-  constructor(client: sol.Connection) {
+  constructor(client: SolConnection) {
     this.client = client
   }
 
@@ -13,22 +20,19 @@ export default class AptosAdaptor {
   }
 
   async detectNetwork(): Promise<any> {
-    // TODO
+    return (await this.client.getLatestBlockhash('finalized')).blockhash
   }
 
   async getBlockNumber() {
-    // TODO
-    const info = await this.detectNetwork()
-    return Number(info.block_height)
+    return (await this.client.getBlockHeight('confirmed'))
   }
 
   async getTransactionCount() {
-    // TODO check
-    return await this.client.getTransactionCount()
+    return await this.client.getTransactionCount('finalized')
   }
 
   async getBalance(addr: string) {
-    return BigNumber.from(await this.client.getBalance(new sol.PublicKey(addr)))
+    return BigNumber.from(await this.client.getBalance(new SolPublicKey(addr)))
   }
 
   async getCode(addr) {
@@ -58,39 +62,80 @@ export default class AptosAdaptor {
       const block = await this.client.getBlock(number, params[1])
       return _wrapSolanaBlock(block)
     } else if (method === 'eth_getTransactionByHash') {
-      return this.waitForTransaction(params[0])
+      return this._getTransaction(params[0])
     } else if (method === 'eth_getTransactionReceipt') {
-      return this.waitForTransaction(params[0])
+      return this._getTransaction(params[0], 1)
     }
   }
 
+  async _getTransaction(hash: string, confirmations?: number) {
+    const result = await this.client.getTransaction(hash, { commitment: confirmations ? 'finalized' : 'confirmed' })
+    return result && _wrapSolanaTx(result)
+  }
+
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
-    const result = await this.client.getTransaction(hash, { commitment: 'finalized', maxSupportedTransactionVersion: 0 })
-    return _wrapSolanaTx(result)
+    return new Promise((resolve, reject) => {
+      const h = setInterval(async () => {
+        try {
+          const info = await this._getTransaction(hash, confirmations)
+          if (info) {
+            clearInterval(h)
+            resolve(info)
+          }
+        } catch {}
+      }, 1000)
+
+      if (timeout) {
+        timer(timeout * 1000).then(() => {
+          clearInterval(h)
+          reject(new Error('Time out'))
+        })
+      }
+    })
   }
 }
 
-function _wrapSolanaBlock(raw) {
+function _wrapSolanaBlock(raw: BlockResponse) {
   return {
-    hash: '0x' + Number(raw.block_height).toString(16),
-    parentHash: '0x' + Number(raw.block_height - 1).toString(16),
-    number: raw.block_height,
-    timestamp: Math.floor(raw.block_timestamp / 1000000).toString(),
-    transactions: raw.transactions?.filter(tx => tx.type === 'user_transaction').map(_wrapSolanaTx) || []
+    hash: raw.parentSlot + 1,
+    parentHash: raw.parentSlot,
+    number: raw.parentSlot + 1,
+    timestamp: raw.blockTime,
+    transactions: raw.transactions?.map(tx => _wrapSolanaTx({ ...tx, slot: raw.parentSlot + 1, blockTime: raw.blockTime })) || []
   }
 }
 
-function _wrapSolanaTx(raw) {
-  return raw
+function _wrapSolanaTx(raw: TransactionResponse) {
+  const {
+    blockTime,
+    slot,
+    transaction: { signatures, message },
+    meta: { err, logMessages }
+  } = raw
+  const { recentBlockhash, instructions, accountKeys } = message
+
+  const signer = accountKeys.filter((_, i) => message.isAccountSigner(i))
+
+  const programs = Array.from((<any>message).indexToProgramIds.entries())
+    .filter(([_, programId]) => programId.toString() !== 'ComputeBudget111111111111111111111111111111')
+  const indices = programs.map(p => p[0])
+  const ins = instructions.filter(ins => indices.includes(ins.programIdIndex))
+
+  if (!ins.length) {
+    return
+  }
+  const { accounts, data, programIdIndex } = ins[0]
+  const programId = programs.find(p => p[0] === programIdIndex)[1]
+
   return {
     blockHash: 'n/a',
-    blockNumber: '',
-    hash: utils.hexZeroPad(raw.hash, 32),
-    from: utils.hexZeroPad(raw.sender, 32),
-    to: utils.hexZeroPad(raw.payload?.function?.split('::')?.[0] || '0x', 32),
+    blockNumber: slot,
+    hash: signatures[0],
+    from: signer.toString(),
+    to: programId.toString(),
     value: '0',
-    input: JSON.stringify(raw.payload),
-    timestamp: Math.floor(raw.timestamp / 1000000).toString(),
-    status: raw.success ? '0x1' : '0x0'
+    input: utils.hexlify(bs58.decode(data)),
+    timestamp: blockTime,
+    status: err ? '0x0' : '0x1'
   }
 }

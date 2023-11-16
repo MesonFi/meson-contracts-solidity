@@ -16,7 +16,7 @@ import { ERC20 } from '@mesonfi/contract-abis'
 import { Rpc } from './Rpc'
 import { Swap } from './Swap'
 import { SwapWithSigner } from './SwapWithSigner'
-import { SwapSigner } from './SwapSigner'
+import { SwapSigner, clipRecipient } from './SwapSigner'
 import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwap'
 import * as adaptors from './adaptors'
 import AptosAdaptor from './adaptors/aptos/AptosAdaptor'
@@ -487,12 +487,7 @@ export class MesonClient {
 
   async executeSwap(signedRelease: SignedSwapReleaseData, depositToPool: boolean = false, ...overrides: [CallOverrides?]) {
     const { encoded } = signedRelease
-    let recipient = signedRelease.recipient
-    if (encoded.substring(54, 58) === '00c3') { // to tron
-      recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
-    } else if (['027d', '0310'].includes(encoded.substring(54, 58))) { // to aptos, sui
-      recipient = recipient.substring(0, 42)
-    }
+    const recipient = clipRecipient(signedRelease.recipient, encoded)
     const sig = utils.splitSignature(signedRelease.signature)
     return this.#mesonInstance.executeSwap(encoded, sig.r, sig.yParityAndS, recipient, depositToPool, ...overrides)
   }

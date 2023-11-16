@@ -4,7 +4,7 @@ global.fetch = fetch
 import { AptosClient } from 'aptos'
 import { providers, Signer, utils } from 'ethers'
 import { JsonRpcProvider as SuiProvider } from '@mysten/sui.js'
-import sol from '@solana/web3.js'
+import { Connection as SolConnection } from '@solana/web3.js'
 import TronWeb from 'tronweb'
 import { Provider as ZkProvider, Wallet as ZkWallet } from 'zksync-web3'
 
@@ -23,7 +23,7 @@ export function getWallet (privateKey, client) {
     return _aptos.getWallet(privateKey, client)
   } else if (client instanceof SuiProvider) {
     return _sui.getWallet(privateKey, client)
-  } else if (client instanceof sol.Connection) {
+  } else if (client instanceof SolConnection) {
     return _solana.getWallet(privateKey, client)
   } else if (client instanceof ZkProvider) {
     return _zksync.getWallet(privateKey, client)
@@ -39,7 +39,7 @@ export function getContract(address, abi, clientOrAdaptor) {
     return _aptos.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof SuiProvider || clientOrAdaptor instanceof SuiAdaptor) {
     return _sui.getContract(address, abi, clientOrAdaptor)
-  } else if (clientOrAdaptor instanceof sol.Connection || clientOrAdaptor instanceof SolanaAdaptor) {
+  } else if (clientOrAdaptor instanceof SolConnection || clientOrAdaptor instanceof SolanaAdaptor) {
     return _solana.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof providers.Provider || Signer.isSigner(clientOrAdaptor)) {
     return _ethers.getContract(address, abi, clientOrAdaptor)

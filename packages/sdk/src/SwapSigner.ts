@@ -2,7 +2,6 @@ import { Wallet, utils } from 'ethers'
 import { HDNode } from "@ethersproject/hdnode";
 import TronWeb from 'tronweb'
 import bs58 from 'bs58'
-import { isAddress } from './adaptors';
 
 const NOTICE_SIGN_REQUEST = 'Sign to request a swap on Meson'
 const NOTICE_SIGN_RELEASE = 'Sign to release a swap on Meson'
@@ -14,13 +13,24 @@ export type CompactSignature = string
 const nonTyped = (encoded: string) => parseInt(encoded[15], 16) >= 8
 const fromTron = (encoded: string) => encoded.substring(60, 64) === '00c3'
 const toTron = (encoded: string) => encoded.substring(54, 58) === '00c3'
-const toEthAddress = (addr: string) => {
-  if (isAddress('tron', addr)) {
-    return `0x${TronWeb.address.toHex(addr).substring(2)}`
-  } else if (isAddress('solana', addr)) {
-    return utils.hexlify(bs58.decode(addr)).substring(0, 42)
+export const clipRecipient = (recipient: string, encoded: string) => {
+  const chain = encoded.substring(54, 58)
+  if (chain === '00c3') {
+    // to tron
+    return `0x${TronWeb.address.toHex(recipient).substring(2)}`
+  } else if (chain === '01f5') {
+    // to solana
+    if (utils.isHexString(recipient)) {
+      return recipient
+    } else {
+      return utils.hexlify(bs58.decode(recipient)).substring(0, 42)
+    }
+  } else if (['027d', '0310'].includes(chain)) {
+    // to aptos, sui
+    return recipient.substring(0, 42)
   } else {
-    return addr.substring(0, 42)
+    // to eth
+    return recipient
   }
 }
 const noticeRecipient = (encoded: string) => toTron(encoded) ? 'Recipient (tron address in hex format)' : 'Recipient'
@@ -66,14 +76,14 @@ export class SwapSigner {
   static prehashRelease(encoded: string, recipient: string, testnet?: boolean): string {
     if (fromTron(encoded)) {
       const header = nonTyped(encoded) ? '\x19TRON Signed Message:\n53\n' : '\x19TRON Signed Message:\n32\n'
-      return utils.solidityPack(['string', 'bytes32', 'address'], [header, encoded, toEthAddress(recipient)])
+      return utils.solidityPack(['string', 'bytes32', 'address'], [header, encoded, clipRecipient(recipient, encoded)])
     } else if (nonTyped(encoded)) {
       const header = '\x19Ethereum Signed Message:\n52'
-      return utils.solidityPack(['string', 'bytes32', 'address'], [header, encoded, toEthAddress(recipient)])
+      return utils.solidityPack(['string', 'bytes32', 'address'], [header, encoded, clipRecipient(recipient, encoded)])
     }
     const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
     const typeHash = utils.solidityKeccak256(['string', 'string'], [`bytes32 ${notice}`, `address ${noticeRecipient(encoded)}`])
-    const valueHash = utils.solidityKeccak256(['bytes32', 'address'], [encoded, toEthAddress(recipient)])
+    const valueHash = utils.solidityKeccak256(['bytes32', 'address'], [encoded, clipRecipient(recipient, encoded)])
     return utils.solidityPack(['bytes32', 'bytes32'], [typeHash, valueHash])
   }
 
@@ -82,7 +92,7 @@ export class SwapSigner {
   }
 
   static hashWithdraw(encoded: string, recipient: string): string {
-    return utils.keccak256(utils.solidityPack(['bytes32', 'address'], [encoded, toEthAddress(recipient)]))
+    return utils.keccak256(utils.solidityPack(['bytes32', 'address'], [encoded, clipRecipient(recipient, encoded)]))
   }
 }
 
@@ -153,16 +163,16 @@ export class RemoteSwapSigner extends SwapSigner {
   async signSwapRelease(encoded: string, recipient: string, testnet?: boolean): Promise<CompactSignature> {
     let signature
     if (fromTron(encoded)) {
-      const message = utils.solidityPack(['bytes32', 'address'], [encoded, toEthAddress(recipient)]).replace('0x', '0x0a')
+      const message = utils.solidityPack(['bytes32', 'address'], [encoded, clipRecipient(recipient, encoded)]).replace('0x', '0x0a')
       signature = await this.remoteSigner.signMessage(message)
     } else if (nonTyped(encoded)) {
-      const message = utils.solidityPack(['bytes32', 'address'], [encoded, toEthAddress(recipient)])
+      const message = utils.solidityPack(['bytes32', 'address'], [encoded, clipRecipient(recipient, encoded)])
       signature = await this.remoteSigner.signMessage(message)
     } else {
       const notice = testnet ? NOTICE_TESTNET_SIGN_RELEASE : NOTICE_SIGN_RELEASE
       const data = [
         { type: 'bytes32', name: notice, value: encoded },
-        { type: 'address', name: noticeRecipient(encoded), value: toEthAddress(recipient) }
+        { type: 'address', name: noticeRecipient(encoded), value: clipRecipient(recipient, encoded) }
       ]
       signature = await this.remoteSigner.signTypedData(data)
     }

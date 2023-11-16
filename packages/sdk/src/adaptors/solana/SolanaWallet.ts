@@ -1,12 +1,18 @@
 import { utils } from 'ethers'
+import {
+  Keypair as SolKeypair,
+  PublicKey as SolPublicKey,
+  Connection as SolConnection,
+  Transaction as SolTransaction,
+} from '@solana/web3.js'
 import sol from '@solana/web3.js'
 import nacl from 'tweetnacl'
 import SolanaAdaptor from './SolanaAdaptor'
 
 export default class SolanaWallet extends SolanaAdaptor {
-  readonly keypair: sol.Keypair
+  readonly keypair: SolKeypair
 
-  constructor(client: sol.Connection, keypair: sol.Keypair) {
+  constructor(client: SolConnection, keypair: SolKeypair) {
     super(client)
     this.keypair = keypair
   }
@@ -30,11 +36,11 @@ export default class SolanaWallet extends SolanaAdaptor {
     return utils.hexlify(signature)
   }
 
-  async sendTransaction(tx: sol.Transaction, options?) {
-    const hash = await sol.sendAndConfirmTransaction(this.client, tx, [this.keypair])
+  async sendTransaction(tx: SolTransaction, options?) {
+    const hash = await this.client.sendTransaction(tx, [this.keypair])
     return {
       hash,
-      wait: () => this.waitForTransaction(hash)
+      wait: () => this.waitForTransaction(hash, 1)
     }
   }
 
@@ -50,15 +56,21 @@ export class SolanaExtWallet extends SolanaWallet {
     this.ext = ext
   }
 
+  get publicKey() {
+    return new SolPublicKey(this.address)
+  }
+
   get address() {
-    return ''
+    return this.ext?.currentAccount?.address
   }
 
   async sendTransaction(tx: sol.Transaction, options?) {
-    const hash = ''
+    tx.recentBlockhash = await this.detectNetwork()
+    tx.feePayer = this.publicKey
+    const hash = await this.ext.sendTransaction(tx)
     return {
       hash,
-      wait: () => this.waitForTransaction(hash)
+      wait: () => this.waitForTransaction(hash, 1)
     }
   }
 

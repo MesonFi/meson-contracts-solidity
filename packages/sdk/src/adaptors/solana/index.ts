@@ -1,8 +1,17 @@
 import { BigNumber, BigNumberish, utils } from 'ethers'
-import sol, { SystemProgram } from '@solana/web3.js'
+import {
+  SystemProgram,
+  AccountMeta,
+  Keypair as SolKeypair,
+  PublicKey as SolPublicKey,
+  Connection as SolConnection,
+  Transaction as SolTransaction,
+  TransactionInstruction as SolTransactionInstruction,
+} from '@solana/web3.js'
 import {
   getMint,
   approve,
+  transfer,
   getAssociatedTokenAddressSync,
   getOrCreateAssociatedTokenAccount,
   TOKEN_PROGRAM_ID,
@@ -36,25 +45,48 @@ const STORE_PREFIX = {
   BALANCE_OF_POOL: Buffer.from('balance_of_pool'),
 }
 
-export function getWallet(privateKey: string, client: sol.Connection): SolanaWallet {
-  let keypair: sol.Keypair
+const SOLANA_METHODS = [
+  'init',
+  'transferOwnership',
+  'transferPremiumManager',
+  'addSupportToken',
+  'depositAndRegister',
+  'deposit',
+  'withdraw',
+  'addAuthorizedAddr',
+  'removeAuthorizedAddr',
+  'transferPoolOwner',
+  'withdrawServiceFee',
+  'postSwapFromInitiator', // 11
+  'bondSwap',
+  'cancelSwap',
+  'executeSwap',
+  'lockSwap',
+  'unlock',
+  'release'
+]
+
+export function getWallet(privateKey: string, client: SolConnection): SolanaWallet {
+  let keypair: SolKeypair
   if (!privateKey) {
-    keypair = sol.Keypair.generate()
+    keypair = SolKeypair.generate()
+  } else if (Array.isArray(privateKey)) {
+    // specific for solana
+    keypair = SolKeypair.fromSecretKey(new Uint8Array(privateKey))
   } else if (privateKey.startsWith('0x')) {
-    keypair = sol.Keypair.fromSeed(utils.arrayify(privateKey))
-  } else if (Array.isArray(privateKey)) { // specific for solana
-    keypair = sol.Keypair.fromSecretKey(new Uint8Array(privateKey))
+    keypair = SolKeypair.fromSeed(utils.arrayify(privateKey))
   } else {
-    keypair = sol.Keypair.fromSecretKey(bs58.decode(privateKey))
+    // specific for solana
+    keypair = SolKeypair.fromSecretKey(bs58.decode(privateKey))
   }
   return new SolanaWallet(client, keypair)
 }
 
-export function getWalletFromExtension(ext, client: sol.Connection): SolanaExtWallet {
+export function getWalletFromExtension(ext, client: SolConnection): SolanaExtWallet {
   return new SolanaExtWallet(client, ext)
 }
 
-export function getContract(address, abi, clientOrAdaptor: sol.Connection | SolanaAdaptor) {
+export function getContract(address, abi, clientOrAdaptor: SolConnection | SolanaAdaptor) {
   let adaptor: SolanaAdaptor
   if (clientOrAdaptor instanceof SolanaWallet) {
     adaptor = clientOrAdaptor
@@ -64,11 +96,11 @@ export function getContract(address, abi, clientOrAdaptor: sol.Connection | Sola
     adaptor = new SolanaAdaptor(clientOrAdaptor)
   }
 
-  const programId = new sol.PublicKey(address)
+  const programId = new SolPublicKey(address)
 
   const _getStore = (seeds: Buffer[]) => {
     return {
-      pubkey: sol.PublicKey.findProgramAddressSync(seeds, programId)[0],
+      pubkey: SolPublicKey.findProgramAddressSync(seeds, programId)[0],
       isSigner: false,
       isWritable: true,
     }
@@ -85,9 +117,9 @@ export function getContract(address, abi, clientOrAdaptor: sol.Connection | Sola
 
   const _getAdmins = memoize(async () => {
     const { data } = await adaptor.client.getAccountInfo(stores.admin.pubkey)
-    const admin = new sol.PublicKey(data.subarray(0, 32))
-    const premiumManager = new sol.PublicKey(data.subarray(32, 64))
-    return { admin, premiumManager }
+    const owner = new SolPublicKey(data.subarray(0, 32))
+    const premiumManager = new SolPublicKey(data.subarray(32, 64))
+    return { owner, premiumManager }
   })
 
   const _getSupportedTokens = memoize(async () => {
@@ -95,7 +127,7 @@ export function getContract(address, abi, clientOrAdaptor: sol.Connection | Sola
     const indexes: number[] = []
     const tokens: string[] = []
     for (let i = 1; i < 255; i++) {
-      const tokenAddr = new sol.PublicKey(data.subarray(i * 32, (i + 1) * 32)).toString()
+      const tokenAddr = new SolPublicKey(data.subarray(i * 32, (i + 1) * 32)).toString()
       if (tokenAddr !== SystemProgram.programId.toString()) {
         indexes.push(i)
         tokens.push(tokenAddr)
@@ -134,29 +166,54 @@ export function getContract(address, abi, clientOrAdaptor: sol.Connection | Sola
     if (!info) {
       return
     }
-    return new sol.PublicKey(info.data).toString()
+    return new SolPublicKey(info.data).toString()
   }, poolIndex => BigNumber.from(poolIndex).toString())
 
   const _poolOfAuthorizedAddr = async (addr: string) => {
     const info = await adaptor.client.getAccountInfo(_getStore([
       STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT,
-      new sol.PublicKey(addr).toBuffer()
+      new SolPublicKey(addr).toBuffer()
     ]).pubkey)
     return info ? _bigNumberFromBuffer(info.data).toNumber() : 0
   }
 
-  const _getTokenAccount = (token: string, owner: string | sol.PublicKey) => {
+  const _getTokenAccount = (token: string, owner: string | SolPublicKey) => {
     const tokenAccount = getAssociatedTokenAddressSync(
-      new sol.PublicKey(token),
-      typeof owner === 'string' ? new sol.PublicKey(owner) : owner,
+      new SolPublicKey(token),
+      typeof owner === 'string' ? new SolPublicKey(owner) : owner,
       true
     )
     return { pubkey: tokenAccount, isSigner: false, isWritable: true }
   }
 
-  const call = async (instructionId: number, getArguments: (arg0: any) => { keys: sol.AccountMeta[], data?: number[] }) => {
-    const { keys, data = [] } = getArguments({ stores, SYSTEM_PROGRAM, TOKEN_PROGRAM })
-    const tx = new sol.Transaction().add(new sol.TransactionInstruction({
+  const _getPostedSwap = async (encoded: string) => {
+    const store = _getStore([STORE_PREFIX.POSTED_SWAP, Buffer.from(encoded.substring(2), 'hex')])
+    const info = await adaptor.client.getAccountInfo(store.pubkey)
+    if (!info) {
+      return { exist: false }
+    }
+    const hex = utils.hexlify(info.data)
+    const poolIndex = BigNumber.from(hex.substring(0, 18))
+    const initiator = '0x' + hex.substring(18, 58)
+    const fromAddressInHex = '0x' + hex.substring(58, 122)
+    const fromAddress = new SolPublicKey(utils.arrayify(fromAddressInHex))
+    const pending = BigNumber.from(fromAddressInHex).gt(0)
+    return {
+      initiator: pending ? initiator : undefined,
+      poolOwner: pending ? await _ownerOfPool(poolIndex) : undefined,
+      fromAddress,
+      exist: true,
+    }
+  }
+
+  type CallArguments = { keys: AccountMeta[], data?: number[] }
+  const call = async (
+    instructionId: number,
+    getArgs: CallArguments | ((arg0: any) => CallArguments)
+  ) => {
+    const args = typeof getArgs === 'function' ? getArgs({ stores, SYSTEM_PROGRAM, TOKEN_PROGRAM }) : getArgs
+    const { keys, data = [] } = args
+    const tx = new SolTransaction().add(new SolTransactionInstruction({
       programId,
       keys,
       data: Buffer.from([instructionId, ...data]),
@@ -179,6 +236,35 @@ export function getContract(address, abi, clientOrAdaptor: sol.Connection | Sola
         return {
           format: () => abi,
           parseTransaction: tx => {
+            const { data } = tx
+            const name = SOLANA_METHODS[Number(data.substring(0, 4))]
+            const args: any = { encodedSwap: '0x' + data.substring(4, 68) }
+            switch (name) {
+              case 'postSwapFromInitiator':
+                args.postingValue = BigNumber.from('0x' + data.substring(68, 108) + data.substring(114, 124))
+                break
+              case 'bondSwap':
+              case 'cancelSwap':
+                break
+              case 'lockSwap':
+              case 'unlock':
+                args.initiator = '0x' + data.substring(68, 108)
+                break
+              case 'executeSwap':
+                args.recipient = '0x' + data.substring(196, 236)
+                break
+              case 'directRelease':
+                args.recipient = new SolPublicKey(utils.arrayify('0x' + data.substring(236, 300))).toString()
+              case 'release':
+                args.initiator = '0x' + data.substring(196, 236)
+                break
+            }
+            if (['executeSwap', 'release', 'directRelease'].includes(name)) {
+              const { r, yParityAndS } = utils.splitSignature('0x' + data.substring(68, 196))
+              args.r = r
+              args.yParityAndS = yParityAndS
+            }
+            return { name, args }
           }
         }
       } else if (['queryFilter', 'on', 'removeAllListeners'].includes(prop)) {
@@ -190,12 +276,12 @@ export function getContract(address, abi, clientOrAdaptor: sol.Connection | Sola
       } else if (prop === 'call') {
         return call
       } else if (prop === 'createTokenAccount') {
-        return async (token: string, owner: string | sol.PublicKey = stores.contractSigner.pubkey) => {
+        return async (token: string, owner: string | SolPublicKey = stores.contractSigner.pubkey) => {
           return await getOrCreateAssociatedTokenAccount(
             adaptor.client,
             (<SolanaWallet>adaptor).keypair,
-            new sol.PublicKey(token),
-            typeof owner === 'string' ? new sol.PublicKey(owner) : owner,
+            new SolPublicKey(token),
+            typeof owner === 'string' ? new SolPublicKey(owner) : owner,
             true,
           )
         }
@@ -215,23 +301,27 @@ export function getContract(address, abi, clientOrAdaptor: sol.Connection | Sola
 
             // ERC20 like
             if (prop === 'name') {
-              // const data = await getMint(adaptor.client, new sol.PublicKey(address))
+              // const data = await getMint(adaptor.client, new SolPublicKey(address))
             } else if (prop === 'symbol') {
-              // const data = await getMint(adaptor.client, new sol.PublicKey(address))
+              // const data = await getMint(adaptor.client, new SolPublicKey(address))
             } else if (prop === 'decimals') {
-              const data = await getMint(adaptor.client, new sol.PublicKey(address))
+              const data = await getMint(adaptor.client, new SolPublicKey(address))
               return data.decimals
             } else if (prop === 'balanceOf') {
               const tokenAccount = _getTokenAccount(address, args[0])
-              const data = await adaptor.client.getTokenAccountBalance(tokenAccount.pubkey)
-              return BigNumber.from(data.value.amount)
+              try {
+                const data = await adaptor.client.getTokenAccountBalance(tokenAccount.pubkey)
+                return BigNumber.from(data.value.amount)
+              } catch {
+                return BigNumber.from(0)
+              }
             } else if (prop === 'allowance') {
               const tokenAccount = _getTokenAccount(address, args[0])
               const info = await adaptor.client.getAccountInfo(tokenAccount.pubkey)
               if (!info) {
                 return BigNumber.from(0)
               }
-              const spender = new sol.PublicKey(info.data.subarray(76, 76 + 32))
+              const spender = new SolPublicKey(info.data.subarray(76, 76 + 32))
               if (spender.toString() === args[1]) {
                 return _bigNumberFromReverseBuffer(info.data.subarray(121, 121 + 8))
               }
@@ -270,7 +360,23 @@ export function getContract(address, abi, clientOrAdaptor: sol.Connection | Sola
               }
               return _bigNumberFromBuffer(info.data.subarray(0, 8))
             } else if (prop === 'getPostedSwap') {
+              const encoded = Swap.decode(args[0]).encoded
+              return await _getPostedSwap(encoded)
             } else if (prop === 'getLockedSwap') {
+              const encoded = Swap.decode(args[0]).encoded
+              const swapId = _getSwapId(encoded, args[1])
+              const store = _getStore([STORE_PREFIX.LOCKED_SWAP, Buffer.from(swapId.substring(2), 'hex')])
+              const info = await adaptor.client.getAccountInfo(store.pubkey)
+              if (!info) {
+                return { until: 0 } // never locked
+              }
+              const hex = utils.hexlify(info.data)
+              const poolIndex = BigNumber.from(hex.substring(0, 18))
+              const until = BigNumber.from('0x' + hex.substring(18, 34)).toNumber()
+              if (!until) {
+                return { until: 0, poolOwner: '0x1' } // locked & released
+              }
+              return { until, poolOwner: await _ownerOfPool(poolIndex) }
             }
 
             throw new Error(`SolanaContract read not implemented (${prop})`)
@@ -284,6 +390,23 @@ export function getContract(address, abi, clientOrAdaptor: sol.Connection | Sola
             }
 
             if (prop === 'transfer') {
+              const tokenAccount = _getTokenAccount(address, signerPubkey)
+              const destination = await getOrCreateAssociatedTokenAccount(
+                adaptor.client,
+                (<SolanaWallet>adaptor).keypair,
+                new SolPublicKey(address),
+                new SolPublicKey(args[0]),
+                true,
+              )
+              const hash = await transfer(
+                adaptor.client,
+                (<SolanaWallet>adaptor).keypair,
+                tokenAccount.pubkey,
+                destination.address,
+                signerPubkey,
+                args[1].toNumber()
+              )
+              return { hash, wait: () => adaptor.waitForTransaction(hash) }
             } else if (prop === 'approve') {
               const [spender, amount] = args
               const tokenAccount = _getTokenAccount(address, signerPubkey)
@@ -291,71 +414,91 @@ export function getContract(address, abi, clientOrAdaptor: sol.Connection | Sola
                 adaptor.client,
                 (<SolanaWallet>adaptor).keypair,
                 tokenAccount.pubkey,
-                new sol.PublicKey(spender),
+                new SolPublicKey(spender),
                 signerPubkey,
                 amount.toNumber(),
               )
               return { hash, wait: () => adaptor.waitForTransaction(hash) }
+            } else if (prop === 'transferOwnership') {
+              const [newOwner] = args
+              return await call(1, {
+                data: [],
+                keys: [
+                  stores.admin,
+                  { pubkey: signerPubkey, isSigner: true, isWritable: false },
+                  { pubkey: new SolPublicKey(newOwner), isSigner: false, isWritable: false },
+                ],
+              })
+            } else if (prop === 'transferPremiumManager') {
+              const [newPremiumManager] = args
+              return await call(2, {
+                data: [],
+                keys: [
+                  stores.admin,
+                  { pubkey: signerPubkey, isSigner: true, isWritable: false },
+                  { pubkey: new SolPublicKey(newPremiumManager), isSigner: false, isWritable: false },
+                ],
+              })
             } else if (prop === 'addSupportToken') {
               const [tokenAddr, tokenIndex] = args
-              const { admin } = await _getAdmins()
-              return await call(3, ({ stores, SYSTEM_PROGRAM }) => ({
+              const { owner } = await _getAdmins()
+              return await call(3, {
                 data: [tokenIndex],
                 keys: [
                   SYSTEM_PROGRAM,
-                  { pubkey: admin },
+                  { pubkey: owner, isSigner: true, isWritable: false },
                   stores.admin,
                   stores.supportedTokens,
                   _getStoreBalanceOfPool(0, tokenIndex),
-                  { pubkey: new sol.PublicKey(tokenAddr) },
+                  { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
                 ],
-              }))
+              })
             } else if (prop === 'depositAndRegister') {
               const amount = BigNumber.from(args[0]).toNumber()
               const poolTokenIndex = BigNumber.from(args[1])
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
               const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toNumber()
-              return await call(4, ({ SYSTEM_PROGRAM }) => ({
+              return await call(4, {
                 data: [..._numToBuffer(poolIndex, 8)],
                 keys: [
                   SYSTEM_PROGRAM,
                   _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, signerPubkey.toBuffer()]),
                   _getStore([STORE_PREFIX.POOL_OWNER, _numToBuffer(poolIndex, 8)]),
-                  { pubkey: signerPubkey, isSigner: true },
+                  { pubkey: signerPubkey, isSigner: true, isWritable: false },
                 ],
-              }))
+              })
             } else if (prop === 'deposit') {
               const amount = BigNumber.from(args[0]).toNumber()
               const poolTokenIndex = BigNumber.from(args[1])
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
               const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toNumber()
               const tokenAddr = await _getTokenAddr(tokenIndex)
-              return await call(5, ({ SYSTEM_PROGRAM, TOKEN_PROGRAM }) => ({
+              return await call(5, {
                 data: [tokenIndex, ..._numToBuffer(amount, 8)],
                 keys: [
                   SYSTEM_PROGRAM,
                   TOKEN_PROGRAM,
                   _getTokenAccount(tokenAddr, stores.contractSigner.pubkey),
-                  { pubkey: new sol.PublicKey(tokenAddr) },
+                  { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
                   stores.supportedTokens,
                   _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, signerPubkey.toBuffer()]),
                   _getStoreBalanceOfPool(poolIndex, tokenIndex),
                   { pubkey: signerPubkey, isSigner: true, isWritable: true },
                   _getTokenAccount(tokenAddr, signerPubkey),
                 ],
-              }))
+              })
             } else if (prop === 'withdraw') {
               const amount = BigNumber.from(args[0]).toNumber()
               const poolTokenIndex = BigNumber.from(args[1])
               const tokenIndex = poolTokenIndex.div(2 ** 40).toNumber()
               const poolIndex = poolTokenIndex.mod(BigNumber.from(2).pow(40)).toNumber()
               const tokenAddr = await _getTokenAddr(tokenIndex)
-              return await call(6, ({ TOKEN_PROGRAM }) => ({
+              return await call(6, {
                 data: [tokenIndex, ..._numToBuffer(amount, 8)],
                 keys: [
                   TOKEN_PROGRAM,
                   _getTokenAccount(tokenAddr, stores.contractSigner.pubkey),
-                  { pubkey: new sol.PublicKey(tokenAddr) },
+                  { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
                   stores.contractSigner,
                   stores.supportedTokens,
                   _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, signerPubkey.toBuffer()]),
@@ -364,7 +507,7 @@ export function getContract(address, abi, clientOrAdaptor: sol.Connection | Sola
                   { pubkey: signerPubkey, isSigner: true, isWritable: true },
                   _getTokenAccount(tokenAddr, signerPubkey),
                 ],
-              }))
+              })
             } else if (['addAuthorizedAddr', 'removeAuthorizedAddr', 'transferPoolOwner'].includes(prop)) {
             } else if (prop === 'withdrawServiceFee') {
             } else {
@@ -372,7 +515,7 @@ export function getContract(address, abi, clientOrAdaptor: sol.Connection | Sola
               if (prop === 'postSwapFromInitiator') {
                 const [_, postingValue] = args
                 const tokenAddr = await _getTokenAddr(swap.inToken)
-                return await call(11, ({ SYSTEM_PROGRAM, TOKEN_PROGRAM }) => ({
+                return await call(11, {
                   data: [
                     ...utils.arrayify(swap.encoded),
                     ...utils.arrayify(postingValue.substring(0, 42)),
@@ -382,73 +525,102 @@ export function getContract(address, abi, clientOrAdaptor: sol.Connection | Sola
                     SYSTEM_PROGRAM,
                     TOKEN_PROGRAM,
                     _getTokenAccount(tokenAddr, stores.contractSigner.pubkey),
-                    { pubkey: new sol.PublicKey(tokenAddr) },
+                    { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
                     stores.supportedTokens,
                     _getStore([STORE_PREFIX.POSTED_SWAP, Buffer.from(swap.encoded.substring(2), 'hex')]),
                     { pubkey: signerPubkey, isSigner: true, isWritable: true },
                     _getTokenAccount(tokenAddr, signerPubkey),
                   ],
-                }))
+                })
               } else if (prop === 'bondSwap') {
-                return await call(12, () => ({
+                return await call(12, {
                   data: [...utils.arrayify(swap.encoded)],
                   keys: [
                     _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, signerPubkey.toBuffer()]),
                     _getStore([STORE_PREFIX.POSTED_SWAP, Buffer.from(swap.encoded.substring(2), 'hex')]),
                     { pubkey: signerPubkey, isSigner: true, isWritable: true },
                   ],
-                }))
+                })
               } else if (prop === 'cancelSwap') {
+                const tokenAddr = await _getTokenAddr(swap.inToken)
+                const posted =  await _getPostedSwap(swap.encoded)
+                if (!posted?.fromAddress) {
+                  throw new Error('No posted swap')
+                }
+                return await call(13, {
+                  data: [...utils.arrayify(swap.encoded)],
+                  keys: [
+                    TOKEN_PROGRAM,
+                    _getTokenAccount(tokenAddr, stores.contractSigner.pubkey),
+                    { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
+                    stores.contractSigner,
+                    _getStore([STORE_PREFIX.POSTED_SWAP, Buffer.from(swap.encoded.substring(2), 'hex')]),
+                    _getTokenAccount(tokenAddr, posted.fromAddress),
+                  ],
+                })
               } else if (prop === 'executeSwap') {
                 const [_, r, yParityAndS, recipient, depositToPool] = args
                 const poolIndex = await _poolOfAuthorizedAddr(signerPubkey.toString())
                 const tokenAddr = await _getTokenAddr(swap.inToken)
-                return await call(14, ({ TOKEN_PROGRAM }) => ({
+                return await call(14, {
                   data: [
                     ...utils.arrayify(swap.encoded),
                     ...utils.arrayify(r),
                     ...utils.arrayify(yParityAndS),
-                    ...new sol.PublicKey(recipient).toBuffer(),
+                    ...utils.arrayify(recipient),
                     depositToPool ? 1 : 0,
                   ],
                   keys: [
                     TOKEN_PROGRAM,
                     _getTokenAccount(tokenAddr, stores.contractSigner.pubkey),
-                    { pubkey: new sol.PublicKey(tokenAddr), isSigner: false, isWritable: false },
+                    { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
                     stores.contractSigner,
                     _getStore([STORE_PREFIX.POOL_OWNER, _numToBuffer(poolIndex, 8)]),
                     _getStoreBalanceOfPool(poolIndex, swap.inToken),
                     _getStore([STORE_PREFIX.POSTED_SWAP, Buffer.from(swap.encoded.substring(2), 'hex')]),
                     _getTokenAccount(tokenAddr, signerPubkey),
                   ],
-                }))
+                })
               } else if (prop === 'lockSwap') {
                 const [_, { initiator, recipient }] = args
                 const tokenAddr = await _getTokenAddr(swap.outToken)
                 const swapId = _getSwapId(swap.encoded, initiator)
                 const poolIndex = await _poolOfAuthorizedAddr(signerPubkey.toString())
-                return await call(15, ({ SYSTEM_PROGRAM }) => ({
+                return await call(15, {
                   data: [
                     ...utils.arrayify(swap.encoded),
                     ...utils.arrayify(initiator),
-                    ...new sol.PublicKey(recipient).toBuffer(),
+                    ...new SolPublicKey(recipient).toBuffer(),
                   ],
                   keys: [
                     SYSTEM_PROGRAM,
-                    { pubkey: new sol.PublicKey(tokenAddr), isSigner: false, isWritable: false },
+                    { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
                     { ...stores.supportedTokens, isWritable: false },
                     _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, signerPubkey.toBuffer()]),
                     _getStoreBalanceOfPool(poolIndex, swap.outToken),
                     _getStore([STORE_PREFIX.LOCKED_SWAP, Buffer.from(swapId.substring(2), 'hex')]),
                     { pubkey: signerPubkey, isSigner: true, isWritable: false },
                   ],
-                }))
+                })
               } else if (prop === 'unlock') {
+                const [_, initiator] = args
+                const swapId = _getSwapId(swap.encoded, initiator)
+                const poolIndex = await _poolOfAuthorizedAddr(signerPubkey.toString())
+                return await call(16, {
+                  data: [
+                    ...utils.arrayify(swap.encoded),
+                    ...utils.arrayify(initiator),
+                  ],
+                  keys: [
+                    _getStoreBalanceOfPool(poolIndex, swap.outToken),
+                    _getStore([STORE_PREFIX.LOCKED_SWAP, Buffer.from(swapId.substring(2), 'hex')]),
+                  ],
+                })
               } else if (prop === 'release') {
                 const [_, r, yParityAndS, initiator, recipient] = args
                 const tokenAddr = await _getTokenAddr(swap.outToken)
                 const swapId = _getSwapId(swap.encoded, initiator)
-                return await call(17, ({ TOKEN_PROGRAM }) => ({
+                return await call(17, {
                   data: [
                     ...utils.arrayify(swap.encoded),
                     ...utils.arrayify(r),
@@ -458,15 +630,15 @@ export function getContract(address, abi, clientOrAdaptor: sol.Connection | Sola
                   keys: [
                     TOKEN_PROGRAM,
                     _getTokenAccount(tokenAddr, stores.contractSigner.pubkey),
-                    { pubkey: new sol.PublicKey(tokenAddr), isSigner: false, isWritable: false },
+                    { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
                     stores.contractSigner,
                     stores.admin,
                     _getStoreBalanceOfPool(0, swap.outToken),
                     _getStore([STORE_PREFIX.LOCKED_SWAP, Buffer.from(swapId.substring(2), 'hex')]),
                     { pubkey: signerPubkey, isSigner: true, isWritable: false },
-                    _getTokenAccount(tokenAddr, new sol.PublicKey(recipient)),
+                    _getTokenAccount(tokenAddr, new SolPublicKey(recipient)),
                   ],
-                }))
+                })
               } else if (prop === 'directRelease') {
               } else if (prop === 'simpleRelease') {
               }
@@ -498,7 +670,7 @@ function _getSwapId(encoded: string, initiator: string) {
 
 export function formatAddress(addr: string) {
   try {
-    return new sol.PublicKey(addr).toString()
+    return new SolPublicKey(addr).toString()
   } catch {
     return
   }
