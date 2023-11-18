@@ -574,6 +574,13 @@
         "decimals": 6,
         "addr": "0x33B57dC70014FD7AA6e1ed3080eeD2B619632B8e",
         "tokenIndex": 10
+      },
+      {
+        "name": "EOS",
+        "symbol": "EOS",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 191
       }
     ]
   },
@@ -799,11 +806,19 @@
     "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
     "tokens": [
       {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "tokenIndex": 1
+      },
+      {
         "name": "USD Base Coin",
         "symbol": "USDbC",
         "decimals": 6,
         "addr": "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA",
-        "tokenIndex": 4
+        "tokenIndex": 4,
+        "disabled": true
       },
       {
         "name": "ETH",
@@ -1301,6 +1316,23 @@
       "decimals": 9
     },
     "mesonAddress": "",
-    "tokens": []
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "link": "address/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?network=mainnet",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+        "link": "address/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB?network=mainnet",
+        "tokenIndex": 2
+      }
+    ]
   }
 ]
