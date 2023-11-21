@@ -244,7 +244,7 @@
     ],
     "addressFormat": "ethers",
     "url": "https://api.avax.network/ext/bc/C/rpc",
-    "explorer": "https://snowtrace.io",
+    "explorer": "https://subnets.avax.network/c-chain",
     "nativeCurrency": {
       "name": "Avalanche",
       "symbol": "AVAX",

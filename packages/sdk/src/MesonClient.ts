@@ -255,6 +255,15 @@ export class MesonClient {
     this.#mesonInstance.on('*', listener)
   }
 
+  async fetchEvents(blockRange = 100) {
+    const blockNumber = await this.#mesonInstance.provider.getBlockNumber()
+    const filter = {
+      address: this.address,
+      fromBlock: blockNumber - blockRange,
+    }
+    return await this.#mesonInstance.provider.getLogs?.(filter)
+  }
+
   /// General read methods
   async getShortCoinType(...overrides: [CallOverrides?]) {
     return await this.#mesonInstance.getShortCoinType(...overrides)
