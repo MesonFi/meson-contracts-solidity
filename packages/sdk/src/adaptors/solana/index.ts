@@ -373,10 +373,13 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
               const hex = utils.hexlify(info.data)
               const poolIndex = BigNumber.from(hex.substring(0, 18))
               const until = BigNumber.from('0x' + hex.substring(18, 34)).toNumber()
-              if (!until) {
-                return { until: 0, poolOwner: '0x1' } // locked & released
+              if (until) {
+                return { until, poolOwner: await _ownerOfPool(poolIndex) }
+              } else if (poolIndex.gt(0)) {
+                return { until: 0, poolOwner: '0x1' } // released
+              } else {
+                return { until: 0 } // unlocked
               }
-              return { until, poolOwner: await _ownerOfPool(poolIndex) }
             }
 
             throw new Error(`SolanaContract read not implemented (${prop})`)
@@ -508,8 +511,61 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                   _getTokenAccount(tokenAddr, signerPubkey),
                 ],
               })
-            } else if (['addAuthorizedAddr', 'removeAuthorizedAddr', 'transferPoolOwner'].includes(prop)) {
+            } else if (prop === 'addAuthorizedAddr') {
+              const pubkey = new SolPublicKey(args[0])
+              const poolIndex = await _poolOfAuthorizedAddr(signerPubkey.toString())
+              return await call(7, {
+                keys: [
+                  SYSTEM_PROGRAM,
+                  _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, signerPubkey.toBuffer()]),
+                  _getStore([STORE_PREFIX.POOL_OWNER, _numToBuffer(poolIndex, 8)]),
+                  _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, pubkey.toBuffer()]),
+                  { pubkey: signerPubkey, isSigner: true, isWritable: false },
+                  { pubkey, isSigner: false, isWritable: false },
+                ],
+              })
+            } else if (prop === 'removeAuthorizedAddr') {
+              const pubkey = new SolPublicKey(args[0])
+              const poolIndex = await _poolOfAuthorizedAddr(signerPubkey.toString())
+              return await call(8, {
+                keys: [
+                  _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, signerPubkey.toBuffer()]),
+                  _getStore([STORE_PREFIX.POOL_OWNER, _numToBuffer(poolIndex, 8)]),
+                  _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, pubkey.toBuffer()]),
+                  { pubkey: signerPubkey, isSigner: true, isWritable: false },
+                  { pubkey, isSigner: false, isWritable: false },
+                ],
+              })
+            } else if (prop === 'transferPoolOwner') {
+              const pubkey = new SolPublicKey(args[0])
+              const poolIndex = await _poolOfAuthorizedAddr(signerPubkey.toString())
+              return await call(9, {
+                keys: [
+                  _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, signerPubkey.toBuffer()]),
+                  _getStore([STORE_PREFIX.POOL_OWNER, _numToBuffer(poolIndex, 8)]),
+                  _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, pubkey.toBuffer()]),
+                  { pubkey: signerPubkey, isSigner: true, isWritable: false },
+                  { pubkey, isSigner: false, isWritable: false },
+                ],
+              })
             } else if (prop === 'withdrawServiceFee') {
+              const tokenIndex = args[0]
+              const amount = BigNumber.from(args[1]).toNumber()
+              const toPoolIndex = args[2]
+              return await call(10, {
+                data: [
+                  tokenIndex,
+                  ..._numToBuffer(amount, 8),
+                  ..._numToBuffer(toPoolIndex, 8),
+                ],
+                keys: [
+                  stores.admin,
+                  _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, signerPubkey.toBuffer()]),
+                  _getStoreBalanceOfPool(0, tokenIndex),
+                  _getStoreBalanceOfPool(toPoolIndex, tokenIndex),
+                  { pubkey: signerPubkey, isSigner: true, isWritable: false },
+                ],
+              })
             } else {
               const swap = Swap.decode(args[0])
               if (prop === 'postSwapFromInitiator') {

@@ -234,7 +234,7 @@ export class MesonClient {
   }
 
   isCoreToken(tokenIndex: number) {
-    return (tokenIndex === 52) || ((tokenIndex > 190) && ((tokenIndex % 4) === 3))
+    return [-1, 52].includes(tokenIndex) || ((tokenIndex > 190) && ((tokenIndex % 4) === 3))
   }
 
   /// Contract instance
@@ -255,11 +255,16 @@ export class MesonClient {
     this.#mesonInstance.on('*', listener)
   }
 
-  async fetchEvents(blockRange = 100) {
-    const blockNumber = await this.#mesonInstance.provider.getBlockNumber()
-    const filter = {
+  async fetchEvents(blockRange = 100, toBlock?: number) {
+    const filter: providers.Filter = {
       address: this.address,
-      fromBlock: blockNumber - blockRange,
+    }
+    if (!toBlock) {
+      const blockNumber = await this.#mesonInstance.provider.getBlockNumber()
+      filter.fromBlock = blockNumber - blockRange
+    } else {
+      filter.fromBlock = toBlock - blockRange
+      filter.toBlock = toBlock
     }
     return await this.#mesonInstance.provider.getLogs?.(filter)
   }

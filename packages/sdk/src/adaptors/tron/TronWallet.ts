@@ -24,6 +24,9 @@ export default class TronWallet extends TronAdaptor {
   }
 
   async sendTransaction(payload, overrides) {
+    if (!payload.contract) {
+      return await this.transfer(payload)
+    }
     const { contract, method, args } = payload
     const hash = await contract[method](...args).send(overrides)
     return {

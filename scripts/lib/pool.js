@@ -2,7 +2,9 @@ const { MesonClient, adaptors } = require('@mesonfi/sdk')
 const { Meson } = require('@mesonfi/contract-abis')
 
 function getTokenIndex(network, symbol) {
-  if (symbol.toLowerCase() === 'uct') {
+  if (!symbol) {
+    return -1
+  } if (symbol.toLowerCase() === 'uct') {
     return 255
   }
 
