@@ -521,8 +521,8 @@
     ]
   },
   {
-    "id": "skale-testnet",
-    "name": "SKALE Testnet (Europa)",
+    "id": "skale-europa-testnet",
+    "name": "SKALE Europa Testnet",
     "alias": "SKALE",
     "chainId": "0x1c6199cc",
     "slip44": "0x1c6199cc",
@@ -553,6 +553,35 @@
         "decimals": 6,
         "addr": "0xa388F9783d8E5B0502548061c3b06bf4300Fc0E1",
         "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "skale-nebula-testnet",
+    "name": "SKALE Nebula Testnet",
+    "alias": "SKALE",
+    "chainId": "0x1dfd2731",
+    "slip44": "0x1dfd2731",
+    "shortSlip44": "0x2731",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://staging-v3.skalenodes.com/v1/staging-faint-slimy-achird",
+    "explorer": "https://staging-faint-slimy-achird.explorer.staging-v3.skalenodes.com",
+    "nativeCurrency": {
+      "name": "sFUEL",
+      "symbol": "sFUEL",
+      "decimals": 18
+    },
+    "mesonAddress": "0x7dCdB05275aF70a58272E746d3AFd43C7d91F41D",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x717d43399ab3a8aada669CDC9560a6BAfdeA9796",
+        "tokenIndex": 1
       }
     ]
   },
@@ -684,6 +713,78 @@
         "decimals": 6,
         "addr": "4iEra9v5uBqmWTaKSZaWeJJNaRcgagveW1yqXKCNNz86",
         "link": "address/4iEra9v5uBqmWTaKSZaWeJJNaRcgagveW1yqXKCNNz86?network=testnet",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "x1-testnet",
+    "name": "X1 Testnet",
+    "alias": "X1",
+    "chainId": "0xc3",
+    "slip44": "0x800000c4",
+    "shortSlip44": "0x00c4",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://testrpc.x1.tech",
+    "explorer": "https://www.oklink.com/x1-test",
+    "nativeCurrency": {
+      "name": "OKB",
+      "symbol": "OKB",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0xcD65196488b2e2fbcbc3E5d675B3108f4935e64a",
+        "tokenIndex": 1
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xb471644294eD4648F07f404a5d257B381b1E1e26",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "viction-testnet",
+    "name": "Viction Testnet",
+    "alias": "TOMO",
+    "chainId": "0x59",
+    "slip44": "0x80000379",
+    "shortSlip44": "0x0379",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.testnet.tomochain.com",
+    "explorer": "https://scan.testnet.tomochain.com",
+    "nativeCurrency": {
+      "name": "TOMO",
+      "symbol": "TOMO",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0xcD65196488b2e2fbcbc3E5d675B3108f4935e64a",
+        "tokenIndex": 1
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xb471644294eD4648F07f404a5d257B381b1E1e26",
         "tokenIndex": 2
       }
     ]
