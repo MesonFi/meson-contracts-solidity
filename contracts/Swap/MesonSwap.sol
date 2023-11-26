@@ -242,7 +242,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     require(_inChainFrom(encodedSwap) == SHORT_COIN_TYPE, "Swap not for this chain");
     require(
       _tokenType(_inTokenIndexFrom(encodedSwap)) == _tokenType(_outTokenIndexFrom(encodedSwap)),
-      "In & out token categories do not match"
+      "In & out token types do not match"
     );
     require(_postedSwaps[encodedSwap] == 0, "Swap already exists");
 
