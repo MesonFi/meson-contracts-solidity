@@ -31,6 +31,32 @@ export default class TronAdaptor {
     return account.type === 'Contract' ? '0x1' : '0x'
   }
 
+  async getLogs(filter) {
+    const toBlock = await this.client.trx.getBlockByNumber(filter.toBlock)
+    const sinceTimestamp = toBlock.block_header.raw_data.timestamp
+
+    const cache = []
+    let page = 1
+    while (true) {
+      const events = await this.client.event.getEventsByContractAddress(filter.address, {
+        onlyConfirmed: true,
+        sinceTimestamp,
+        size: 200,
+        page,
+      })
+      const filtered = events.filter(e => e.block >= filter.fromBlock)
+      cache.push(filtered)
+      if (filtered.length < events.length) {
+        break
+      }
+      page++
+
+      // TODO: page doesn't work
+      break
+    }
+    return cache.flat().reverse().map(_wrapTronEvent)
+  }
+
   on () {}
   removeAllListeners () {}
 
@@ -57,7 +83,7 @@ export default class TronAdaptor {
       const h = setInterval(async () => {
         let info
         try {
-          if (confirmations > 1) {
+          if (confirmations) {
             info = await this.client.trx.getTransactionInfo(hash)
           } else {
             info = await this.client.trx.getUnconfirmedTransactionInfo(hash)
@@ -67,7 +93,7 @@ export default class TronAdaptor {
           clearInterval(h)
           resolve(_wrapTronReceipt(info))
         }
-      }, 1000)
+      }, 3000)
 
       if (timeout) {
         timer(timeout * 1000).then(() => {
@@ -86,6 +112,16 @@ function _wrapTronBlock(raw) {
     number: raw.block_header.raw_data.number,
     timestamp: Math.floor(raw.block_header.raw_data.timestamp / 1000).toString(),
     transactions: raw.transactions?.map(_wrapTronTx) || []
+  }
+}
+
+function _wrapTronEvent(raw) {
+  const { block, timestamp, contract, name, transaction } = raw
+  return {
+    blockNumber: block,
+    address: contract,
+    name,
+    transactionHash: transaction,
   }
 }
 

@@ -79,7 +79,7 @@ export default class AptosAdaptor {
 
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
     const result = await this.client.waitForTransactionWithResult(hash, {
-      checkSuccess: false,
+      checkSuccess: !!confirmations,
       timeoutSecs: timeout || 20
     })
     return _wrapAptosTx(result)

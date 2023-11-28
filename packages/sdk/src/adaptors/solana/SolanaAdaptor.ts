@@ -24,7 +24,7 @@ export default class AptosAdaptor {
   }
 
   async getBlockNumber() {
-    return (await this.client.getBlockHeight('confirmed'))
+    return (await this.client.getBlockHeight('finalized'))
   }
 
   async getTransactionCount() {
@@ -40,15 +40,19 @@ export default class AptosAdaptor {
     return
   }
 
+  async getLogs(filter) {
+    // TODO: fromBlock & toBlock
+    const list = await this.client.getSignaturesForAddress(new SolPublicKey(filter.address), { limit: 200 })
+    return list.map(raw => _wrapSolanaEvent(raw, filter.address)).reverse()
+  }
+
   on () {}
   removeAllListeners () {}
 
   async send(method, params) {
     if (method === 'eth_getBlockByNumber') {
       if (params[0] === 'latest') {
-        const number = await this.getBlockNumber()
-        const block = await this.client.getBlock(number)
-        return _wrapSolanaBlock(block)
+        return
       } else {
         const number = parseInt(params[0])
         const block = await this.client.getBlock(number, params[1])
@@ -83,7 +87,7 @@ export default class AptosAdaptor {
             resolve(info)
           }
         } catch {}
-      }, 1000)
+      }, 5000)
 
       if (timeout) {
         timer(timeout * 1000).then(() => {
@@ -94,6 +98,16 @@ export default class AptosAdaptor {
     })
   }
 }
+
+function _wrapSolanaEvent(raw, address) {
+  const { slot, blockTime, err, signature } = raw
+  return {
+    blockNumber: slot,
+    address,
+    transactionHash: signature,
+  }
+}
+
 
 function _wrapSolanaBlock(raw: BlockResponse) {
   return {
