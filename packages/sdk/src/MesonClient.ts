@@ -255,16 +255,28 @@ export class MesonClient {
     this.#mesonInstance.on('*', listener)
   }
 
-  async fetchEvents(blockRange = 100, toBlock?: number) {
+  async fetchLatestEvents(blockRange = 100): Promise<providers.Log[]> {
+    const toBlock = await this.#mesonInstance.provider.getBlockNumber()
+    const fromBlock = toBlock - blockRange
+    return await this.fetchEventsBetween(fromBlock, toBlock)
+  }
+
+  async fetchEventsBetween(fromBlock?: number, toBlock?: number): Promise<providers.Log[]> {
+    let from = fromBlock
+    const results = []
+    while (from + 2999 < toBlock) {
+      results.push(await this.#fetchEvents(from, from + 2999))
+      from += 3000
+    }
+    results.push(await this.#fetchEvents(from, toBlock))
+    return results.flat()
+  }
+
+  async #fetchEvents(fromBlock?: number, toBlock?: number) {
     const filter: providers.Filter = {
       address: this.address,
-    }
-    if (!toBlock) {
-      const blockNumber = await this.#mesonInstance.provider.getBlockNumber()
-      filter.fromBlock = blockNumber - blockRange
-    } else {
-      filter.fromBlock = toBlock - blockRange
-      filter.toBlock = toBlock
+      fromBlock,
+      toBlock,
     }
     return await this.#mesonInstance.provider.getLogs?.(filter)
   }

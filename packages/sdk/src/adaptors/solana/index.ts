@@ -676,6 +676,13 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                 const [_, r, yParityAndS, initiator, recipient] = args
                 const tokenAddr = await _getTokenAddr(swap.outToken)
                 const swapId = _getSwapId(swap.encoded, initiator)
+                const taRecipient = await getOrCreateAssociatedTokenAccount(
+                  adaptor.client,
+                  (<SolanaWallet>adaptor).keypair,
+                  new SolPublicKey(tokenAddr),
+                  new SolPublicKey(recipient),
+                  true,
+                )
                 return await call(17, {
                   data: [
                     ...utils.arrayify(swap.encoded),
@@ -692,7 +699,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                     _getStoreBalanceOfPool(0, swap.outToken),
                     _getStore([STORE_PREFIX.LOCKED_SWAP, Buffer.from(swapId.substring(2), 'hex')]),
                     { pubkey: signerPubkey, isSigner: true, isWritable: false },
-                    _getTokenAccount(tokenAddr, new SolPublicKey(recipient)),
+                    { pubkey: taRecipient.address, isSigner: false, isWritable: true },
                   ],
                 })
               } else if (prop === 'directRelease') {
