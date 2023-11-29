@@ -46,24 +46,25 @@ const STORE_PREFIX = {
 }
 
 const SOLANA_METHODS = [
-  'init',
-  'transferOwnership',
-  'transferPremiumManager',
-  'addSupportToken',
-  'depositAndRegister',
-  'deposit',
-  'withdraw',
-  'addAuthorizedAddr',
-  'removeAuthorizedAddr',
-  'transferPoolOwner',
-  'withdrawServiceFee',
-  'postSwapFromInitiator', // 11
-  'bondSwap',
-  'cancelSwap',
-  'executeSwap',
-  'lockSwap',
-  'unlock',
-  'release'
+  /* 00 */ 'init',
+  /* 01 */ 'transferOwnership',
+  /* 02 */ 'transferPremiumManager',
+  /* 03 */ 'addSupportToken',
+  /* 04 */ 'depositAndRegister',
+  /* 05 */ 'deposit',
+  /* 06 */ 'withdraw',
+  /* 07 */ 'addAuthorizedAddr',
+  /* 08 */ 'removeAuthorizedAddr',
+  /* 09 */ 'transferPoolOwner',
+  /* 10 */ 'withdrawServiceFee',
+  /* 11 */ 'postSwapFromInitiator',
+  /* 12 */ 'bondSwap',
+  /* 13 */ 'cancelSwap',
+  /* 14 */ 'executeSwap',
+  /* 15 */ 'lockSwap',
+  /* 16 */ 'unlock',
+  /* 17 */ 'release',
+  /* 18 */ 'directRelease',
 ]
 
 export function getWallet(privateKey: string, client: SolConnection): SolanaWallet {
@@ -703,6 +704,41 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                   ],
                 })
               } else if (prop === 'directRelease') {
+                const [_, r, yParityAndS, initiator, recipient] = args
+                const tokenAddr = await _getTokenAddr(swap.outToken)
+                const swapId = _getSwapId(swap.encoded, initiator)
+                const poolIndex = await _poolOfAuthorizedAddr(signerPubkey.toString())
+                const taRecipient = await getOrCreateAssociatedTokenAccount(
+                  adaptor.client,
+                  (<SolanaWallet>adaptor).keypair,
+                  new SolPublicKey(tokenAddr),
+                  new SolPublicKey(recipient),
+                  true,
+                )
+                return await call(18, {
+                  data: [
+                    ...utils.arrayify(swap.encoded),
+                    ...utils.arrayify(r),
+                    ...utils.arrayify(yParityAndS),
+                    ...utils.arrayify(initiator),
+                    ...new SolPublicKey(recipient).toBuffer(),
+                  ],
+                  keys: [
+                    SYSTEM_PROGRAM,
+                    TOKEN_PROGRAM,
+                    _getTokenAccount(tokenAddr, stores.contractSigner.pubkey),
+                    { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
+                    stores.contractSigner,
+                    stores.admin,
+                    stores.supportedTokens,
+                    _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, signerPubkey.toBuffer()]),
+                    _getStoreBalanceOfPool(poolIndex, swap.outToken),
+                    _getStoreBalanceOfPool(0, swap.outToken),
+                    _getStore([STORE_PREFIX.LOCKED_SWAP, Buffer.from(swapId.substring(2), 'hex')]),
+                    { pubkey: signerPubkey, isSigner: true, isWritable: false },
+                    { pubkey: taRecipient.address, isSigner: false, isWritable: true },
+                  ],
+                })
               } else if (prop === 'simpleRelease') {
               }
             }
