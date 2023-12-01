@@ -324,6 +324,435 @@
     ]
   },
   {
+    "id": "solana",
+    "name": "Solana",
+    "alias": "SOL",
+    "chainId": "solana:0x1",
+    "slip44": "0x800001f5",
+    "shortSlip44": "0x01f5",
+    "extensions": [
+      "solana"
+    ],
+    "addressFormat": "solana",
+    "url": "https://api.mainnet-beta.solana.com",
+    "explorer": "https://explorer.solana.com",
+    "nativeCurrency": {
+      "name": "Solana",
+      "symbol": "SOL",
+      "decimals": 9
+    },
+    "mesonAddress": "FR1SDyLUj7PrMbtkUCkDrBymk5eWrRmr3UvWFb5Kjbmd",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "link": "address/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?network=mainnet",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+        "link": "address/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB?network=mainnet",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "base",
+    "name": "Base",
+    "alias": "base",
+    "chainId": "0x2105",
+    "slip44": "0x80002105",
+    "shortSlip44": "0x2105",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://mainnet.base.org",
+    "explorer": "https://basescan.org",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "tokenIndex": 1
+      },
+      {
+        "name": "USD Base Coin",
+        "symbol": "USDbC",
+        "decimals": 6,
+        "addr": "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA",
+        "tokenIndex": 4,
+        "disabled": true
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
+    "id": "linea",
+    "name": "Linea",
+    "alias": "LINEA",
+    "chainId": "0xe708",
+    "slip44": "0x8000e708",
+    "shortSlip44": "0xe708",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.linea.build",
+    "explorer": "https://lineascan.build",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x176211869cA2b568f2A7D4EE941E073a821EE1ff",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xA219439258ca9da29E9Cc4cE5596924745e12B93",
+        "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
+    "id": "manta",
+    "name": "Manta",
+    "alias": "MANTA",
+    "chainId": "0xa9",
+    "slip44": "0x80000263",
+    "shortSlip44": "0x0263",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://manta-pacific.calderachain.xyz/http",
+    "explorer": "https://manta-pacific.calderaexplorer.xyz",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      },
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0xb73603C5d87fA094B7314C74ACE2e64D165016fb",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xf417F5A458eC102B90352F697D6e2Ac3A3d2851f",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "zksync",
+    "name": "zkSync Era",
+    "alias": "ZKS",
+    "chainId": "0x144",
+    "slip44": "0x80000324",
+    "shortSlip44": "0x0324",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://mainnet.era.zksync.io",
+    "explorer": "https://explorer.zksync.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x2DcC88Fa6b6950EE28245C3238B8993BE5feeA42",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
+        "link": "address/0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "",
+        "link": "",
+        "tokenIndex": 2,
+        "disabled": true
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
+    "id": "zkevm",
+    "name": "Polygon zkEVM",
+    "alias": "ZKEVM",
+    "chainId": "0x44d",
+    "slip44": "0x8000044d",
+    "shortSlip44": "0x044d",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://zkevm-rpc.com",
+    "explorer": "https://zkevm.polygonscan.com",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "tokenIndex": 1,
+        "addr": "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035"
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "tokenIndex": 2,
+        "addr": "0x1E4a5963aBFD975d8c9021ce480b42188849D41d"
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
+    "id": "scroll",
+    "name": "Scroll",
+    "alias": "SCROLL",
+    "chainId": "0x82750",
+    "slip44": "0x80082750",
+    "shortSlip44": "0x2750",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.scroll.io",
+    "explorer": "https://blockscout.scroll.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df",
+        "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
+    "id": "opbnb",
+    "name": "opBNB",
+    "alias": "opbnb",
+    "chainId": "0xcc",
+    "slip44": "0x800000cc",
+    "shortSlip44": "0x00cc",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://opbnb-mainnet-rpc.bnbchain.org",
+    "explorer": "https://opbnbscan.com",
+    "nativeCurrency": {
+      "name": "BNB",
+      "symbol": "BNB",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "minCoreFee": "5000; // min 0.005 BNB ~ $1",
+    "tokens": [
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 18,
+        "addr": "0x9e5aac1ba1a2e6aed6b32689dfcf62a509ca96f3",
+        "tokenIndex": 34
+      },
+      {
+        "name": "BNB",
+        "symbol": "BNB",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 251
+      }
+    ]
+  },
+  {
+    "id": "cfx",
+    "name": "Conflux eSpace",
+    "alias": "CFX",
+    "chainId": "0x406",
+    "slip44": "0x800001f7",
+    "shortSlip44": "0x01f7",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://evm.confluxrpc.com",
+    "explorer": "https://evm.confluxscan.net",
+    "nativeCurrency": {
+      "name": "Conflux",
+      "symbol": "CFX",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "uctAddress": "0xD955A8279A7A96Cf6c7D11A3A6FB25F415C5139C",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 18,
+        "addr": "0x6963efed0ab40f6c3d7bda44a05dcf1437c44372",
+        "tokenIndex": 33
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 18,
+        "addr": "0xfe97e85d13abd9c1c33384e796f10b73905637ce",
+        "tokenIndex": 34
+      },
+      {
+        "name": "Proof of Deposit (meson.fi)",
+        "symbol": "PoD",
+        "decimals": 6,
+        "addr": "0xDd3d867db5Ca13E5F055Dd4484648fddDF3248EB",
+        "tokenIndex": 32
+      }
+    ]
+  },
+  {
+    "id": "eos",
+    "name": "EOS EVM",
+    "alias": "EOS",
+    "chainId": "0x4571",
+    "slip44": "0x800000c2",
+    "shortSlip44": "0x00c2",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://api.evm.eosnetwork.com",
+    "explorer": "https://explorer.evm.eosnetwork.com",
+    "nativeCurrency": {
+      "name": "EOS",
+      "symbol": "EOS",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xfA9343C3897324496A05fC75abeD6bAC29f8A40f",
+        "tokenIndex": 2,
+        "disabled": true
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x33B57dC70014FD7AA6e1ed3080eeD2B619632B8e",
+        "tokenIndex": 10
+      },
+      {
+        "name": "EOS",
+        "symbol": "EOS",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 191
+      }
+    ]
+  },
+  {
     "id": "ftm",
     "name": "Fantom",
     "alias": "FTM",
@@ -394,51 +823,6 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 255
-      }
-    ]
-  },
-  {
-    "id": "cfx",
-    "name": "Conflux eSpace",
-    "alias": "CFX",
-    "chainId": "0x406",
-    "slip44": "0x800001f7",
-    "shortSlip44": "0x01f7",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://evm.confluxrpc.com",
-    "explorer": "https://evm.confluxscan.net",
-    "nativeCurrency": {
-      "name": "Conflux",
-      "symbol": "CFX",
-      "decimals": 18
-    },
-    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "uctAddress": "0xD955A8279A7A96Cf6c7D11A3A6FB25F415C5139C",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 18,
-        "addr": "0x6963efed0ab40f6c3d7bda44a05dcf1437c44372",
-        "tokenIndex": 33
-      },
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 18,
-        "addr": "0xfe97e85d13abd9c1c33384e796f10b73905637ce",
-        "tokenIndex": 34
-      },
-      {
-        "name": "Proof of Deposit (meson.fi)",
-        "symbol": "PoD",
-        "decimals": 6,
-        "addr": "0xDd3d867db5Ca13E5F055Dd4484648fddDF3248EB",
-        "tokenIndex": 32
       }
     ]
   },
@@ -540,185 +924,6 @@
     ]
   },
   {
-    "id": "eos",
-    "name": "EOS EVM",
-    "alias": "EOS",
-    "chainId": "0x4571",
-    "slip44": "0x800000c2",
-    "shortSlip44": "0x00c2",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://api.evm.eosnetwork.com",
-    "explorer": "https://explorer.evm.eosnetwork.com",
-    "nativeCurrency": {
-      "name": "EOS",
-      "symbol": "EOS",
-      "decimals": 18
-    },
-    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "tokens": [
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0xfA9343C3897324496A05fC75abeD6bAC29f8A40f",
-        "tokenIndex": 2,
-        "disabled": true
-      },
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0x33B57dC70014FD7AA6e1ed3080eeD2B619632B8e",
-        "tokenIndex": 10
-      },
-      {
-        "name": "EOS",
-        "symbol": "EOS",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 191
-      }
-    ]
-  },
-  {
-    "id": "zksync",
-    "name": "zkSync Era",
-    "alias": "ZKS",
-    "chainId": "0x144",
-    "slip44": "0x80000324",
-    "shortSlip44": "0x0324",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://mainnet.era.zksync.io",
-    "explorer": "https://explorer.zksync.io",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x2DcC88Fa6b6950EE28245C3238B8993BE5feeA42",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
-        "link": "address/0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
-        "tokenIndex": 1
-      },
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "",
-        "link": "",
-        "tokenIndex": 2,
-        "disabled": true
-      },
-      {
-        "name": "ETH",
-        "symbol": "ETH",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
-      }
-    ]
-  },
-  {
-    "id": "zkevm",
-    "name": "Polygon zkEVM",
-    "alias": "ZKEVM",
-    "chainId": "0x44d",
-    "slip44": "0x8000044d",
-    "shortSlip44": "0x044d",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://zkevm-rpc.com",
-    "explorer": "https://zkevm.polygonscan.com",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 6,
-        "tokenIndex": 1,
-        "addr": "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035"
-      },
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "tokenIndex": 2,
-        "addr": "0x1E4a5963aBFD975d8c9021ce480b42188849D41d"
-      },
-      {
-        "name": "ETH",
-        "symbol": "ETH",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
-      }
-    ]
-  },
-  {
-    "id": "linea",
-    "name": "Linea",
-    "alias": "LINEA",
-    "chainId": "0xe708",
-    "slip44": "0x8000e708",
-    "shortSlip44": "0xe708",
-    "extensions": [
-      "metamask"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://rpc.linea.build",
-    "explorer": "https://lineascan.build",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0x176211869cA2b568f2A7D4EE941E073a821EE1ff",
-        "tokenIndex": 1
-      },
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0xA219439258ca9da29E9Cc4cE5596924745e12B93",
-        "tokenIndex": 2
-      },
-      {
-        "name": "ETH",
-        "symbol": "ETH",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
-      }
-    ]
-  },
-  {
     "id": "evmos",
     "name": "Evmos",
     "alias": "evmos",
@@ -786,50 +991,6 @@
     ]
   },
   {
-    "id": "base",
-    "name": "Base",
-    "alias": "base",
-    "chainId": "0x2105",
-    "slip44": "0x80002105",
-    "shortSlip44": "0x2105",
-    "extensions": [
-      "metamask"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://mainnet.base.org",
-    "explorer": "https://basescan.org",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-        "tokenIndex": 1
-      },
-      {
-        "name": "USD Base Coin",
-        "symbol": "USDbC",
-        "decimals": 6,
-        "addr": "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA",
-        "tokenIndex": 4,
-        "disabled": true
-      },
-      {
-        "name": "ETH",
-        "symbol": "ETH",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
-      }
-    ]
-  },
-  {
     "id": "metis",
     "name": "Metis",
     "alias": "metis",
@@ -890,49 +1051,6 @@
         "symbol": "USDT",
         "decimals": 6,
         "addr": "0x919C1c267BC06a7039e03fcc2eF738525769109c",
-        "tokenIndex": 2
-      }
-    ]
-  },
-  {
-    "id": "manta",
-    "name": "Manta",
-    "alias": "MANTA",
-    "chainId": "0xa9",
-    "slip44": "0x80000263",
-    "shortSlip44": "0x0263",
-    "extensions": [
-      "metamask"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://manta-pacific.calderachain.xyz/http",
-    "explorer": "https://manta-pacific.calderaexplorer.xyz",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "tokens": [
-      {
-        "name": "ETH",
-        "symbol": "ETH",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
-      },
-      {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0xb73603C5d87fA094B7314C74ACE2e64D165016fb",
-        "tokenIndex": 1
-      },
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0xf417F5A458eC102B90352F697D6e2Ac3A3d2851f",
         "tokenIndex": 2
       }
     ]
@@ -1160,86 +1278,6 @@
     ]
   },
   {
-    "id": "opbnb",
-    "name": "opBNB",
-    "alias": "opbnb",
-    "chainId": "0xcc",
-    "slip44": "0x800000cc",
-    "shortSlip44": "0x00cc",
-    "extensions": [
-      "metamask"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://opbnb-mainnet-rpc.bnbchain.org",
-    "explorer": "https://opbnbscan.com",
-    "nativeCurrency": {
-      "name": "BNB",
-      "symbol": "BNB",
-      "decimals": 18
-    },
-    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "minCoreFee": "5000; // min 0.005 BNB ~ $1",
-    "tokens": [
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 18,
-        "addr": "0x9e5aac1ba1a2e6aed6b32689dfcf62a509ca96f3",
-        "tokenIndex": 34
-      },
-      {
-        "name": "BNB",
-        "symbol": "BNB",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 251
-      }
-    ]
-  },
-  {
-    "id": "scroll",
-    "name": "Scroll",
-    "alias": "SCROLL",
-    "chainId": "0x82750",
-    "slip44": "0x80082750",
-    "shortSlip44": "0x2750",
-    "extensions": [
-      "metamask"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://rpc.scroll.io",
-    "explorer": "https://blockscout.scroll.io",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4",
-        "tokenIndex": 1
-      },
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df",
-        "tokenIndex": 2
-      },
-      {
-        "name": "ETH",
-        "symbol": "ETH",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
-      }
-    ]
-  },
-  {
     "id": "celo",
     "name": "Celo",
     "alias": "CELO",
@@ -1294,44 +1332,6 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 52
-      }
-    ]
-  },
-  {
-    "id": "solana",
-    "name": "Solana",
-    "alias": "SOL",
-    "chainId": "solana:0x1",
-    "slip44": "0x800001f5",
-    "shortSlip44": "0x01f5",
-    "extensions": [
-      "solana"
-    ],
-    "addressFormat": "solana",
-    "url": "https://api.mainnet-beta.solana.com",
-    "explorer": "https://explorer.solana.com",
-    "nativeCurrency": {
-      "name": "Solana",
-      "symbol": "SOL",
-      "decimals": 9
-    },
-    "mesonAddress": "FR1SDyLUj7PrMbtkUCkDrBymk5eWrRmr3UvWFb5Kjbmd",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-        "link": "address/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v?network=mainnet",
-        "tokenIndex": 1
-      },
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
-        "link": "address/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB?network=mainnet",
-        "tokenIndex": 2
       }
     ]
   }
