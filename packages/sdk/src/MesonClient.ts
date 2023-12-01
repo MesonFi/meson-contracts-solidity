@@ -520,12 +520,7 @@ export class MesonClient {
 
   async directExecuteSwap(signedRelease: SignedSwapReleaseData, ...overrides: [CallOverrides?]) {
     const { encoded, initiator } = signedRelease
-    let recipient = signedRelease.recipient
-    if (encoded.substring(54, 58) === '00c3') { // to tron
-      recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
-    } else if (['027d', '0310'].includes(encoded.substring(54, 58))) { // to aptos, sui
-      recipient = recipient.substring(0, 42)
-    }
+    const recipient = clipRecipient(signedRelease.recipient, encoded)
     const sig = utils.splitSignature(signedRelease.signature)
     return this.#mesonInstance.directExecuteSwap(encoded, sig.r, sig.yParityAndS, initiator, recipient, ...overrides)
   }
