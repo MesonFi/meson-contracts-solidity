@@ -778,14 +778,23 @@
         "symbol": "USDC",
         "decimals": 6,
         "addr": "0xcD65196488b2e2fbcbc3E5d675B3108f4935e64a",
-        "tokenIndex": 1
+        "tokenIndex": 1,
+        "disabled": true
       },
       {
         "name": "USDT",
         "symbol": "USDT",
         "decimals": 6,
         "addr": "0xb471644294eD4648F07f404a5d257B381b1E1e26",
-        "tokenIndex": 2
+        "tokenIndex": 2,
+        "disabled": true
+      },
+      {
+        "name": "CUSD",
+        "symbol": "CUSD",
+        "decimals": 6,
+        "addr": "0x581E76d391896faD8D35BBDCeA33ee09B57a930C",
+        "tokenIndex": 6
       }
     ]
   }

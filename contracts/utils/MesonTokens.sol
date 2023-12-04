@@ -13,6 +13,7 @@ contract MesonTokens {
   ///       1, 9:    USDC, USDC.e
   ///       2, 10:   USDT, USDT.e
   ///       3:       BUSD, USDT.e
+  ///       6:       CUSD (Viction/Tomo)
   ///       17:      PoD USDC
   ///       18:      PoD USDT
   ///       19:      PoD BUSD
