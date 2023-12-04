@@ -128,7 +128,11 @@ export class MesonClient {
     } else if (lowerCaseSymbol.includes('dai')) {
       return 'dai'
     } else if (lowerCaseSymbol.includes('cusd')) {
-      return 'cusd'
+      if (symbol === 'cUSD') {
+        return 'cusd'
+      } else {
+        return 'tomo_cusd'
+      }
     } else if (lowerCaseSymbol.includes('pod')) {
       return 'pod'
     } else {
