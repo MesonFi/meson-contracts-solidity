@@ -255,7 +255,6 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                 args.recipient = '0x' + data.substring(196, 236)
                 break
               case 'directRelease':
-                args.recipient = new SolPublicKey(utils.arrayify('0x' + data.substring(236, 300))).toString()
               case 'release':
                 args.initiator = '0x' + data.substring(196, 236)
                 break
@@ -444,7 +443,8 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                 ],
               })
             } else if (prop === 'addSupportToken') {
-              const [tokenAddr, tokenIndex] = args
+              const [_tokenAddr, tokenIndex] = args
+              const tokenAddr = _tokenAddr.startsWith('0x') ? 1 : _tokenAddr
               const { owner } = await _getAdmins()
               return await call(3, {
                 data: [tokenIndex],
@@ -484,6 +484,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                   TOKEN_PROGRAM,
                   _getTokenAccount(tokenAddr, stores.contractSigner.pubkey),
                   { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
+                  stores.contractSigner,
                   stores.supportedTokens,
                   _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, signerPubkey.toBuffer()]),
                   _getStoreBalanceOfPool(poolIndex, tokenIndex),
@@ -500,6 +501,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
               return await call(6, {
                 data: [tokenIndex, ..._numToBuffer(amount, 8)],
                 keys: [
+                  SYSTEM_PROGRAM,
                   TOKEN_PROGRAM,
                   _getTokenAccount(tokenAddr, stores.contractSigner.pubkey),
                   { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
@@ -583,6 +585,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                     TOKEN_PROGRAM,
                     _getTokenAccount(tokenAddr, stores.contractSigner.pubkey),
                     { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
+                    stores.contractSigner,
                     stores.supportedTokens,
                     _getStore([STORE_PREFIX.POSTED_SWAP, Buffer.from(swap.encoded.substring(2), 'hex')]),
                     { pubkey: signerPubkey, isSigner: true, isWritable: true },
@@ -607,35 +610,29 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                 return await call(13, {
                   data: [...utils.arrayify(swap.encoded)],
                   keys: [
+                    SYSTEM_PROGRAM,
                     TOKEN_PROGRAM,
                     _getTokenAccount(tokenAddr, stores.contractSigner.pubkey),
                     { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
                     stores.contractSigner,
                     _getStore([STORE_PREFIX.POSTED_SWAP, Buffer.from(swap.encoded.substring(2), 'hex')]),
+                    { pubkey: new SolPublicKey(posted.fromAddress), isSigner: false, isWritable: true },
                     _getTokenAccount(tokenAddr, posted.fromAddress),
                   ],
                 })
               } else if (prop === 'executeSwap') {
                 const [_, r, yParityAndS, recipient, depositToPool] = args
                 const poolIndex = await _poolOfAuthorizedAddr(signerPubkey.toString())
-                const tokenAddr = await _getTokenAddr(swap.inToken)
                 return await call(14, {
                   data: [
                     ...utils.arrayify(swap.encoded),
                     ...utils.arrayify(r),
                     ...utils.arrayify(yParityAndS),
                     ...utils.arrayify(recipient),
-                    depositToPool ? 1 : 0,
                   ],
                   keys: [
-                    TOKEN_PROGRAM,
-                    _getTokenAccount(tokenAddr, stores.contractSigner.pubkey),
-                    { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
-                    stores.contractSigner,
-                    _getStore([STORE_PREFIX.POOL_OWNER, _numToBuffer(poolIndex, 8)]),
                     _getStoreBalanceOfPool(poolIndex, swap.inToken),
                     _getStore([STORE_PREFIX.POSTED_SWAP, Buffer.from(swap.encoded.substring(2), 'hex')]),
-                    _getTokenAccount(tokenAddr, signerPubkey),
                   ],
                 })
               } else if (prop === 'lockSwap') {
@@ -655,6 +652,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                     { ...stores.supportedTokens, isWritable: false },
                     _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, signerPubkey.toBuffer()]),
                     _getStoreBalanceOfPool(poolIndex, swap.outToken),
+                    _getStoreBalanceOfPool(poolIndex, 247),
                     _getStore([STORE_PREFIX.LOCKED_SWAP, Buffer.from(swapId.substring(2), 'hex')]),
                     { pubkey: signerPubkey, isSigner: true, isWritable: false },
                   ],
@@ -670,6 +668,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                   ],
                   keys: [
                     _getStoreBalanceOfPool(poolIndex, swap.outToken),
+                    _getStoreBalanceOfPool(poolIndex, 247),
                     _getStore([STORE_PREFIX.LOCKED_SWAP, Buffer.from(swapId.substring(2), 'hex')]),
                   ],
                 })
@@ -692,6 +691,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                     ...utils.arrayify(initiator),
                   ],
                   keys: [
+                    SYSTEM_PROGRAM,
                     TOKEN_PROGRAM,
                     _getTokenAccount(tokenAddr, stores.contractSigner.pubkey),
                     { pubkey: new SolPublicKey(tokenAddr), isSigner: false, isWritable: false },
@@ -700,6 +700,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                     _getStoreBalanceOfPool(0, swap.outToken),
                     _getStore([STORE_PREFIX.LOCKED_SWAP, Buffer.from(swapId.substring(2), 'hex')]),
                     { pubkey: signerPubkey, isSigner: true, isWritable: false },
+                    { pubkey: new SolPublicKey(recipient), isSigner: false, isWritable: true },
                     { pubkey: taRecipient.address, isSigner: false, isWritable: true },
                   ],
                 })
@@ -721,7 +722,6 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                     ...utils.arrayify(r),
                     ...utils.arrayify(yParityAndS),
                     ...utils.arrayify(initiator),
-                    ...new SolPublicKey(recipient).toBuffer(),
                   ],
                   keys: [
                     SYSTEM_PROGRAM,
@@ -736,6 +736,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                     _getStoreBalanceOfPool(0, swap.outToken),
                     _getStore([STORE_PREFIX.LOCKED_SWAP, Buffer.from(swapId.substring(2), 'hex')]),
                     { pubkey: signerPubkey, isSigner: true, isWritable: false },
+                    { pubkey: new SolPublicKey(recipient), isSigner: false, isWritable: true },
                     { pubkey: taRecipient.address, isSigner: false, isWritable: true },
                   ],
                 })

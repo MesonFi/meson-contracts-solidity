@@ -98,6 +98,8 @@ export class MesonClient {
       return 'eth'
     } else if (tokenIndex >= 248) {
       return 'bnb'
+    } else if (tokenIndex >= 244) {
+      return 'sol'
     } else if (tokenIndex === 191) {
       return 'gas-token'
     } else if (tokenIndex <= 64) {
@@ -119,6 +121,8 @@ export class MesonClient {
       return 'eth'
     } else if (lowerCaseSymbol.includes('bnb')) {
       return 'bnb'
+    } else if (lowerCaseSymbol.includes('sol')) {
+      return 'sol'
     } else if (lowerCaseSymbol.includes('usdc') || lowerCaseSymbol.includes('usdbc')) {
       return 'usdc'
     } else if (lowerCaseSymbol.includes('usdt')) {
@@ -241,6 +245,20 @@ export class MesonClient {
     return [-1, 52].includes(tokenIndex) || ((tokenIndex > 190) && ((tokenIndex % 4) === 3))
   }
 
+  get coreDecimals() {
+    switch (this.addressFormat) {
+      case 'aptos':
+        return 8
+      case 'sui':
+      case 'solana':
+        return 9
+      case 'tron':
+        return 6
+      default:
+        return 18
+    }
+  }
+
   /// Contract instance
   getContractInstance(addr: string, abi: any, provider = this.provider) {
     return adaptors.getContract(addr, abi, provider)
@@ -325,7 +343,7 @@ export class MesonClient {
   async getTokenBalance(addr: string, tokenIndex: number) {
     if (this.isCoreToken(tokenIndex)) {
       const rawValue = await this.getBalance(addr)
-      return this.#formatBalance(rawValue, 18)
+      return this.#formatBalance(rawValue, this.coreDecimals)
     }
     const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: addr })
     const tokenContract = this.getTokenContract(tokenAddr)
@@ -381,7 +399,7 @@ export class MesonClient {
       return this.#mesonInstance.signer.sendTransaction({
         ...overrides[0],
         to: recipient,
-        value: BigNumber.from(value).mul(1e12)
+        value: BigNumber.from(value).mul(10 ** (this.coreDecimals - 6))
       })
     }
     const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: this.address })
@@ -410,7 +428,7 @@ export class MesonClient {
     const poolTokenIndex = utils.solidityPack(['uint8', 'uint40'], [tokenIndex, poolIndex])
     const opt: CallOverrides = {}
     if (this.isCoreToken(tokenIndex)) {
-      opt.value = BigNumber.from(value).mul(1e12)
+      opt.value = BigNumber.from(value).mul(10 ** (this.coreDecimals - 6))
     }
     return this.#mesonInstance.depositAndRegister(value, poolTokenIndex, opt)
   }
@@ -424,7 +442,7 @@ export class MesonClient {
     const poolTokenIndex = utils.solidityPack(['uint8', 'uint40'], [tokenIndex, poolIndex])
     const opt: CallOverrides = {}
     if (this.isCoreToken(tokenIndex)) {
-      opt.value = BigNumber.from(value).mul(1e12)
+      opt.value = BigNumber.from(value).mul(10 ** (this.coreDecimals - 6))
     }
     return this.#mesonInstance.deposit(value, poolTokenIndex, opt)
   }
@@ -471,7 +489,7 @@ export class MesonClient {
     const opt: CallOverrides = { ...overrides }
     const swap = Swap.decode(encoded)
     if (this.isCoreToken(swap.inToken)) {
-      opt.value = BigNumber.from(swap.amount).mul(1e12)
+      opt.value = BigNumber.from(swap.amount).mul(10 ** (this.coreDecimals - 6))
     }
     return this.#mesonInstance.postSwapFromInitiator(
       encoded,

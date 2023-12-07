@@ -57,7 +57,7 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://rpc.ankr.com/bsc",
+    "url": "https://bsc-dataseed1.bnbchain.org",
     "explorer": "https://bscscan.com",
     "nativeCurrency": {
       "name": "Binance Chain Native Token",
@@ -337,7 +337,7 @@
     "url": "https://api.mainnet-beta.solana.com",
     "explorer": "https://explorer.solana.com",
     "nativeCurrency": {
-      "name": "Solana",
+      "name": "SOL",
       "symbol": "SOL",
       "decimals": 9
     },
@@ -358,6 +358,13 @@
         "addr": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
         "link": "address/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB?network=mainnet",
         "tokenIndex": 2
+      },
+      {
+        "name": "SOL",
+        "symbol": "SOL",
+        "decimals": 9,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 247
       }
     ]
   },
