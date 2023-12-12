@@ -242,7 +242,7 @@ export class MesonClient {
   }
 
   isCoreToken(tokenIndex: number) {
-    return [-1, 52].includes(tokenIndex) || ((tokenIndex > 190) && ((tokenIndex % 4) === 3))
+    return tokenIndex === -1 || (tokenIndex >= 49 && tokenIndex <= 64) || ((tokenIndex > 190) && ((tokenIndex % 4) === 3))
   }
 
   get coreDecimals() {

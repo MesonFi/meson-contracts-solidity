@@ -18,12 +18,14 @@ contract MesonTokens {
   ///       18:      PoD USDT
   ///       19:      PoD BUSD
   ///       32:      PoD
-  ///     33-64:   stablecoins with decimals 18
+  ///     33-48:   stablecoins with decimals 18
   ///       33:      USDC
   ///       34:      USDT
   ///       35:      BUSD
   ///       36:      (reserved for DAI)
   ///       37:      cUSD (Celo)
+  ///     49-64:   stablecoins as core (decimals 18)
+  ///       49:      USDC
   ///       52:      XDAI
   ///     65-128:  (Unspecified)
   ///     129-190: (Unspecified)
@@ -57,7 +59,7 @@ contract MesonTokens {
   uint256[50] private __gap;
 
   function _isCoreToken(uint8 tokenIndex) internal returns (bool) {
-    return (tokenIndex == 52) || ((tokenIndex > 190) && ((tokenIndex % 4) == 3));
+    return (tokenIndex >= 49 && tokenIndex <= 64) || ((tokenIndex > 190) && ((tokenIndex % 4) == 3));
   }
 
   /// @notice Return all supported token addresses in an array ordered by `tokenIndex`

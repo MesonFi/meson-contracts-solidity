@@ -797,5 +797,34 @@
         "tokenIndex": 6
       }
     ]
+  },
+  {
+    "id": "zkfair-testnet",
+    "name": "ZKFair Testnet",
+    "alias": "ZKFAIR",
+    "chainId": "0xab4b",
+    "slip44": "0x8000ab4b",
+    "shortSlip44": "0xab4b",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://testnet-rpc.zkfair.io",
+    "explorer": "https://testnet-scan.zkfair.io",
+    "nativeCurrency": {
+      "name": "USDC",
+      "symbol": "USDC",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 49
+      }
+    ]
   }
 ]

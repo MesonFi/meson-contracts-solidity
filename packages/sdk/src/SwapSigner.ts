@@ -1,5 +1,5 @@
 import { Wallet, utils } from 'ethers'
-import { HDNode } from "@ethersproject/hdnode";
+import { HDNode } from '@ethersproject/hdnode'
 import TronWeb from 'tronweb'
 import bs58 from 'bs58'
 
