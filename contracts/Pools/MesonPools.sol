@@ -236,6 +236,12 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
     }
 
+    uint256 amountToShare = _amountToShare(encodedSwap);
+    if (amountToShare > 0) {
+      releaseAmount -= amountToShare;
+      _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, _poolIndexToShare(encodedSwap))] += amountToShare;
+    }
+
     uint256 coreAmount = _coreTokenAmount(encodedSwap);
     if (coreAmount > 0) {
       _transferCoreToken(recipient, coreAmount);
@@ -277,6 +283,12 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       uint256 serviceFee = _serviceFee(encodedSwap);
       releaseAmount -= serviceFee;
       _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
+    }
+
+    uint256 amountToShare = _amountToShare(encodedSwap);
+    if (amountToShare > 0) {
+      releaseAmount -= amountToShare;
+      _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, _poolIndexToShare(encodedSwap))] += amountToShare;
     }
 
     uint256 coreAmount = _coreTokenAmount(encodedSwap);
@@ -328,6 +340,12 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       uint256 serviceFee = _serviceFee(encodedSwap);
       releaseAmount -= serviceFee;
       _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
+    }
+
+    uint256 amountToShare = _amountToShare(encodedSwap);
+    if (amountToShare > 0) {
+      releaseAmount -= amountToShare;
+      _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, _poolIndexToShare(encodedSwap))] += amountToShare;
     }
 
     uint256 coreAmount = _coreTokenAmount(encodedSwap);

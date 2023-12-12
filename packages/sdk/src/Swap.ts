@@ -23,6 +23,8 @@ export interface SwapData {
   saltData?: string,
   amountForCoreToken?: BigNumberish,
   coreTokenPrice?: number,
+  poolIndexToShare?: number,
+  amountToShare?: BigNumberish,
   fee: BigNumberish,
   expireTs: number,
   inChain: string,
@@ -103,7 +105,15 @@ export class Swap implements SwapData {
   }
 
   private _makeFullSalt(data: SwapData): string {
-    const { salt, saltHeader, saltData = '0x', amountForCoreToken, coreTokenPrice } = data
+    const {
+      salt,
+      saltHeader,
+      saltData = '0x',
+      amountForCoreToken,
+      coreTokenPrice,
+      poolIndexToShare,
+      amountToShare,
+    } = data
     if (salt) {
       if (!utils.isHexString(salt) || salt.length > 22) {
         throw new Error('The given salt is invalid')
@@ -124,6 +134,19 @@ export class Swap implements SwapData {
           .toHexString().substring(2).padStart(3, '0')
         if (saltData2.length > 3) {
           throw new Error('Invalid amountForCoreToken; overflow')
+        }
+        return `${saltHeader}${saltData1}${saltData2}${this._randomHex(8)}`
+      } else if ((parseInt(saltHeader[3], 16) & 2) === 2) {
+        if (!Number.isInteger(poolIndexToShare) || poolIndexToShare < 65536 || poolIndexToShare > 65536 * 2 - 1) {
+          throw new Error('Invalid poolIndexToShare')
+        }
+        const saltData1 = (poolIndexToShare - 65536).toString(16).padStart(4, '0')
+        const num = BigNumber.from(amountToShare).toNumber()
+        const pow = Math.ceil(Math.log10(num))
+        const d = pow <= 3 ? num : (pow - 4) * 9000 + Math.round(num / 10 ** (pow - 4))
+        const saltData2 = BigNumber.from(d).toHexString().substring(2).padStart(4, '0')
+        if (saltData2.length > 4) {
+          throw new Error('Invalid amountToShare; overflow')
         }
         return `${saltHeader}${saltData1}${saltData2}${this._randomHex(8)}`
       }
@@ -213,8 +236,26 @@ export class Swap implements SwapData {
     return BigNumber.from(parseInt(this.salt.slice(11, 14), 16)).mul(1e5)
   }
 
+  get poolIndexToShare(): number {
+    if (this.willTransferToContract || ((parseInt(this.salt[3], 16) & 6) !== 2)) {
+      return 0
+    }
+    return parseInt(this.salt.slice(6, 10), 16) + 65536
+  }
+
+  get amountToShare(): BigNumber {
+    if (this.willTransferToContract || ((parseInt(this.salt[3], 16) & 6) !== 2)) {
+      return BigNumber.from(0)
+    }
+    const d = BigNumber.from(parseInt(this.salt.slice(10, 14), 16))
+    if (d.lte(1000)) {
+      return d
+    }
+    return d.sub(1000).mod(9000).add(1000).mul(BigNumber.from(10).pow(d.sub(1000).div(9000)))
+  }
+
   get receive(): BigNumber {
-    return this.amount.sub(this.totalFee).sub(this.amountForCoreToken)
+    return this.amount.sub(this.totalFee).sub(this.amountForCoreToken).sub(this.amountToShare)
   }
 
   get coreTokenPrice(): number {

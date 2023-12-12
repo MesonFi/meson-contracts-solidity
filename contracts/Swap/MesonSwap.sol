@@ -21,8 +21,11 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   ///     salt & 0x10000000000000000000 == true => API;
   ///     salt & 0x08000000000000000000 == true => use *non-typed signing* (some wallets such as hardware wallets don't support EIP-712v1);
   ///     salt & 0x04000000000000000000 == true => swap for core token (n/a for releasing to contract);
-  ///     salt & 0x0000fffff00000000000 == true => price for core token;
-  ///     salt & 0x000000000fff00000000 == true => amount for core token;
+  ///         salt & 0xfffff00000000000         => price for core token;
+  ///         salt & 0x00000fff00000000         => amount for core token;
+  ///     salt & 0x02000000000000000000 == true => share some release amount to partner;
+  ///         salt & 0xffff000000000000 + 65536 => pool index to share;
+  ///         salt & 0x0000ffff00000000         => amount to share;
   ///     salt & 0x0000ffffffffffffffff: customized data that can be passed to integrated 3rd-party smart contract;
   ///   fee: The fee given to LPs (liquidity providers). An extra service fee maybe charged afterwards;
   ///   expireTs: The expiration time of this swap on the initial chain. The LP should `executeSwap` and receive his funds before `expireTs`;
