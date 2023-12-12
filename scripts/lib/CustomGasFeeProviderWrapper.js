@@ -4,7 +4,7 @@ const { EthersProviderWrapper } = require('@nomiclabs/hardhat-ethers/internal/et
 module.exports = class CustomGasFeeProviderWrapper extends EthersProviderWrapper {
   async getFeeData() {
     const result = await super.getFeeData()
-    // For Polygon || Linea
+    // For BNB || Polygon || Linea
     // result.maxPriorityFeePerGas = result.gasPrice
     // result.maxFeePerGas = result.gasPrice.add(result.lastBaseFeePerGas)
 
