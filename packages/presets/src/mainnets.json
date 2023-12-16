@@ -711,6 +711,13 @@
         "decimals": 6,
         "addr": "0xDd3d867db5Ca13E5F055Dd4484648fddDF3248EB",
         "tokenIndex": 32
+      },
+      {
+        "name": "CFX",
+        "symbol": "CFX",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 191
       }
     ]
   },
@@ -785,7 +792,15 @@
         "symbol": "USDC",
         "decimals": 6,
         "addr": "0x04068da6c83afcfa0e13ba15a6696662335d5b75",
-        "tokenIndex": 1
+        "tokenIndex": 1,
+        "disabled": true
+      },
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x28a92dde19D9989F39A49905d7C9C2FAc7799bDf",
+        "tokenIndex": 9
       }
     ]
   },

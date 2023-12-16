@@ -826,5 +826,41 @@
         "tokenIndex": 49
       }
     ]
+  },
+  {
+    "id": "b2-testnet",
+    "name": "B2 Testnet",
+    "alias": "B2",
+    "chainId": "0x3ea",
+    "slip44": "0x800003ea",
+    "shortSlip44": "0x03ea",
+    "extensions": [
+      "metamask"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://zkevm-rpc.bsquared.network",
+    "explorer": "https://testnet.bsquared.network",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "tokenIndex": 1,
+        "addr": "0xcD65196488b2e2fbcbc3E5d675B3108f4935e64a"
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 6,
+        "tokenIndex": 2,
+        "addr": "0xb471644294eD4648F07f404a5d257B381b1E1e26"
+      }
+    ]
   }
 ]

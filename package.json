@@ -33,6 +33,7 @@
     "testnet:x1": "hardhat deploy --testnet x1 --upgradable true",
     "testnet:viction": "hardhat deploy --testnet viction --upgradable true",
     "testnet:zkfair": "hardhat deploy --testnet zkfair --upgradable true",
+    "testnet:b2": "hardhat deploy --testnet b2 --upgradable true",
     "deploy:eth": "hardhat deploy --mainnet eth --upgradable true",
     "deploy:bnb": "hardhat deploy --mainnet bnb --upgradable true",
     "deploy:polygon": "hardhat deploy --mainnet polygon --upgradable true",
