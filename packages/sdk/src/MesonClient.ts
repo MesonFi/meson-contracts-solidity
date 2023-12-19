@@ -411,6 +411,23 @@ export class MesonClient {
     return tokenContract.transfer(recipient, value, ...overrides)
   }
 
+  async estimateTransferToken(tokenIndex: number, recipient: string, value: BigNumberish, ...overrides: [CallOverrides?]) {
+    if (this.isCoreToken(tokenIndex)) {
+      return this.#mesonInstance.signer.estimateGas({
+        ...overrides[0],
+        to: recipient,
+        value: BigNumber.from(value).mul(10 ** (this.coreDecimals - 6))
+      })
+    }
+    const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: this.address })
+    const tokenContract = this.getTokenContract(tokenAddr).connect(this.#mesonInstance.signer)
+    const decimals = await tokenContract.decimals()
+    if (decimals > 6) {
+      value = BigNumber.from(value).mul(10 ** (decimals - 6))
+    }
+    return tokenContract.estimateGas.transfer(recipient, value, ...overrides)
+  }
+
   async approveToken(tokenIndex: number, spender: string, value: BigNumberish, ...overrides: [CallOverrides?]) {
     if (this.isCoreToken(tokenIndex)) {
       return
