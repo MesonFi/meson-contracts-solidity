@@ -64,7 +64,8 @@
     "deploy:opbnb": "hardhat deploy --mainnet opbnb --upgradable true",
     "deploy:scroll": "hardhat deploy --mainnet scroll --upgradable true",
     "deploy:celo": "hardhat deploy --mainnet celo --upgradable true",
-    "deploy:gnosis": "hardhat deploy --mainnet gnosis --upgradable true"
+    "deploy:gnosis": "hardhat deploy --mainnet gnosis --upgradable true",
+    "deploy:zkfair": "hardhat deploy --mainnet zkfair --upgradable true"
   },
   "devDependencies": {
     "@matterlabs/hardhat-zksync-deploy": "^0.6.2",
