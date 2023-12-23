@@ -79,7 +79,7 @@ export default class AptosAdaptor {
 
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
     return new Promise((resolve, reject) => {
-      const h = setInterval(async () => {
+      const tryGetTransaction = async () => {
         try {
           const info = await this._getTransaction(hash, confirmations)
           if (info) {
@@ -87,7 +87,9 @@ export default class AptosAdaptor {
             resolve(info)
           }
         } catch {}
-      }, 5000)
+      }
+      const h = setInterval(tryGetTransaction, 5000)
+      tryGetTransaction()
 
       if (timeout) {
         timer(timeout * 1000).then(() => {

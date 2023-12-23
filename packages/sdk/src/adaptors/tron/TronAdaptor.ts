@@ -80,7 +80,7 @@ export default class TronAdaptor {
 
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
     return new Promise((resolve, reject) => {
-      const h = setInterval(async () => {
+      const tryGetTransaction = async () => {
         let info
         try {
           if (confirmations) {
@@ -93,7 +93,9 @@ export default class TronAdaptor {
           clearInterval(h)
           resolve(_wrapTronReceipt(info))
         }
-      }, 3000)
+      }
+      const h = setInterval(tryGetTransaction, 3000)
+      tryGetTransaction()
 
       if (timeout) {
         timer(timeout * 1000).then(() => {
