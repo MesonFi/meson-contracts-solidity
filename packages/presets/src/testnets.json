@@ -13,6 +13,11 @@
     "addressFormat": "ethers",
     "url": "https://rpc.ankr.com/eth_goerli",
     "explorer": "https://goerli.etherscan.io/",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
     "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
     "tokens": [
       {
@@ -841,8 +846,8 @@
     "url": "https://zkevm-rpc.bsquared.network",
     "explorer": "https://testnet.bsquared.network",
     "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
+      "name": "BTC",
+      "symbol": "BTC",
       "decimals": 18
     },
     "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",

@@ -34,7 +34,8 @@
         "symbol": "BUSD",
         "decimals": 18,
         "addr": "0x4fabb145d64652a948d72533023f6e7a623c7c53",
-        "tokenIndex": 35
+        "tokenIndex": 35,
+        "disabled": true
       },
       {
         "name": "ETH",
@@ -86,7 +87,8 @@
         "symbol": "BUSD",
         "decimals": 18,
         "addr": "0xe9e7cea3dedca5984780bafc599bd69add087d56",
-        "tokenIndex": 35
+        "tokenIndex": 35,
+        "disabled": true
       },
       {
         "name": "BNB",
