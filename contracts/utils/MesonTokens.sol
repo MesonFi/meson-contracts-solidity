@@ -30,10 +30,14 @@ contract MesonTokens {
   ///     65-128:  (Unspecified)
   ///     129-190: (Unspecified)
   ///     191:     No-swap core
-  ///     192-243: (Unspecified)
+  ///     192-239: (Unspecified)
+  ///     240-243: BTC & BTC equivalent
+  ///       240:     PoD BTC
+  ///       242:     ERC20 BTC
+  ///       243:     BTC as core
   ///     244-247: SOL & SOL equivalent
   ///       244:     PoD SOL
-  ///       246:     (reserved for ERC20 SOL)
+  ///       246:     ERC20 SOL
   ///       247:     SOL as core
   ///     248-251: BNB & BNB equivalent
   ///       248:     PoD BNB
