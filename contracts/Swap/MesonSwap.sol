@@ -203,7 +203,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
     bytes32 yParityAndS,
     address initiator,
     address recipient
-  ) external matchProtocolVersion(encodedSwap) verifyEncodedSwap(encodedSwap) {
+  ) payable external matchProtocolVersion(encodedSwap) verifyEncodedSwap(encodedSwap) {
     _checkReleaseSignature(encodedSwap, recipient, r, yParityAndS, initiator);
 
     _postedSwaps[encodedSwap] = 1;
@@ -218,7 +218,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   }
 
   function simpleExecuteSwap(uint256 encodedSwap)
-    external matchProtocolVersion(encodedSwap) verifyEncodedSwap(encodedSwap)
+    payable external matchProtocolVersion(encodedSwap) verifyEncodedSwap(encodedSwap)
   {
     uint256 amount = _amountFrom(encodedSwap);
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
