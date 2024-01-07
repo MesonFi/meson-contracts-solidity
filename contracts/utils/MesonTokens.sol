@@ -33,7 +33,7 @@ contract MesonTokens {
   ///     192-239: (Unspecified)
   ///     240-243: BTC & BTC equivalent
   ///       240:     PoD BTC
-  ///       242:     ERC20 BTC
+  ///       242:     ERC20 BTC (decimals 8 except BNB Chain)
   ///       243:     BTC as core
   ///     244-247: SOL & SOL equivalent
   ///       244:     PoD SOL

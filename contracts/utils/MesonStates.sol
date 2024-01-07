@@ -94,7 +94,7 @@ contract MesonStates is MesonTokens, MesonHelpers {
       require(Address.isContract(token), "The given token address is not a contract");
 
       if (_needAdjustAmount(tokenIndex)) {
-        amount *= 1e12;
+        amount *= (tokenIndex == 242 && SHORT_COIN_TYPE != 0x02ca) ? 100 : 1e12;
       }
       (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
         ERC20_TRANSFER_FROM_SELECTOR,
@@ -126,7 +126,7 @@ contract MesonStates is MesonTokens, MesonHelpers {
       require(Address.isContract(token), "The given token address is not a contract");
 
       if (_needAdjustAmount(tokenIndex)) {
-        amount *= 1e12;
+        amount *= (tokenIndex == 242 && SHORT_COIN_TYPE != 0x02ca) ? 100 : 1e12;
       }
 
       if (SHORT_COIN_TYPE == 0x00c3) {
@@ -163,7 +163,7 @@ contract MesonStates is MesonTokens, MesonHelpers {
   ) internal {
     require(Address.isContract(contractAddr), "The given recipient address is not a contract");
     if (_needAdjustAmount(tokenIndex)) {
-      amount *= 1e12;
+      amount *= (tokenIndex == 242 && SHORT_COIN_TYPE != 0x02ca) ? 100 : 1e12;
     }
 
     if (_isCoreToken(tokenIndex)) {
