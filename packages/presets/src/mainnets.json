@@ -105,8 +105,8 @@
         "tokenIndex": 251
       },
       {
-        "name": "Wrapped BTC",
-        "symbol": "WBTC",
+        "name": "BTCB",
+        "symbol": "BTCB",
         "decimals": 18,
         "addr": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
         "tokenIndex": 242
