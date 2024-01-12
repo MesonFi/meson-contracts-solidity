@@ -77,7 +77,7 @@ exports.withdraw = async function withdraw(symbol, amount, { network, wallet }) 
   return tx
 }
 
-exports.withdrawServiceFee = async function withdraw(symbol, amount, { network, wallet }) {
+exports.withdrawServiceFee = async function withdrawServiceFee(symbol, amount, { network, wallet }) {
   const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
   const tokenIndex = getTokenIndex(network, symbol)
 
