@@ -25,7 +25,7 @@ export default class SolanaWallet extends SolanaAdaptor {
     return this.publicKey.toString()
   }
 
-  signMessage (msg: string) {
+  signMessage(msg: string) {
     let signData: Uint8Array
     if (utils.isHexString(msg)) {
       signData = utils.arrayify(msg)

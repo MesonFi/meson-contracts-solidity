@@ -110,7 +110,6 @@ function _wrapSolanaEvent(raw, address) {
   }
 }
 
-
 function _wrapSolanaBlock(raw: BlockResponse) {
   return {
     hash: raw.parentSlot + 1,

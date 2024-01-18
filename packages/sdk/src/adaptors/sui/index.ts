@@ -7,9 +7,10 @@ import {
 
 import memoize from 'lodash/memoize'
 
+import { getSwapId } from '../../utils'
+import { Swap } from '../../Swap'
 import SuiAdaptor from './SuiAdaptor'
 import SuiWallet, { SuiExtWallet } from './SuiWallet'
-import { Swap } from '../../Swap'
 
 export function getWallet(privateKey: string, client: SuiProvider): SuiWallet {
   let keypair: SuiKeypair
@@ -327,7 +328,7 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
             } else if (prop === 'getLockedSwap') {
               const storeG = await getStoreG()
               const swap = Swap.decode(args[0])
-              const swapId = _getSwapId(swap.encoded, args[1])
+              const swapId = getSwapId(swap.encoded, args[1])
               const result = await getDynamicFieldValue(storeG.locked_swaps, { type: 'vector<u8>', value: _vectorize(swapId) })
               if (!result) {
                 return { until: 0 } // never locked
@@ -545,11 +546,6 @@ function _findMesonMethodModule(method) {
 
 function _vectorize(hex: string) {
   return Array.from(utils.arrayify(hex))
-}
-
-function _getSwapId(encoded, initiator) {
-  const packed = utils.solidityPack(['bytes32', 'address'], [encoded, initiator])
-  return utils.keccak256(packed)
 }
 
 function _getCompactSignature(r: string, yParityAndS: string) {

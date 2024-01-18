@@ -1,6 +1,6 @@
 {
   "name": "@mesonfi/sdk",
-  "version": "1.15.8",
+  "version": "1.16.2",
   "description": "",
   "license": "MIT",
   "repository": "https://github.com/MesonFi/meson-contracts-solidity",
@@ -29,6 +29,7 @@
     "cross-fetch": "^3.1.5",
     "ethers": "5.7.2",
     "lodash": "^4.17.21",
+    "starknet": "^5.24.3",
     "tronweb": "5.2.0",
     "tweetnacl": "1.0.3",
     "zksync-web3": "0.13.4"
@@ -39,6 +40,7 @@
     "@types/lodash": "^4.14.186",
     "@types/mocha": "^9.1.1",
     "@types/node": "^20.9.0",
+    "abi-wan-kanabi": "^2.1.0",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "ethereum-waffle": "^4.0.4",

@@ -25,9 +25,13 @@ export const clipRecipient = (recipient: string, encoded: string) => {
     } else {
       return utils.hexlify(bs58.decode(recipient)).substring(0, 42)
     }
-  } else if (['027d', '0310'].includes(chain)) {
-    // to aptos, sui
-    return recipient.substring(0, 42)
+  } else if (['027d', '0310', '232c'].includes(chain)) {
+    // to aptos, sui, starknet
+    if (utils.isAddress(recipient)) {
+      return recipient
+    } else {
+      return utils.hexZeroPad(recipient, 32).substring(0, 42)
+    }
   } else {
     // to eth
     return recipient

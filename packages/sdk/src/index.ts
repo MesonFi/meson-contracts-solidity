@@ -5,3 +5,5 @@ export { SwapSigner, EthersWalletSwapSigner, RemoteSwapSigner, NonEcdsaRemoteSwa
 export { SwapWithSigner } from './SwapWithSigner'
 export { SignedSwapRequest, SignedSwapRequestData, SignedSwapRelease, SignedSwapReleaseData } from './SignedSwap'
 export * as adaptors from './adaptors'
+
+export * as stark from 'starknet'

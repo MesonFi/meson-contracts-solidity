@@ -22,6 +22,7 @@ import * as adaptors from './adaptors'
 import AptosAdaptor from './adaptors/aptos/AptosAdaptor'
 import SuiAdaptor from './adaptors/sui/SuiAdaptor'
 import SolanaAdaptor from './adaptors/solana/SolanaAdaptor'
+import StarkAdaptor from './adaptors/starknet/StarkAdaptor'
 
 const Zero = constants.AddressZero.substring(2)
 const AddressOne = '0x0000000000000000000000000000000000000001'
@@ -157,6 +158,8 @@ export class MesonClient {
       this.addressFormat = 'sui'
     } else if (mesonInstance.provider instanceof SolanaAdaptor) {
       this.addressFormat = 'solana'
+    } else if (mesonInstance.provider instanceof StarkAdaptor) {
+      this.addressFormat = 'starknet'
     } else {
       this.addressFormat = 'tron'
     }
@@ -287,7 +290,7 @@ export class MesonClient {
     return await this.fetchEventsBetween(fromBlock, toBlock)
   }
 
-  async fetchEventsBetween(fromBlock?: number, toBlock?: number): Promise<providers.Log[]> {
+  async fetchEventsBetween(fromBlock: number, toBlock: number): Promise<providers.Log[]> {
     let from = fromBlock
     const results = []
     while (from + 2999 < toBlock) {
@@ -298,7 +301,7 @@ export class MesonClient {
     return results.flat()
   }
 
-  async #fetchEvents(fromBlock?: number, toBlock?: number) {
+  async #fetchEvents(fromBlock: number, toBlock: number) {
     const filter: providers.Filter = {
       address: this.address,
       fromBlock,
@@ -529,7 +532,7 @@ export class MesonClient {
   }
 
   async lockSwap(encoded: string, initiator: string, recipient?: string, ...overrides: [CallOverrides?]) {
-    if (['027d', '0310', '01f5'].includes(encoded.substring(54, 58))) { // to aptos or sui
+    if (['027d', '0310', '01f5', '232c'].includes(encoded.substring(54, 58))) { // to aptos, sui, solana, starknet
       return this.#mesonInstance.lockSwap(encoded, { initiator, recipient } as any, ...overrides)
     } else {
       return this.#mesonInstance.lockSwap(encoded, initiator, ...overrides)

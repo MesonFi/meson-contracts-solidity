@@ -19,9 +19,10 @@ import {
 import memoize from 'lodash/memoize'
 import bs58 from 'bs58'
 
+import { getSwapId } from '../../utils'
+import { Swap } from '../../Swap'
 import SolanaAdaptor from './SolanaAdaptor'
 import SolanaWallet, { SolanaExtWallet } from './SolanaWallet'
-import { Swap } from '../../Swap'
 
 const SYSTEM_PROGRAM = {
   pubkey: SystemProgram.programId,
@@ -364,7 +365,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
               return await _getPostedSwap(encoded)
             } else if (prop === 'getLockedSwap') {
               const encoded = Swap.decode(args[0]).encoded
-              const swapId = _getSwapId(encoded, args[1])
+              const swapId = getSwapId(encoded, args[1])
               const store = _getStore([STORE_PREFIX.LOCKED_SWAP, Buffer.from(swapId.substring(2), 'hex')])
               const info = await adaptor.client.getAccountInfo(store.pubkey)
               if (!info) {
@@ -638,7 +639,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
               } else if (prop === 'lockSwap') {
                 const [_, { initiator, recipient }] = args
                 const tokenAddr = await _getTokenAddr(swap.outToken)
-                const swapId = _getSwapId(swap.encoded, initiator)
+                const swapId = getSwapId(swap.encoded, initiator)
                 const poolIndex = await _poolOfAuthorizedAddr(signerPubkey.toString())
                 return await call(15, {
                   data: [
@@ -659,7 +660,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                 })
               } else if (prop === 'unlock') {
                 const [_, initiator] = args
-                const swapId = _getSwapId(swap.encoded, initiator)
+                const swapId = getSwapId(swap.encoded, initiator)
                 const poolIndex = await _poolOfAuthorizedAddr(signerPubkey.toString())
                 return await call(16, {
                   data: [
@@ -675,7 +676,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
               } else if (prop === 'release') {
                 const [_, r, yParityAndS, initiator, recipient] = args
                 const tokenAddr = await _getTokenAddr(swap.outToken)
-                const swapId = _getSwapId(swap.encoded, initiator)
+                const swapId = getSwapId(swap.encoded, initiator)
                 const taRecipient = await getOrCreateAssociatedTokenAccount(
                   adaptor.client,
                   (<SolanaWallet>adaptor).keypair,
@@ -707,7 +708,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
               } else if (prop === 'directRelease') {
                 const [_, r, yParityAndS, initiator, recipient] = args
                 const tokenAddr = await _getTokenAddr(swap.outToken)
-                const swapId = _getSwapId(swap.encoded, initiator)
+                const swapId = getSwapId(swap.encoded, initiator)
                 const poolIndex = await _poolOfAuthorizedAddr(signerPubkey.toString())
                 const taRecipient = await getOrCreateAssociatedTokenAccount(
                   adaptor.client,
@@ -761,11 +762,6 @@ function _bigNumberFromBuffer(buffer: Buffer) {
 
 function _bigNumberFromReverseBuffer(buffer: Buffer) {
   return BigNumber.from('0x' + Array.from(buffer).reverse().map(x => x.toString(16).padStart(2, '0')).join(''))
-}
-
-function _getSwapId(encoded: string, initiator: string) {
-  const packed = utils.solidityPack(['bytes32', 'address'], [encoded, initiator])
-  return utils.keccak256(packed)
 }
 
 export function formatAddress(addr: string) {

@@ -1,0 +1,39 @@
+[
+  {
+    "members": [
+      {
+        "name": "to",
+        "offset": 0,
+        "type": "felt"
+      },
+      {
+        "name": "selector",
+        "offset": 1,
+        "type": "felt"
+      },
+      {
+        "name": "data",
+        "offset": 2,
+        "type": "felt*"
+      }
+    ],
+    "name": "CallArray",
+    "size": 3,
+    "type": "struct"
+  },
+  {
+    "outputs": [
+      {
+        "name": "calls_len",
+        "type": "felt"
+      },
+      {
+        "name": "calls",
+        "type": "CallArray*"
+      }
+    ],
+    "name": "__execute__",
+    "inputs": [],
+    "type": "function"
+  }
+]

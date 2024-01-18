@@ -2,9 +2,10 @@ import { BigNumber, BigNumberish, utils } from 'ethers'
 import { AptosClient, AptosAccount } from 'aptos'
 import memoize from 'lodash/memoize'
 
+import { getSwapId } from '../../utils'
+import { Swap } from '../../Swap'
 import AptosAdaptor from './AptosAdaptor'
 import AptosWallet, { AptosExtWallet } from './AptosWallet'
-import { Swap } from '../../Swap'
 
 export function getWallet(privateKey: string, client: AptosClient): AptosWallet {
   if (privateKey && !privateKey.startsWith('0x')) {
@@ -249,7 +250,7 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
               const result = await readTable(data.locked_swaps.handle, {
                 key_type: 'vector<u8>',
                 value_type: `${address}::MesonStates::LockedSwap`,
-                key: _getSwapId(Swap.decode(args[0]).encoded, args[1])
+                key: getSwapId(Swap.decode(args[0]).encoded, args[1])
               })
               if (!result) {
                 return { until: 0 } // never locked
@@ -404,11 +405,6 @@ function _findMesonMethodModule(method) {
 
 function _vectorize(hex: string) {
   return Array.from(utils.arrayify(hex))
-}
-
-function _getSwapId(encoded, initiator) {
-  const packed = utils.solidityPack(['bytes32', 'address'], [encoded, initiator])
-  return utils.keccak256(packed)
 }
 
 function _getCompactSignature(r: string, yParityAndS: string) {

@@ -1,0 +1,52 @@
+[
+  {
+    "members": [
+      {
+        "name": "to",
+        "offset": 0,
+        "type": "felt"
+      },
+      {
+        "name": "selector",
+        "offset": 1,
+        "type": "felt"
+      },
+      {
+        "name": "offset",
+        "offset": 2,
+        "type": "felt"
+      },
+      {
+        "name": "len",
+        "offset": 3,
+        "type": "felt"
+      }
+    ],
+    "name": "CallArray",
+    "size": 4,
+    "type": "struct"
+  },
+  {
+    "outputs": [
+      {
+        "name": "calls_len",
+        "type": "felt"
+      },
+      {
+        "name": "calls",
+        "type": "CallArray*"
+      },
+      {
+        "name": "data_len",
+        "type": "felt"
+      },
+      {
+        "name": "data",
+        "type": "felt*"
+      }
+    ],
+    "name": "__execute__",
+    "inputs": [],
+    "type": "function"
+  }
+]
