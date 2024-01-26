@@ -2,8 +2,9 @@ import { BigNumber, utils } from 'ethers'
 import {
   Connection as SolConnection,
   PublicKey as SolPublicKey,
-  BlockResponse,
-  TransactionResponse,
+  type BlockResponse,
+  type TransactionResponse,
+  type CompiledInstruction,
 } from '@solana/web3.js'
 import bs58 from 'bs58'
 import { timer } from '../../utils'
@@ -35,9 +36,9 @@ export default class AptosAdaptor {
     return BigNumber.from(await this.client.getBalance(new SolPublicKey(addr)))
   }
 
-  async getCode(addr) {
-    // TODO
-    return
+  async getCode(addr: string) {
+    const accountInfo = await this.client.getAccountInfo(new SolPublicKey(addr))
+    return accountInfo.executable ? '0x1' : ''
   }
 
   async getLogs(filter) {
@@ -125,32 +126,38 @@ function _wrapSolanaTx(raw: TransactionResponse) {
     blockTime,
     slot,
     transaction: { signatures, message },
-    meta: { err, logMessages }
+    meta: { err, logMessages, innerInstructions }
   } = raw
   const { recentBlockhash, instructions, accountKeys } = message
-
   const signer = accountKeys.filter((_, i) => message.isAccountSigner(i))
-
-  const programs = Array.from((<any>message).indexToProgramIds.entries())
-    .filter(([_, programId]) => programId.toString() !== 'ComputeBudget111111111111111111111111111111')
-  const indices = programs.map(p => p[0])
-  const ins = instructions.filter(ins => indices.includes(ins.programIdIndex))
-
-  if (!ins.length) {
-    return
-  }
-  const { accounts, data, programIdIndex } = ins[0]
-  const programId = programs.find(p => p[0] === programIdIndex)[1]
+  const parsed = instructions.map(ins => _parseInstruction(ins, accountKeys))
+  const innerParsed = innerInstructions
+    .map(inner => {
+      const by = parsed[inner.index]?.programId
+      return inner.instructions.map(ins => _parseInstruction(ins, accountKeys, by))
+    })
+    .flat()
+  const allParsed = [...parsed, ...innerParsed]
 
   return {
     blockHash: 'n/a',
     blockNumber: slot,
     hash: signatures[0],
     from: signer.toString(),
-    to: programId.toString(),
+    to: allParsed.map(parsed => parsed.programId),
+    input: allParsed.map(parsed => parsed.data),
     value: '0',
-    input: utils.hexlify(bs58.decode(data)),
     timestamp: blockTime,
     status: err ? '0x0' : '0x1'
   }
+}
+
+function _parseInstruction(ins: CompiledInstruction, keys: SolPublicKey[], by?: string) {
+  const { accounts, data: bs58Data, programIdIndex } = ins
+  const data = utils.hexlify(bs58.decode(bs58Data)) + (by ? `@${by}` : '')
+  const programId = keys[programIdIndex]?.toString()
+  if (!programId) {
+    return
+  }
+  return { programId, data, accounts }
 }

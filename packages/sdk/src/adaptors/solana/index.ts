@@ -238,9 +238,12 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
         return {
           format: () => abi,
           parseTransaction: tx => {
-            const { data } = tx
+            const [data, contractAddress = false] = tx.data.split('@')
             const name = SOLANA_METHODS[Number(data.substring(0, 4))]
             const args: any = { encodedSwap: '0x' + data.substring(4, 68) }
+            if (contractAddress) {
+              args.contractAddress = contractAddress
+            }
             switch (name) {
               case 'postSwapFromInitiator':
                 args.postingValue = BigNumber.from('0x' + data.substring(68, 108) + data.substring(114, 124))
