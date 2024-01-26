@@ -51,7 +51,7 @@ interface IMesonPoolsEvents {
   event SwapUnlocked(uint256 indexed encodedSwap);
 
   /// @notice Event when a swap was released.
-  /// Emit at the end of `release()`, `directRelease()` and `simpleRelease()` calls.
+  /// Emit at the end of `release()`, `directRelease()` calls.
   /// @param encodedSwap Encoded swap
   event SwapReleased(uint256 indexed encodedSwap);
 }

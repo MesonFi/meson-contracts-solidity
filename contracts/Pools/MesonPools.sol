@@ -259,7 +259,6 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     address recipient
   ) external matchProtocolVersion(encodedSwap) forTargetChain(encodedSwap) {
     require(_msgSender() == tx.origin, "Cannot be called through contracts");
-    require(_expireTsFrom(encodedSwap) > block.timestamp, "Cannot release because expired");
     require(recipient != address(0), "Recipient cannot be zero address");
 
     bool feeWaived = _feeWaived(encodedSwap);
@@ -273,7 +272,12 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     uint40 poolIndex = poolOfAuthorizedAddr[_msgSender()];
     require(poolIndex != 0, "Caller not registered. Call depositAndRegister.");
 
-    _checkReleaseSignature(encodedSwap, recipient, r, yParityAndS, initiator);
+    if (r != bytes32(0x0)) {
+      require(_expireTsFrom(encodedSwap) > block.timestamp, "Cannot release because expired");
+      _checkReleaseSignature(encodedSwap, recipient, r, yParityAndS, initiator);
+    } else if (!feeWaived) {
+      require(_isPremiumManager(), "Caller is not the premium manager");
+    }
     _lockedSwaps[swapId] = 1;
 
     uint256 releaseAmount = _amountToLock(encodedSwap);
@@ -324,38 +328,6 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       (bool success, ) = address(0x5a6869ef5b81DCb58EBF51b8F893c31f5AFE3Fa8).call(data);
       require(success, "Call faucet not successful");
     } 
-  }
-
-  function simpleRelease(uint256 encodedSwap, address recipient)
-    external matchProtocolVersion(encodedSwap) forTargetChain(encodedSwap)
-  {
-    require(_isPremiumManager(), "Caller is not the premium manager");
-    require(recipient != address(0), "Recipient cannot be zero address");
-
-    uint256 releaseAmount = _amountToLock(encodedSwap);
-    _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 1)] -= releaseAmount;
-
-    bool feeWaived = _feeWaived(encodedSwap);
-    if (!feeWaived) {
-      uint256 serviceFee = _serviceFee(encodedSwap);
-      releaseAmount -= serviceFee;
-      _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, 0)] += serviceFee;
-    }
-
-    uint256 amountToShare = _amountToShare(encodedSwap);
-    if (amountToShare > 0) {
-      releaseAmount -= amountToShare;
-      _balanceOfPoolToken[_poolTokenIndexForOutToken(encodedSwap, _poolIndexToShare(encodedSwap))] += amountToShare;
-    }
-
-    uint256 coreAmount = _coreTokenAmount(encodedSwap);
-    if (coreAmount > 0) {
-      _balanceOfPoolToken[_poolTokenIndexFrom(indexOfToken[address(1)], 1)] -= coreAmount;
-      _transferCoreToken(recipient, coreAmount);
-    }
-    _safeTransfer(_outTokenIndexFrom(encodedSwap), recipient, releaseAmount);
-
-    emit SwapReleased(encodedSwap);
   }
 
   /// @notice Read information for a locked swap
