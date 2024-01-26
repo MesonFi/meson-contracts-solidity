@@ -290,22 +290,23 @@ export class MesonClient {
     return await this.fetchEventsBetween(fromBlock, toBlock)
   }
 
-  async fetchEventsBetween(fromBlock: number, toBlock: number): Promise<providers.Log[]> {
+  async fetchEventsBetween(fromBlock: number, toBlock: number, topics = null): Promise<providers.Log[]> {
     let from = fromBlock
     const results = []
     while (from + 2999 < toBlock) {
-      results.push(await this.#fetchEvents(from, from + 2999))
+      results.push(await this.#fetchEvents(from, from + 2999, topics))
       from += 3000
     }
-    results.push(await this.#fetchEvents(from, toBlock))
+    results.push(await this.#fetchEvents(from, toBlock, topics))
     return results.flat()
   }
 
-  async #fetchEvents(fromBlock: number, toBlock: number) {
+  async #fetchEvents(fromBlock: number, toBlock: number, topics = null) {
     const filter: providers.Filter = {
       address: this.address,
       fromBlock,
       toBlock,
+      topics,
     }
     return await this.#mesonInstance.provider.getLogs?.(filter)
   }
