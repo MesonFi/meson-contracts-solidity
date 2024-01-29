@@ -69,7 +69,8 @@
     "deploy:zkfair": "hardhat deploy --mainnet zkfair --upgradable true",
     "deploy:bevm": "hardhat deploy --mainnet bevm --upgradable true",
     "deploy:map": "hardhat deploy --mainnet map --upgradable true",
-    "deploy:core": "hardhat deploy --mainnet core --upgradable true"
+    "deploy:core": "hardhat deploy --mainnet core --upgradable true",
+    "deploy:ancient8": "hardhat deploy --mainnet ancient8 --upgradable true"
   },
   "devDependencies": {
     "@matterlabs/hardhat-zksync-deploy": "^0.6.2",

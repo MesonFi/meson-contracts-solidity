@@ -1540,5 +1540,35 @@
         "tokenIndex": 242
       }
     ]
+  },
+  {
+    "id": "ancient8",
+    "name": "Ancient8",
+    "alias": "A8",
+    "chainId": "0x34fb5e38",
+    "slip44": "0xaaaaaaaa",
+    "shortSlip44": "0xaaaa",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.ancient8.gg",
+    "explorer": "https://scan.ancient8.gg",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
   }
 ]
