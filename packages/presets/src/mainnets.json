@@ -406,7 +406,8 @@
     "slip44": "0x80002105",
     "shortSlip44": "0x2105",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://mainnet.base.org",
@@ -450,7 +451,8 @@
     "slip44": "0x8000e708",
     "shortSlip44": "0xe708",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://rpc.linea.build",
@@ -493,7 +495,8 @@
     "slip44": "0x80000263",
     "shortSlip44": "0x0263",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://manta-pacific.calderachain.xyz/http",
@@ -627,7 +630,8 @@
     "slip44": "0x80082750",
     "shortSlip44": "0x2750",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://rpc.scroll.io",
@@ -670,7 +674,8 @@
     "slip44": "0x800000cc",
     "shortSlip44": "0x00cc",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://opbnb-mainnet-rpc.bnbchain.org",
@@ -1050,7 +1055,8 @@
     "slip44": "0x80000440",
     "shortSlip44": "0x0440",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://andromeda.metis.io/?owner=1088",
@@ -1086,7 +1092,8 @@
     "slip44": "0x800008ae",
     "shortSlip44": "0x08ae",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://evm.kava.io",
@@ -1115,7 +1122,8 @@
     "slip44": "0x80001388",
     "shortSlip44": "0x1388",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://rpc.mantle.xyz",
@@ -1228,7 +1236,8 @@
     "slip44": "0x79f99296",
     "shortSlip44": "0x9296",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://mainnet.skalenodes.com/v1/elated-tan-skat",
@@ -1264,7 +1273,8 @@
     "slip44": "0x585eb4b1",
     "shortSlip44": "0xb4b1",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://mainnet.skalenodes.com/v1/green-giddy-denebola",
@@ -1293,7 +1303,8 @@
     "slip44": "0x800056ce",
     "shortSlip44": "0x56ce",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://api.nautilus.nautchain.xyz",
@@ -1337,7 +1348,8 @@
     "slip44": "0x8000ce10",
     "shortSlip44": "0xce10",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://1rpc.io/celo",
@@ -1366,7 +1378,8 @@
     "slip44": "0x800002bc",
     "shortSlip44": "0x02bc",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://rpc.gnosischain.com",
@@ -1395,7 +1408,8 @@
     "slip44": "0x8000a70e",
     "shortSlip44": "0xa70e",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://rpc.zkfair.io",
@@ -1424,10 +1438,11 @@
     "slip44": "0x800005dd",
     "shortSlip44": "0x05dd",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://rpc-1.bevm.io",
+    "url": "https://rpc-canary-1.bevm.io",
     "explorer": "https://scan.bevm.io",
     "nativeCurrency": {
       "name": "BTC",
@@ -1442,6 +1457,87 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 243
+      }
+    ]
+  },
+  {
+    "id": "map",
+    "name": "MAP Protocol",
+    "alias": "MAP",
+    "chainId": "0x58f8",
+    "slip44": "0x800058f8",
+    "shortSlip44": "0x58f8",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.maplabs.io",
+    "explorer": "https://maposcan.io",
+    "nativeCurrency": {
+      "name": "MAPO",
+      "symbol": "MAPO",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "Mapped Wrapped Ether",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x05aB928d446d8ce6761e368c8e7bE03C3168A9ec",
+        "tokenIndex": 254
+      }
+    ]
+  },
+  {
+    "id": "core",
+    "name": "Core",
+    "alias": "CORE",
+    "chainId": "0x45c",
+    "slip44": "0x8000045c",
+    "shortSlip44": "0x045c",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.coredao.org",
+    "explorer": "https://scan.coredao.org",
+    "nativeCurrency": {
+      "name": "CORE",
+      "symbol": "CORE",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0xa4151B2B3e269645181dCcF2D426cE75fcbDeca9",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x900101d06A7426441Ae63e9AB3B9b0F63Be145F1",
+        "tokenIndex": 2
+      },
+      {
+        "name": "Wrapped Ether",
+        "symbol": "WETH",
+        "decimals": 18,
+        "addr": "0xeAB3aC417c4d6dF6b143346a46fEe1B847B50296",
+        "tokenIndex": 254
+      },
+      {
+        "name": "Bitcoin",
+        "symbol": "BTC.b",
+        "decimals": 8,
+        "addr": "0x2297aEbD383787A160DD0d9F71508148769342E3",
+        "tokenIndex": 242
       }
     ]
   }

@@ -45,7 +45,7 @@ contract MesonTokens {
   ///       251:     BNB as core
   ///     252-255: ETH & ETH equivalent
   ///       252:     PoD ETH
-  ///       254:     (reserved for ERC20 ETH like WETH)
+  ///       254:     Wrapped ETH
   ///       255:     ETH as core
   /// value: the supported token's contract address
   mapping(uint8 => address) public tokenForIndex;

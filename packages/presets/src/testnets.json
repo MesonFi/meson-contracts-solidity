@@ -482,7 +482,8 @@
     "slip44": "0x1c6199cc",
     "shortSlip44": "0x99cc",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://staging-v3.skalenodes.com/v1/staging-legal-crazy-castor",
@@ -518,7 +519,8 @@
     "slip44": "0x1dfd2731",
     "shortSlip44": "0x2731",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://staging-v3.skalenodes.com/v1/staging-faint-slimy-achird",
@@ -547,7 +549,8 @@
     "slip44": "0xaaaaaaaa",
     "shortSlip44": "0xaaaa",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://rpcv2-testnet.ancient8.gg",
@@ -583,7 +586,8 @@
     "slip44": "0x800028c5",
     "shortSlip44": "0x28c5",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://rpc.katla.taiko.xyz",
@@ -612,7 +616,8 @@
     "slip44": "0x800000c4",
     "shortSlip44": "0x00c4",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://testrpc.x1.tech",
@@ -648,7 +653,8 @@
     "slip44": "0x80000379",
     "shortSlip44": "0x0379",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect"
     ],
     "addressFormat": "ethers",
     "url": "https://rpc.testnet.tomochain.com",
@@ -689,15 +695,17 @@
     "id": "b2-testnet",
     "name": "B2 Testnet",
     "alias": "B2",
-    "chainId": "0x3ea",
+    "chainId": "0x44e",
     "slip44": "0x800003ea",
     "shortSlip44": "0x03ea",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect",
+      "btc_aa_particle"
     ],
-    "addressFormat": "ethers",
-    "url": "https://zkevm-rpc.bsquared.network",
-    "explorer": "https://testnet.bsquared.network",
+    "addressFormat": "ethers:bitcoin",
+    "url": "https://haven-rpc.bsquared.network",
+    "explorer": "https://haven-explorer.bsquared.network",
     "nativeCurrency": {
       "name": "BTC",
       "symbol": "BTC",
@@ -710,14 +718,14 @@
         "symbol": "USDC",
         "decimals": 6,
         "tokenIndex": 1,
-        "addr": "0xcD65196488b2e2fbcbc3E5d675B3108f4935e64a"
+        "addr": "0xb471644294eD4648F07f404a5d257B381b1E1e26"
       },
       {
         "name": "USDT",
         "symbol": "USDT",
         "decimals": 6,
         "tokenIndex": 2,
-        "addr": "0xb471644294eD4648F07f404a5d257B381b1E1e26"
+        "addr": "0x62f4c6A2fEcc5A4EA394d8f1341c90EF7ffED6C8"
       },
       {
         "name": "BTC",
@@ -736,7 +744,9 @@
     "slip44": "0x80006868",
     "shortSlip44": "0x6868",
     "extensions": [
-      "metamask"
+      "metamask",
+      "walletconnect",
+      "btc_aa_particle"
     ],
     "addressFormat": "ethers",
     "url": "https://testnet-rpc.merlinchain.io",
