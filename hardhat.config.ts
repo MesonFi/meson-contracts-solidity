@@ -6,7 +6,7 @@ import '@openzeppelin/hardhat-upgrades'
 import '@matterlabs/hardhat-zksync-deploy'
 import '@matterlabs/hardhat-zksync-solc'
 import dotenv from 'dotenv'
-import { HardhatPluginError } from 'hardhat/plugins';
+import { HardhatPluginError } from 'hardhat/plugins'
 
 import { task } from 'hardhat/config'
 import mainnets from '@mesonfi/presets/src/mainnets.json'

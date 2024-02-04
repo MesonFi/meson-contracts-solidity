@@ -579,11 +579,15 @@ export class MesonClient {
 
   async directRelease(signedRelease: SignedSwapReleaseData, ...overrides: [CallOverrides?]) {
     const { encoded, initiator } = signedRelease
+    const swap = Swap.decode(encoded)
     let recipient = signedRelease.recipient
     if (encoded.substring(54, 58) === '00c3') { // to tron
       recipient = TronWeb.address.toHex(recipient).replace(/^41/, '0x')
     }
-    const sig = utils.splitSignature(signedRelease.signature)
+    let sig = utils.splitSignature(signedRelease.signature)
+    if (swap.expireTs < Date.now() / 1000) {
+      sig = utils.splitSignature('0x'.padEnd(130, '0'))
+    }
     return this.#mesonInstance.directRelease(encoded, sig.r, sig.yParityAndS, initiator, recipient, ...overrides)
   }
 

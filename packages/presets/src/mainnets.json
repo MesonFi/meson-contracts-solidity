@@ -1570,5 +1570,72 @@
         "tokenIndex": 255
       }
     ]
+  },
+  {
+    "id": "zeta",
+    "name": "ZetaChain",
+    "alias": "ZETA",
+    "chainId": "0x1b58",
+    "slip44": "0x80001b58",
+    "shortSlip44": "0x1b58",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://zetachain-evm.blockpi.network:443/v1/rpc/public",
+    "explorer": "https://explorer.zetachain.com",
+    "nativeCurrency": {
+      "name": "ZETA",
+      "symbol": "ZETA",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0xd97b1de3619ed2c6beb3860147e30ca8a7dc9891",
+        "tokenIndex": 254
+      },
+      {
+        "name": "BTC",
+        "symbol": "BTC",
+        "decimals": 8,
+        "addr": "0x13A0c5930C028511Dc02665E7285134B6d11A5f4",
+        "tokenIndex": 242
+      }
+    ]
+  },
+  {
+    "id": "merlin",
+    "name": "Merlin",
+    "alias": "MERLIN",
+    "chainId": "0x960",
+    "slip44": "0x80006868",
+    "shortSlip44": "0x6868",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.merlinchain.io",
+    "explorer": "https://scan.merlinchain.io",
+    "nativeCurrency": {
+      "name": "BTC",
+      "symbol": "BTC",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "BTC",
+        "symbol": "BTC",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 243
+      }
+    ]
   }
 ]
