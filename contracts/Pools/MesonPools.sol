@@ -246,7 +246,9 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     if (coreAmount > 0) {
       _transferCoreToken(recipient, coreAmount);
     }
-    _release(encodedSwap, _outTokenIndexFrom(encodedSwap), initiator, recipient, releaseAmount);
+    if (releaseAmount > 0) {
+      _release(encodedSwap, _outTokenIndexFrom(encodedSwap), initiator, recipient, releaseAmount);
+    }
 
     emit SwapReleased(encodedSwap);
   }
@@ -300,7 +302,9 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       _balanceOfPoolToken[_poolTokenIndexFrom(indexOfToken[address(1)], poolIndex)] -= coreAmount;
       _transferCoreToken(recipient, coreAmount);
     }
-    _release(encodedSwap, _outTokenIndexFrom(encodedSwap), initiator, recipient, releaseAmount);
+    if (releaseAmount > 0) {
+      _release(encodedSwap, _outTokenIndexFrom(encodedSwap), initiator, recipient, releaseAmount);
+    }
 
     emit SwapReleased(encodedSwap);
   }
