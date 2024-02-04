@@ -1612,7 +1612,7 @@
     "id": "merlin",
     "name": "Merlin",
     "alias": "MERLIN",
-    "chainId": "0x960",
+    "chainId": "0x1068",
     "slip44": "0x80006868",
     "shortSlip44": "0x6868",
     "extensions": [
