@@ -125,14 +125,15 @@ export class Swap implements SwapData {
         return `${saltHeader}${saltData.substring(2)}${this._randomHex(18 - saltData.length)}`
       }
       if ((parseInt(saltHeader[3], 16) & 4) === 4) {
+        const len = this.outChain === '0x6868' ? 4 : 5 // adhoc
         const saltData1 = BigNumber.from((coreTokenPrice || 0) * this._pFactor)
-          .toHexString().substring(2).padStart(5, '0')
-        if (saltData1.length > 5) {
+          .toHexString().substring(2).replace(/^0/, '').padStart(len, '0')
+        if (saltData1.length > len) {
           throw new Error('Invalid coreTokenPrice; overflow')
         }
         const saltData2 = BigNumber.from(amountForCoreToken || 0).div(1e5)
-          .toHexString().substring(2).padStart(3, '0')
-        if (saltData2.length > 3) {
+          .toHexString().substring(2).replace(/^0/, '').padStart(8 - len, '0')
+        if (saltData2.length > (8 - len)) {
           throw new Error('Invalid amountForCoreToken; overflow')
         }
         return `${saltHeader}${saltData1}${saltData2}${this._randomHex(8)}`
@@ -214,9 +215,13 @@ export class Swap implements SwapData {
   static minServiceFee(tokenIndex: number): number {
     if (tokenIndex >= 252) {
       return 500 // 0.0005 ETH
+    } else if (tokenIndex >= 244) {
+      return 5000 // 0.005 BNB or SOL
+    } else if (tokenIndex >= 240) {
+      return 50 // 0.00005 BTC
     } else if (tokenIndex >= 191) {
-      return 5000 // 0.005 BNB or other
-    } else {
+      return 5000 // 0.005 other
+    } {
       return 500_000 // $0.5
     }
   }
@@ -233,7 +238,8 @@ export class Swap implements SwapData {
     if (!this.swapForCoreToken) {
       return BigNumber.from(0)
     }
-    return BigNumber.from(parseInt(this.salt.slice(11, 14), 16)).mul(1e5)
+    const pos = this.outChain === '0x6868' ? 10 : 11 // adhoc
+    return BigNumber.from(parseInt(this.salt.slice(pos, 14), 16)).mul(1e5)
   }
 
   get poolIndexToShare(): number {
@@ -262,7 +268,8 @@ export class Swap implements SwapData {
     if (!this.swapForCoreToken) {
       return
     }
-    return parseInt(this.salt.slice(6, 11), 16) / this._pFactor
+    const pos = this.outChain === '0x6868' ? 10 : 11 // adhoc
+    return parseInt(this.salt.slice(6, pos), 16) / this._pFactor
   }
 
   get coreTokenAmount(): BigNumber {
@@ -275,6 +282,8 @@ export class Swap implements SwapData {
   get _pFactor() : number {
     if (this.outChain === '0x56ce') {
       return 1000
+    } else if (this.outChain === '0x6868') {
+      return 1
     } else {
       return 10
     }

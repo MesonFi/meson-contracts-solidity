@@ -1628,7 +1628,16 @@
       "decimals": 18
     },
     "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "coreTokenPriceFactor": 1,
     "tokens": [
+      {
+        "name": "BTC",
+        "symbol": "BTC",
+        "decimals": 6,
+        "addr": "0x0",
+        "tokenIndex": 15,
+        "fake": true
+      },
       {
         "name": "BTC",
         "symbol": "BTC",
