@@ -1617,7 +1617,8 @@
     "shortSlip44": "0x6868",
     "extensions": [
       "metamask",
-      "walletconnect"
+      "walletconnect",
+      "btc_aa_particle"
     ],
     "addressFormat": "ethers",
     "url": "https://rpc.merlinchain.io",
