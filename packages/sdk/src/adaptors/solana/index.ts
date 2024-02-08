@@ -737,6 +737,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                     stores.supportedTokens,
                     _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, signerPubkey.toBuffer()]),
                     _getStoreBalanceOfPool(poolIndex, swap.outToken),
+                    _getStoreBalanceOfPool(poolIndex, 247),
                     _getStoreBalanceOfPool(0, swap.outToken),
                     _getStore([STORE_PREFIX.LOCKED_SWAP, Buffer.from(swapId.substring(2), 'hex')]),
                     { pubkey: signerPubkey, isSigner: true, isWritable: false },
