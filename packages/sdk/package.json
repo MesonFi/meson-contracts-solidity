@@ -19,7 +19,7 @@
     "prepare": "yarn build"
   },
   "dependencies": {
-    "@mesonfi/contract-abis": "^1.13.0",
+    "@mesonfi/contract-abis": "^1.16.0",
     "@mesonfi/contract-types": "^1.13.0",
     "@mysten/sui.js": "0.33.0",
     "@solana/spl-token": "0.3.8",
