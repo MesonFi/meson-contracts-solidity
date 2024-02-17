@@ -712,6 +712,7 @@
       "decimals": 18
     },
     "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "coreTokenPriceFactor": 1,
     "tokens": [
       {
         "name": "USDC",
@@ -757,6 +758,7 @@
       "decimals": 18
     },
     "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "coreTokenPriceFactor": 1,
     "tokens": [
       {
         "name": "USDC",
