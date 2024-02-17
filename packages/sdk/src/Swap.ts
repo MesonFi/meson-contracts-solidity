@@ -125,7 +125,7 @@ export class Swap implements SwapData {
         return `${saltHeader}${saltData.substring(2)}${this._randomHex(18 - saltData.length)}`
       }
       if ((parseInt(saltHeader[3], 16) & 4) === 4) {
-        const len = this.outChain === '0x6868' ? 4 : 5 // adhoc
+        const len = this._splitPos - 6
         const saltData1 = BigNumber.from((coreTokenPrice || 0) * this._pFactor)
           .toHexString().substring(2).replace(/^0/, '').padStart(len, '0')
         if (saltData1.length > len) {
@@ -238,8 +238,11 @@ export class Swap implements SwapData {
     if (!this.swapForCoreToken) {
       return BigNumber.from(0)
     }
-    const pos = this.outChain === '0x6868' ? 10 : 11 // adhoc
-    return BigNumber.from(parseInt(this.salt.slice(pos, 14), 16)).mul(1e5)
+    return BigNumber.from(parseInt(this.salt.slice(this._splitPos, 14), 16)).mul(1e5)
+  }
+
+  get _splitPos() : number {
+    return ['0x6868', '0x03ea'].includes(this.outChain) ? 10 : 11 // adhoc, merlin & b2
   }
 
   get poolIndexToShare(): number {
@@ -268,8 +271,7 @@ export class Swap implements SwapData {
     if (!this.swapForCoreToken) {
       return
     }
-    const pos = this.outChain === '0x6868' ? 10 : 11 // adhoc
-    return parseInt(this.salt.slice(6, pos), 16) / this._pFactor
+    return parseInt(this.salt.slice(6, this._splitPos), 16) / this._pFactor
   }
 
   get coreTokenAmount(): BigNumber {
@@ -282,7 +284,7 @@ export class Swap implements SwapData {
   get _pFactor() : number {
     if (this.outChain === '0x56ce') {
       return 1000
-    } else if (this.outChain === '0x6868') {
+    } else if (['0x6868', '0x03ea'].includes(this.outChain)) { // adhoc, merlin & b2
       return 1
     } else {
       return 10

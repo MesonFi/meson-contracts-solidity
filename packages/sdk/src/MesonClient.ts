@@ -510,11 +510,18 @@ export class MesonClient {
     )
   }
 
-  async postSwapFromInitiator(encoded: string, initiator: string, poolIndex: number, overrides?: CallOverrides) {
+  async postSwapFromInitiator(encoded: string, initiator: string, poolIndex: number, overrides?: CallOverrides, populate?: boolean) {
     const opt: CallOverrides = { ...overrides }
     const swap = Swap.decode(encoded)
     if (this.isCoreToken(swap.inToken)) {
       opt.value = BigNumber.from(swap.amount).mul(10 ** (this.coreDecimals - 6))
+    }
+    if (populate) {
+      return this.#mesonInstance.populateTransaction?.postSwapFromInitiator(
+        encoded,
+        utils.solidityPack(['address', 'uint40'], [initiator, poolIndex]),
+        opt
+      )
     }
     return this.#mesonInstance.postSwapFromInitiator(
       encoded,
@@ -558,14 +565,14 @@ export class MesonClient {
     return this.#mesonInstance.release(encoded, sig.r, sig.yParityAndS, initiator, recipient, ...overrides)
   }
 
-  async executeSwap(signedRelease: SignedSwapReleaseData, depositToPool: boolean = false, ...overrides: [CallOverrides?]) {
+  async executeSwap(signedRelease: SignedSwapReleaseData, depositToPool: boolean = false, overrides?: CallOverrides) {
     const { encoded } = signedRelease
     const recipient = clipRecipient(signedRelease.recipient, encoded)
     const sig = utils.splitSignature(signedRelease.signature)
-    return this.#mesonInstance.executeSwap(encoded, sig.r, sig.yParityAndS, recipient, depositToPool, ...overrides)
+    return this.#mesonInstance.executeSwap(encoded, sig.r, sig.yParityAndS, recipient, depositToPool, overrides)
   }
 
-  async directExecuteSwap(signedRelease: SignedSwapReleaseData, overrides?: CallOverrides) {
+  async directExecuteSwap(signedRelease: SignedSwapReleaseData, overrides?: CallOverrides, populate?: boolean) {
     const { encoded, initiator } = signedRelease
     const recipient = clipRecipient(signedRelease.recipient, encoded)
     const sig = utils.splitSignature(signedRelease.signature)
@@ -573,6 +580,9 @@ export class MesonClient {
     const swap = Swap.decode(encoded)
     if (this.isCoreToken(swap.inToken)) {
       opt.value = BigNumber.from(swap.amount).mul(10 ** (this.coreDecimals - 6))
+    }
+    if (populate) {
+      return this.#mesonInstance.populateTransaction?.directExecuteSwap(encoded, sig.r, sig.yParityAndS, initiator, recipient, opt)
     }
     return this.#mesonInstance.directExecuteSwap(encoded, sig.r, sig.yParityAndS, initiator, recipient, opt)
   }
