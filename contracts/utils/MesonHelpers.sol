@@ -85,7 +85,8 @@ contract MesonHelpers is MesonConfig, Context {
 
   function _amountForCoreTokenFrom(uint256 encodedSwap) internal pure returns (uint256) {
     if (_swapForCoreToken(encodedSwap)) {
-      return ((encodedSwap >> 160) & (SHORT_COIN_TYPE == 0x6868 ? 0x0000FFFF : 0x00000FFF)) * 1e5;
+      uint256 mask = (SHORT_COIN_TYPE == 0x6868 || SHORT_COIN_TYPE == 0x03ea) ? 0x0000FFFF : 0x00000FFF;
+      return ((encodedSwap >> 160) & mask) * 1e5;
     }
     return 0;
   }
@@ -93,7 +94,7 @@ contract MesonHelpers is MesonConfig, Context {
   function _coreTokenAmount(uint256 encodedSwap) internal pure returns (uint256) {
     uint256 amountForCore = _amountForCoreTokenFrom(encodedSwap);
     if (amountForCore > 0) {
-      if (SHORT_COIN_TYPE == 0x6868) {
+      if (SHORT_COIN_TYPE == 0x6868 || SHORT_COIN_TYPE == 0x03ea) {
         return amountForCore * CORE_TOKEN_PRICE_FACTOR / ((encodedSwap >> 176) & 0xFFFF);
       } else {
         return amountForCore * CORE_TOKEN_PRICE_FACTOR / ((encodedSwap >> 172) & 0xFFFFF);
