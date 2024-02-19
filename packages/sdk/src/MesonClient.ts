@@ -565,11 +565,11 @@ export class MesonClient {
     return this.#mesonInstance.release(encoded, sig.r, sig.yParityAndS, initiator, recipient, ...overrides)
   }
 
-  async executeSwap(signedRelease: SignedSwapReleaseData, depositToPool: boolean = false, overrides?: CallOverrides) {
+  async executeSwap(signedRelease: SignedSwapReleaseData, depositToPool: boolean = false, ...overrides: [CallOverrides?]) {
     const { encoded } = signedRelease
     const recipient = clipRecipient(signedRelease.recipient, encoded)
     const sig = utils.splitSignature(signedRelease.signature)
-    return this.#mesonInstance.executeSwap(encoded, sig.r, sig.yParityAndS, recipient, depositToPool, overrides)
+    return this.#mesonInstance.executeSwap(encoded, sig.r, sig.yParityAndS, recipient, depositToPool, ...overrides)
   }
 
   async directExecuteSwap(signedRelease: SignedSwapReleaseData, overrides?: CallOverrides, populate?: boolean) {
