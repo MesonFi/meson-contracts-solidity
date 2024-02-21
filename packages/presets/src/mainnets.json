@@ -1618,6 +1618,7 @@
     "extensions": [
       "metamask",
       "walletconnect",
+      "particle",
       "btc_aa_particle"
     ],
     "addressFormat": "ethers",
