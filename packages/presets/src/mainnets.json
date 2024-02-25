@@ -1635,14 +1635,6 @@
       {
         "name": "BTC",
         "symbol": "BTC",
-        "decimals": 6,
-        "addr": "0x0",
-        "tokenIndex": 15,
-        "fake": true
-      },
-      {
-        "name": "BTC",
-        "symbol": "BTC",
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 243

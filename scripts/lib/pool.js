@@ -8,7 +8,7 @@ function getTokenIndex(network, symbol) {
     return 255
   }
 
-  const token = network.tokens.find(t => !t.disabled && !t.fake && t.symbol.toLowerCase().includes(symbol.toLowerCase()))
+  const token = network.tokens.find(t => !t.disabled && t.symbol.toLowerCase().includes(symbol.toLowerCase()))
   return token.tokenIndex
 }
 
