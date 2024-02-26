@@ -98,6 +98,14 @@
         "disabled": true
       },
       {
+        "name": "iZUMi Bond USD",
+        "symbol": "iUSD",
+        "decimals": 18,
+        "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
+        "tokenIndex": 65,
+        "partner": "iusd"
+      },
+      {
         "name": "BNB",
         "symbol": "BNB",
         "decimals": 18,
@@ -200,6 +208,14 @@
         "decimals": 6,
         "addr": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
         "tokenIndex": 9
+      },
+      {
+        "name": "iZUMi Bond USD",
+        "symbol": "iUSD",
+        "decimals": 18,
+        "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
+        "tokenIndex": 65,
+        "partner": "iusd"
       },
       {
         "name": "ETH",
@@ -1638,6 +1654,14 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 243
+      },
+      {
+        "name": "iZUMi Bond USD",
+        "symbol": "iUSD",
+        "decimals": 18,
+        "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
+        "tokenIndex": 65,
+        "partner": "iusd"
       }
     ]
   }

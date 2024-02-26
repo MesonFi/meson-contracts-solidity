@@ -110,6 +110,8 @@ export class MesonClient {
         return 'pod'
       }
       return 'stablecoins'
+    } else if (tokenIndex <= 128) {
+      return (Math.floor(tokenIndex / 2) - 31).toString()
     } else {
       return 'unknown'
     }

@@ -27,7 +27,8 @@ contract MesonTokens {
   ///     49-64:   stablecoins as core (decimals 18)
   ///       49:      USDC
   ///       52:      XDAI
-  ///     65-128:  (Unspecified)
+  ///     65-128:  3rd party tokens
+  ///       65:      iUSD (iZUMi Bond USD)
   ///     129-190: (Unspecified)
   ///     191:     No-swap core
   ///     192-239: (Unspecified)

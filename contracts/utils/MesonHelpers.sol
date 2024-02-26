@@ -163,11 +163,14 @@ contract MesonHelpers is MesonConfig, Context {
 
   function _tokenType(uint8 tokenIndex) internal pure returns (uint8) {
     if (tokenIndex >= 192) {
-      // Non stablecoins
+      // Non stablecoins [192, 255] -> [48, 63]
       return tokenIndex / 4;
-    } else if (tokenIndex < 65) {
-      // Stablecoins
+    } else if (tokenIndex <= 64) {
+      // Stablecoins [1, 64] -> 0
       return 0;
+    } else if (tokenIndex <= 128) {
+      // 3rd party tokens [65, 128] -> [1, 33]
+      return tokenIndex / 2 - 31;
     }
     revert("Token index not allowed for swapping");
   }
