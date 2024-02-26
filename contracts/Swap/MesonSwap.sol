@@ -2,7 +2,6 @@
 pragma solidity 0.8.16;
 
 import "./IMesonSwapEvents.sol";
-import "../interfaces/IAuthorizer.sol";
 import "../utils/MesonStates.sol";
 
 /// @title MesonSwap
@@ -98,7 +97,6 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   {
     address initiator = _initiatorFromPosted(postingValue);
     require(_msgSender() == contractAddress, "Transaction should be sent from contractAddress");
-    require(IAuthorizer(contractAddress).isAuthorized(initiator), "Not authorized by contract");
     _postedSwaps[encodedSwap] = postingValue;
 
     uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
