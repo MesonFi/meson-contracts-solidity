@@ -1625,6 +1625,57 @@
     ]
   },
   {
+    "id": "mode",
+    "name": "Mode",
+    "alias": "MODE",
+    "chainId": "0x868b",
+    "slip44": "0x8000868b",
+    "shortSlip44": "0x868b",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://mainnet.mode.network",
+    "explorer": "https://explorer.mode.network",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0xd988097fb8612cc24eeC14542bC03424c656005f",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xf0F161fDA2712DB8b566946122a5af183995e2eD",
+        "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      },
+      {
+        "name": "Wrapped BTC",
+        "symbol": "WBTC",
+        "decimals": 8,
+        "addr": "0xcDd475325D6F564d27247D1DddBb0DAc6fA0a5CF",
+        "tokenIndex": 242
+      }
+    ]
+  },
+  {
     "id": "merlin",
     "name": "Merlin",
     "alias": "MERLIN",

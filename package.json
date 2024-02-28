@@ -33,6 +33,7 @@
     "testnet:x1": "hardhat deploy --testnet x1 --upgradable true",
     "testnet:viction": "hardhat deploy --testnet viction --upgradable true",
     "testnet:zkfair": "hardhat deploy --testnet zkfair --upgradable true",
+    "testnet:goshen": "hardhat deploy --testnet goshen --upgradable true",
     "testnet:b2": "hardhat deploy --testnet b2 --upgradable true",
     "testnet:merlin": "hardhat deploy --testnet merlin --upgradable true",
     "deploy:eth": "hardhat deploy --mainnet eth --upgradable true",
@@ -72,7 +73,8 @@
     "deploy:core": "hardhat deploy --mainnet core --upgradable true",
     "deploy:ancient8": "hardhat deploy --mainnet ancient8 --upgradable true",
     "deploy:zeta": "hardhat deploy --mainnet zeta --upgradable true",
-    "deploy:merlin": "hardhat deploy --mainnet merlin --upgradable true"
+    "deploy:merlin": "hardhat deploy --mainnet merlin --upgradable true",
+    "deploy:mode": "hardhat deploy --mainnet mode --upgradable true"
   },
   "devDependencies": {
     "@matterlabs/hardhat-zksync-deploy": "^0.6.2",

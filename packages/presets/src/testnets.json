@@ -692,6 +692,36 @@
     ]
   },
   {
+    "id": "goshen-testnet",
+    "name": "Goshen Testnet",
+    "alias": "GOSHEN",
+    "chainId": "0x550c",
+    "slip44": "0x8000550c",
+    "shortSlip44": "0x550c",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://testnet-alpha.goshen.network/rpc",
+    "explorer": "https://explorer-testnet.goshen.network",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
     "id": "b2-testnet",
     "name": "B2 Testnet",
     "alias": "B2",
@@ -703,7 +733,7 @@
       "walletconnect",
       "btc_aa_particle"
     ],
-    "addressFormat": "ethers:bitcoin",
+    "addressFormat": "ethers",
     "url": "https://haven-rpc.bsquared.network",
     "explorer": "https://haven-explorer.bsquared.network",
     "nativeCurrency": {
