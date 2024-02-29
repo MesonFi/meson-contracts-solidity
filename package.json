@@ -73,8 +73,9 @@
     "deploy:core": "hardhat deploy --mainnet core --upgradable true",
     "deploy:ancient8": "hardhat deploy --mainnet ancient8 --upgradable true",
     "deploy:zeta": "hardhat deploy --mainnet zeta --upgradable true",
-    "deploy:merlin": "hardhat deploy --mainnet merlin --upgradable true",
-    "deploy:mode": "hardhat deploy --mainnet mode --upgradable true"
+    "deploy:mode": "hardhat deploy --mainnet mode --upgradable true",
+    "deploy:blast": "hardhat deploy --mainnet blast --upgradable true",
+    "deploy:merlin": "hardhat deploy --mainnet merlin --upgradable true"
   },
   "devDependencies": {
     "@matterlabs/hardhat-zksync-deploy": "^0.6.2",

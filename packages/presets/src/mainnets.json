@@ -1676,6 +1676,51 @@
     ]
   },
   {
+    "id": "blast",
+    "name": "Blast",
+    "alias": "BLAST",
+    "chainId": "0x13e31",
+    "slip44": "0x80001331",
+    "shortSlip44": "0x1331",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://blast.blockpi.network/v1/rpc/public",
+    "explorer": "https://blastscan.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USDB",
+        "symbol": "USDB",
+        "decimals": 18,
+        "addr": "0x4300000000000000000000000000000000000003",
+        "tokenIndex": 39
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      },
+      {
+        "name": "iZUMi Bond USD",
+        "symbol": "iUSD",
+        "decimals": 18,
+        "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
+        "tokenIndex": 65,
+        "partner": "iusd"
+      }
+    ]
+  },
+  {
     "id": "merlin",
     "name": "Merlin",
     "alias": "MERLIN",
