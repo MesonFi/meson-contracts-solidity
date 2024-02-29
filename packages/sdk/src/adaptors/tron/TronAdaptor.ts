@@ -89,7 +89,7 @@ export default class TronAdaptor {
             info = await this.client.trx.getUnconfirmedTransactionInfo(hash)
           }
         } catch {}
-        if (Object.keys(info).length) {
+        if (Object.keys(info || {}).length) {
           clearInterval(h)
           resolve(_wrapTronReceipt(info))
         }
