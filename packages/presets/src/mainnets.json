@@ -544,6 +544,14 @@
         "decimals": 6,
         "addr": "0xf417F5A458eC102B90352F697D6e2Ac3A3d2851f",
         "tokenIndex": 2
+      },
+      {
+        "name": "Blast ETH",
+        "symbol": "BETH",
+        "decimals": 18,
+        "addr": "0xaff124456115674d04B1caAD15b627Da95dBd85C",
+        "tokenIndex": 254,
+        "partner": "iusd"
       }
     ]
   },
@@ -1708,7 +1716,8 @@
         "symbol": "ETH",
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
+        "tokenIndex": 255,
+        "partner": "^iusd"
       },
       {
         "name": "iZUMi Bond USD",
@@ -1757,7 +1766,8 @@
         "decimals": 18,
         "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
         "tokenIndex": 65,
-        "partner": "iusd"
+        "partner": "iusd",
+        "disabled": true
       }
     ]
   }
