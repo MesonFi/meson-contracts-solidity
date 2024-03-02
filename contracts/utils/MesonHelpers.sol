@@ -34,10 +34,26 @@ contract MesonHelpers is MesonConfig, Context {
     return (encodedSwap >> 208) & 0xFFFFFFFFFF;
   }
 
+  function _amountToLock(uint256 encodedSwap) internal pure returns (uint256) {
+    return _amountFrom(encodedSwap) - _feeForLp(encodedSwap) - _amountForCoreTokenFrom(encodedSwap);
+  }
+
   /// @notice Calculate the service fee from `encodedSwap`
   /// See variable `_postedSwaps` in `MesonSwap.sol` for the defination of `encodedSwap`
   function _serviceFee(uint256 encodedSwap) internal pure returns (uint256) {
-    uint256 minFee = _inTokenIndexFrom(encodedSwap) >= 191 ? SERVICE_FEE_MINIMUM_CORE : SERVICE_FEE_MINIMUM;
+    uint8 tokenIndex = _inTokenIndexFrom(encodedSwap);
+    uint256 minFee;
+    if (tokenIndex >= 252) {
+      minFee = SERVICE_FEE_MINIMUM_ETH;
+    } else if (tokenIndex >= 248) {
+      minFee = SERVICE_FEE_MINIMUM_BNB;
+    } else if (tokenIndex >= 244) {
+      minFee = SERVICE_FEE_MINIMUM_ETH;
+    } else if (tokenIndex >= 240) {
+      minFee = SERVICE_FEE_MINIMUM_BTC;
+    } else {
+      minFee = SERVICE_FEE_MINIMUM;
+    }
     // Default to `serviceFee` = 0.05% * `amount`
     uint256 fee = _amountFrom(encodedSwap) * SERVICE_FEE_RATE / 10000;
     return fee > minFee ? fee : minFee;
@@ -79,14 +95,13 @@ contract MesonHelpers is MesonConfig, Context {
   }
 
   function _swapForCoreToken(uint256 encodedSwap) internal pure returns (bool) {
-    return !_willTransferToContract(encodedSwap) && (_outTokenIndexFrom(encodedSwap) < 191) &&
-      ((encodedSwap & 0x0400000000000000000000000000000000000000000000000000) > 0);
+    return (_outTokenIndexFrom(encodedSwap) < 191) &&
+      ((encodedSwap & 0x8410000000000000000000000000000000000000000000000000) == 0x8410000000000000000000000000000000000000000000000000);
   }
 
   function _amountForCoreTokenFrom(uint256 encodedSwap) internal pure returns (uint256) {
     if (_swapForCoreToken(encodedSwap)) {
-      uint256 mask = (SHORT_COIN_TYPE == 0x6868 || SHORT_COIN_TYPE == 0x03ea) ? 0x0000FFFF : 0x00000FFF;
-      return ((encodedSwap >> 160) & mask) * 1e5;
+      return _decompressFixedPrecision((encodedSwap >> 160) & 0xFFFF) * 1e3;
     }
     return 0;
   }
@@ -94,17 +109,9 @@ contract MesonHelpers is MesonConfig, Context {
   function _coreTokenAmount(uint256 encodedSwap) internal pure returns (uint256) {
     uint256 amountForCore = _amountForCoreTokenFrom(encodedSwap);
     if (amountForCore > 0) {
-      if (SHORT_COIN_TYPE == 0x6868 || SHORT_COIN_TYPE == 0x03ea) {
-        return amountForCore * CORE_TOKEN_PRICE_FACTOR / ((encodedSwap >> 176) & 0xFFFF);
-      } else {
-        return amountForCore * CORE_TOKEN_PRICE_FACTOR / ((encodedSwap >> 172) & 0xFFFFF);
-      }
+      return amountForCore * 1e4 / _decompressFixedPrecision((encodedSwap >> 176) & 0xFFFF);
     }
     return 0;
-  }
-
-  function _amountToLock(uint256 encodedSwap) internal pure returns (uint256) {
-    return _amountFrom(encodedSwap) - _feeForLp(encodedSwap) - _amountForCoreTokenFrom(encodedSwap);
   }
 
   function _shareWithPartner(uint256 encodedSwap) internal pure returns (bool) {
@@ -114,13 +121,16 @@ contract MesonHelpers is MesonConfig, Context {
 
   function _amountToShare(uint256 encodedSwap) internal pure returns (uint256) {
     if (_shareWithPartner(encodedSwap)) {
-      uint256 d = (encodedSwap >> 160) & 0xFFFF;
-      if (d <= 1000) {
-        return d;
-      }
-      return ((d - 1000) % 9000 + 1000) * 10 ** ((d - 1000) / 9000);
+      return _decompressFixedPrecision((encodedSwap >> 160) & 0xFFFF);
     }
     return 0;
+  }
+
+  function _decompressFixedPrecision(uint256 d) internal pure returns (uint256) {
+    if (d <= 1000) {
+      return d;
+    }
+    return ((d - 1000) % 9000 + 1000) * 10 ** ((d - 1000) / 9000);
   }
 
   function _poolIndexToShare(uint256 encodedSwap) internal pure returns (uint40) {

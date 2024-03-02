@@ -73,7 +73,6 @@
       "decimals": 18
     },
     "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "minCoreFee": "5000; // min 0.005 BNB ~ $1",
     "tokens": [
       {
         "name": "USD Coin",
@@ -710,7 +709,6 @@
       "decimals": 18
     },
     "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "minCoreFee": "5000; // min 0.005 BNB ~ $1",
     "tokens": [
       {
         "name": "Tether USD",

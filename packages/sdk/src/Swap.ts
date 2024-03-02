@@ -101,7 +101,11 @@ export class Swap implements SwapData {
     this.inToken = data.inToken
     this.outChain = data.outChain
     this.outToken = data.outToken
+    this.salt = data.saltHeader || '0x0000'
     this.salt = this._makeFullSalt(data)
+    if (data.amountForCoreToken === 'all') {
+      this.amount = this.amountForCoreToken.add(this.totalFee)
+    }
   }
 
   private _makeFullSalt(data: SwapData): string {
@@ -109,7 +113,6 @@ export class Swap implements SwapData {
       salt,
       saltHeader,
       saltData = '0x',
-      amountForCoreToken,
       coreTokenPrice,
       poolIndexToShare,
       amountToShare,
@@ -124,28 +127,40 @@ export class Swap implements SwapData {
       if (saltData !== '0x') {
         return `${saltHeader}${saltData.substring(2)}${this._randomHex(18 - saltData.length)}`
       }
-      if ((parseInt(saltHeader[3], 16) & 4) === 4) {
-        const len = this._splitPos - 6
-        const saltData1 = BigNumber.from((coreTokenPrice || 0) * this._pFactor)
-          .toHexString().substring(2).replace(/^0/, '').padStart(len, '0')
-        if (saltData1.length > len) {
-          throw new Error('Invalid coreTokenPrice; overflow')
+      if (this.swapForCoreToken) {
+        const amountForCoreToken = data.amountForCoreToken === 'all'
+          ? this.amount.sub(this.totalFee)
+          : data.amountForCoreToken
+        if (this._newFormat) {
+          const saltData1 = this._compressFixedPrecision((coreTokenPrice || 0) * 1e4)
+          if (saltData1.length > 4) {
+            throw new Error('Invalid coreTokenPrice; overflow')
+          }
+          const saltData2 = this._compressFixedPrecision(BigNumber.from(amountForCoreToken || 0).div(1e3))
+          if (saltData2.length > 4) {
+            throw new Error('Invalid amountForCoreToken; overflow')
+          }
+          return `${saltHeader}${saltData1}${saltData2}${this._randomHex(8)}`
+        } else {
+          const len = this._splitPos - 6
+          const saltData1 = BigNumber.from((coreTokenPrice || 0) * this._pFactor)
+            .toHexString().substring(2).replace(/^0/, '').padStart(len, '0')
+          if (saltData1.length > len) {
+            throw new Error('Invalid coreTokenPrice; overflow')
+          }
+          const saltData2 = BigNumber.from(amountForCoreToken || 0).div(1e5)
+            .toHexString().substring(2).replace(/^0/, '').padStart(8 - len, '0')
+          if (saltData2.length > (8 - len)) {
+            throw new Error('Invalid amountForCoreToken; overflow')
+          }
+          return `${saltHeader}${saltData1}${saltData2}${this._randomHex(8)}`
         }
-        const saltData2 = BigNumber.from(amountForCoreToken || 0).div(1e5)
-          .toHexString().substring(2).replace(/^0/, '').padStart(8 - len, '0')
-        if (saltData2.length > (8 - len)) {
-          throw new Error('Invalid amountForCoreToken; overflow')
-        }
-        return `${saltHeader}${saltData1}${saltData2}${this._randomHex(8)}`
-      } else if ((parseInt(saltHeader[3], 16) & 2) === 2) {
+      } else if (this.shareWithPartner) {
         if (!Number.isInteger(poolIndexToShare) || poolIndexToShare < 65536 || poolIndexToShare > 65536 * 2 - 1) {
           throw new Error('Invalid poolIndexToShare')
         }
         const saltData1 = (poolIndexToShare - 65536).toString(16).padStart(4, '0')
-        const num = BigNumber.from(amountToShare).toNumber()
-        const pow = Math.ceil(Math.log10(num))
-        const d = pow <= 3 ? num : (pow - 4) * 9000 + Math.round(num / 10 ** (pow - 4))
-        const saltData2 = BigNumber.from(d).toHexString().substring(2).padStart(4, '0')
+        const saltData2 = this._compressFixedPrecision(amountToShare)
         if (saltData2.length > 4) {
           throw new Error('Invalid amountToShare; overflow')
         }
@@ -230,46 +245,39 @@ export class Swap implements SwapData {
     return this.serviceFee.add(this.fee)
   }
 
+  get receive(): BigNumber {
+    return this.amount.sub(this.totalFee).sub(this.amountForCoreToken).sub(this.amountToShare)
+  }
+
   get swapForCoreToken(): boolean {
     return !this.willTransferToContract && ((parseInt(this.salt[3], 16) & 4) === 4)
+  }
+
+  get _newFormat(): boolean {
+    return (parseInt(this.salt[4], 16) & 1) === 1
+  }
+
+  get _splitPos() : number {
+    if (this._newFormat) {
+      return 10
+    }
+    return ['0x6868', '0x03ea'].includes(this.outChain) ? 10 : 11 // adhoc, merlin & b2
   }
 
   get amountForCoreToken(): BigNumber {
     if (!this.swapForCoreToken) {
       return BigNumber.from(0)
+    } else if (this._newFormat) {
+      return BigNumber.from(this._decompressFixedPrecision('0x' + this.salt.slice(10, 14))).mul(1e3)
     }
     return BigNumber.from(parseInt(this.salt.slice(this._splitPos, 14), 16)).mul(1e5)
-  }
-
-  get _splitPos() : number {
-    return ['0x6868', '0x03ea'].includes(this.outChain) ? 10 : 11 // adhoc, merlin & b2
-  }
-
-  get poolIndexToShare(): number {
-    if (this.willTransferToContract || ((parseInt(this.salt[3], 16) & 6) !== 2)) {
-      return 0
-    }
-    return parseInt(this.salt.slice(6, 10), 16) + 65536
-  }
-
-  get amountToShare(): BigNumber {
-    if (this.willTransferToContract || ((parseInt(this.salt[3], 16) & 6) !== 2)) {
-      return BigNumber.from(0)
-    }
-    const d = BigNumber.from(parseInt(this.salt.slice(10, 14), 16))
-    if (d.lte(1000)) {
-      return d
-    }
-    return d.sub(1000).mod(9000).add(1000).mul(BigNumber.from(10).pow(d.sub(1000).div(9000)))
-  }
-
-  get receive(): BigNumber {
-    return this.amount.sub(this.totalFee).sub(this.amountForCoreToken).sub(this.amountToShare)
   }
 
   get coreTokenPrice(): number {
     if (!this.swapForCoreToken) {
       return
+    } else if (this._newFormat) {
+      return Number(this._decompressFixedPrecision('0x' + this.salt.slice(6, 10))) / 1e4
     }
     return parseInt(this.salt.slice(6, this._splitPos), 16) / this._pFactor
   }
@@ -277,6 +285,8 @@ export class Swap implements SwapData {
   get coreTokenAmount(): BigNumber {
     if (this.amountForCoreToken.eq(0)) {
       return BigNumber.from(0)
+    } else if (this._newFormat) {
+      return this.amountForCoreToken.mul(1e4).div(this.coreTokenPrice * 1e4)
     }
     return this.amountForCoreToken.mul(this._pFactor).div(this.coreTokenPrice * this._pFactor)
   }
@@ -289,6 +299,41 @@ export class Swap implements SwapData {
     } else {
       return 10
     }
+  }
+
+  get shareWithPartner(): boolean {
+    return !this.willTransferToContract && ((parseInt(this.salt[3], 16) & 6) === 2)
+  }
+
+  get poolIndexToShare(): number {
+    return this.shareWithPartner ? (parseInt(this.salt.slice(6, 10), 16) + 65536) : 0
+  }
+
+  get amountToShare(): BigNumber {
+    if (!this.poolIndexToShare) {
+      return BigNumber.from(0)
+    }
+    return BigNumber.from(this._decompressFixedPrecision('0x' + this.salt.slice(10, 14)))
+  }
+
+  _compressFixedPrecision(value: BigNumberish, precision = 3): string {
+    const mod = 9n * 10n ** BigInt(precision)
+    const d = BigNumber.from(value).toBigInt()
+    const pow = Math.ceil(Math.log10(Number(d)))
+
+    const level = BigInt(pow - precision - 1)
+    const compressed = pow <= precision ? d : level * mod + d / (10n ** level)
+    return compressed.toString(16).padStart(4, '0')
+  }
+
+  _decompressFixedPrecision(hex: string, precision = 3): BigInt {
+    const factor = 10n ** BigInt(precision)
+    const mod = 9n * factor
+    const d = BigInt(hex)
+    if (d < factor) {
+      return d
+    }
+    return ((d - factor) % mod + factor) * (10n ** ((d - factor) / mod))
   }
 
   get expired(): Boolean {

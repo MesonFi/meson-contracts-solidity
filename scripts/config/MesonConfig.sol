@@ -12,9 +12,9 @@ contract MesonConfig {
   uint256 constant MAX_SWAP_AMOUNT = 1e11; // 100,000.000000 = 100k
   uint256 constant SERVICE_FEE_RATE = 5; // service fee = 5 / 10000 = 0.05%
   uint256 constant SERVICE_FEE_MINIMUM = 500_000; // min $0.5
-  uint256 constant SERVICE_FEE_MINIMUM_CORE = CONFIG_MIN_CORE_FEE
-
-  uint256 constant CORE_TOKEN_PRICE_FACTOR = CONFIG_CORE_TOKEN_PRICE_FACTOR;
+  uint256 constant SERVICE_FEE_MINIMUM_ETH = 500; // min 0.0005 ETH (or SOL)
+  uint256 constant SERVICE_FEE_MINIMUM_BNB = 5000; // min 0.005 BNB
+  uint256 constant SERVICE_FEE_MINIMUM_BTC = 10; // min 0.00001 BTC
 
   uint256 constant MIN_BOND_TIME_PERIOD = 1 hours;
   uint256 constant MAX_BOND_TIME_PERIOD = 2 hours;
