@@ -567,7 +567,7 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                 ],
                 keys: [
                   stores.admin,
-                  _getStore([STORE_PREFIX.POOL_OF_AUTHORIZED_ACCOUNT, signerPubkey.toBuffer()]),
+                  _getStore([STORE_PREFIX.POOL_OWNER, _numToBuffer(toPoolIndex, 8)]),
                   _getStoreBalanceOfPool(0, tokenIndex),
                   _getStoreBalanceOfPool(toPoolIndex, tokenIndex),
                   { pubkey: signerPubkey, isSigner: true, isWritable: false },
