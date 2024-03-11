@@ -9,12 +9,17 @@ import {
   TransactionInstruction as SolTransactionInstruction,
 } from '@solana/web3.js'
 import {
+  getAccount,
   getMint,
   approve,
   transfer,
   getAssociatedTokenAddressSync,
   getOrCreateAssociatedTokenAccount,
+  createAssociatedTokenAccountInstruction,
+  TokenAccountNotFoundError,
+  TokenInvalidAccountOwnerError,
   TOKEN_PROGRAM_ID,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 import memoize from 'lodash/memoize'
 import bs58 from 'bs58'
@@ -208,14 +213,16 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
     }
   }
 
-  type CallArguments = { keys: AccountMeta[], data?: number[] }
+  type CallArguments = { keys: AccountMeta[], data?: number[], extraInstructions?: SolTransactionInstruction[] }
   const call = async (
     instructionId: number,
     getArgs: CallArguments | ((arg0: any) => CallArguments)
   ) => {
     const args = typeof getArgs === 'function' ? getArgs({ stores, SYSTEM_PROGRAM, TOKEN_PROGRAM }) : getArgs
-    const { keys, data = [] } = args
-    const tx = new SolTransaction().add(new SolTransactionInstruction({
+    const { keys, data = [], extraInstructions = [] } = args
+    const tx = new SolTransaction()
+    extraInstructions.forEach(ins => tx.add(ins))
+    tx.add(new SolTransactionInstruction({
       programId,
       keys,
       data: Buffer.from([instructionId, ...data]),
@@ -680,13 +687,23 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                 const [_, r, yParityAndS, initiator, recipient] = args
                 const tokenAddr = await _getTokenAddr(swap.outToken)
                 const swapId = getSwapId(swap.encoded, initiator)
-                const taRecipient = await getOrCreateAssociatedTokenAccount(
-                  adaptor.client,
-                  (<SolanaWallet>adaptor).keypair,
-                  new SolPublicKey(tokenAddr),
-                  new SolPublicKey(recipient),
-                  true,
-                )
+                const taRecipient = _getTokenAccount(tokenAddr, recipient)
+                
+                const extraInstructions = []
+                try {
+                  await getAccount(adaptor.client, taRecipient.pubkey, undefined, TOKEN_PROGRAM_ID)
+                } catch (e) {
+                  if (e instanceof TokenAccountNotFoundError || e instanceof TokenInvalidAccountOwnerError) {
+                    extraInstructions.push(createAssociatedTokenAccountInstruction(
+                      signerPubkey,
+                      taRecipient.pubkey,
+                      new SolPublicKey(recipient),
+                      new SolPublicKey(tokenAddr),
+                      TOKEN_PROGRAM_ID,
+                      ASSOCIATED_TOKEN_PROGRAM_ID
+                    ))
+                  }
+                }
                 return await call(17, {
                   data: [
                     ...utils.arrayify(swap.encoded),
@@ -705,21 +722,32 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                     _getStore([STORE_PREFIX.LOCKED_SWAP, Buffer.from(swapId.substring(2), 'hex')]),
                     { pubkey: signerPubkey, isSigner: true, isWritable: false },
                     { pubkey: new SolPublicKey(recipient), isSigner: false, isWritable: true },
-                    { pubkey: taRecipient.address, isSigner: false, isWritable: true },
+                    _getTokenAccount(tokenAddr, recipient),
                   ],
+                  extraInstructions,
                 })
               } else if (prop === 'directRelease') {
                 const [_, r, yParityAndS, initiator, recipient] = args
                 const tokenAddr = await _getTokenAddr(swap.outToken)
                 const swapId = getSwapId(swap.encoded, initiator)
                 const poolIndex = await _poolOfAuthorizedAddr(signerPubkey.toString())
-                const taRecipient = await getOrCreateAssociatedTokenAccount(
-                  adaptor.client,
-                  (<SolanaWallet>adaptor).keypair,
-                  new SolPublicKey(tokenAddr),
-                  new SolPublicKey(recipient),
-                  true,
-                )
+                const taRecipient = _getTokenAccount(tokenAddr, recipient)
+
+                const extraInstructions = []
+                try {
+                  await getAccount(adaptor.client, taRecipient.pubkey, undefined, TOKEN_PROGRAM_ID)
+                } catch (e) {
+                  if (e instanceof TokenAccountNotFoundError || e instanceof TokenInvalidAccountOwnerError) {
+                    extraInstructions.push(createAssociatedTokenAccountInstruction(
+                      signerPubkey,
+                      taRecipient.pubkey,
+                      new SolPublicKey(recipient),
+                      new SolPublicKey(tokenAddr),
+                      TOKEN_PROGRAM_ID,
+                      ASSOCIATED_TOKEN_PROGRAM_ID
+                    ))
+                  }
+                }
                 return await call(18, {
                   data: [
                     ...utils.arrayify(swap.encoded),
@@ -742,8 +770,9 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                     _getStore([STORE_PREFIX.LOCKED_SWAP, Buffer.from(swapId.substring(2), 'hex')]),
                     { pubkey: signerPubkey, isSigner: true, isWritable: false },
                     { pubkey: new SolPublicKey(recipient), isSigner: false, isWritable: true },
-                    { pubkey: taRecipient.address, isSigner: false, isWritable: true },
+                    taRecipient,
                   ],
+                  extraInstructions,
                 })
               } else if (prop === 'simpleRelease') {
               }
