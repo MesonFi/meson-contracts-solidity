@@ -97,12 +97,20 @@
         "disabled": true
       },
       {
+        "name": "First Digital USD",
+        "symbol": "FDUSD",
+        "decimals": 18,
+        "addr": "0xc5f0f7b66764F6ec8C8Dff7BA683102295E16409",
+        "tokenIndex": 40
+      },
+      {
         "name": "iZUMi Bond USD",
         "symbol": "iUSD",
         "decimals": 18,
         "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
         "tokenIndex": 65,
-        "partner": "iusd"
+        "partner": "iusd",
+        "disabled": true
       },
       {
         "name": "BNB",
@@ -214,7 +222,8 @@
         "decimals": 18,
         "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
         "tokenIndex": 65,
-        "partner": "iusd"
+        "partner": "iusd",
+        "disabled": true
       },
       {
         "name": "ETH",
@@ -543,6 +552,14 @@
         "decimals": 6,
         "addr": "0xf417F5A458eC102B90352F697D6e2Ac3A3d2851f",
         "tokenIndex": 2
+      },
+      {
+        "name": "iZUMi Bond USD",
+        "symbol": "iUSD",
+        "decimals": 18,
+        "addr": "0x078f712f038a95beea94f036cadb49188a90604b",
+        "tokenIndex": 65,
+        "partner": "iusd"
       },
       {
         "name": "Blast ETH",
@@ -1337,7 +1354,6 @@
       "decimals": 18
     },
     "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "coreTokenPriceFactor": 1000,
     "tokens": [
       {
         "name": "USD Coin",
@@ -1728,6 +1744,80 @@
     ]
   },
   {
+    "id": "inevm",
+    "name": "inEVM",
+    "alias": "inevm",
+    "chainId": "0x9dd",
+    "slip44": "0x800009dd",
+    "shortSlip44": "0x09dd",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://mainnet.rpc.inevm.com/http",
+    "explorer": "https://explorer.inevm.com",
+    "nativeCurrency": {
+      "name": "INJ",
+      "symbol": "INJ",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x8358D8291e3bEDb04804975eEa0fe9fe0fAfB147",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x97423A68BAe94b5De52d767a17aBCc54c157c0E5",
+        "tokenIndex": 2
+      },
+      {
+        "name": "INJ",
+        "symbol": "INJ",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 191
+      }
+    ]
+  },
+  {
+    "id": "zklink",
+    "name": "zkLink Nova",
+    "alias": "ZKLINK",
+    "chainId": "0xc5cc4",
+    "slip44": "0x80005cc4",
+    "shortSlip44": "0x5cc4",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.zklink.io",
+    "explorer": "https://explorer.zklink.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x2DcC88Fa6b6950EE28245C3238B8993BE5feeA42",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
     "id": "merlin",
     "name": "Merlin",
     "alias": "MERLIN",
@@ -1742,14 +1832,13 @@
     ],
     "addressFormat": "ethers",
     "url": "https://rpc.merlinchain.io",
-    "explorer": "https://scan.merlinchain.io",
+    "explorer": "https://merlin.l2scan.co",
     "nativeCurrency": {
       "name": "BTC",
       "symbol": "BTC",
       "decimals": 18
     },
     "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "coreTokenPriceFactor": 1,
     "tokens": [
       {
         "name": "BTC",

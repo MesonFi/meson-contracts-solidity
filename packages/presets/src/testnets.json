@@ -722,6 +722,66 @@
     ]
   },
   {
+    "id": "bob-sepolia",
+    "name": "Bob Sepolia",
+    "alias": "BOB",
+    "chainId": "0x6f",
+    "slip44": "0x8000006f",
+    "shortSlip44": "0x006f",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://testnet.rpc.gobob.xyz",
+    "explorer": "https://testnet-explorer.gobob.xyz",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
+    "id": "bitlayer-testnet",
+    "name": "BitLayer Testnet",
+    "alias": "BITLAYER",
+    "chainId": "0x3106a",
+    "slip44": "0x8000106a",
+    "shortSlip44": "0x106a",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://testnet-rpc.bitlayer.org",
+    "explorer": "https://testnet-scan.bitlayer.org",
+    "nativeCurrency": {
+      "name": "BTC",
+      "symbol": "BTC",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "BTC",
+        "symbol": "BTC",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 243
+      }
+    ]
+  },
+  {
     "id": "b2-testnet",
     "name": "B2 Testnet",
     "alias": "B2",

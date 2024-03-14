@@ -24,8 +24,8 @@ const mainnetConnections = Object.fromEntries(
     .filter(item => item.url)
     .map(item => [item.id, {
       url: item.url?.replace('${INFURA_API_KEY}', INFURA_API_KEY),
-      zksync: item.id.startsWith('zksync'),
-      ethNetwork: item.id.startsWith('zksync') && 'eth',
+      zksync: item.id.startsWith('zksync') || item.id.startsWith('zklink'),
+      ethNetwork: 'eth',
       timeout: 0,
       gas: 'auto',
       gasMultiplier: 1.1,
@@ -37,7 +37,7 @@ const testnetConnections = Object.fromEntries(
     .map(item => [item.id, {
       url: item.url?.replace('${INFURA_API_KEY}', INFURA_API_KEY),
       zksync: item.id.startsWith('zksync'),
-      ethNetwork: item.id.startsWith('zksync') && 'goerli',
+      ethNetwork: 'goerli',
       timeout: 0,
     }])
 )

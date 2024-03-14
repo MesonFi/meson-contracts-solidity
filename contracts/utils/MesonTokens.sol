@@ -25,6 +25,7 @@ contract MesonTokens {
   ///       36:      (reserved for DAI)
   ///       37:      cUSD (Celo)
   ///       39:      USDB (Blast)
+  ///       40:      FDUSD
   ///     49-64:   stablecoins as core (decimals 18)
   ///       49:      USDC
   ///       52:      XDAI

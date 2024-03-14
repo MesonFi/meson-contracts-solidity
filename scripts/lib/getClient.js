@@ -22,7 +22,7 @@ exports.getClient = function getClient (network) {
     return new StarkProvider({ nodeUrl: network.url })
   } else if (network.id.startsWith('tron')) {
     return new TronWeb({ fullHost: network.url })
-  } else if (network.id.startsWith('zksync')) {
+  } else if (network.id.startsWith('zksync') || network.id.startsWith('zklink')) {
     return new Provider(network.url)
   } else {
     hre.changeNetwork(network.id)
