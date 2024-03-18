@@ -1465,6 +1465,13 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 49
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x4b21b980d0Dc7D3C0C6175b0A412694F3A1c7c6b",
+        "tokenIndex": 254
       }
     ]
   },

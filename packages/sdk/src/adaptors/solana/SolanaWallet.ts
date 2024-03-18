@@ -4,6 +4,7 @@ import {
   PublicKey as SolPublicKey,
   Connection as SolConnection,
   Transaction as SolTransaction,
+  SystemProgram,
 } from '@solana/web3.js'
 import sol from '@solana/web3.js'
 import nacl from 'tweetnacl'
@@ -36,7 +37,16 @@ export default class SolanaWallet extends SolanaAdaptor {
     return utils.hexlify(signature)
   }
 
-  async sendTransaction(tx: SolTransaction, options?) {
+  async sendTransaction(tx, options?) {
+    if (!(tx instanceof SolTransaction)) {
+      tx = new SolTransaction().add(
+        SystemProgram.transfer({
+          fromPubkey: this.publicKey,
+          toPubkey: new SolPublicKey(tx.to),
+          lamports: tx.value.toString(),
+        })
+      )
+    }
     const hash = await this.client.sendTransaction(tx, [this.keypair])
     return {
       hash,
