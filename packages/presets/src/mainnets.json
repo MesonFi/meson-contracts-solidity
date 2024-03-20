@@ -109,8 +109,7 @@
         "decimals": 18,
         "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
         "tokenIndex": 65,
-        "partner": "iusd",
-        "disabled": true
+        "partner": "iusd"
       },
       {
         "name": "BNB",
@@ -1860,8 +1859,7 @@
         "decimals": 18,
         "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
         "tokenIndex": 65,
-        "partner": "iusd",
-        "disabled": true
+        "partner": "iusd"
       }
     ]
   }
