@@ -566,7 +566,8 @@
         "decimals": 18,
         "addr": "0xaff124456115674d04B1caAD15b627Da95dBd85C",
         "tokenIndex": 254,
-        "partner": "iusd"
+        "partner": "iusd",
+        "disabled": true
       }
     ]
   },
