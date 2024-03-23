@@ -103,9 +103,6 @@ export class Swap implements SwapData {
     this.outToken = data.outToken
     this.salt = data.saltHeader || '0x0000'
     this.salt = this._makeFullSalt(data)
-    if (data.amountForCoreToken === 'all') {
-      this.amount = this.amountForCoreToken.add(this.totalFee)
-    }
   }
 
   private _makeFullSalt(data: SwapData): string {
@@ -128,15 +125,14 @@ export class Swap implements SwapData {
         return `${saltHeader}${saltData.substring(2)}${this._randomHex(18 - saltData.length)}`
       }
       if (this.swapForCoreToken) {
-        const amountForCoreToken = data.amountForCoreToken === 'all'
-          ? this.amount.sub(this.totalFee)
-          : data.amountForCoreToken
         if (this._newFormat) {
           const saltData1 = this._compressFixedPrecision((coreTokenPrice || 0) * 1e4)
           if (saltData1.length > 4) {
             throw new Error('Invalid coreTokenPrice; overflow')
           }
-          const saltData2 = this._compressFixedPrecision(BigNumber.from(amountForCoreToken || 0).div(1e3))
+          const saltData2 = data.amountForCoreToken === 'all'
+            ? 'ffff'
+            : this._compressFixedPrecision(BigNumber.from(data.amountForCoreToken || 0).div(1e3))
           if (saltData2.length > 4) {
             throw new Error('Invalid amountForCoreToken; overflow')
           }
@@ -148,7 +144,7 @@ export class Swap implements SwapData {
           if (saltData1.length > len) {
             throw new Error('Invalid coreTokenPrice; overflow')
           }
-          const saltData2 = BigNumber.from(amountForCoreToken || 0).div(1e5)
+          const saltData2 = BigNumber.from(data.amountForCoreToken || 0).div(1e5)
             .toHexString().substring(2).replace(/^0/, '').padStart(8 - len, '0')
           if (saltData2.length > (8 - len)) {
             throw new Error('Invalid amountForCoreToken; overflow')
@@ -268,7 +264,11 @@ export class Swap implements SwapData {
     if (!this.swapForCoreToken) {
       return BigNumber.from(0)
     } else if (this._newFormat) {
-      return BigNumber.from(this._decompressFixedPrecision('0x' + this.salt.slice(10, 14))).mul(1e3)
+      const d = '0x' + this.salt.slice(10, 14)
+      if (d === '0xffff') {
+        return this.amount.sub(this.totalFee)
+      }
+      return BigNumber.from(this._decompressFixedPrecision(d)).mul(1e3)
     }
     return BigNumber.from(parseInt(this.salt.slice(this._splitPos, 14), 16)).mul(1e5)
   }

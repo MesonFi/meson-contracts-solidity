@@ -101,7 +101,11 @@ contract MesonHelpers is MesonConfig, Context {
 
   function _amountForCoreTokenFrom(uint256 encodedSwap) internal pure returns (uint256) {
     if (_swapForCoreToken(encodedSwap)) {
-      return _decompressFixedPrecision((encodedSwap >> 160) & 0xFFFF) * 1e3;
+      uint256 d = (encodedSwap >> 160) & 0xFFFF;
+      if (d == 0xFFFF) {
+        return _amountFrom(encodedSwap) - _feeForLp(encodedSwap) - (_feeWaived(encodedSwap) ? 0 : _serviceFee(encodedSwap));
+      }
+      return _decompressFixedPrecision(d) * 1e3;
     }
     return 0;
   }
