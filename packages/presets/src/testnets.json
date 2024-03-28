@@ -448,7 +448,7 @@
     ],
     "addressFormat": "sui",
     "url": "https://fullnode.testnet.sui.io:443",
-    "explorer": "https://explorer.sui.io",
+    "explorer": "https://suiscan.xyz/testnet",
     "nativeCurrency": {
       "name": "SUI",
       "symbol": "SUI",
@@ -461,7 +461,7 @@
         "symbol": "USDC",
         "decimals": 6,
         "addr": "0x4d3c6980f114f8b4a05aac828dc060234ec755e417c2d2d35f4f181c48ddf4be::USDC::USDC",
-        "link": "object/0x4d3c6980f114f8b4a05aac828dc060234ec755e417c2d2d35f4f181c48ddf4be?module=USDC&network=testnet",
+        "link": "object/0x4d3c6980f114f8b4a05aac828dc060234ec755e417c2d2d35f4f181c48ddf4be",
         "tokenIndex": 1
       },
       {
@@ -469,7 +469,7 @@
         "symbol": "USDT",
         "decimals": 6,
         "addr": "0x4d3c6980f114f8b4a05aac828dc060234ec755e417c2d2d35f4f181c48ddf4be::USDT::USDT",
-        "link": "object/0x4d3c6980f114f8b4a05aac828dc060234ec755e417c2d2d35f4f181c48ddf4be?module=USDT&network=testnet",
+        "link": "object/0x4d3c6980f114f8b4a05aac828dc060234ec755e417c2d2d35f4f181c48ddf4be",
         "tokenIndex": 2
       }
     ]
