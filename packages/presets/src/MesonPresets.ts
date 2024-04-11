@@ -41,6 +41,7 @@ export interface PresetToken {
 
 export interface PresetNetwork {
   id: string
+  disabled?: boolean
   name: string
   chainId: string,
   slip44: string
@@ -72,22 +73,22 @@ export class MesonPresets {
     this._networks = testnet ? testnets : mainnets
   }
 
-  getAllNetworks(): PresetNetwork[] {
-    return (this._networks || mainnets as PresetNetwork[]).filter(n => n.url)
+  getAllNetworks(includeDisabled?: boolean): PresetNetwork[] {
+    return (this._networks || mainnets as PresetNetwork[]).filter(n => n.url && (includeDisabled || !n.disabled))
   }
 
   getNetwork(id: string): PresetNetwork {
-    const networks = this.getAllNetworks()
+    const networks = this.getAllNetworks(true)
     return networks.find(item => item.id === id)
   }
 
   getNetworkFromShortCoinType(shortCoinType: string): PresetNetwork {
-    const networks = this.getAllNetworks()
+    const networks = this.getAllNetworks(true)
     return networks.find(item => item.shortSlip44 === shortCoinType)
   }
 
   getNetworkFromChainId(chainId: string): PresetNetwork {
-    const networks = this.getAllNetworks()
+    const networks = this.getAllNetworks(true)
     return networks.find(item => item.chainId === chainId)
   }
 

@@ -314,7 +314,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       _transferToContract(tokenIndex, recipient, initiator, amount, _saltDataFrom(encodedSwap));
     } else {
       _safeTransfer(tokenIndex, recipient, amount);
-      if ((SHORT_COIN_TYPE == 0x9296 || SHORT_COIN_TYPE == 0xb4b1) && _swapForCoreToken(encodedSwap)) {
+      if ((SHORT_COIN_TYPE == 0x9296 || SHORT_COIN_TYPE == 0xb4b1 || SHORT_COIN_TYPE == 0x6c62) && _swapForCoreToken(encodedSwap)) {
         _callSkaleFaucet(recipient);
       }
     }
@@ -331,7 +331,12 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       bytes memory data = abi.encodeWithSelector(bytes4(0x0c11dedd), recipient);
       (bool success, ) = address(0x5a6869ef5b81DCb58EBF51b8F893c31f5AFE3Fa8).call(data);
       require(success, "Call faucet not successful");
-    } 
+    } else if (SHORT_COIN_TYPE == 0x6c62) {
+      // SKALE Calypso
+      bytes memory data = abi.encodeWithSelector(bytes4(0x0c11dedd), recipient);
+      (bool success, ) = address(0x02891b34B7911A9C68e82C193cd7A6fBf0c3b30A).call(data);
+      require(success, "Call faucet not successful");
+    }
   }
 
   /// @notice Read information for a locked swap

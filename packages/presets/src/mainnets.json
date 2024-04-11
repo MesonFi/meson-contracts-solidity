@@ -1021,6 +1021,7 @@
   },
   {
     "id": "evmos",
+    "disabled": true,
     "name": "Evmos",
     "alias": "evmos",
     "chainId": "0x2329",
@@ -1051,6 +1052,7 @@
   },
   {
     "id": "one",
+    "disabled": true,
     "name": "Harmony",
     "alias": "ONE",
     "chainId": "0x63564c40",
@@ -1335,6 +1337,43 @@
     ]
   },
   {
+    "id": "skale-calypso",
+    "name": "SKALE Calypso",
+    "alias": "SKALE",
+    "chainId": "0x5d456c62",
+    "slip44": "0x5d456c62",
+    "shortSlip44": "0x6c62",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague",
+    "explorer": "https://honorable-steel-rasalhague.explorer.mainnet.skalenodes.com",
+    "nativeCurrency": {
+      "name": "sFUEL",
+      "symbol": "sFUEL",
+      "decimals": 18
+    },
+    "mesonAddress": "0x4c2F26ba59cD10C605b669add14966547CA93d02",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x7Cf76E740Cb23b99337b21F392F22c47Ad910c67",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xf9B5736E74b37Ec2EDd37B1B3c8e1aF9fa426F2A",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
     "id": "naut",
     "name": "Nautilus",
     "alias": "NAUT",
@@ -1472,36 +1511,6 @@
         "decimals": 18,
         "addr": "0x4b21b980d0Dc7D3C0C6175b0A412694F3A1c7c6b",
         "tokenIndex": 254
-      }
-    ]
-  },
-  {
-    "id": "bevm",
-    "name": "BEVM",
-    "alias": "BEVM",
-    "chainId": "0x5dd",
-    "slip44": "0x800005dd",
-    "shortSlip44": "0x05dd",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://rpc-canary-1.bevm.io",
-    "explorer": "https://scan.bevm.io",
-    "nativeCurrency": {
-      "name": "BTC",
-      "symbol": "BTC",
-      "decimals": 18
-    },
-    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "tokens": [
-      {
-        "name": "BTC",
-        "symbol": "BTC",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 243
       }
     ]
   },
@@ -1824,6 +1833,36 @@
     ]
   },
   {
+    "id": "xlayer",
+    "name": "XLayer",
+    "alias": "XLAYER",
+    "chainId": "0x00c4",
+    "slip44": "0x800000c4",
+    "shortSlip44": "0x00c4",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.xlayer.tech",
+    "explorer": "https://www.okx.com/explorer/xlayer",
+    "nativeCurrency": {
+      "name": "OKB",
+      "symbol": "OKB",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x1e4a5963abfd975d8c9021ce480b42188849d41d",
+        "tokenIndex": 2
+      }
+    ]
+  },
+  {
     "id": "merlin",
     "name": "Merlin",
     "alias": "MERLIN",
@@ -1860,6 +1899,157 @@
         "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
         "tokenIndex": 65,
         "partner": "iusd"
+      }
+    ]
+  },
+  {
+    "id": "b2",
+    "name": "B² Network",
+    "alias": "B2",
+    "chainId": "0xdf",
+    "slip44": "0x800000df",
+    "shortSlip44": "0x00df",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.bsquared.network",
+    "explorer": "https://explorer.bsquared.network",
+    "nativeCurrency": {
+      "name": "BTC",
+      "symbol": "BTC",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "BTC",
+        "symbol": "BTC",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 243
+      }
+    ]
+  },
+  {
+    "id": "bitlayer",
+    "name": "Bitlayer",
+    "alias": "BITLAYER",
+    "chainId": "0x310c5",
+    "slip44": "0x800310c5",
+    "shortSlip44": "0x10c5",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://mainnet-rpc.bitlayer.org",
+    "explorer": "https://www.btrscan.com",
+    "nativeCurrency": {
+      "name": "BTC",
+      "symbol": "BTC",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "BTC",
+        "symbol": "BTC",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 243
+      }
+    ]
+  },
+  {
+    "id": "taproot",
+    "name": "Taproot",
+    "alias": "TR",
+    "chainId": "0x038f",
+    "slip44": "0x8000038f",
+    "shortSlip44": "0x038f",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.taprootchain.io",
+    "explorer": "https://scan.taprootchain.io",
+    "nativeCurrency": {
+      "name": "BTC",
+      "symbol": "BTC",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "BTC",
+        "symbol": "BTC",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 243
+      }
+    ]
+  },
+  {
+    "id": "bevm",
+    "disabled": true,
+    "name": "BEVM",
+    "alias": "BEVM",
+    "chainId": "0x5dd",
+    "slip44": "0x800005dd",
+    "shortSlip44": "0x05dd",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc-canary-1.bevm.io",
+    "explorer": "https://scan.bevm.io",
+    "nativeCurrency": {
+      "name": "BTC",
+      "symbol": "BTC",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "BTC",
+        "symbol": "BTC",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 243
+      }
+    ]
+  },
+  {
+    "id": "bevm2",
+    "name": "BEVM",
+    "alias": "BEVM",
+    "chainId": "0x2ced",
+    "slip44": "0x80002ced",
+    "shortSlip44": "0x2ced",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc-mainnet-1.bevm.io",
+    "explorer": "https://scan-mainnet.bevm.io",
+    "nativeCurrency": {
+      "name": "BTC",
+      "symbol": "BTC",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "BTC",
+        "symbol": "BTC",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 243
       }
     ]
   }

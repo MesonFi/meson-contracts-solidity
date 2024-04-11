@@ -725,7 +725,7 @@
     "id": "bob-sepolia",
     "name": "Bob Sepolia",
     "alias": "BOB",
-    "chainId": "0x6f",
+    "chainId": "0x94258",
     "slip44": "0x8000006f",
     "shortSlip44": "0x006f",
     "extensions": [
@@ -733,8 +733,8 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://testnet.rpc.gobob.xyz",
-    "explorer": "https://testnet-explorer.gobob.xyz",
+    "url": "https://sepolia-dencun.rpc.gobob.xyz",
+    "explorer": "https://sepolia-dencun.explorer.gobob.xyz",
     "nativeCurrency": {
       "name": "ETH",
       "symbol": "ETH",
@@ -752,19 +752,19 @@
     ]
   },
   {
-    "id": "bitlayer-testnet",
-    "name": "BitLayer Testnet",
-    "alias": "BITLAYER",
-    "chainId": "0x3106a",
-    "slip44": "0x8000106a",
-    "shortSlip44": "0x106a",
+    "id": "tuna-testnet",
+    "name": "Tuna Testnet",
+    "alias": "TUNA",
+    "chainId": "0x278b",
+    "slip44": "0x8000278b",
+    "shortSlip44": "0x278b",
     "extensions": [
       "metamask",
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://testnet-rpc.bitlayer.org",
-    "explorer": "https://testnet-scan.bitlayer.org",
+    "url": "https://babytuna.rpc.tunachain.io",
+    "explorer": "https://babytuna.explorer.tunachain.io",
     "nativeCurrency": {
       "name": "BTC",
       "symbol": "BTC",
@@ -782,88 +782,26 @@
     ]
   },
   {
-    "id": "b2-testnet",
-    "name": "B2 Testnet",
-    "alias": "B2",
-    "chainId": "0x44e",
-    "slip44": "0x800003ea",
-    "shortSlip44": "0x03ea",
+    "id": "oneness-testnet",
+    "name": "Oneness Testnet",
+    "alias": "ONENESS",
+    "chainId": "0x85d",
+    "slip44": "0x8000085d",
+    "shortSlip44": "0x085d",
     "extensions": [
       "metamask",
-      "walletconnect",
-      "btc_aa_particle"
+      "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://haven-rpc.bsquared.network",
-    "explorer": "https://haven-explorer.bsquared.network",
+    "url": "https://rpc.testnet.onenesslabs.io",
+    "explorer": "https://scan.testnet.onenesslabs.io",
     "nativeCurrency": {
       "name": "BTC",
       "symbol": "BTC",
       "decimals": 18
     },
     "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
-    "coreTokenPriceFactor": 1,
     "tokens": [
-      {
-        "name": "USDC",
-        "symbol": "USDC",
-        "decimals": 6,
-        "tokenIndex": 1,
-        "addr": "0xb471644294eD4648F07f404a5d257B381b1E1e26"
-      },
-      {
-        "name": "USDT",
-        "symbol": "USDT",
-        "decimals": 6,
-        "tokenIndex": 2,
-        "addr": "0x62f4c6A2fEcc5A4EA394d8f1341c90EF7ffED6C8"
-      },
-      {
-        "name": "BTC",
-        "symbol": "BTC",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 243
-      }
-    ]
-  },
-  {
-    "id": "merlin-testnet",
-    "name": "Merlin Testnet",
-    "alias": "MERLIN",
-    "chainId": "0xa7b14",
-    "slip44": "0x80006868",
-    "shortSlip44": "0x6868",
-    "extensions": [
-      "metamask",
-      "walletconnect",
-      "btc_aa_particle"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://testnet-rpc.merlinchain.io",
-    "explorer": "https://testnet-scan.merlinchain.io",
-    "nativeCurrency": {
-      "name": "BTC",
-      "symbol": "BTC",
-      "decimals": 18
-    },
-    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
-    "coreTokenPriceFactor": 1,
-    "tokens": [
-      {
-        "name": "USDC",
-        "symbol": "USDC",
-        "decimals": 6,
-        "tokenIndex": 1,
-        "addr": "0xb471644294eD4648F07f404a5d257B381b1E1e26"
-      },
-      {
-        "name": "USDT",
-        "symbol": "USDT",
-        "decimals": 6,
-        "tokenIndex": 2,
-        "addr": "0x62f4c6A2fEcc5A4EA394d8f1341c90EF7ffED6C8"
-      },
       {
         "name": "BTC",
         "symbol": "BTC",
