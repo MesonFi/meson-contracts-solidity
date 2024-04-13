@@ -31,6 +31,7 @@ contract MesonTokens {
   ///       52:      XDAI
   ///     65-128:  3rd party tokens
   ///       65:      iUSD (iZUMi Bond USD)
+  ///       67:      M-BTC (Merlin BTC)
   ///     129-190: (Unspecified)
   ///     191:     No-swap core
   ///     192-239: (Unspecified)

@@ -1710,6 +1710,14 @@
         "decimals": 8,
         "addr": "0xcDd475325D6F564d27247D1DddBb0DAc6fA0a5CF",
         "tokenIndex": 242
+      },
+      {
+        "name": "Merlin BTC",
+        "symbol": "M-BTC",
+        "decimals": 18,
+        "addr": "0x59889b7021243dB5B1e065385F918316cD90D46c",
+        "tokenIndex": 67,
+        "partner": "iusd"
       }
     ]
   },
@@ -1898,6 +1906,14 @@
         "decimals": 18,
         "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
         "tokenIndex": 65,
+        "partner": "iusd"
+      },
+      {
+        "name": "Merlin BTC",
+        "symbol": "M-BTC",
+        "decimals": 18,
+        "addr": "0xB880fd278198bd590252621d4CD071b1842E9Bcd",
+        "tokenIndex": 67,
         "partner": "iusd"
       }
     ]
