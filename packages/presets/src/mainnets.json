@@ -1844,7 +1844,7 @@
     "id": "xlayer",
     "name": "XLayer",
     "alias": "XLAYER",
-    "chainId": "0x00c4",
+    "chainId": "0xc4",
     "slip44": "0x800000c4",
     "shortSlip44": "0x00c4",
     "extensions": [
@@ -1982,7 +1982,7 @@
     "id": "taproot",
     "name": "Taproot",
     "alias": "TR",
-    "chainId": "0x038f",
+    "chainId": "0x38f",
     "slip44": "0x8000038f",
     "shortSlip44": "0x038f",
     "extensions": [
