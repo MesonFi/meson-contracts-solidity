@@ -132,7 +132,11 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                 const poolIndex = rawArgs[2].startsWith('0x')
                   ? new DataView(utils.arrayify(rawArgs[2]).buffer).getBigUint64(0, true).toString()
                   : rawArgs[2]
-                args.postingValue = BigNumber.from(utils.solidityPack(['address', 'uint40'], [rawArgs[1].replace('0x14', '0x'), poolIndex]))
+                let initiator = rawArgs[1]
+                if (initiator.length === 44) {
+                  initiator = initiator.replace('0x14', '0x')
+                }
+                args.postingValue = BigNumber.from(utils.solidityPack(['address', 'uint40'], [initiator, poolIndex]))
                 break
               }
               case 'bondSwap':
@@ -140,13 +144,22 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                 break
               case 'lockSwap':
               case 'unlock':
-                args.initiator = rawArgs[1].replace('0x14', '0x')
+                args.initiator = rawArgs[1]
+                if (args.initiator.length === 44) {
+                  args.initiator = args.initiator.replace('0x14', '0x')
+                }
                 break
               case 'executeSwap':
-                args.recipient = rawArgs[2].replace('0x14', '0x')
+                args.recipient = rawArgs[2]
+                if (args.recipient.length === 44) {
+                  args.recipient = args.recipient.replace('0x14', '0x')
+                }
                 break
               case 'release':
-                args.initiator = rawArgs[2].replace('0x14', '0x')
+                args.initiator = rawArgs[2]
+                if (args.initiator.length === 44) {
+                  args.initiator = args.initiator.replace('0x14', '0x')
+                }
                 break
               case 'directRelease':
                 args.initiator = rawArgs[2]
@@ -154,7 +167,11 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                 break
             }
             if (['executeSwap', 'release', 'directRelease'].includes(name)) {
-              const { r, yParityAndS } = utils.splitSignature(rawArgs[1].replace('0x40', '0x'))
+              let signature = rawArgs[1]
+              if (signature.length === 132) {
+                signature = signature.replace('0x40', '0x')
+              }
+              const { r, yParityAndS } = utils.splitSignature(signature)
               args.r = r
               args.yParityAndS = yParityAndS
             }
