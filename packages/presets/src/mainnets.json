@@ -50,6 +50,14 @@
         "decimals": 8,
         "addr": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
         "tokenIndex": 242
+      },
+      {
+        "name": "StakeStone Ether",
+        "symbol": "STONE",
+        "decimals": 18,
+        "addr": "0x7122985656e38BDC0302Db86685bb972b145bD3C",
+        "tokenIndex": 71,
+        "partner": "iusd"
       }
     ]
   },
@@ -123,7 +131,16 @@
         "symbol": "BTCB",
         "decimals": 18,
         "addr": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
-        "tokenIndex": 242
+        "tokenIndex": 242,
+        "partner": "^iusd"
+      },
+      {
+        "name": "MERL",
+        "symbol": "MERL",
+        "decimals": 18,
+        "addr": "0x4239E0E03d41E385D171D00c623Eb6b9AF483cd9",
+        "tokenIndex": 69,
+        "partner": "^iusd"
       }
     ]
   },
@@ -364,7 +381,8 @@
         "decimals": 6,
         "addr": "TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8",
         "link": "token20/TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8",
-        "tokenIndex": 1
+        "tokenIndex": 1,
+        "disabled": true
       },
       {
         "name": "Tether USD",
@@ -511,6 +529,98 @@
     ]
   },
   {
+    "id": "zksync",
+    "name": "zkSync Era",
+    "alias": "ZKS",
+    "chainId": "0x144",
+    "slip44": "0x80000324",
+    "shortSlip44": "0x0324",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://mainnet.era.zksync.io",
+    "explorer": "https://explorer.zksync.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x2DcC88Fa6b6950EE28245C3238B8993BE5feeA42",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
+        "link": "address/0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "",
+        "link": "",
+        "tokenIndex": 2,
+        "disabled": true
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
+    "id": "blast",
+    "name": "Blast",
+    "alias": "BLAST",
+    "chainId": "0x13e31",
+    "slip44": "0x80001331",
+    "shortSlip44": "0x1331",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://blast.blockpi.network/v1/rpc/public",
+    "explorer": "https://blastscan.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USDB",
+        "symbol": "USDB",
+        "decimals": 18,
+        "addr": "0x4300000000000000000000000000000000000003",
+        "tokenIndex": 39
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      },
+      {
+        "name": "iZUMi Bond USD",
+        "symbol": "iUSD",
+        "decimals": 18,
+        "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
+        "tokenIndex": 65,
+        "partner": "iusd"
+      }
+    ]
+  },
+  {
     "id": "manta",
     "name": "Manta",
     "alias": "MANTA",
@@ -568,70 +678,31 @@
         "tokenIndex": 254,
         "partner": "iusd",
         "disabled": true
-      }
-    ]
-  },
-  {
-    "id": "zksync",
-    "name": "zkSync Era",
-    "alias": "ZKS",
-    "chainId": "0x144",
-    "slip44": "0x80000324",
-    "shortSlip44": "0x0324",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://mainnet.era.zksync.io",
-    "explorer": "https://explorer.zksync.io",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x2DcC88Fa6b6950EE28245C3238B8993BE5feeA42",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
-        "link": "address/0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
-        "tokenIndex": 1
       },
       {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "",
-        "link": "",
-        "tokenIndex": 2,
-        "disabled": true
-      },
-      {
-        "name": "ETH",
-        "symbol": "ETH",
+        "name": "StakeStone Ether",
+        "symbol": "STONE",
         "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
+        "addr": "0xEc901DA9c68E90798BbBb74c11406A32A70652C3",
+        "tokenIndex": 71,
+        "partner": "iusd"
       }
     ]
   },
   {
-    "id": "zkevm",
-    "name": "Polygon zkEVM",
-    "alias": "ZKEVM",
-    "chainId": "0x44d",
-    "slip44": "0x8000044d",
-    "shortSlip44": "0x044d",
+    "id": "mode",
+    "name": "Mode",
+    "alias": "MODE",
+    "chainId": "0x868b",
+    "slip44": "0x8000868b",
+    "shortSlip44": "0x868b",
     "extensions": [
       "metamask",
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://zkevm-rpc.com",
-    "explorer": "https://zkevm.polygonscan.com",
+    "url": "https://mainnet.mode.network",
+    "explorer": "https://explorer.mode.network",
     "nativeCurrency": {
       "name": "ETH",
       "symbol": "ETH",
@@ -643,15 +714,15 @@
         "name": "USD Coin",
         "symbol": "USDC",
         "decimals": 6,
-        "tokenIndex": 1,
-        "addr": "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035"
+        "addr": "0xd988097fb8612cc24eeC14542bC03424c656005f",
+        "tokenIndex": 1
       },
       {
         "name": "Tether USD",
         "symbol": "USDT",
         "decimals": 6,
-        "tokenIndex": 2,
-        "addr": "0x1E4a5963aBFD975d8c9021ce480b42188849D41d"
+        "addr": "0xf0F161fDA2712DB8b566946122a5af183995e2eD",
+        "tokenIndex": 2
       },
       {
         "name": "ETH",
@@ -659,6 +730,132 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 255
+      },
+      {
+        "name": "Wrapped BTC",
+        "symbol": "WBTC",
+        "decimals": 8,
+        "addr": "0xcDd475325D6F564d27247D1DddBb0DAc6fA0a5CF",
+        "tokenIndex": 242
+      },
+      {
+        "name": "Merlin BTC",
+        "symbol": "M-BTC",
+        "decimals": 18,
+        "addr": "0x59889b7021243dB5B1e065385F918316cD90D46c",
+        "tokenIndex": 67,
+        "partner": "iusd"
+      }
+    ]
+  },
+  {
+    "id": "ancient8",
+    "name": "Ancient8",
+    "alias": "A8",
+    "chainId": "0x34fb5e38",
+    "slip44": "0xaaaaaaaa",
+    "shortSlip44": "0xaaaa",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.ancient8.gg",
+    "explorer": "https://scan.ancient8.gg",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
+    "id": "zklink",
+    "name": "zkLink Nova",
+    "alias": "ZKLINK",
+    "chainId": "0xc5cc4",
+    "slip44": "0x80005cc4",
+    "shortSlip44": "0x5cc4",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.zklink.io",
+    "explorer": "https://explorer.zklink.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x2DcC88Fa6b6950EE28245C3238B8993BE5feeA42",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x1a1A3b2ff016332e866787B311fcB63928464509",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x2F8A25ac62179B31D62D7F80884AE57464699059",
+        "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
+    "id": "mnt",
+    "name": "Mantle",
+    "alias": "MNT",
+    "chainId": "0x1388",
+    "slip44": "0x80001388",
+    "shortSlip44": "0x1388",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.mantle.xyz",
+    "explorer": "https://explorer.mantle.xyz",
+    "nativeCurrency": {
+      "name": "MNT",
+      "symbol": "MNT",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
+        "tokenIndex": 2
       }
     ]
   },
@@ -696,6 +893,108 @@
         "decimals": 6,
         "addr": "0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df",
         "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
+    "id": "xlayer",
+    "name": "XLayer",
+    "alias": "XLAYER",
+    "chainId": "0xc4",
+    "slip44": "0x800000c4",
+    "shortSlip44": "0x00c4",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.xlayer.tech",
+    "explorer": "https://www.okx.com/explorer/xlayer",
+    "nativeCurrency": {
+      "name": "OKB",
+      "symbol": "OKB",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x74b7F16337b8972027F6196A17a631aC6dE26d22",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x1E4a5963aBFD975d8c9021ce480b42188849D41d",
+        "tokenIndex": 2
+      },
+      {
+        "name": "Wrapped ETH",
+        "symbol": "WETH",
+        "decimals": 18,
+        "addr": "0x5A77f1443D16ee5761d310e38b62f77f726bC71c",
+        "tokenIndex": 254
+      },
+      {
+        "name": "Wrapped BTC",
+        "symbol": "WBTC",
+        "decimals": 8,
+        "addr": "0xEA034fb02eB1808C2cc3adbC15f447B93CbE08e1",
+        "tokenIndex": 242
+      },
+      {
+        "name": "OKB",
+        "symbol": "OKB",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 191
+      }
+    ]
+  },
+  {
+    "id": "zkevm",
+    "name": "Polygon zkEVM",
+    "alias": "ZKEVM",
+    "chainId": "0x44d",
+    "slip44": "0x8000044d",
+    "shortSlip44": "0x044d",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://zkevm-rpc.com",
+    "explorer": "https://zkevm.polygonscan.com",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "tokenIndex": 1,
+        "addr": "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035"
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "tokenIndex": 2,
+        "addr": "0x1E4a5963aBFD975d8c9021ce480b42188849D41d"
       },
       {
         "name": "ETH",
@@ -1156,43 +1455,6 @@
     ]
   },
   {
-    "id": "mnt",
-    "name": "Mantle",
-    "alias": "MNT",
-    "chainId": "0x1388",
-    "slip44": "0x80001388",
-    "shortSlip44": "0x1388",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://rpc.mantle.xyz",
-    "explorer": "https://explorer.mantle.xyz",
-    "nativeCurrency": {
-      "name": "MNT",
-      "symbol": "MNT",
-      "decimals": 18
-    },
-    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
-        "tokenIndex": 1
-      },
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
-        "tokenIndex": 2
-      }
-    ]
-  },
-  {
     "id": "aptos",
     "name": "Aptos",
     "alias": "APT",
@@ -1596,36 +1858,6 @@
     ]
   },
   {
-    "id": "ancient8",
-    "name": "Ancient8",
-    "alias": "A8",
-    "chainId": "0x34fb5e38",
-    "slip44": "0xaaaaaaaa",
-    "shortSlip44": "0xaaaa",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://rpc.ancient8.gg",
-    "explorer": "https://scan.ancient8.gg",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "tokens": [
-      {
-        "name": "ETH",
-        "symbol": "ETH",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
-      }
-    ]
-  },
-  {
     "id": "zeta",
     "name": "ZetaChain",
     "alias": "ZETA",
@@ -1659,110 +1891,6 @@
         "decimals": 8,
         "addr": "0x13A0c5930C028511Dc02665E7285134B6d11A5f4",
         "tokenIndex": 242
-      }
-    ]
-  },
-  {
-    "id": "mode",
-    "name": "Mode",
-    "alias": "MODE",
-    "chainId": "0x868b",
-    "slip44": "0x8000868b",
-    "shortSlip44": "0x868b",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://mainnet.mode.network",
-    "explorer": "https://explorer.mode.network",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "tokens": [
-      {
-        "name": "USD Coin",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0xd988097fb8612cc24eeC14542bC03424c656005f",
-        "tokenIndex": 1
-      },
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0xf0F161fDA2712DB8b566946122a5af183995e2eD",
-        "tokenIndex": 2
-      },
-      {
-        "name": "ETH",
-        "symbol": "ETH",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
-      },
-      {
-        "name": "Wrapped BTC",
-        "symbol": "WBTC",
-        "decimals": 8,
-        "addr": "0xcDd475325D6F564d27247D1DddBb0DAc6fA0a5CF",
-        "tokenIndex": 242
-      },
-      {
-        "name": "Merlin BTC",
-        "symbol": "M-BTC",
-        "decimals": 18,
-        "addr": "0x59889b7021243dB5B1e065385F918316cD90D46c",
-        "tokenIndex": 67,
-        "partner": "iusd"
-      }
-    ]
-  },
-  {
-    "id": "blast",
-    "name": "Blast",
-    "alias": "BLAST",
-    "chainId": "0x13e31",
-    "slip44": "0x80001331",
-    "shortSlip44": "0x1331",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://blast.blockpi.network/v1/rpc/public",
-    "explorer": "https://blastscan.io",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "tokens": [
-      {
-        "name": "USDB",
-        "symbol": "USDB",
-        "decimals": 18,
-        "addr": "0x4300000000000000000000000000000000000003",
-        "tokenIndex": 39
-      },
-      {
-        "name": "ETH",
-        "symbol": "ETH",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
-      },
-      {
-        "name": "iZUMi Bond USD",
-        "symbol": "iUSD",
-        "decimals": 18,
-        "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
-        "tokenIndex": 65,
-        "partner": "iusd"
       }
     ]
   },
@@ -1811,66 +1939,6 @@
     ]
   },
   {
-    "id": "zklink",
-    "name": "zkLink Nova",
-    "alias": "ZKLINK",
-    "chainId": "0xc5cc4",
-    "slip44": "0x80005cc4",
-    "shortSlip44": "0x5cc4",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://rpc.zklink.io",
-    "explorer": "https://explorer.zklink.io",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x2DcC88Fa6b6950EE28245C3238B8993BE5feeA42",
-    "tokens": [
-      {
-        "name": "ETH",
-        "symbol": "ETH",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
-      }
-    ]
-  },
-  {
-    "id": "xlayer",
-    "name": "XLayer",
-    "alias": "XLAYER",
-    "chainId": "0xc4",
-    "slip44": "0x800000c4",
-    "shortSlip44": "0x00c4",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://rpc.xlayer.tech",
-    "explorer": "https://www.okx.com/explorer/xlayer",
-    "nativeCurrency": {
-      "name": "OKB",
-      "symbol": "OKB",
-      "decimals": 18
-    },
-    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
-    "tokens": [
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0x1e4a5963abfd975d8c9021ce480b42188849d41d",
-        "tokenIndex": 2
-      }
-    ]
-  },
-  {
     "id": "merlin",
     "name": "Merlin",
     "alias": "MERLIN",
@@ -1901,6 +1969,20 @@
         "tokenIndex": 243
       },
       {
+        "name": "USD Coin",
+        "symbol": "M-USDC",
+        "decimals": 6,
+        "addr": "0x6b4eCAdA640F1B30dBdB68f77821A03A5f282EbE",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "M-USDT",
+        "decimals": 6,
+        "addr": "0x967aEC3276b63c5E2262da9641DB9dbeBB07dC0d",
+        "tokenIndex": 2
+      },
+      {
         "name": "iZUMi Bond USD",
         "symbol": "iUSD",
         "decimals": 18,
@@ -1914,6 +1996,22 @@
         "decimals": 18,
         "addr": "0xB880fd278198bd590252621d4CD071b1842E9Bcd",
         "tokenIndex": 67,
+        "partner": "iusd"
+      },
+      {
+        "name": "MERL",
+        "symbol": "MERL",
+        "decimals": 18,
+        "addr": "0x5c46bFF4B38dc1EAE09C5BAc65872a1D8bc87378",
+        "tokenIndex": 69,
+        "partner": "^iusd"
+      },
+      {
+        "name": "Merlin's Seal STONE",
+        "symbol": "M-STONE",
+        "decimals": 18,
+        "addr": "0xB5d8b1e73c79483d7750C5b8DF8db45A0d24e2cf",
+        "tokenIndex": 71,
         "partner": "iusd"
       }
     ]
@@ -1945,6 +2043,50 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 243
+      },
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0xE544e8a38aDD9B1ABF21922090445Ba93f74B9E5",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x681202351a488040Fa4FdCc24188AfB582c9DD62",
+        "tokenIndex": 2
+      },
+      {
+        "name": "First Digital USD",
+        "symbol": "FDUSD",
+        "decimals": 18,
+        "addr": "0xc2fe4f673455ef92299770a09cdb5e8756a525d5",
+        "tokenIndex": 40
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0xD48d3A551757ac47655fCe25BDE1B0B6b1Cb2a5A",
+        "tokenIndex": 254
+      },
+      {
+        "name": "Free BTC",
+        "symbol": "fBTC",
+        "decimals": 18,
+        "addr": "0x5D247F32b792A61f7b4078Cf7752A878aff152e2",
+        "tokenIndex": 240,
+        "partner": "iusd"
+      },
+      {
+        "name": "STONE ETH on BSquared",
+        "symbol": "BSTONE",
+        "decimals": 18,
+        "addr": "0x7537C1F80c9E157ED7AFD93a494be3e1f04f1462",
+        "tokenIndex": 71,
+        "partner": "iusd"
       }
     ]
   },
@@ -1975,6 +2117,27 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 243
+      },
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x9827431e8b77e87c9894bd50b055d6be56be0030",
+        "tokenIndex": 1
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xfe9f969faf8ad72a83b761138bf25de87eff9dd2",
+        "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0xef63d4e178b3180beec9b0e143e0f37f4c93f4c2",
+        "tokenIndex": 254
       }
     ]
   },

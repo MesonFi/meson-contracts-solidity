@@ -32,6 +32,8 @@ contract MesonTokens {
   ///     65-128:  3rd party tokens
   ///       65:      iUSD (iZUMi Bond USD)
   ///       67:      M-BTC (Merlin BTC)
+  ///       69:      MERL
+  ///       71:      STONE
   ///     129-190: (Unspecified)
   ///     191:     No-swap core
   ///     192-239: (Unspecified)
