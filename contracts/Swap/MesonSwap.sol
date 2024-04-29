@@ -14,7 +14,7 @@ contract MesonSwap is IMesonSwapEvents, MesonStates {
   ///   version: Version of encoding
   ///   amount: The amount of tokens of this swap, always in decimal 6. The amount of a swap is capped at $100k so it can be safely encoded in uint48;
   ///   salt: The salt value of this swap, carrying some information below:
-  ///     salt & 0x80000000000000000000 == true => will release to an owa address, otherwise a smart contract;
+  ///     salt & 0x80000000000000000000 == true => will release to an EOA address, otherwise a smart contract;
   ///     salt & 0x40000000000000000000 == true => will waive *service fee*;
   ///     salt & 0x20000000000000000000 == true => meson.to;
   ///     salt & 0x10000000000000000000 == true => API;
