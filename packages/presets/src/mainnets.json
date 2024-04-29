@@ -2091,6 +2091,50 @@
     ]
   },
   {
+    "id": "bob",
+    "name": "BOB",
+    "alias": "BOB",
+    "chainId": "0xed88",
+    "slip44": "0x8000ed88",
+    "shortSlip44": "0xed88",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.gobob.xyz",
+    "explorer": "https://explorer.gobob.xyz",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "BTC",
+        "symbol": "BTC",
+        "decimals": 8,
+        "addr": "0x03c7054bcb39f7b2e5b2c7acb37583e32d70cfa3",
+        "tokenIndex": 242
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0x05d032ac25d322df992303dca074ee7392c117b9",
+        "tokenIndex": 2
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
     "id": "bitlayer",
     "name": "Bitlayer",
     "alias": "BITLAYER",

@@ -87,7 +87,8 @@
     "deploy:merlin": "hardhat deploy --mainnet merlin --upgradable true",
     "deploy:b2": "hardhat deploy --mainnet b2 --upgradable true",
     "deploy:bitlayer": "hardhat deploy --mainnet bitlayer --upgradable true",
-    "deploy:taproot": "hardhat deploy --mainnet taproot --upgradable true"
+    "deploy:taproot": "hardhat deploy --mainnet taproot --upgradable true",
+    "deploy:bob": "hardhat deploy --mainnet bob --upgradable true"
   },
   "devDependencies": {
     "@matterlabs/hardhat-zksync-deploy": "^0.6.2",
