@@ -103,6 +103,8 @@ export class MesonClient {
       return 'sol'
     } else if (tokenIndex >= 240) {
       return 'btc'
+    } else if (tokenIndex >= 236) {
+      return 'matic'
     } else if (tokenIndex === 191) {
       return 'gas-token'
     } else if (tokenIndex <= 64) {
@@ -130,6 +132,8 @@ export class MesonClient {
       return 'sol'
     } else if (lowerCaseSymbol.includes('btc')) {
       return 'btc'
+    } else if (lowerCaseSymbol.includes('matic')) {
+      return 'matic'
     } else if (lowerCaseSymbol.includes('usdc') || lowerCaseSymbol.includes('usdbc')) {
       return 'usdc'
     } else if (lowerCaseSymbol.includes('usdt')) {

@@ -36,7 +36,11 @@ contract MesonTokens {
   ///       71:      STONE
   ///     129-190: (Unspecified)
   ///     191:     No-swap core
-  ///     192-239: (Unspecified)
+  ///     192-235: (Unspecified)
+  ///     236-239: MATIC & MATIC equivalent
+  ///       236:     PoD MATIC
+  ///       238:     ERC20 MATIC
+  ///       239:     MATIC as core
   ///     240-243: BTC & BTC equivalent
   ///       240:     PoD BTC
   ///       242:     ERC20 BTC (decimals 8 except BNB Chain)

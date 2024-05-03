@@ -133,14 +133,6 @@
         "addr": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
         "tokenIndex": 242,
         "partner": "^iusd"
-      },
-      {
-        "name": "MERL",
-        "symbol": "MERL",
-        "decimals": 18,
-        "addr": "0x4239E0E03d41E385D171D00c623Eb6b9AF483cd9",
-        "tokenIndex": 69,
-        "partner": "^iusd"
       }
     ]
   },
@@ -186,6 +178,13 @@
         "decimals": 8,
         "addr": "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6",
         "tokenIndex": 242
+      },
+      {
+        "name": "MATIC",
+        "symbol": "MATIC",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 239
       }
     ]
   },
@@ -1999,14 +1998,6 @@
         "partner": "iusd"
       },
       {
-        "name": "MERL",
-        "symbol": "MERL",
-        "decimals": 18,
-        "addr": "0x5c46bFF4B38dc1EAE09C5BAc65872a1D8bc87378",
-        "tokenIndex": 69,
-        "partner": "^iusd"
-      },
-      {
         "name": "Merlin's Seal STONE",
         "symbol": "M-STONE",
         "decimals": 18,
@@ -2073,6 +2064,13 @@
         "tokenIndex": 254
       },
       {
+        "name": "MATIC",
+        "symbol": "MATIC",
+        "decimals": 18,
+        "addr": "0xc3ee2Df14B1Bc526c24ED802f1873d49664a0d5c",
+        "tokenIndex": 238
+      },
+      {
         "name": "Free BTC",
         "symbol": "fBTC",
         "decimals": 18,
@@ -2112,8 +2110,8 @@
     "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
     "tokens": [
       {
-        "name": "BTC",
-        "symbol": "BTC",
+        "name": "WBTC",
+        "symbol": "WBTC",
         "decimals": 8,
         "addr": "0x03c7054bcb39f7b2e5b2c7acb37583e32d70cfa3",
         "tokenIndex": 242

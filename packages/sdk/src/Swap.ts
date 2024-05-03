@@ -230,11 +230,10 @@ export class Swap implements SwapData {
       return 5000 // 0.005 BNB or SOL
     } else if (tokenIndex >= 240) {
       return 50 // 0.00005 BTC
-    } else if (tokenIndex >= 191) {
-      return 5000 // 0.005 other
-    } {
-      return 500_000 // $0.5
+    } else if (tokenIndex >= 236) {
+      return 500_000 // 0.5 MATIC
     }
+    return 500_000 // $0.5
   }
 
   get totalFee(): BigNumber {
