@@ -46,7 +46,7 @@ contract MesonStates is MesonTokens, MesonHelpers {
   /// the `poolTokenIndex` is in format of `tokenIndex:uint8|poolIndex:uint40`. `tokenIndex`
   /// is the index of supported tokens given by `tokenForIndex` (see definition in `MesonTokens.sol`).
   /// The balances are always store as tokens have decimal 6, which is the case for USDC/USDT on most chains
-  /// except BNB Chain & Conflux. In the exceptional cases, the value of token amount will be converted
+  /// except BNB Smart Chain & Conflux. In the exceptional cases, the value of token amount will be converted
   /// on deposit and withdrawal (see `_safeTransfer` and `_unsafeDepositToken` in `MesonHelpers.sol`).
   ///
   /// The pool index 0 is reserved for use by Meson to store service fees

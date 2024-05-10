@@ -57,13 +57,13 @@
         "decimals": 18,
         "addr": "0x7122985656e38BDC0302Db86685bb972b145bD3C",
         "tokenIndex": 71,
-        "partner": "iusd"
+        "partner": "free"
       }
     ]
   },
   {
     "id": "bnb",
-    "name": "BNB Chain",
+    "name": "BNB Smart Chain",
     "alias": "BNB",
     "chainId": "0x38",
     "slip44": "0x800002ca",
@@ -117,7 +117,7 @@
         "decimals": 18,
         "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
         "tokenIndex": 65,
-        "partner": "iusd"
+        "partner": "free"
       },
       {
         "name": "BNB",
@@ -132,7 +132,7 @@
         "decimals": 18,
         "addr": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
         "tokenIndex": 242,
-        "partner": "^iusd"
+        "partner": "^free"
       }
     ]
   },
@@ -163,7 +163,15 @@
         "symbol": "USDC.e",
         "decimals": 6,
         "addr": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
-        "tokenIndex": 1
+        "tokenIndex": 1,
+        "disabled": true
+      },
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+        "tokenIndex": 9
       },
       {
         "name": "Tether USD",
@@ -218,13 +226,6 @@
         "disabled": true
       },
       {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
-        "tokenIndex": 2
-      },
-      {
         "name": "USD Coin",
         "symbol": "USDC",
         "decimals": 6,
@@ -232,12 +233,19 @@
         "tokenIndex": 9
       },
       {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 6,
+        "addr": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+        "tokenIndex": 2
+      },
+      {
         "name": "iZUMi Bond USD",
         "symbol": "iUSD",
         "decimals": 18,
         "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
         "tokenIndex": 65,
-        "partner": "iusd",
+        "partner": "free",
         "disabled": true
       },
       {
@@ -282,7 +290,15 @@
         "symbol": "USDC.e",
         "decimals": 6,
         "addr": "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
-        "tokenIndex": 1
+        "tokenIndex": 1,
+        "disabled": true
+      },
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+        "tokenIndex": 9
       },
       {
         "name": "Tether USD",
@@ -524,6 +540,14 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 255
+      },
+      {
+        "name": "Solv BTC",
+        "symbol": "SolvBTC",
+        "decimals": 18,
+        "addr": "0x5FFcE65A40f6d3de5332766ffF6A28BF491C868c",
+        "tokenIndex": 73,
+        "partner": "free"
       }
     ]
   },
@@ -554,7 +578,16 @@
         "decimals": 6,
         "addr": "0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
         "link": "address/0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
-        "tokenIndex": 1
+        "tokenIndex": 1,
+        "disabled": true
+      },
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4",
+        "link": "address/0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4",
+        "tokenIndex": 9
       },
       {
         "name": "Tether USD",
@@ -615,7 +648,7 @@
         "decimals": 18,
         "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
         "tokenIndex": 65,
-        "partner": "iusd"
+        "partner": "free"
       }
     ]
   },
@@ -667,7 +700,7 @@
         "decimals": 18,
         "addr": "0x078f712f038a95beea94f036cadb49188a90604b",
         "tokenIndex": 65,
-        "partner": "iusd"
+        "partner": "free"
       },
       {
         "name": "Blast ETH",
@@ -675,7 +708,7 @@
         "decimals": 18,
         "addr": "0xaff124456115674d04B1caAD15b627Da95dBd85C",
         "tokenIndex": 254,
-        "partner": "iusd",
+        "partner": "free",
         "disabled": true
       },
       {
@@ -684,7 +717,7 @@
         "decimals": 18,
         "addr": "0xEc901DA9c68E90798BbBb74c11406A32A70652C3",
         "tokenIndex": 71,
-        "partner": "iusd"
+        "partner": "free"
       }
     ]
   },
@@ -743,7 +776,7 @@
         "decimals": 18,
         "addr": "0x59889b7021243dB5B1e065385F918316cD90D46c",
         "tokenIndex": 67,
-        "partner": "iusd"
+        "partner": "free"
       }
     ]
   },
@@ -803,6 +836,7 @@
         "symbol": "USDC",
         "decimals": 6,
         "addr": "0x1a1A3b2ff016332e866787B311fcB63928464509",
+        "link": "address/0x1a1A3b2ff016332e866787B311fcB63928464509",
         "tokenIndex": 1
       },
       {
@@ -810,6 +844,7 @@
         "symbol": "USDT",
         "decimals": 6,
         "addr": "0x2F8A25ac62179B31D62D7F80884AE57464699059",
+        "link": "address/0x2F8A25ac62179B31D62D7F80884AE57464699059",
         "tokenIndex": 2
       },
       {
@@ -818,6 +853,24 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 255
+      },
+      {
+        "name": "Merlin BTC",
+        "symbol": "M-BTC",
+        "decimals": 18,
+        "addr": "0x85D431A3a56FDf2d2970635fF627f386b4ae49CC",
+        "link": "address/0x85D431A3a56FDf2d2970635fF627f386b4ae49CC",
+        "tokenIndex": 67,
+        "partner": "free"
+      },
+      {
+        "name": "Solv BTC",
+        "symbol": "SolvBTC",
+        "decimals": 18,
+        "addr": "0xbEAf16cFD8eFe0FC97C2a07E349B9411F5dC272C",
+        "link": "address/0xbEAf16cFD8eFe0FC97C2a07E349B9411F5dC272C",
+        "tokenIndex": 73,
+        "partner": "free"
       }
     ]
   },
@@ -986,7 +1039,15 @@
         "symbol": "USDC",
         "decimals": 6,
         "tokenIndex": 1,
-        "addr": "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035"
+        "addr": "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035",
+        "disabled": true
+      },
+      {
+        "name": "USD Coin",
+        "symbol": "USDC.e",
+        "decimals": 6,
+        "tokenIndex": 9,
+        "addr": "0x37eAA0eF3549a5Bb7D431be78a3D99BD360d19e5"
       },
       {
         "name": "Tether USD",
@@ -1849,9 +1910,9 @@
       },
       {
         "name": "Bitcoin",
-        "symbol": "BTC.b",
+        "symbol": "CoreBTC",
         "decimals": 8,
-        "addr": "0x2297aEbD383787A160DD0d9F71508148769342E3",
+        "addr": "0x8034ab88c3512246bf7894f57c834dddbd1de01f",
         "tokenIndex": 242
       }
     ]
@@ -1987,7 +2048,7 @@
         "decimals": 18,
         "addr": "0x0A3BB08b3a15A19b4De82F8AcFc862606FB69A2D",
         "tokenIndex": 65,
-        "partner": "iusd"
+        "partner": "free"
       },
       {
         "name": "Merlin BTC",
@@ -1995,7 +2056,15 @@
         "decimals": 18,
         "addr": "0xB880fd278198bd590252621d4CD071b1842E9Bcd",
         "tokenIndex": 67,
-        "partner": "iusd"
+        "partner": "free"
+      },
+      {
+        "name": "Solv BTC",
+        "symbol": "SolvBTC",
+        "decimals": 18,
+        "addr": "0x41D9036454BE47d3745A823C4aaCD0e29cFB0f71",
+        "tokenIndex": 73,
+        "partner": "free"
       },
       {
         "name": "Merlin's Seal STONE",
@@ -2003,7 +2072,7 @@
         "decimals": 18,
         "addr": "0xB5d8b1e73c79483d7750C5b8DF8db45A0d24e2cf",
         "tokenIndex": 71,
-        "partner": "iusd"
+        "partner": "free"
       }
     ]
   },
@@ -2076,7 +2145,7 @@
         "decimals": 18,
         "addr": "0x5D247F32b792A61f7b4078Cf7752A878aff152e2",
         "tokenIndex": 240,
-        "partner": "iusd"
+        "partner": "free"
       },
       {
         "name": "STONE ETH on BSquared",
@@ -2084,7 +2153,7 @@
         "decimals": 18,
         "addr": "0x7537C1F80c9E157ED7AFD93a494be3e1f04f1462",
         "tokenIndex": 71,
-        "partner": "iusd"
+        "partner": "free"
       }
     ]
   },
@@ -2144,7 +2213,7 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://mainnet-rpc.bitlayer.org",
+    "url": "https://rpc.bitlayer.org",
     "explorer": "https://www.btrscan.com",
     "nativeCurrency": {
       "name": "BTC",

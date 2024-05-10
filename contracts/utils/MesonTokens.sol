@@ -34,6 +34,7 @@ contract MesonTokens {
   ///       67:      M-BTC (Merlin BTC)
   ///       69:      MERL
   ///       71:      STONE
+  ///       73:      SolvBTC
   ///     129-190: (Unspecified)
   ///     191:     No-swap core
   ///     192-235: (Unspecified)
@@ -43,7 +44,7 @@ contract MesonTokens {
   ///       239:     MATIC as core
   ///     240-243: BTC & BTC equivalent
   ///       240:     PoD BTC
-  ///       242:     ERC20 BTC (decimals 8 except BNB Chain)
+  ///       242:     ERC20 BTC (decimals 8 except BNB Smart Chain)
   ///       243:     BTC as core
   ///     244-247: SOL & SOL equivalent
   ///       244:     PoD SOL
