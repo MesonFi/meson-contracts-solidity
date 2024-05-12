@@ -542,6 +542,14 @@
         "tokenIndex": 255
       },
       {
+        "name": "Merlin BTC",
+        "symbol": "M-BTC",
+        "decimals": 18,
+        "addr": "0xe4D584ae9b753e549cAE66200A6475d2f00705f7",
+        "tokenIndex": 67,
+        "partner": "free"
+      },
+      {
         "name": "Solv BTC",
         "symbol": "SolvBTC",
         "decimals": 18,
