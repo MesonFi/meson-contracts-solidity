@@ -246,9 +246,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
     if (coreAmount > 0) {
       _transferCoreToken(recipient, coreAmount);
     }
-    if (releaseAmount > 0) {
-      _release(encodedSwap, _outTokenIndexFrom(encodedSwap), initiator, recipient, releaseAmount);
-    }
+    _release(encodedSwap, _outTokenIndexFrom(encodedSwap), initiator, recipient, releaseAmount);
 
     emit SwapReleased(encodedSwap);
   }
@@ -302,9 +300,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
       _balanceOfPoolToken[_poolTokenIndexFrom(indexOfToken[address(1)], poolIndex)] -= coreAmount;
       _transferCoreToken(recipient, coreAmount);
     }
-    if (releaseAmount > 0) {
-      _release(encodedSwap, _outTokenIndexFrom(encodedSwap), initiator, recipient, releaseAmount);
-    }
+    _release(encodedSwap, _outTokenIndexFrom(encodedSwap), initiator, recipient, releaseAmount);
 
     emit SwapReleased(encodedSwap);
   }
@@ -312,7 +308,7 @@ contract MesonPools is IMesonPoolsEvents, MesonStates {
   function _release(uint256 encodedSwap, uint8 tokenIndex, address initiator, address recipient, uint256 amount) internal {
     if (_willTransferToContract(encodedSwap)) {
       _transferToContract(tokenIndex, recipient, initiator, amount, _saltDataFrom(encodedSwap));
-    } else {
+    } else if (amount > 0) {
       _safeTransfer(tokenIndex, recipient, amount);
       if ((SHORT_COIN_TYPE == 0x9296 || SHORT_COIN_TYPE == 0xb4b1 || SHORT_COIN_TYPE == 0x6c62) && _swapForCoreToken(encodedSwap)) {
         _callSkaleFaucet(recipient);
