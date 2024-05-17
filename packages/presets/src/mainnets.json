@@ -2162,6 +2162,22 @@
         "addr": "0x7537C1F80c9E157ED7AFD93a494be3e1f04f1462",
         "tokenIndex": 71,
         "partner": "free"
+      },
+      {
+        "name": "Merlin BTC",
+        "symbol": "M-BTC",
+        "decimals": 18,
+        "addr": "0x236CdB93E16884266e902fEE1f5Db37a19B72878",
+        "tokenIndex": 67,
+        "partner": "free"
+      },
+      {
+        "name": "Solv BTC",
+        "symbol": "SolvBTC",
+        "decimals": 18,
+        "addr": "0x2931a7dAb3dF4135823Ca9f36680fbbC741a2b3B",
+        "tokenIndex": 73,
+        "partner": "free"
       }
     ]
   },
@@ -2348,6 +2364,27 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 243
+      },
+      {
+        "name": "BUSDC",
+        "symbol": "BUSDC",
+        "decimals": 6,
+        "addr": "0x2f5ee356fAeBE9C51f5996f09ce807AaeCF14dDF",
+        "tokenIndex": 1
+      },
+      {
+        "name": "BUSDT",
+        "symbol": "BUSDT",
+        "decimals": 6,
+        "addr": "0x48CfbeC43a29dD3bfb8933e4A183678826494ac7",
+        "tokenIndex": 2
+      },
+      {
+        "name": "BETH",
+        "symbol": "BETH",
+        "decimals": 18,
+        "addr": "0xc68Ddbe40A24Ab7FE7987F3c97d4094f4dC68f21",
+        "tokenIndex": 254
       }
     ]
   }
