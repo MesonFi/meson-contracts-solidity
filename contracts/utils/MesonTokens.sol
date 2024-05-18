@@ -26,6 +26,7 @@ contract MesonTokens {
   ///       37:      cUSD (Celo)
   ///       39:      USDB (Blast)
   ///       40:      FDUSD
+  ///       41:      BBUSD
   ///     49-64:   stablecoins as core (decimals 18)
   ///       49:      USDC
   ///       52:      XDAI
@@ -44,7 +45,7 @@ contract MesonTokens {
   ///       239:     MATIC as core
   ///     240-243: BTC & BTC equivalent
   ///       240:     PoD BTC
-  ///       242:     ERC20 BTC (decimals 8 except BNB Smart Chain)
+  ///       242:     ERC20 BTC (decimals 8 except BNB Smart Chain & BounceBit)
   ///       243:     BTC as core
   ///     244-247: SOL & SOL equivalent
   ///       244:     PoD SOL

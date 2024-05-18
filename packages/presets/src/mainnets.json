@@ -2226,6 +2226,43 @@
     ]
   },
   {
+    "id": "bb",
+    "name": "BounceBit",
+    "alias": "BB",
+    "chainId": "0x1771",
+    "slip44": "0x80001771",
+    "shortSlip44": "0x1771",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://fullnode-mainnet.bouncebitapi.com",
+    "explorer": "https://bbscan.io",
+    "nativeCurrency": {
+      "name": "BB",
+      "symbol": "BB",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "BBTC",
+        "symbol": "BBTC",
+        "decimals": 18,
+        "addr": "0xF5e11df1ebCf78b6b6D26E04FF19cD786a1e81dC",
+        "tokenIndex": 242
+      },
+      {
+        "name": "BBUSD",
+        "symbol": "BBUSD",
+        "decimals": 18,
+        "addr": "0x77776b40C3d75cb07ce54dEA4b2Fd1D07F865222",
+        "tokenIndex": 41
+      }
+    ]
+  },
+  {
     "id": "bitlayer",
     "name": "Bitlayer",
     "alias": "BITLAYER",
