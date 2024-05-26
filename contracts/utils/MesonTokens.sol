@@ -35,7 +35,8 @@ contract MesonTokens {
   ///       67:      M-BTC (Merlin BTC)
   ///       69:      MERL
   ///       71:      STONE
-  ///       73:      SolvBTC
+  ///       73:      SolvBTC.m
+  ///       75:      SolvBTC.b
   ///     129-190: (Unspecified)
   ///     191:     No-swap core
   ///     192-235: (Unspecified)

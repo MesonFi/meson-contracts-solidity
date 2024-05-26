@@ -133,6 +133,14 @@
         "addr": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
         "tokenIndex": 242,
         "partner": "^free"
+      },
+      {
+        "name": "SolvBTC.b",
+        "symbol": "SolvBTC.b",
+        "decimals": 18,
+        "addr": "0x4aae823a6a0b376De6A78e74eCC5b079d38cBCf7",
+        "tokenIndex": 75,
+        "partner": "free"
       }
     ]
   },
@@ -550,8 +558,8 @@
         "partner": "free"
       },
       {
-        "name": "Solv BTC",
-        "symbol": "SolvBTC",
+        "name": "SolvBTC.m",
+        "symbol": "SolvBTC.m",
         "decimals": 18,
         "addr": "0x5FFcE65A40f6d3de5332766ffF6A28BF491C868c",
         "tokenIndex": 73,
@@ -872,12 +880,39 @@
         "partner": "free"
       },
       {
-        "name": "Solv BTC",
-        "symbol": "SolvBTC",
+        "name": "SolvBTC.m",
+        "symbol": "SolvBTC.m",
         "decimals": 18,
         "addr": "0xbEAf16cFD8eFe0FC97C2a07E349B9411F5dC272C",
         "link": "address/0xbEAf16cFD8eFe0FC97C2a07E349B9411F5dC272C",
         "tokenIndex": 73,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.b",
+        "symbol": "SolvBTC.b",
+        "decimals": 18,
+        "addr": "0x586E593Ffa60c15Ed722342f3C08cc90410e4fEA",
+        "link": "address/0x586E593Ffa60c15Ed722342f3C08cc90410e4fEA",
+        "tokenIndex": 75,
+        "partner": "free"
+      },
+      {
+        "name": "BBTC",
+        "symbol": "BBTC",
+        "decimals": 18,
+        "addr": "0x7118D8700B1b635CA37992294349Dc616fDC94Fe",
+        "link": "address/0x7118D8700B1b635CA37992294349Dc616fDC94Fe",
+        "tokenIndex": 242,
+        "partner": "free"
+      },
+      {
+        "name": "BBUSD",
+        "symbol": "BBUSD",
+        "decimals": 18,
+        "addr": "0x7F934E97101e2239b9cB438A4B07d9474AD51406",
+        "link": "address/0x7F934E97101e2239b9cB438A4B07d9474AD51406",
+        "tokenIndex": 41,
         "partner": "free"
       }
     ]
@@ -1922,6 +1957,14 @@
         "decimals": 8,
         "addr": "0x8034ab88c3512246bf7894f57c834dddbd1de01f",
         "tokenIndex": 242
+      },
+      {
+        "name": "SolvBTC.b",
+        "symbol": "SolvBTC.b",
+        "decimals": 18,
+        "addr": "0x5B1Fb849f1F76217246B8AAAC053b5C7b15b7dc3",
+        "tokenIndex": 75,
+        "partner": "free"
       }
     ]
   },
@@ -2067,8 +2110,8 @@
         "partner": "free"
       },
       {
-        "name": "Solv BTC",
-        "symbol": "SolvBTC",
+        "name": "SolvBTC.m",
+        "symbol": "SolvBTC.m",
         "decimals": 18,
         "addr": "0x41D9036454BE47d3745A823C4aaCD0e29cFB0f71",
         "tokenIndex": 73,
@@ -2172,8 +2215,8 @@
         "partner": "free"
       },
       {
-        "name": "Solv BTC",
-        "symbol": "SolvBTC",
+        "name": "SolvBTC.m",
+        "symbol": "SolvBTC.m",
         "decimals": 18,
         "addr": "0x2931a7dAb3dF4135823Ca9f36680fbbC741a2b3B",
         "tokenIndex": 73,
@@ -2251,14 +2294,23 @@
         "symbol": "BBTC",
         "decimals": 18,
         "addr": "0xF5e11df1ebCf78b6b6D26E04FF19cD786a1e81dC",
-        "tokenIndex": 242
+        "tokenIndex": 242,
+        "partner": "^free"
       },
       {
         "name": "BBUSD",
         "symbol": "BBUSD",
         "decimals": 18,
         "addr": "0x77776b40C3d75cb07ce54dEA4b2Fd1D07F865222",
-        "tokenIndex": 41
+        "tokenIndex": 41,
+        "partner": "^free"
+      },
+      {
+        "name": "BB",
+        "symbol": "BB",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 191
       }
     ]
   },
@@ -2310,6 +2362,14 @@
         "decimals": 18,
         "addr": "0xef63d4e178b3180beec9b0e143e0f37f4c93f4c2",
         "tokenIndex": 254
+      },
+      {
+        "name": "BIT-STONE",
+        "symbol": "BIT-STONE",
+        "decimals": 18,
+        "addr": "0xe5B9C20B3de172A4FEc1f9a0aa1D2aA0A03E86b4",
+        "tokenIndex": 71,
+        "partner": "free"
       }
     ]
   },
@@ -2422,6 +2482,14 @@
         "decimals": 18,
         "addr": "0xc68Ddbe40A24Ab7FE7987F3c97d4094f4dC68f21",
         "tokenIndex": 254
+      },
+      {
+        "name": "BEV-STONE",
+        "symbol": "BEV-STONE",
+        "decimals": 18,
+        "addr": "0x44890e863427258048F9b3eC433F86aD2FfD1c28",
+        "tokenIndex": 71,
+        "partner": "free"
       }
     ]
   }
