@@ -1,6 +1,6 @@
 const { ethers } = require('hardhat')
 const { AptosClient } = require('aptos')
-const { JsonRpcProvider: SuiProvider, Connection: SuiConnection } = require('@mysten/sui.js')
+const { SuiClient } = require('@mysten/sui.js/client')
 const { Connection: SolConnection } = require('@solana/web3.js')
 const { RpcProvider: StarkProvider } = require('starknet')
 const TronWeb = require('tronweb')
@@ -11,11 +11,7 @@ exports.getClient = function getClient (network) {
   if (network.id.startsWith('aptos')) {
     return new AptosClient(network.url)
   } else if (network.id.startsWith('sui')) {
-    const connection = new SuiConnection({
-      fullnode: network.url,
-      faucet: 'https://faucet.testnet.sui.io/gas',
-    })
-    return new SuiProvider(connection)
+    return new SuiClient({ url: network.url })
   } else if (network.id.startsWith('solana')) {
     return new SolConnection(network.url, 'confirmed')
   } else if (network.id.startsWith('starknet')) {

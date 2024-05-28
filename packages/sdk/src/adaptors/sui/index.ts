@@ -1,9 +1,7 @@
 import { BigNumber, BigNumberish, utils } from 'ethers'
-import {
-  Ed25519Keypair as SuiKeypair,
-  JsonRpcProvider as SuiProvider,
-  TransactionBlock,
-} from '@mysten/sui.js'
+import { SuiClient } from '@mysten/sui.js/client'
+import { Ed25519Keypair as SuiKeypair } from '@mysten/sui.js/keypairs/ed25519'
+import { TransactionBlock } from '@mysten/sui.js/transactions'
 
 import memoize from 'lodash/memoize'
 
@@ -12,7 +10,7 @@ import { Swap } from '../../Swap'
 import SuiAdaptor from './SuiAdaptor'
 import SuiWallet, { SuiExtWallet } from './SuiWallet'
 
-export function getWallet(privateKey: string, client: SuiProvider): SuiWallet {
+export function getWallet(privateKey: string, client: SuiClient): SuiWallet {
   let keypair: SuiKeypair
   if (!privateKey) {
     keypair = SuiKeypair.generate()
@@ -24,11 +22,11 @@ export function getWallet(privateKey: string, client: SuiProvider): SuiWallet {
   return new SuiWallet(client, keypair)
 }
 
-export function getWalletFromExtension(ext, client: SuiProvider): SuiExtWallet {
+export function getWalletFromExtension(ext, client: SuiClient): SuiExtWallet {
   return new SuiExtWallet(client, ext)
 }
 
-export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdaptor) {
+export function getContract(address, abi, clientOrAdaptor: SuiClient | SuiAdaptor) {
   let adaptor: SuiAdaptor
   if (clientOrAdaptor instanceof SuiWallet) {
     adaptor = clientOrAdaptor
@@ -70,7 +68,7 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
     }
   }
 
-  const getDynamicFieldValue = async (store: any, field: { type: string, value?: any }) => {
+  const getDynamicFieldValue = async (store: any, field: { type: string, value: any }) => {
     try {
       const res = await adaptor.client.getDynamicFieldObject({ parentId: store.fields.id.id, name: field })
       if (res.error?.code === 'dynamicFieldNotFound') {
@@ -88,12 +86,12 @@ export function getContract(address, abi, clientOrAdaptor: SuiProvider | SuiAdap
   const getSupportedTokens = memoize(async () => {
     const storeG = await getStoreG()
     const data = await getDynamicFields(storeG.supported_coins)
-    const sortedData = data.sort((x, y) => x.name.value - y.name.value)
+    const sortedData = data.sort((x, y) => Number(x.name.value) - Number(y.name.value))
     const indexes: number[] = []
     const tokens: string[] = []
     for (const item of sortedData) {
       const coinObject = await memoizedGetObject(item.objectId)
-      indexes.push(item.name.value)
+      indexes.push(Number(item.name.value))
       tokens.push(formatAddress(coinObject.value.fields.name))
     }
     return { tokens, indexes }

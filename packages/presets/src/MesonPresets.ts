@@ -1,5 +1,5 @@
 import { providers } from 'ethers'
-import { JsonRpcProvider as SuiProvider, Connection as SuiConnection } from '@mysten/sui.js'
+import { SuiClient } from '@mysten/sui.js/client'
 import { Connection as SolConnection } from '@solana/web3.js'
 import { RpcProvider as StarkProvider } from 'starknet'
 import TronWeb from 'tronweb'
@@ -201,7 +201,7 @@ export class MesonPresets {
     if (id.startsWith('aptos')) {
       return [AptosFallbackClient, [urls]]
     } else if (id.startsWith('sui')) {
-      return [SuiProvider, [new SuiConnection({ fullnode: url })]]
+      return [SuiClient, [{ url }]]
     } else if (id.startsWith('solana')) {
       return [SolConnection, [url, 'confirmed']]
     } else if (id.startsWith('starknet')) {

@@ -3,7 +3,7 @@ global.fetch = fetch
 
 import { AptosClient } from 'aptos'
 import { providers, Signer, utils } from 'ethers'
-import { JsonRpcProvider as SuiProvider } from '@mysten/sui.js'
+import { SuiClient } from '@mysten/sui.js/client'
 import { Connection as SolConnection } from '@solana/web3.js'
 import { RpcProvider as StarkProvider } from 'starknet'
 import TronWeb from 'tronweb'
@@ -24,7 +24,7 @@ import StarkAdaptor from './starknet/StarkAdaptor'
 export function getWallet (privateKey, client) {
   if (client instanceof AptosClient) {
     return _aptos.getWallet(privateKey, client)
-  } else if (client instanceof SuiProvider) {
+  } else if (client instanceof SuiClient) {
     return _sui.getWallet(privateKey, client)
   } else if (client instanceof SolConnection) {
     return _solana.getWallet(privateKey, client)
@@ -42,7 +42,7 @@ export function getWallet (privateKey, client) {
 export function getContract(address, abi, clientOrAdaptor) {
   if (clientOrAdaptor instanceof AptosClient || clientOrAdaptor instanceof AptosAdaptor) {
     return _aptos.getContract(address, abi, clientOrAdaptor)
-  } else if (clientOrAdaptor instanceof SuiProvider || clientOrAdaptor instanceof SuiAdaptor) {
+  } else if (clientOrAdaptor instanceof SuiClient || clientOrAdaptor instanceof SuiAdaptor) {
     return _sui.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof SolConnection || clientOrAdaptor instanceof SolanaAdaptor) {
     return _solana.getContract(address, abi, clientOrAdaptor)

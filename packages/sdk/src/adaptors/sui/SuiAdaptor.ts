@@ -1,21 +1,18 @@
 import { BigNumber, utils } from 'ethers'
-import {
-  JsonRpcProvider as SuiProvider,
-  type SuiTransactionBlockResponse
-} from '@mysten/sui.js'
+import { SuiClient, type SuiTransactionBlockResponse } from '@mysten/sui.js/client'
 
 const mesonAddress = '0x371a30d40fcc357a37d412c4750a57303d58c9482e5f51886e46f7bf774028f3'
 
 export default class SuiAdaptor {
-  readonly client: SuiProvider
+  readonly client: SuiClient
 
-  constructor(client: SuiProvider) {
+  constructor(client: SuiClient) {
     this.client = client
   }
 
   get nodeUrl() {
     // TODO
-    return this.client.connection.fullnode
+    return '[Sui nodeUrl not available]'
   }
 
   async detectNetwork(): Promise<any> {

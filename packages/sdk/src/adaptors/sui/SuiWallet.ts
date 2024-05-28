@@ -1,23 +1,16 @@
 import { utils } from 'ethers'
-import {
-  JsonRpcProvider as SuiProvider,
-  Keypair as SuiKeypair,
-  RawSigner,
-  TransactionBlock,
-  type SuiTransactionBlockResponseOptions,
-} from '@mysten/sui.js'
+import { SuiClient, type SuiTransactionBlockResponseOptions } from '@mysten/sui.js/client'
+import { Ed25519Keypair as SuiKeypair } from '@mysten/sui.js/keypairs/ed25519'
+import { TransactionBlock } from '@mysten/sui.js/transactions'
+
 import SuiAdaptor from './SuiAdaptor'
 
 export default class SuiWallet extends SuiAdaptor {
   readonly keypair: SuiKeypair
-  readonly signer: RawSigner
 
-  constructor(client: SuiProvider, keypair?: SuiKeypair) {
+  constructor(client: SuiClient, keypair?: SuiKeypair) {
     super(client)
-    if (keypair) {
-      this.keypair = keypair
-      this.signer = new RawSigner(keypair, client)
-    }
+    this.keypair = keypair
   }
 
   get address() {
@@ -28,7 +21,7 @@ export default class SuiWallet extends SuiAdaptor {
     const txb = new TransactionBlock()
     const [coin] = txb.splitCoins(txb.gas, [txb.pure(value)])
     txb.transferObjects([coin], txb.pure(to))
-    const result = await this.signer.signAndExecuteTransactionBlock({ transactionBlock: txb, options })
+    const result = await this.client.signAndExecuteTransactionBlock({ signer: this.keypair, transactionBlock: txb, options })
     return {
       hash: result.digest,
       wait: () => this._wrapSuiTx(result)
@@ -40,7 +33,10 @@ export default class SuiWallet extends SuiAdaptor {
   }
 
   async sendTransaction(txb: TransactionBlock, options?: SuiTransactionBlockResponseOptions) {
-    const result = await this.signer.signAndExecuteTransactionBlock({ transactionBlock: txb, options })
+    if (!(txb instanceof TransactionBlock)) {
+      return this.transfer(txb, options)
+    }
+    const result = await this.client.signAndExecuteTransactionBlock({ signer: this.keypair, transactionBlock: txb, options })
     return {
       hash: result.digest,
       wait: () => this._wrapSuiTx(result)
@@ -74,7 +70,7 @@ export default class SuiWallet extends SuiAdaptor {
 export class SuiExtWallet extends SuiWallet {
   readonly ext: any
 
-  constructor(client: SuiProvider, ext) {
+  constructor(client: SuiClient, ext) {
     super(client)
     this.ext = ext
   }
