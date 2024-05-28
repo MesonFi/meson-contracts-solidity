@@ -89,7 +89,8 @@
     "deploy:bb": "hardhat deploy --mainnet bb --upgradable true",
     "deploy:bitlayer": "hardhat deploy --mainnet bitlayer --upgradable true",
     "deploy:taproot": "hardhat deploy --mainnet taproot --upgradable true",
-    "deploy:bob": "hardhat deploy --mainnet bob --upgradable true"
+    "deploy:bob": "hardhat deploy --mainnet bob --upgradable true",
+    "deploy:taiko": "hardhat deploy --mainnet taiko --upgradable true"
   },
   "devDependencies": {
     "@matterlabs/hardhat-zksync-deploy": "^0.6.2",

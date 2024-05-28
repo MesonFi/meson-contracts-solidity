@@ -1057,6 +1057,43 @@
     ]
   },
   {
+    "id": "taiko",
+    "name": "Taiko",
+    "alias": "TAIKO",
+    "chainId": "0x28c58",
+    "slip44": "0x800028c5",
+    "shortSlip44": "0x28c5",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc.mainnet.taiko.xyz",
+    "explorer": "https://taikoscan.network",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x07d83526730c7438048D55A4fc0b850e2aaB6f0b",
+        "tokenIndex": 1
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
     "id": "zkevm",
     "name": "Polygon zkEVM",
     "alias": "ZKEVM",
