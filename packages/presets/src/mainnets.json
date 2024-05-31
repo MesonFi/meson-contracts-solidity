@@ -131,8 +131,7 @@
         "symbol": "BTCB",
         "decimals": 18,
         "addr": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
-        "tokenIndex": 242,
-        "partner": "^free"
+        "tokenIndex": 242
       },
       {
         "name": "SolvBTC.b",
@@ -903,7 +902,7 @@
         "decimals": 18,
         "addr": "0x7118D8700B1b635CA37992294349Dc616fDC94Fe",
         "link": "address/0x7118D8700B1b635CA37992294349Dc616fDC94Fe",
-        "tokenIndex": 242,
+        "tokenIndex": 241,
         "partner": "free"
       },
       {
@@ -995,6 +994,22 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 255
+      },
+      {
+        "name": "SolvBTC.m",
+        "symbol": "SolvBTC.m",
+        "decimals": 18,
+        "addr": "0x2365649F604377bA6472579e8c19fACFED13C9DC",
+        "tokenIndex": 73,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.b",
+        "symbol": "SolvBTC.b",
+        "decimals": 18,
+        "addr": "0x3Ba89d490AB1C0c9CC2313385b30710e838370a4",
+        "tokenIndex": 75,
+        "partner": "free"
       }
     ]
   },
@@ -2233,7 +2248,7 @@
         "decimals": 18,
         "addr": "0x5D247F32b792A61f7b4078Cf7752A878aff152e2",
         "tokenIndex": 240,
-        "partner": "free"
+        "disabled": true
       },
       {
         "name": "STONE ETH on BSquared",
@@ -2406,6 +2421,22 @@
         "decimals": 18,
         "addr": "0xe5B9C20B3de172A4FEc1f9a0aa1D2aA0A03E86b4",
         "tokenIndex": 71,
+        "partner": "free"
+      },
+      {
+        "name": "Merlin BTC",
+        "symbol": "M-BTC",
+        "decimals": 18,
+        "addr": "0x50660CAC0e59E35c6A120E704A872dF80D421a9d",
+        "tokenIndex": 67,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.m",
+        "symbol": "SolvBTC.m",
+        "decimals": 18,
+        "addr": "0xe04d21d999FaEDf1e72AdE6629e20A11a1ed14FA",
+        "tokenIndex": 73,
         "partner": "free"
       }
     ]
