@@ -2,6 +2,7 @@ import { Wallet, utils } from 'ethers'
 import { HDNode } from '@ethersproject/hdnode'
 import TronWeb from 'tronweb'
 import bs58 from 'bs58'
+import { helpers, config } from '@ckb-lumos/lumos'
 
 const NOTICE_SIGN_REQUEST = 'Sign to request a swap on Meson'
 const NOTICE_SIGN_RELEASE = 'Sign to release a swap on Meson'
@@ -31,6 +32,19 @@ export const clipRecipient = (recipient: string, encoded: string) => {
       return recipient
     } else {
       return utils.hexZeroPad(recipient, 32).substring(0, 42)
+    }
+  } else if (chain === '0135') {
+    // to ckb
+    if (utils.isAddress(recipient)) {
+      return recipient
+    } else {
+      const lockScript = helpers.parseAddress(recipient, {
+        config: recipient.startsWith('ckb') ? config.MAINNET : config.TESTNET
+      })
+      if (!lockScript.args.startsWith('0x0001')) {
+        throw new Error('Recipient not supported')
+      }
+      return lockScript.args.replace('0x0001', '0x')
     }
   } else {
     // to eth

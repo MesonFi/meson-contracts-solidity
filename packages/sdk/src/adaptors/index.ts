@@ -8,6 +8,7 @@ import { Connection as SolConnection } from '@solana/web3.js'
 import { RpcProvider as StarkProvider } from 'starknet'
 import TronWeb from 'tronweb'
 import { Provider as ZkProvider, Wallet as ZkWallet } from 'zksync-web3'
+import { RPC as CkbRPC } from '@ckb-lumos/lumos'
 
 import * as _aptos from './aptos'
 import * as _ethers from './ethers'
@@ -16,10 +17,12 @@ import * as _solana from './solana'
 import * as _starknet from './starknet'
 import * as _tron from './tron'
 import * as _zksync from './zksync'
+import * as _ckb from './ckb'
 import AptosAdaptor from './aptos/AptosAdaptor'
 import SuiAdaptor from './sui/SuiAdaptor'
 import SolanaAdaptor from './solana/SolanaAdaptor'
 import StarkAdaptor from './starknet/StarkAdaptor'
+import CkbAdaptor from './ckb/CkbAdaptor'
 
 export function getWallet (privateKey, client) {
   if (client instanceof AptosClient) {
@@ -30,6 +33,8 @@ export function getWallet (privateKey, client) {
     return _solana.getWallet(privateKey, client)
   } else if (client instanceof StarkProvider) {
     return _starknet.getWallet(privateKey, client)
+  } else if (client instanceof CkbRPC) {
+    return _ckb.getWallet(privateKey, client)
   } else if (client instanceof ZkProvider) {
     return _zksync.getWallet(privateKey, client)
   } else if (client instanceof providers.Provider) {
@@ -48,6 +53,8 @@ export function getContract(address, abi, clientOrAdaptor) {
     return _solana.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof StarkProvider || clientOrAdaptor instanceof StarkAdaptor) {
     return _starknet.getContract(address, abi, clientOrAdaptor)
+  } else if (clientOrAdaptor instanceof CkbRPC || clientOrAdaptor instanceof CkbAdaptor) {
+    return _ckb.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof providers.Provider || Signer.isSigner(clientOrAdaptor)) {
     return _ethers.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof ZkProvider || clientOrAdaptor instanceof ZkWallet) {
@@ -57,7 +64,7 @@ export function getContract(address, abi, clientOrAdaptor) {
   }
 }
 
-export type AddressFormat = 'ethers' | 'bitcoin' | 'tron' | 'aptos' | 'sui' | 'solana' | 'starknet'
+export type AddressFormat = 'ethers' | 'bitcoin' | 'tron' | 'aptos' | 'sui' | 'solana' | 'starknet' | 'ckb'
 export function isAddress(format: AddressFormat, addr: string): boolean {
   if (format === 'ethers') {
     return utils.isHexString(addr) && utils.isAddress(addr)
@@ -70,6 +77,9 @@ export function isAddress(format: AddressFormat, addr: string): boolean {
   } else if (format === 'solana') {
     return !!_solana.formatAddress(addr)
   } else if (format === 'starknet') {
+    // TODO
+    return !!addr
+  } else if (format === 'ckb') {
     // TODO
     return !!addr
   }
@@ -94,6 +104,8 @@ export function formatAddress(format: AddressFormat, addr: string): string {
     return _solana.formatAddress(addr)
   } else if (format === 'starknet') {
     return _starknet.formatAddress(addr)
+  } else if (format === 'ckb') {
+    return _ckb.formatAddress(addr)
   }
 }
 
@@ -104,3 +116,4 @@ export const solana = _solana
 export const starknet = _starknet
 export const tron = _tron
 export const zksync = _zksync
+export const ckb = _ckb

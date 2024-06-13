@@ -17,7 +17,8 @@ import {
   AptosFallbackClient,
   RpcFallbackProvider,
   FailsafeStaticJsonRpcProvider,
-  FailsafeWebSocketProvider
+  FailsafeWebSocketProvider,
+  ExtendedCkbClient,
 } from './providers'
 
 import testnets from './testnets.json'
@@ -51,6 +52,7 @@ export interface PresetNetwork {
   url?: string
   explorer?: string
   mesonAddress: string
+  metadata?: any
   uctAddress?: string
   nativeCurrency?: {
     name?: string
@@ -206,6 +208,8 @@ export class MesonPresets {
       return [SolConnection, [url, 'confirmed']]
     } else if (id.startsWith('starknet')) {
       return [StarkProvider, [{ nodeUrl: url }]]
+    } else if (id.startsWith('ckb')) {
+      return [ExtendedCkbClient, [url, undefined, { ...network.metadata, tokens: network.tokens }]]
     } else if (id.startsWith('tron')) {
       return [TronWeb, [{ fullHost: url }]]
     }

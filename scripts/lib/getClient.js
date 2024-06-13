@@ -5,6 +5,7 @@ const { Connection: SolConnection } = require('@solana/web3.js')
 const { RpcProvider: StarkProvider } = require('starknet')
 const TronWeb = require('tronweb')
 const { Provider } = require('zksync-web3')
+const { RPC: CkbRPC } = require('@ckb-lumos/lumos')
 const CustomGasFeeProviderWrapper = require('./CustomGasFeeProviderWrapper')
 
 exports.getClient = function getClient (network) {
@@ -20,6 +21,8 @@ exports.getClient = function getClient (network) {
     return new TronWeb({ fullHost: network.url })
   } else if (network.id.startsWith('zksync') || network.id.startsWith('zklink')) {
     return new Provider(network.url)
+  } else if (network.id.startsWith('ckb')) {
+    return new CkbRPC(network.url)
   } else {
     hre.changeNetwork(network.id)
     ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)

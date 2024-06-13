@@ -1,6 +1,6 @@
 {
   "name": "@mesonfi/sdk",
-  "version": "1.17.20",
+  "version": "1.18.0-rc.1",
   "description": "",
   "license": "MIT",
   "repository": "https://github.com/MesonFi/meson-contracts-solidity",
@@ -19,6 +19,7 @@
     "prepare": "yarn build"
   },
   "dependencies": {
+    "@ckb-lumos/lumos": "^0.22.2",
     "@mesonfi/contract-abis": "^1.16.0",
     "@mesonfi/contract-types": "^1.13.0",
     "@mysten/sui.js": "0.54.1",

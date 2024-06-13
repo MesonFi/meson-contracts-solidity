@@ -1,6 +1,7 @@
 import { providers, errors } from 'ethers'
 import sample from 'lodash/sample'
 import { AptosClient, Types } from 'aptos'
+import { RPC as CkbRPC, type config } from '@ckb-lumos/lumos'
 
 function timer(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -163,5 +164,14 @@ export class FailsafeWebSocketProvider extends providers.WebSocketProvider {
       }
       throw e
     }
+  }
+}
+
+export class ExtendedCkbClient extends CkbRPC {
+  readonly metadata: any
+
+  constructor(url: string, config: any, metadata: any) {
+    super(url, config || {})
+    this.metadata = metadata
   }
 }

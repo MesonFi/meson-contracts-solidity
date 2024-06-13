@@ -1,6 +1,6 @@
 {
   "name": "@mesonfi/presets",
-  "version": "1.17.26",
+  "version": "1.18.0-rc.1",
   "description": "",
   "license": "MIT",
   "repository": "https://github.com/MesonFi/meson-contracts-solidity",
@@ -18,8 +18,9 @@
     "prepare": "yarn build"
   },
   "dependencies": {
+    "@ckb-lumos/lumos": "^0.22.2",
     "@mesonfi/contract-abis": "^1.16.0",
-    "@mesonfi/sdk": "^1.17.20",
+    "@mesonfi/sdk": "^1.18.0-rc.1",
     "@mysten/sui.js": "0.54.1",
     "@solana/web3.js": "1.87.5",
     "aptos": "1.3.16",

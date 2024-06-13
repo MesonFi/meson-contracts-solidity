@@ -23,6 +23,7 @@ import AptosAdaptor from './adaptors/aptos/AptosAdaptor'
 import SuiAdaptor from './adaptors/sui/SuiAdaptor'
 import SolanaAdaptor from './adaptors/solana/SolanaAdaptor'
 import StarkAdaptor from './adaptors/starknet/StarkAdaptor'
+import CkbAdaptor from './adaptors/ckb/CkbAdaptor'
 
 const Zero = constants.AddressZero.substring(2)
 const AddressOne = '0x0000000000000000000000000000000000000001'
@@ -166,6 +167,8 @@ export class MesonClient {
       this.addressFormat = 'solana'
     } else if (mesonInstance.provider instanceof StarkAdaptor) {
       this.addressFormat = 'starknet'
+    } else if (mesonInstance.provider instanceof CkbAdaptor) {
+      this.addressFormat = 'ckb'
     } else {
       this.addressFormat = 'tron'
     }
@@ -261,6 +264,7 @@ export class MesonClient {
   get coreDecimals() {
     switch (this.addressFormat) {
       case 'aptos':
+      case 'ckb':
         return 8
       case 'sui':
       case 'solana':
@@ -546,7 +550,7 @@ export class MesonClient {
   }
 
   async lockSwap(encoded: string, initiator: string, recipient?: string, ...overrides: [CallOverrides?]) {
-    if (['027d', '0310', '01f5', '232c'].includes(encoded.substring(54, 58))) { // to aptos, sui, solana, starknet
+    if (['027d', '0310', '01f5', '232c', '0135'].includes(encoded.substring(54, 58))) { // to aptos, sui, solana, starknet
       return this.#mesonInstance.lockSwap(encoded, { initiator, recipient } as any, ...overrides)
     } else {
       return this.#mesonInstance.lockSwap(encoded, initiator, ...overrides)

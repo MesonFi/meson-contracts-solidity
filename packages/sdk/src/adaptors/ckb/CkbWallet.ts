@@ -1,0 +1,111 @@
+import {
+  type RPC as CkbRPC,
+  hd,
+  helpers,
+  commons,
+  utils,
+  type Script,
+} from '@ckb-lumos/lumos'
+import CkbAdaptor from './CkbAdaptor'
+
+export default class CkbWallet extends CkbAdaptor {
+  readonly #address: string
+  readonly #privateKey: string
+  readonly publicKey: string
+
+  protected _pkhPrefix: string
+
+  constructor(client: CkbRPC, opt: { address?: string, privateKey?: string }) {
+    super(client)
+    if (opt.privateKey) {
+      this._pkhPrefix = '0x000000'
+      this.#privateKey = opt.privateKey
+      this.#address = helpers.encodeToAddress({
+        codeHash: this.network.SCRIPTS.SECP256K1_BLAKE160.CODE_HASH,
+        hashType: this.network.SCRIPTS.SECP256K1_BLAKE160.HASH_TYPE,
+        args: hd.key.publicKeyToBlake160(hd.key.privateToPublic(opt.privateKey)),
+      }, { config: this.network })
+    } else if (opt.address) {
+      this.#address = opt.address
+      this._pkhPrefix = this._prefixFromCodeHash(this.lockScript.codeHash)
+    }
+  }
+
+  get address(): string {
+    return this.#address
+  }
+
+  get lockScript(): Script {
+    return helpers.parseAddress(this.address, { config: this.network })
+  }
+
+  get lockHash(): string {
+    return utils.computeScriptHash(this.lockScript)
+  }
+
+  get pkh(): string {
+    return this.lockScript.args.replace('0x', this._pkhPrefix)
+  }
+
+  async deploy() {}
+
+  async transfer({ to, value }) {}
+
+  async sendTransaction(txSkeleton: helpers.TransactionSkeletonType, ...args: any[]) {
+    if (!this.#address) {
+      throw new Error('Cannot sign the transaction. No private key.')
+    }
+    const prepared = commons.common.prepareSigningEntries(txSkeleton, { config: this.network })
+    const signatures = prepared.get('signingEntries')
+      .map(({ message }) => hd.key.signRecoverable(message, this.#privateKey))
+    const tx = helpers.sealTransaction(prepared, signatures.toJSON())
+    const hash = await this.client.sendTransaction(tx, 'passthrough')
+    return {
+      hash,
+      wait: () => this.waitForTransaction(hash)
+    }
+  }
+}
+
+export class CkbWalletFromJoyId extends CkbWallet {
+  readonly ext: any
+
+  constructor(client: CkbRPC, ext) {
+    super(client, {})
+    this.ext = ext
+    this._pkhPrefix = '0x01'
+  }
+
+  get address(): string {
+    return this.ext?.currentAccount?.address
+  }
+
+  async deploy(): Promise<any> {
+    throw new Error('Cannot deploy with extention wallet')
+  }
+
+  async sendTransaction(txSkeleton: helpers.TransactionSkeletonType, witnessIndex: number = 0) {
+    const converted = this.#convertTxSkeleton(txSkeleton)
+    const tx = await this.ext?.signRawTransaction(converted, witnessIndex)
+    const hash = await this.client.sendTransaction(tx, 'passthrough')
+    return {
+      hash,
+      wait: () => this.waitForTransaction(hash)
+    }
+  }
+
+  #convertTxSkeleton(txSkeleton: helpers.TransactionSkeletonType) {
+    return {
+      version: '0x0',
+      cellDeps: txSkeleton.cellDeps.toJSON(),
+      headerDeps: [],
+      inputs: txSkeleton.inputs.toJSON().map((input, inputIndex) => ({
+        previousOutput: input.outPoint,
+        since: txSkeleton.inputSinces.get(inputIndex) || '0x0'
+      })),
+      outputs: txSkeleton.outputs.toJSON().map(output => output.cellOutput),
+      outputsData: txSkeleton.outputs.toJSON().map(x => x.data),
+      witnesses: txSkeleton.witnesses.toJSON(),
+    }
+  }
+}
