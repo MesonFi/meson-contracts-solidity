@@ -563,6 +563,30 @@
         "addr": "0x5FFcE65A40f6d3de5332766ffF6A28BF491C868c",
         "tokenIndex": 73,
         "partner": "free"
+      },
+      {
+        "name": "SolvBTC.b",
+        "symbol": "SolvBTC.b",
+        "decimals": 18,
+        "addr": "0x96155858A02c410c3C814BB32Fdc413b3241b62E",
+        "tokenIndex": 75,
+        "partner": "free"
+      },
+      {
+        "name": "BBTC",
+        "symbol": "BBTC",
+        "decimals": 18,
+        "addr": "0x93C12084dCFC08c759ad96B94234D9C39705689f",
+        "tokenIndex": 241,
+        "partner": "free"
+      },
+      {
+        "name": "BBUSD",
+        "symbol": "BBUSD",
+        "decimals": 18,
+        "addr": "0x17E7332300F6a1B3b14eDce9Ef9Bf582E32a00f4",
+        "tokenIndex": 41,
+        "partner": "free"
       }
     ]
   },
@@ -791,6 +815,22 @@
         "decimals": 18,
         "addr": "0x59889b7021243dB5B1e065385F918316cD90D46c",
         "tokenIndex": 67,
+        "partner": "free"
+      },
+      {
+        "name": "BBTC",
+        "symbol": "BBTC",
+        "decimals": 18,
+        "addr": "0xF570e9f6a6916eA31c12c2234a11941f5E990783",
+        "tokenIndex": 241,
+        "partner": "free"
+      },
+      {
+        "name": "BBUSD",
+        "symbol": "BBUSD",
+        "decimals": 18,
+        "addr": "0xeAa2b5F25a6DD61149B4bF37311209788394f9c4",
+        "tokenIndex": 41,
         "partner": "free"
       }
     ]
@@ -1068,6 +1108,22 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 191
+      },
+      {
+        "name": "SolvBTC.m",
+        "symbol": "SolvBTC.m",
+        "decimals": 18,
+        "addr": "0x2D8100E48c1A954601F3E1aA9aC1554D850f9068",
+        "tokenIndex": 73,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.b",
+        "symbol": "SolvBTC.b",
+        "decimals": 18,
+        "addr": "0x59889b7021243dB5B1e065385F918316cD90D46c",
+        "tokenIndex": 75,
+        "partner": "free"
       }
     ]
   },
@@ -2011,6 +2067,14 @@
         "tokenIndex": 242
       },
       {
+        "name": "SolvBTC.m",
+        "symbol": "SolvBTC.m",
+        "decimals": 18,
+        "addr": "0xe04d21d999FaEDf1e72AdE6629e20A11a1ed14FA",
+        "tokenIndex": 73,
+        "partner": "free"
+      },
+      {
         "name": "SolvBTC.b",
         "symbol": "SolvBTC.b",
         "decimals": 18,
@@ -2278,7 +2342,7 @@
   },
   {
     "id": "bob",
-    "name": "BOB",
+    "name": "Bob",
     "alias": "BOB",
     "chainId": "0xed88",
     "slip44": "0x8000ed88",
@@ -2317,6 +2381,22 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 255
+      },
+      {
+        "name": "SolvBTC.m",
+        "symbol": "SolvBTC.m",
+        "decimals": 18,
+        "addr": "0x0fB263c9514EB8d2c577A8e65cB6CAA57c49848f",
+        "tokenIndex": 73,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.b",
+        "symbol": "SolvBTC.b",
+        "decimals": 18,
+        "addr": "0x59889b7021243dB5B1e065385F918316cD90D46c",
+        "tokenIndex": 75,
+        "partner": "free"
       }
     ]
   },
