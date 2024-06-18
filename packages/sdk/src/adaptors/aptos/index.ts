@@ -378,13 +378,6 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
                   _vectorize(initiator),
                   recipient
                 ]
-              } else if (prop === 'simpleRelease') {
-                const [_, recipient] = args
-                payload.type_arguments = [await getTokenAddr(swap.outToken)]
-                payload.arguments = [
-                  _vectorize(swap.encoded),
-                  recipient
-                ]
               }
             }
 
@@ -412,7 +405,6 @@ function _findMesonMethodModule(method) {
       'unlock',
       'release',
       'directRelease',
-      'simpleRelease',
     ],
     MesonSwap: ['postSwapFromInitiator', 'bondSwap', 'cancelSwap', 'executeSwap'],
   }

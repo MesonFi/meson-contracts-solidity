@@ -104,16 +104,17 @@ export class RpcFallbackProvider extends providers.FallbackProvider {
   }
 
   private async _send(method, params) {
-    if (!this.#currentProvider) {
-      this.sampleRpc()
+    const configs = [...this.providerConfigs].sort(() => Math.sign(Math.random() - 0.5))
+    const errors = []
+    while (configs.length) {
+      const current = configs.pop()
+      try {
+        return await timeout((current.provider as providers.JsonRpcProvider).send(method, params), 3000)
+      } catch (e) {
+        errors.push(e)
+      }
     }
-
-    try {
-      return await timeout(this.#currentProvider.send(method, params), 3000)
-    } catch (e) {
-      this.#currentProvider = null
-      return this._send(method, params)
-    }
+    throw new AggregateError(errors, 'All providers failed')
   }
 
   async perform(method: string, params: { [name: string]: any }): Promise<any> {
@@ -128,6 +129,18 @@ export class RpcFallbackProvider extends providers.FallbackProvider {
 }
 
 export class FailsafeStaticJsonRpcProvider extends providers.StaticJsonRpcProvider {
+  constructor(url: string, network: providers.Networkish) {
+    super({
+      url,
+      timeout: 10_000,
+      throttleLimit: 3,
+      throttleCallback: async (attempt: number, url: string) => {
+        console.log(`[429]`, url, attempt)
+        return true
+      }
+    }, network)
+  }
+
   async sendTransaction (signedTransaction: string | Promise<string>): Promise<providers.TransactionResponse> {
     return new Promise((resolve, reject) => {
       const h = setTimeout(() => {

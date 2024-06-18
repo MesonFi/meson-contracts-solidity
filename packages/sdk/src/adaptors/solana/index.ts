@@ -774,7 +774,6 @@ export function getContract(address, abi, clientOrAdaptor: SolConnection | Solan
                   ],
                   extraInstructions,
                 })
-              } else if (prop === 'simpleRelease') {
               }
             }
           }
