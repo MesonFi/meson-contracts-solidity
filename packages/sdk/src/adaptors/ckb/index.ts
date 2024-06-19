@@ -42,10 +42,10 @@ export function getContract(address: string, abi, clientOrAdaptor: CkbRPC | CkbA
   const pools: [number, string][] = metadata.pools || []
   const lpWallet = new CkbWallet(adaptor.client, { address: pools[0][1] })
 
-  const _getUdtBalance = async (udt: string, addr: string) => {
+  const _getUdtBalance = async (token: string, addr: string) => {
     const collector = adaptor.indexer.collector({
       lock: helpers.parseAddress(addr, { config: adaptor.network }),
-      type: { hashType: 'type', codeHash: metadata.code_hash_xudt, args: udt },
+      type: { hashType: 'type', codeHash: metadata.code_hash_xudt, args: token },
     })
     let balance = BigNumber.from(0)
     for await (const cell of collector.collect()) {

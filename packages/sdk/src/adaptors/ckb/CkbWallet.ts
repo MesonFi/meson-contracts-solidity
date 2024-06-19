@@ -1,3 +1,4 @@
+import { BigNumber, type BigNumberish } from 'ethers'
 import {
   type RPC as CkbRPC,
   hd,
@@ -49,11 +50,42 @@ export default class CkbWallet extends CkbAdaptor {
 
   async deploy() {}
 
-  async transfer({ to, value }) {}
+  async _getTransferSkeleton({ to, value }) {
+    const cellProvider = {
+      collector: query => this.indexer.collector({ type: 'empty', data: '0x', ...query })
+    }
 
-  async sendTransaction(txSkeleton: helpers.TransactionSkeletonType, ...args: any[]) {
+    let txSkeleton = helpers.TransactionSkeleton({ cellProvider })
+    txSkeleton = await commons.common.transfer(
+      txSkeleton,
+      [this.#address],
+      to,
+      BigNumber.from(value).toBigInt(),
+      undefined,
+      undefined,
+      { config: this.network },
+    )
+
+    txSkeleton = await commons.common.payFeeByFeeRate(
+      txSkeleton,
+      [this.#address],
+      1500,
+      undefined,
+      { config: this.network },
+    )
+
+    return txSkeleton
+  }
+
+  async sendTransaction(txObject: helpers.TransactionSkeletonType | { to: string, value: BigNumberish }, ...args: any[]) {
     if (!this.#address) {
       throw new Error('Cannot sign the transaction. No private key.')
+    }
+    let txSkeleton: helpers.TransactionSkeletonType
+    if (!(txObject instanceof helpers.TransactionSkeleton)) {
+      txSkeleton = await this._getTransferSkeleton(txObject as { to: string, value: any })
+    } else {
+      txSkeleton = txObject
     }
     const prepared = commons.common.prepareSigningEntries(txSkeleton, { config: this.network })
     const signatures = prepared.get('signingEntries')
