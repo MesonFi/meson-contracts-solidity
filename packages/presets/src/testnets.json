@@ -1,49 +1,5 @@
 [
   {
-    "id": "goerli",
-    "name": "Goerli Testnet",
-    "alias": "ETH",
-    "chainId": "0x5",
-    "slip44": "0x8000003c",
-    "shortSlip44": "0x003c",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://rpc.ankr.com/eth_goerli",
-    "explorer": "https://goerli.etherscan.io/",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
-    "tokens": [
-      {
-        "name": "USD//C",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0x07865c6e87b9f70255377e024ace6630c1eaa37f",
-        "tokenIndex": 1
-      },
-      {
-        "name": "Tether USD",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49",
-        "tokenIndex": 2
-      },
-      {
-        "name": "ETH",
-        "symbol": "ETH",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
-      }
-    ]
-  },
-  {
     "id": "sepolia",
     "name": "Sepolia Testnet",
     "alias": "sep",
@@ -68,7 +24,7 @@
         "name": "USDC",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "0x6f3193f3eBa58f73c69fCF055B4182933faee517",
+        "addr": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
         "tokenIndex": 1
       },
       {
@@ -88,91 +44,10 @@
     ]
   },
   {
-    "id": "bnb-testnet",
-    "name": "BNB Testnet",
-    "alias": "BNB",
-    "chainId": "0x61",
-    "slip44": "0x800002ca",
-    "shortSlip44": "0x02ca",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://bsc-testnet.public.blastapi.io",
-    "explorer": "https://testnet.bscscan.com",
-    "nativeCurrency": {
-      "name": "Binance Chain Native Token",
-      "symbol": "tBNB",
-      "decimals": 18
-    },
-    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
-    "tokens": [
-      {
-        "name": "USDC",
-        "symbol": "USDC",
-        "decimals": 18,
-        "addr": "0xCEaD5Eb7D8Bbd27BC970c42486fD019A33eA1BB4",
-        "tokenIndex": 33
-      },
-      {
-        "name": "USDT",
-        "symbol": "USDT",
-        "decimals": 18,
-        "addr": "0x68501701Ad6D5fAB8B08cfD6102f11A19F2eE444",
-        "tokenIndex": 34
-      },
-      {
-        "name": "BUSD",
-        "symbol": "BUSD",
-        "decimals": 18,
-        "addr": "0xbC0C50aEd4adFc98c16Bc3A83DAB5Df359EEe119",
-        "tokenIndex": 35
-      }
-    ]
-  },
-  {
-    "id": "polygon-testnet",
-    "name": "Polygon Mumbai",
-    "alias": "MATIC",
-    "chainId": "0x13881",
-    "slip44": "0x800003c6",
-    "shortSlip44": "0x03c6",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://rpc.ankr.com/polygon_mumbai",
-    "explorer": "https://mumbai.polygonscan.com",
-    "nativeCurrency": {
-      "name": "MATIC",
-      "symbol": "MATIC",
-      "decimals": 18
-    },
-    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
-    "tokens": [
-      {
-        "name": "USDC",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0x68501701Ad6D5fAB8B08cfD6102f11A19F2eE444",
-        "tokenIndex": 1
-      },
-      {
-        "name": "USDT",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0x074a3ba57ae16bf5aa3b5b822e57ab0ec5a7be72",
-        "tokenIndex": 2
-      }
-    ]
-  },
-  {
-    "id": "arb-goerli",
-    "name": "Arbitrum Goerli",
+    "id": "arb-sepolia",
+    "name": "Arbitrum Sepolia",
     "alias": "ARB",
-    "chainId": "0x66eed",
+    "chainId": "0x66eee",
     "slip44": "0x80002329",
     "shortSlip44": "0x2329",
     "extensions": [
@@ -180,8 +55,8 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://goerli-rollup.arbitrum.io/rpc",
-    "explorer": "https://goerli-rollup-explorer.arbitrum.io",
+    "url": "https://sepolia-rollup.arbitrum.io/rpc",
+    "explorer": "https://sepolia.arbiscan.io",
     "nativeCurrency": {
       "name": "ETH",
       "symbol": "ETH",
@@ -190,62 +65,11 @@
     "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
     "tokens": [
       {
-        "name": "USD//C",
+        "name": "USDC",
         "symbol": "USDC",
         "decimals": 6,
-        "addr": "0x8FB1E3fC51F3b789dED7557E680551d93Ea9d892",
+        "addr": "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
         "tokenIndex": 1
-      },
-      {
-        "name": "USDT",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0xB401e876346B3C77DD51781Efba5223d2F1e6697",
-        "tokenIndex": 2
-      },
-      {
-        "name": "ETH",
-        "symbol": "ETH",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
-      }
-    ]
-  },
-  {
-    "id": "opt-goerli",
-    "name": "Optimistic Goerli",
-    "alias": "OPT",
-    "chainId": "0x1a4",
-    "slip44": "0x80000266",
-    "shortSlip44": "0x0266",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://optimism-goerli.public.blastapi.io",
-    "explorer": "https://goerli-optimism.etherscan.io",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
-    "tokens": [
-      {
-        "name": "USD//C",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0x7E07E15D2a87A24492740D16f5bdF58c16db0c4E",
-        "tokenIndex": 1
-      },
-      {
-        "name": "USDT",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0x853eb4bA5D0Ba2B77a0A5329Fd2110d5CE149ECE",
-        "tokenIndex": 2
       },
       {
         "name": "ETH",
@@ -290,6 +114,110 @@
         "decimals": 6,
         "addr": "0xCEaD5Eb7D8Bbd27BC970c42486fD019A33eA1BB4",
         "tokenIndex": 2
+      }
+    ]
+  },
+  {
+    "id": "bnb-testnet",
+    "name": "BNB Testnet",
+    "alias": "BNB",
+    "chainId": "0x61",
+    "slip44": "0x800002ca",
+    "shortSlip44": "0x02ca",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://bsc-testnet.public.blastapi.io",
+    "explorer": "https://testnet.bscscan.com",
+    "nativeCurrency": {
+      "name": "Binance Chain Native Token",
+      "symbol": "tBNB",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 18,
+        "addr": "0x64544969ed7EBf5f083679233325356EbE738930",
+        "tokenIndex": 33
+      },
+      {
+        "name": "USDT",
+        "symbol": "USDT",
+        "decimals": 18,
+        "addr": "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd",
+        "tokenIndex": 34
+      }
+    ]
+  },
+  {
+    "id": "opt-sepolia",
+    "name": "OP Sepolia",
+    "alias": "OP",
+    "chainId": "0xaa37dc",
+    "slip44": "0x80000266",
+    "shortSlip44": "0x0266",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://sepolia.optimism.io",
+    "explorer": "https://sepolia-optimism.etherscan.io",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x5fd84259d66Cd46123540766Be93DFE6D43130D7",
+        "tokenIndex": 1
+      },
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
+    "id": "polygon-amoy",
+    "name": "Polygon Amoy",
+    "alias": "MATIC",
+    "chainId": "0x13882",
+    "slip44": "0x800003c6",
+    "shortSlip44": "0x03c6",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://rpc-amoy.polygon.technology",
+    "explorer": "https://amoy.polygonscan.com",
+    "nativeCurrency": {
+      "name": "MATIC",
+      "symbol": "MATIC",
+      "decimals": 18
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582",
+        "tokenIndex": 1
       }
     ]
   },
@@ -579,36 +507,6 @@
     ]
   },
   {
-    "id": "taiko-testnet",
-    "name": "Taiko Katla",
-    "alias": "TAIKO",
-    "chainId": "0x28c60",
-    "slip44": "0x800028c5",
-    "shortSlip44": "0x28c5",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://rpc.katla.taiko.xyz",
-    "explorer": "https://explorer.katla.taiko.xyz",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
-    "tokens": [
-      {
-        "name": "ETH",
-        "symbol": "ETH",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
-      }
-    ]
-  },
-  {
     "id": "merlin-testnet",
     "name": "Merlin Testnet",
     "alias": "MERLIN",
@@ -650,43 +548,6 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 243
-      }
-    ]
-  },
-  {
-    "id": "x1-testnet",
-    "name": "X1 Testnet",
-    "alias": "X1",
-    "chainId": "0xc3",
-    "slip44": "0x800000c4",
-    "shortSlip44": "0x00c4",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://testrpc.x1.tech",
-    "explorer": "https://www.oklink.com/x1-test",
-    "nativeCurrency": {
-      "name": "OKB",
-      "symbol": "OKB",
-      "decimals": 18
-    },
-    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
-    "tokens": [
-      {
-        "name": "USDC",
-        "symbol": "USDC",
-        "decimals": 6,
-        "addr": "0xcD65196488b2e2fbcbc3E5d675B3108f4935e64a",
-        "tokenIndex": 1
-      },
-      {
-        "name": "USDT",
-        "symbol": "USDT",
-        "decimals": 6,
-        "addr": "0xb471644294eD4648F07f404a5d257B381b1E1e26",
-        "tokenIndex": 2
       }
     ]
   },
@@ -750,36 +611,6 @@
     "addressFormat": "ethers",
     "url": "https://testnet-alpha.goshen.network/rpc",
     "explorer": "https://explorer-testnet.goshen.network",
-    "nativeCurrency": {
-      "name": "ETH",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
-    "tokens": [
-      {
-        "name": "ETH",
-        "symbol": "ETH",
-        "decimals": 18,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 255
-      }
-    ]
-  },
-  {
-    "id": "bob-sepolia",
-    "name": "Bob Sepolia",
-    "alias": "BOB",
-    "chainId": "0x94258",
-    "slip44": "0x8000006f",
-    "shortSlip44": "0x006f",
-    "extensions": [
-      "metamask",
-      "walletconnect"
-    ],
-    "addressFormat": "ethers",
-    "url": "https://sepolia-dencun.rpc.gobob.xyz",
-    "explorer": "https://sepolia-dencun.explorer.gobob.xyz",
     "nativeCurrency": {
       "name": "ETH",
       "symbol": "ETH",
@@ -876,20 +707,23 @@
     },
     "mesonAddress": "0x9776d6023396db2fd555f86d909ae89a441b4b3a3a5947441cad406f4c0720c5",
     "metadata": {
-      "tx_hash_siglock": "0x153daaf90a223156fb73bc04abf895e645b2f504738b28bbe4af268eb8a632dc",
-      "tx_hash_refcell": "0x6137bd2bc96ecf6bbdc488220af4a2545406f0e61355f27aa80f5fa8b67206fc",
+      "tx_hash_siglock": "0x082a78858b3128f961db7ea69374a09a01b0c6e6477ec7e504f754f154c441c2",
+      "tx_hash_refcell": "0x064d3d6c0799942b5ae339cf1dae6b29a3c9fcd0743ec532cb57c79f5499f25b",
       "tx_hash_joyid": "0x4dcf3f3b09efac8995d6cbee87c5345e812d310094651e0c3d9a730f32dc9263",
       "tx_hash_xudt": "0x877c4c3c6f7159f29ea711f0cd21a54f93dcf950642c6a3a5abc9c070051372e",
       "code_hash_refcell": "0x109f97e74d7fedef4089408f51ef8290fc56ad5d35504b06ee09b75464663678",
       "code_hash_xudt": "0x98701eaf939113606a8a70013fd2e8f27b8f1e234acdc329f3d71f9e9d3d3233",
       "pools": [
-        [1, "ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqwz2eeqeu4sz787fau4gg9k3q4869m7ztchdt7kp"]
+        [
+          1,
+          "ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqwz2eeqeu4sz787fau4gg9k3q4869m7ztchdt7kp"
+        ]
       ]
     },
     "tokens": [
       {
         "name": "ccBTC",
-        "symbol": "BTC",
+        "symbol": "ccBTC",
         "decimals": 8,
         "addr": "0x3b6224e621410370887db7e3d95f63d9c760d7f56ee864521403c99e8b4f34b8",
         "link": "script/0x98701eaf939113606a8a70013fd2e8f27b8f1e234acdc329f3d71f9e9d3d3233/type",

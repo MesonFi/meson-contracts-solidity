@@ -1776,6 +1776,20 @@
         "decimals": 6,
         "addr": "0x1c0491E3396AD6a35f061c62387a95d7218FC515",
         "tokenIndex": 2
+      },
+      {
+        "name": "ERC20 Ether Clone",
+        "symbol": "ETHC",
+        "decimals": 18,
+        "addr": "0xD2Aaa00700000000000000000000000000000000",
+        "tokenIndex": 254
+      },
+      {
+        "name": "Wrapped BTC",
+        "symbol": "WBTC",
+        "decimals": 8,
+        "addr": "0xcb011E86DF014a46F4e3AC3F3cbB114A4EB80870",
+        "tokenIndex": 242
       }
     ]
   },
@@ -1806,6 +1820,20 @@
         "decimals": 6,
         "addr": "0xCC205196288B7A26f6D43bBD68AaA98dde97276d",
         "tokenIndex": 1
+      },
+      {
+        "name": "Europa ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0xaB01BAd2C86e24D371A13eD6367bdCa819589C5D",
+        "tokenIndex": 254
+      },
+      {
+        "name": "Europa WBTC",
+        "symbol": "WBTC",
+        "decimals": 8,
+        "addr": "0x64d2EebA8B02f2aB19e2238f1655A8409dB64817",
+        "tokenIndex": 242
       }
     ]
   },
@@ -1843,6 +1871,20 @@
         "decimals": 6,
         "addr": "0xf9B5736E74b37Ec2EDd37B1B3c8e1aF9fa426F2A",
         "tokenIndex": 2
+      },
+      {
+        "name": "Europa ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x59ab97Ee239e02112652587F9Ef86CB6F762983b",
+        "tokenIndex": 254
+      },
+      {
+        "name": "Europa WBTC",
+        "symbol": "WBTC",
+        "decimals": 8,
+        "addr": "0x98f7d76CfFaD0263Ddb30B10244C02530Ba704c4",
+        "tokenIndex": 242
       }
     ]
   },
@@ -2638,6 +2680,47 @@
         "addr": "0x44890e863427258048F9b3eC433F86aD2FfD1c28",
         "tokenIndex": 71,
         "partner": "free"
+      }
+    ]
+  },
+  {
+    "id": "ckb",
+    "name": "CKB",
+    "alias": "CKB",
+    "chainId": "ckb:mainnet",
+    "slip44": "0x80000135",
+    "shortSlip44": "0x0135",
+    "extensions": [
+      "ckb"
+    ],
+    "addressFormat": "ckb",
+    "url": "https://mainnet.ckb.dev/rpc",
+    "explorer": "https://explorer.nervos.org",
+    "nativeCurrency": {
+      "name": "CKB",
+      "symbol": "CKB",
+      "decimals": 8
+    },
+    "mesonAddress": "0x22b7660c9427782402f139bbb9d6e1debc88649552f86e5462d90116f1e83f74",
+    "metadata": {
+      "tx_hash_siglock": "0x8709d07a3737e3c18954588803ac321ab721376e3528ba2aa484103ddd2327f3",
+      "tx_hash_refcell": "0xe372e74265cf85fffb58e45f319e8d2c6deb94e0a9b029ca1f1f99c521e8ca26",
+      "tx_hash_joyid": "0xbdc3153fcb7c256d007be758c0b50c8da60b5ac0e44ae9e11d3dcc5b73d2b347",
+      "tx_hash_xudt": "0xc81ea047abf1668c055e54b2e6aaa716966582bd53dbcef98d9b020cb5c436ef",
+      "code_hash_refcell": "0x109f97e74d7fedef4089408f51ef8290fc56ad5d35504b06ee09b75464663678",
+      "code_hash_xudt": "0x00000000000000000000000000000000000000000000000000545950455f4944",
+      "pools": [
+        [1, "ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtzm5rhh94jwxalfnqs5cheej25e64usms687nfe"]
+      ]
+    },
+    "tokens": [
+      {
+        "name": "ccBTC",
+        "symbol": "ccBTC",
+        "decimals": 8,
+        "addr": "0x74f8fd146cca83d5fa2acd8a2b0bc7f0408a38b79a173c1e8ca1fbdfc95122ff",
+        "link": "script/0xebc9e13658f6df13593cf59b7e9cd159602b6c3c7d54b14dea43bae600ebae11/type",
+        "tokenIndex": 242
       }
     ]
   }
