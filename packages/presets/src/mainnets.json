@@ -1662,6 +1662,52 @@
         "decimals": 6,
         "addr": "0x919C1c267BC06a7039e03fcc2eF738525769109c",
         "tokenIndex": 2
+      },
+      {
+        "name": "Merlin BTC",
+        "symbol": "M-BTC",
+        "decimals": 18,
+        "addr": "0x59889b7021243dB5B1e065385F918316cD90D46c",
+        "tokenIndex": 67,
+        "partner": "free"
+      }
+    ]
+  },
+  {
+    "id": "kroma",
+    "name": "Kroma",
+    "alias": "kroma",
+    "chainId": "0xff",
+    "slip44": "0x800000ff",
+    "shortSlip44": "0x00ff",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://api.kroma.network",
+    "explorer": "https://kromascan.com",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      },
+      {
+        "name": "Merlin BTC",
+        "symbol": "M-BTC",
+        "decimals": 18,
+        "addr": "0x0F921c39eFd98809FE6D20a88A4357454578987a",
+        "tokenIndex": 67,
+        "partner": "free"
       }
     ]
   },
@@ -2710,7 +2756,10 @@
       "code_hash_refcell": "0x109f97e74d7fedef4089408f51ef8290fc56ad5d35504b06ee09b75464663678",
       "code_hash_xudt": "0x00000000000000000000000000000000000000000000000000545950455f4944",
       "pools": [
-        [1, "ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtzm5rhh94jwxalfnqs5cheej25e64usms687nfe"]
+        [
+          1,
+          "ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtzm5rhh94jwxalfnqs5cheej25e64usms687nfe"
+        ]
       ]
     },
     "tokens": [
