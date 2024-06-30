@@ -22,7 +22,9 @@ exports.getClient = function getClient (network) {
   } else if (network.id.startsWith('zksync') || network.id.startsWith('zklink')) {
     return new Provider(network.url)
   } else if (network.id.startsWith('ckb')) {
-    return new CkbRPC(network.url)
+    const client = new CkbRPC(network.url)
+    client.metadata = { ...network.metadata, tokens: network.tokens }
+    return client
   } else {
     hre.changeNetwork(network.id)
     ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)
