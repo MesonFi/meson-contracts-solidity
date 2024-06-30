@@ -12,7 +12,7 @@ contract MesonTokens {
   ///     1-32:    stablecoins with decimals 6
   ///       1, 9:    USDC, USDC.e
   ///       2, 10:   USDT, USDT.e
-  ///       3:       BUSD, USDT.e
+  ///       3:       BUSD
   ///       6:       CUSD (Viction/Tomo)
   ///       17:      PoD USDC
   ///       18:      PoD USDT
@@ -29,7 +29,7 @@ contract MesonTokens {
   ///       41:      BBUSD
   ///     49-64:   stablecoins as core (decimals 18)
   ///       49:      USDC
-  ///       52:      XDAI
+  ///       52:      DAI
   ///     65-128:  3rd party tokens
   ///       65:      iUSD (iZUMi Bond USD)
   ///       67:      M-BTC (Merlin BTC)
