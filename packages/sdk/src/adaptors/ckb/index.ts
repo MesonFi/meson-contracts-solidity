@@ -25,7 +25,9 @@ export function getWalletFromJoyId(ext, client): CkbWalletFromJoyId {
   return new CkbWalletFromJoyId(client, ext)
 }
 
-const CAPACITY_XUDT = 400_0000_0000
+const CAPACITY_MIN = 65_0000_0000
+const CAPACITY_XUDT = 150_0000_0000
+const CAPACITY_SIGLOCK = 230_0000_0000
 const CAPACITY_REF_CELL = 150_0000_0000
 
 export function getContract(address: string, abi, clientOrAdaptor: CkbRPC | CkbAdaptor) {
@@ -233,7 +235,12 @@ export function getContract(address: string, abi, clientOrAdaptor: CkbRPC | CkbA
   const _collectCell = async (lock: Script, amount: BigNumberish) => {
     const cells = []
     let capacity = BigNumber.from(0)
-    for await (const cell of adaptor.indexer.collector({ lock, type: 'empty' }).collect()) {
+
+    if (BigNumber.from(amount).lte(0)) {
+      return { cells, capacity }
+    }
+
+    for await (const cell of adaptor.indexer.collector({ lock, type: 'empty', data: '0x' }).collect()) {
       capacity = capacity.add(cell.cellOutput.capacity)
       cells.push(cell)
       if (capacity.gte(amount)) {
@@ -317,7 +324,7 @@ export function getContract(address: string, abi, clientOrAdaptor: CkbRPC | CkbA
           }
         }
       } else if (['queryFilter', 'on', 'removeAllListeners'].includes(prop)) {
-        return () => {}
+        return () => { }
       } else if (prop === 'connect') {
         return (wallet: CkbWallet) => getContract(address, abi, wallet)
       } else if (prop === 'filters') {
@@ -342,8 +349,7 @@ export function getContract(address: string, abi, clientOrAdaptor: CkbRPC | CkbA
             } else if (prop === 'symbol') {
               // const data = await getMint(adaptor.client, new SolPublicKey(address))
             } else if (prop === 'decimals') {
-              // TODO
-              return 6
+              return 8 // ccBTC
             } else if (prop === 'balanceOf') {
               return await _getUdtBalance(address, args[0])
             } else if (prop === 'allowance') {
@@ -361,7 +367,8 @@ export function getContract(address: string, abi, clientOrAdaptor: CkbRPC | CkbA
               return pools.find(p => p[1] === args[0])?.[0]
             } else if (prop === 'poolTokenBalance') {
               const [token, poolOwner] = args
-              return await _getUdtBalance(token, poolOwner)
+              const balance = await _getUdtBalance(token, poolOwner)
+              return balance.div(100) // ccBTC: decimals 8 -> 6
             } else if (prop === 'getPostedSwap') {
               return (await _getPostedSwap(args[0])).posted
             } else if (prop === 'getLockedSwap') {
@@ -377,145 +384,198 @@ export function getContract(address: string, abi, clientOrAdaptor: CkbRPC | CkbA
               options = args.pop()
             }
             const signer = <CkbWallet>adaptor
-            const swap = Swap.decode(args[0])
-
-            let udtType: Script
             let txSkeleton = helpers.TransactionSkeleton({ cellProvider: adaptor.indexer })
             let witnessIndex: number
 
-            if (prop === 'postSwapFromInitiator' || prop === 'lockSwap') {
-              let swapAmount: number
-              let sigTimeLockScript: Script
-              let refCells
-              if (prop === 'postSwapFromInitiator') {
-                const [_, postingValue] = args
-                const initiator = postingValue.substring(0, 42)
-                swapAmount = swap.amount.toNumber()
-                sigTimeLockScript = _generateSigTimeLock(swap.encoded, initiator, lpWallet.pkh, signer.pkh)
-                udtType = _udtTypeFromIndex(swap.inToken)
-              } else {
-                const [_, { initiator, recipient }] = args
-                swapAmount = swap.amount.toNumber()
+            if (prop === 'transfer') {
+              const udtType: Script = { hashType: 'type', codeHash: metadata.code_hash_xudt, args: address }
+              const [recipient, amount] = args
 
-                const recipientWallet = new CkbWallet(adaptor.client, { address: recipient })
-                sigTimeLockScript = _generateSigTimeLock(swap.encoded, initiator, recipientWallet.pkh, lpWallet.pkh)
-                udtType = _udtTypeFromIndex(swap.outToken)
-
-                refCells = await _buildRefCells(swap.encoded, initiator)
-              }
-
-              const { udtCells, udtAmount, udtCapacity } = await _collectUDTCell(signer.lockScript, udtType, swapAmount)
+              const { udtCells, udtAmount, udtCapacity } = await _collectUDTCell(signer.lockScript, udtType, amount)
 
               const expectedFee = 500_0000
+              const outputCells: Cell[] = [{
+                data: hexify(Uint128LE.pack(amount.toString())),
+                cellOutput: {
+                  capacity: '0x' + CAPACITY_XUDT.toString(16),
+                  type: udtType,
+                  lock: helpers.parseAddress(recipient, { config: adaptor.network }),
+                },
+              }]
               let requiredCap = BigNumber.from(CAPACITY_XUDT).add(expectedFee)
-              if (refCells?.deltaCapacity > 0) {
-                requiredCap = requiredCap.add(refCells.deltaCapacity)
+              if (udtAmount.gt(amount)) {
+                outputCells.push({
+                  data: hexify(Uint128LE.pack(udtAmount.sub(amount).toString())),
+                  cellOutput: {
+                    capacity: '0x' + CAPACITY_XUDT.toString(16),
+                    type: udtType,
+                    lock: signer.lockScript,
+                  },
+                })
+                requiredCap = requiredCap.add(CAPACITY_XUDT)
               }
-              const { cells, capacity } = await _collectCell(signer.lockScript, requiredCap)
-              
-              txSkeleton = txSkeleton.update('inputs', inputs => inputs.push(...udtCells).push(...cells))
-              txSkeleton = txSkeleton.update('outputs', outputs => outputs
-                .push({
-                  data: hexify(Uint128LE.pack(swapAmount)),
-                  cellOutput: {
-                    capacity: '0x' + CAPACITY_XUDT.toString(16),
-                    type: udtType,
-                    lock: sigTimeLockScript,
-                  },
-                })
-                .push({
-                  data: hexify(Uint128LE.pack(udtAmount.sub(swapAmount).toString())),
-                  cellOutput: {
-                    capacity: '0x' + CAPACITY_XUDT.toString(16),
-                    type: udtType,
-                    lock: signer.lockScript,
-                  },
-                })
-                .push({
-                  data: '0x',
-                  cellOutput: {
-                    capacity: capacity.add(udtCapacity).sub(expectedFee).sub(2 * CAPACITY_XUDT).sub(refCells?.deltaCapacity || 0)
-                      .toHexString().replace('0x0', '0x'),
-                    lock: signer.lockScript,
-                  },
-                })
-              )
 
-              if (refCells) {
-                if (refCells.input) {
-                  txSkeleton = txSkeleton.update('inputs', inputs => inputs.push(refCells.input))
+              const { cells, capacity } = await _collectCell(signer.lockScript, requiredCap.sub(udtCapacity))
+
+              outputCells.push({
+                data: '0x',
+                cellOutput: {
+                  capacity: udtCapacity.add(capacity).sub(requiredCap).toHexString().replace('0x0', '0x'),
+                  lock: signer.lockScript,
                 }
-                txSkeleton = txSkeleton.update('outputs', outputs => outputs.push(refCells.output))
+              })
 
-                const inputSince = since.generateSince({ relative: false, type: 'blockTimestamp', value: refCells.sinceTs })
-                txSkeleton = txSkeleton.update('inputSinces', sinces => sinces.set(0, inputSince))
-              }
+              txSkeleton = txSkeleton.update('inputs', inputs => inputs.push(...udtCells).push(...cells))
+              txSkeleton = txSkeleton.update('outputs', outputs => outputs.push(...outputCells))
 
               txSkeleton = txSkeleton.update('cellDeps', cellDeps => cellDeps
                 .push({ depType: 'depGroup', outPoint: { txHash: adaptor.network.SCRIPTS.SECP256K1_BLAKE160.TX_HASH, index: '0x0' } })
-                .push({ depType: 'depGroup', outPoint: { txHash: metadata.tx_hash_joyid, index: '0x0' } })
-                .push({ depType: 'code', outPoint: { txHash: metadata.tx_hash_refcell, index: '0x0' } })
                 .push({ depType: 'code', outPoint: { txHash: metadata.tx_hash_xudt, index: '0x0' } })
               )
 
               witnessIndex = 0
-            } else if (prop === 'executeSwap' || prop === 'release') {
-              const expectedFee = 500_0000
-              const { cells, capacity } = await _collectCell(signer.lockScript, expectedFee)
+            } else {
+              const swap = Swap.decode(args[0])
+              let udtType: Script
 
-              let outputLock: Script
-              let witnessLock: string
-              if (prop === 'executeSwap') {
-                const [_, r, yParityAndS, recipient, depositToPool] = args
-                outputLock = lpWallet.lockScript
-                witnessLock = utils.hexConcat(['0x00', r, yParityAndS, recipient])
-                udtType = _udtTypeFromIndex(swap.inToken)
+              if (prop === 'postSwapFromInitiator' || prop === 'lockSwap') {
+                let swapAmount: number
+                let sigTimeLockScript: Script
+                let refCells
+                if (prop === 'postSwapFromInitiator') {
+                  const [_, postingValue] = args
+                  const initiator = postingValue.substring(0, 42)
+                  swapAmount = swap.amount.toNumber()
+                  sigTimeLockScript = _generateSigTimeLock(swap.encoded, initiator, lpWallet.pkh, signer.pkh)
+                  udtType = _udtTypeFromIndex(swap.inToken)
+                } else {
+                  const [_, { initiator, recipient }] = args
+                  swapAmount = swap.amount.toNumber()
 
-                const { postedCell } = await _getPostedSwap(swap.encoded)
-                cells.unshift(postedCell)
-              } else {
-                const [_, r, yParityAndS, initiator, recipient] = args
-                const recipientWallet = new CkbWallet(adaptor.client, { address: recipient })
-                outputLock = recipientWallet.lockScript
-                witnessLock = utils.hexConcat(['0x00', r, yParityAndS, '0x' + recipientWallet.pkh.substring(8)])
-                udtType = _udtTypeFromIndex(swap.outToken)
+                  const recipientWallet = new CkbWallet(adaptor.client, { address: recipient })
+                  sigTimeLockScript = _generateSigTimeLock(swap.encoded, initiator, recipientWallet.pkh, lpWallet.pkh)
+                  udtType = _udtTypeFromIndex(swap.outToken)
 
-                const { lockedCell } = await _getLockedSwap(swap.encoded, initiator)
-                cells.unshift(lockedCell)
-              }
+                  refCells = await _buildRefCells(swap.encoded, initiator)
+                }
 
-              txSkeleton = txSkeleton.update('inputs', inputs => inputs.push(...cells))
-              txSkeleton = txSkeleton.update('outputs', outputs => outputs
-                .push({
-                  data: cells[0].data,
+                const { udtCells, udtAmount, udtCapacity } = await _collectUDTCell(signer.lockScript, udtType, swapAmount)
+
+                const expectedFee = 500_0000
+                const outputCells: Cell[] = [{
+                  data: hexify(Uint128LE.pack(swapAmount)),
                   cellOutput: {
+                    capacity: '0x' + CAPACITY_SIGLOCK.toString(16),
                     type: udtType,
-                    lock: outputLock,
-                    capacity: cells[0].cellOutput.capacity,
+                    lock: sigTimeLockScript,
                   },
-                })
-                .push({
+                }]
+                let requiredCap = BigNumber.from(CAPACITY_SIGLOCK).add(expectedFee).add(refCells?.deltaCapacity || 0)
+                if (udtAmount.gt(swapAmount)) {
+                  outputCells.push({
+                    data: hexify(Uint128LE.pack(udtAmount.sub(swapAmount).toString())),
+                    cellOutput: {
+                      capacity: '0x' + CAPACITY_XUDT.toString(16),
+                      type: udtType,
+                      lock: signer.lockScript,
+                    },
+                  })
+                  requiredCap = requiredCap.add(CAPACITY_XUDT)
+                }
+
+                const { cells, capacity } = await _collectCell(signer.lockScript, requiredCap.add(CAPACITY_MIN).sub(udtCapacity))
+
+                outputCells.push({
                   data: '0x',
                   cellOutput: {
+                    capacity: udtCapacity.add(capacity).sub(requiredCap).toHexString().replace('0x0', '0x'),
                     lock: signer.lockScript,
-                    capacity: capacity.sub(expectedFee).toHexString().replace('0x0', '0x'),
-                  },
+                  }
                 })
-              )
 
-              txSkeleton = txSkeleton.update('cellDeps', cellDeps => cellDeps
-                .push({ depType: 'depGroup', outPoint: { txHash: adaptor.network.SCRIPTS.SECP256K1_BLAKE160.TX_HASH, index: '0x0' } })
-                .push({ depType: 'depGroup', outPoint: { txHash: metadata.tx_hash_joyid, index: '0x0' } })
-                .push({ depType: 'code', outPoint: { txHash: metadata.tx_hash_xudt, index: '0x0' } })
-                .push({ depType: 'code', outPoint: { txHash: metadata.tx_hash_siglock, index: '0x0' } })
-              )
+                txSkeleton = txSkeleton.update('inputs', inputs => inputs.push(...udtCells).push(...cells))
+                txSkeleton = txSkeleton.update('outputs', outputs => outputs.push(...outputCells))
 
-              const witness = hexify(blockchain.WitnessArgs.pack({ lock: witnessLock }))
-              txSkeleton = txSkeleton.update('witnesses', witnesses => witnesses.set(0, witness))
+                if (refCells) {
+                  if (refCells.input) {
+                    txSkeleton = txSkeleton.update('inputs', inputs => inputs.push(refCells.input))
+                  }
+                  txSkeleton = txSkeleton.update('outputs', outputs => outputs.push(refCells.output))
 
-              witnessIndex = 1
-            } else {
-              throw new Error(`CkbContract write not implemented (${prop})`)
+                  const inputSince = since.generateSince({ relative: false, type: 'blockTimestamp', value: refCells.sinceTs })
+                  txSkeleton = txSkeleton.update('inputSinces', sinces => sinces.set(0, inputSince))
+                }
+
+                txSkeleton = txSkeleton.update('cellDeps', cellDeps => cellDeps
+                  .push({ depType: 'depGroup', outPoint: { txHash: adaptor.network.SCRIPTS.SECP256K1_BLAKE160.TX_HASH, index: '0x0' } })
+                  .push({ depType: 'code', outPoint: { txHash: metadata.tx_hash_refcell, index: '0x0' } })
+                  .push({ depType: 'code', outPoint: { txHash: metadata.tx_hash_xudt, index: '0x0' } })
+                )
+
+                if (prop === 'postSwapFromInitiator') {
+                  txSkeleton = txSkeleton.update('cellDeps', cellDeps => cellDeps
+                    .push({ depType: 'depGroup', outPoint: { txHash: metadata.tx_hash_joyid, index: '0x0' } })
+                  )
+                }
+
+                witnessIndex = 0
+              } else if (prop === 'executeSwap' || prop === 'release') {
+                const expectedFee = 500_0000
+
+                let cell: Cell
+                let outputLock: Script
+                let witnessLock: string
+                if (prop === 'executeSwap') {
+                  const [_, r, yParityAndS, recipient, depositToPool] = args
+                  outputLock = lpWallet.lockScript
+                  witnessLock = utils.hexConcat(['0x00', r, yParityAndS, recipient])
+                  udtType = _udtTypeFromIndex(swap.inToken)
+
+                  const { postedCell } = await _getPostedSwap(swap.encoded)
+                  cell = postedCell
+                } else {
+                  const [_, r, yParityAndS, initiator, recipient] = args
+                  const recipientWallet = new CkbWallet(adaptor.client, { address: recipient })
+                  outputLock = recipientWallet.lockScript
+                  witnessLock = utils.hexConcat(['0x00', r, yParityAndS, '0x' + recipientWallet.pkh.substring(8)])
+                  udtType = _udtTypeFromIndex(swap.outToken)
+
+                  const { lockedCell } = await _getLockedSwap(swap.encoded, initiator)
+                  cell = lockedCell
+                }
+
+                txSkeleton = txSkeleton.update('inputs', inputs => inputs.push(cell))
+                txSkeleton = txSkeleton.update('outputs', outputs => outputs
+                  .push({
+                    data: cell.data,
+                    cellOutput: {
+                      capacity: '0x' + CAPACITY_XUDT.toString(16),
+                      type: udtType,
+                      lock: outputLock,
+                    },
+                  })
+                  .push({
+                    data: '0x',
+                    cellOutput: {
+                      capacity: '0x' + (CAPACITY_SIGLOCK - CAPACITY_XUDT - expectedFee).toString(16),
+                      lock: signer.lockScript,
+                    },
+                  })
+                )
+
+                txSkeleton = txSkeleton.update('cellDeps', cellDeps => cellDeps
+                  .push({ depType: 'depGroup', outPoint: { txHash: adaptor.network.SCRIPTS.SECP256K1_BLAKE160.TX_HASH, index: '0x0' } })
+                  .push({ depType: 'code', outPoint: { txHash: metadata.tx_hash_xudt, index: '0x0' } })
+                  .push({ depType: 'code', outPoint: { txHash: metadata.tx_hash_siglock, index: '0x0' } })
+                )
+
+                const witness = hexify(blockchain.WitnessArgs.pack({ lock: witnessLock }))
+                txSkeleton = txSkeleton.update('witnesses', witnesses => witnesses.set(0, witness))
+
+                witnessIndex = 1
+              } else {
+                throw new Error(`CkbContract write not implemented (${prop})`)
+              }
             }
 
             const gasWitness = hexify(blockchain.WitnessArgs.pack({ lock: '0x'.padEnd(132, '0') }))

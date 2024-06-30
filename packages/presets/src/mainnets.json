@@ -1036,6 +1036,14 @@
         "tokenIndex": 255
       },
       {
+        "name": "Merlin BTC",
+        "symbol": "M-BTC",
+        "decimals": 18,
+        "addr": "0x95D7F7a7D3f01A4378e28fB777A04D8AF1D9E204",
+        "tokenIndex": 67,
+        "partner": "free"
+      },
+      {
         "name": "SolvBTC.m",
         "symbol": "SolvBTC.m",
         "decimals": 18,
@@ -1712,6 +1720,37 @@
     ]
   },
   {
+    "id": "klaytn",
+    "name": "Klaytn",
+    "alias": "klaytn",
+    "chainId": "0x2019",
+    "slip44": "0x80002019",
+    "shortSlip44": "0x2019",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://public-en-cypress.klaytn.net",
+    "explorer": "https://klaytnscope.com",
+    "nativeCurrency": {
+      "name": "KLAY",
+      "symbol": "KLAY",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "Merlin BTC",
+        "symbol": "M-BTC",
+        "decimals": 18,
+        "addr": "0x0F921c39eFd98809FE6D20a88A4357454578987a",
+        "tokenIndex": 67,
+        "partner": "free"
+      }
+    ]
+  },
+  {
     "id": "aptos",
     "name": "Aptos",
     "alias": "APT",
@@ -2153,6 +2192,14 @@
         "decimals": 8,
         "addr": "0x8034ab88c3512246bf7894f57c834dddbd1de01f",
         "tokenIndex": 242
+      },
+      {
+        "name": "Merlin BTC",
+        "symbol": "M-BTC",
+        "decimals": 18,
+        "addr": "0x985bf15218C2B25d9675D5ac6f1dBE0847Eee759",
+        "tokenIndex": 67,
+        "partner": "free"
       },
       {
         "name": "SolvBTC.m",
@@ -2642,7 +2689,7 @@
   {
     "id": "bevm",
     "disabled": true,
-    "name": "BEVM",
+    "name": "BEVM Canary",
     "alias": "BEVM",
     "chainId": "0x5dd",
     "slip44": "0x800005dd",
@@ -2653,7 +2700,7 @@
     ],
     "addressFormat": "ethers",
     "url": "https://rpc-canary-1.bevm.io",
-    "explorer": "https://scan.bevm.io",
+    "explorer": "https://scan-canary.bevm.io",
     "nativeCurrency": {
       "name": "BTC",
       "symbol": "BTC",
@@ -2752,13 +2799,13 @@
       "tx_hash_siglock": "0x8709d07a3737e3c18954588803ac321ab721376e3528ba2aa484103ddd2327f3",
       "tx_hash_refcell": "0xe372e74265cf85fffb58e45f319e8d2c6deb94e0a9b029ca1f1f99c521e8ca26",
       "tx_hash_joyid": "0xbdc3153fcb7c256d007be758c0b50c8da60b5ac0e44ae9e11d3dcc5b73d2b347",
-      "tx_hash_xudt": "0xc81ea047abf1668c055e54b2e6aaa716966582bd53dbcef98d9b020cb5c436ef",
+      "tx_hash_xudt": "0x3ceb520f240b168e0bddf0d89b4bcabbe7d4fa69751057cbe8e4f27239fad0e9",
       "code_hash_refcell": "0x109f97e74d7fedef4089408f51ef8290fc56ad5d35504b06ee09b75464663678",
-      "code_hash_xudt": "0x00000000000000000000000000000000000000000000000000545950455f4944",
+      "code_hash_xudt": "0x092c2c4a26ea475a8e860c29cf00502103add677705e2ccd8d6fe5af3caa5ae3",
       "pools": [
         [
           1,
-          "ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtzm5rhh94jwxalfnqs5cheej25e64usms687nfe"
+          "ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq20ej9htv2jgltkrrldp3qjqty7krfcz5shct7v6"
         ]
       ]
     },
@@ -2767,8 +2814,8 @@
         "name": "ccBTC",
         "symbol": "ccBTC",
         "decimals": 8,
-        "addr": "0x74f8fd146cca83d5fa2acd8a2b0bc7f0408a38b79a173c1e8ca1fbdfc95122ff",
-        "link": "script/0xebc9e13658f6df13593cf59b7e9cd159602b6c3c7d54b14dea43bae600ebae11/type",
+        "addr": "0x68e64ba4b0daeeec45c1f983d6d574fca370442cafb805bc4265ef74870a4ac8",
+        "link": "script/0x092c2c4a26ea475a8e860c29cf00502103add677705e2ccd8d6fe5af3caa5ae3/type",
         "tokenIndex": 242
       }
     ]

@@ -63,6 +63,7 @@
     "deploy:metis": "hardhat deploy --mainnet metis --upgradable true",
     "deploy:kava": "hardhat deploy --mainnet kava --upgradable true",
     "deploy:kroma": "hardhat deploy --mainnet kroma --upgradable true",
+    "deploy:klaytn": "hardhat deploy --mainnet klaytn --upgradable true",
     "deploy:manta": "hardhat deploy --mainnet manta --upgradable true",
     "deploy:mnt": "hardhat deploy --mainnet mnt --upgradable true",
     "deploy:skale-europa": "hardhat deploy --mainnet skale-europa --upgradable true",

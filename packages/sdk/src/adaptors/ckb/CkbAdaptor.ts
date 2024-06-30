@@ -7,16 +7,21 @@ import {
 } from '@ckb-lumos/lumos'
 import { timer } from '../../utils'
 
-export const JOYID_CODE_HASH = '0xd23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac'
+const JOYID_CODE_HASH = {
+  TESTNET: '0xd23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac',
+  MAINNET: '0xd00c84f0ec8fd441c38bc3f87a371f547190f2fcff88e642bc5bf54b9e318323',
+}
 
 export default class CkbAdaptor {
   readonly network: typeof config.TESTNET
+  readonly joyidCodeHash: string
   readonly client: CkbRPC
   readonly indexer: Indexer
 
   constructor(client: CkbRPC) {
     const isTestnet = client.node.url.includes('testnet')
     this.network = isTestnet ? config.TESTNET : config.MAINNET
+    this.joyidCodeHash = isTestnet ? JOYID_CODE_HASH.TESTNET : JOYID_CODE_HASH.MAINNET
     this.client = client
     const indexerUrl = isTestnet ? 'https://testnet.ckb.dev/indexer' : 'https://mainnet.ckb.dev/indexer'
     this.indexer = new Indexer(indexerUrl, client.node.url)
@@ -26,7 +31,7 @@ export default class CkbAdaptor {
     switch (codeHash) {
       case this.network.SCRIPTS.SECP256K1_BLAKE160.CODE_HASH:
         return '0x000000'
-      case JOYID_CODE_HASH:
+      case this.joyidCodeHash:
         return '0x01'
       default:
         throw new Error('Unsupported codeHash')
@@ -43,7 +48,7 @@ export default class CkbAdaptor {
         }, { config: this.network })
       case '0x01':
         return helpers.encodeToAddress({
-          codeHash: JOYID_CODE_HASH,
+          codeHash: this.joyidCodeHash,
           hashType: 'type',
           args: '0x' + pkh.substring(4),
         }, { config: this.network })
