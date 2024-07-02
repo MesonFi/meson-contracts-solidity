@@ -2794,13 +2794,13 @@
       "symbol": "CKB",
       "decimals": 8
     },
-    "mesonAddress": "0x22b7660c9427782402f139bbb9d6e1debc88649552f86e5462d90116f1e83f74",
+    "mesonAddress": "0x5c010079ef2e7d1480d0d2b6e4652f7a215847b05b9bfff15cf5916e3cd6225e",
     "metadata": {
-      "tx_hash_siglock": "0x8709d07a3737e3c18954588803ac321ab721376e3528ba2aa484103ddd2327f3",
-      "tx_hash_refcell": "0xe372e74265cf85fffb58e45f319e8d2c6deb94e0a9b029ca1f1f99c521e8ca26",
+      "tx_hash_siglock": "0x87b319b42c47d4630e4f0ed0803180d2c09470f0c16c092bdf21c1fc34bb61d2",
+      "tx_hash_refcell": "0x83543f277f427447046c09936835dddd23cd95393dd58b82d39c0f0bf61f4125",
       "tx_hash_joyid": "0xbdc3153fcb7c256d007be758c0b50c8da60b5ac0e44ae9e11d3dcc5b73d2b347",
       "tx_hash_xudt": "0x3ceb520f240b168e0bddf0d89b4bcabbe7d4fa69751057cbe8e4f27239fad0e9",
-      "code_hash_refcell": "0x109f97e74d7fedef4089408f51ef8290fc56ad5d35504b06ee09b75464663678",
+      "code_hash_refcell": "0xa686df60b60d264d0e511ceebe63bb8a59eb685ffa6154c12a0471d63fb5a12b",
       "code_hash_xudt": "0x092c2c4a26ea475a8e860c29cf00502103add677705e2ccd8d6fe5af3caa5ae3",
       "pools": [
         [

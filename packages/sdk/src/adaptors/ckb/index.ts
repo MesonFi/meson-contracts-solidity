@@ -224,7 +224,11 @@ export function getContract(address: string, abi, clientOrAdaptor: CkbRPC | CkbA
     let newDataList = ''
     while (dataList.length > 0) {
       const item = dataList.substring(0, 4)
-      newDataList += (Number('0x' + item.substring(0, 2)) - delta).toString(16).padStart(2, '0') + item.substring(2)
+      const updatedItem = (Number('0x' + item.substring(0, 2)) - delta).toString(16).padStart(2, '0') + item.substring(2)
+      if (newItem === updatedItem) {
+        throw new Error('Duplicated item in ref cell')
+      }
+      newDataList += updatedItem
       dataList = dataList.substring(4)
     }
     newDataList += newItem
@@ -445,12 +449,12 @@ export function getContract(address: string, abi, clientOrAdaptor: CkbRPC | CkbA
                 if (prop === 'postSwapFromInitiator') {
                   const [_, postingValue] = args
                   const initiator = postingValue.substring(0, 42)
-                  swapAmount = swap.amount.toNumber()
+                  swapAmount = swap.amount.toNumber() * 100
                   sigTimeLockScript = _generateSigTimeLock(swap.encoded, initiator, lpWallet.pkh, signer.pkh)
                   udtType = _udtTypeFromIndex(swap.inToken)
                 } else {
                   const [_, { initiator, recipient }] = args
-                  swapAmount = swap.amount.toNumber()
+                  swapAmount = swap.amount.sub(swap.fee).toNumber() * 100
 
                   const recipientWallet = new CkbWallet(adaptor.client, { address: recipient })
                   sigTimeLockScript = _generateSigTimeLock(swap.encoded, initiator, recipientWallet.pkh, lpWallet.pkh)

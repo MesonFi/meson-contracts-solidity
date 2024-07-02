@@ -42,7 +42,7 @@ export const clipRecipient = (recipient: string, encoded: string) => {
         config: recipient.startsWith('ckb') ? config.MAINNET : config.TESTNET
       })
       if (!lockScript.args.startsWith('0x0001')) {
-        throw new Error('Recipient not supported')
+        throw new Error('Recipient not supported. Please enter a JoyID address.')
       }
       return lockScript.args.replace('0x0001', '0x')
     }
