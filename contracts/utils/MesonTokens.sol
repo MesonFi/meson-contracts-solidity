@@ -30,13 +30,17 @@ contract MesonTokens {
   ///     49-64:   stablecoins as core (decimals 18)
   ///       49:      USDC
   ///       52:      DAI
-  ///     65-128:  3rd party tokens
+  ///     65-112:  3rd party tokens (decimals 18)
   ///       65:      iUSD (iZUMi Bond USD)
   ///       67:      M-BTC (Merlin BTC)
   ///       69:      MERL
   ///       71:      STONE
   ///       73:      SolvBTC.m
   ///       75:      SolvBTC.b
+  ///       77:      SolvBTC.a
+  ///       79:      uBTC
+  ///     113-128:  3rd party tokens (decimals 8)
+  ///       113:     pumpBTC
   ///     129-190: (Unspecified)
   ///     191:     No-swap core
   ///     192-235: (Unspecified)
@@ -47,7 +51,7 @@ contract MesonTokens {
   ///     240-243: BTC & BTC equivalent
   ///       240:     PoD BTC
   ///       241:     ERC20 BTC (decimals 18)
-  ///       242:     ERC20 BTC (decimals 8 except BNB Smart Chain)
+  ///       242:     ERC20 BTC (decimals 8 except BNB Smart Chain & BounceBit)
   ///       243:     BTC as core
   ///     244-247: SOL & SOL equivalent
   ///       244:     PoD SOL

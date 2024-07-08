@@ -93,9 +93,7 @@ contract MesonStates is MesonTokens, MesonHelpers {
       require(token != address(0), "Token not supported");
       require(Address.isContract(token), "The given token address is not a contract");
 
-      if (_needAdjustAmount(tokenIndex)) {
-        amount *= (tokenIndex == 242 && SHORT_COIN_TYPE != 0x02ca && SHORT_COIN_TYPE != 0x1771) ? 100 : 1e12;
-      }
+      amount *= _amountFactor(tokenIndex);
       (bool success, bytes memory data) = token.call(abi.encodeWithSelector(
         ERC20_TRANSFER_FROM_SELECTOR,
         sender,
@@ -125,10 +123,7 @@ contract MesonStates is MesonTokens, MesonHelpers {
 
       require(Address.isContract(token), "The given token address is not a contract");
 
-      if (_needAdjustAmount(tokenIndex)) {
-        amount *= (tokenIndex == 242 && SHORT_COIN_TYPE != 0x02ca && SHORT_COIN_TYPE != 0x1771) ? 100 : 1e12;
-      }
-
+      amount *= _amountFactor(tokenIndex);
       if (SHORT_COIN_TYPE == 0x00c3) {
         IERC20Minimal(token).transfer(recipient, amount);
       } else {
@@ -162,10 +157,8 @@ contract MesonStates is MesonTokens, MesonHelpers {
     uint64 data
   ) internal {
     require(Address.isContract(contractAddr), "The given recipient address is not a contract");
-    if (_needAdjustAmount(tokenIndex)) {
-      amount *= (tokenIndex == 242 && SHORT_COIN_TYPE != 0x02ca && SHORT_COIN_TYPE != 0x1771) ? 100 : 1e12;
-    }
 
+    amount *= _amountFactor(tokenIndex);
     if (_isCoreToken(tokenIndex)) {
       // Core tokens (e.g. ETH or BNB)
       IDepositWithBeneficiary(contractAddr).depositWithBeneficiary{value: amount}(
@@ -191,7 +184,14 @@ contract MesonStates is MesonTokens, MesonHelpers {
 
   /// @notice Determine if token has decimal 18 and therefore need to adjust amount
   /// @param tokenIndex The index of token. See `tokenForIndex` in `MesonTokens.sol`
-  function _needAdjustAmount(uint8 tokenIndex) private pure returns (bool) {
-    return tokenIndex > 32;
+  function _amountFactor(uint8 tokenIndex) private pure returns (uint256) {
+    if (tokenIndex <= 32) {
+      return 1;
+    } else if (tokenIndex == 242 && SHORT_COIN_TYPE != 0x02ca && SHORT_COIN_TYPE != 0x1771) {
+      return 100;
+    } else if (tokenIndex > 112 && tokenIndex <= 128) {
+      return 100;
+    }
+    return 1e12;
   }
 }
