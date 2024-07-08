@@ -2777,6 +2777,58 @@
     ]
   },
   {
+    "id": "ailayer",
+    "name": "AILayer",
+    "alias": "AI",
+    "chainId": "0xa59",
+    "slip44": "0x80000a59",
+    "shortSlip44": "0x0a59",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://mainnet-rpc.ailayer.xyz",
+    "explorer": "https://mainnet-explorer.ailayer.xyz",
+    "nativeCurrency": {
+      "name": "BTC",
+      "symbol": "BTC",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "BTC",
+        "symbol": "BTC",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 243
+      },
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 18,
+        "addr": "0xfaBc451eA1Fd9707c6Ba1769F570E760101C7f22",
+        "tokenIndex": 33
+      },
+      {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "decimals": 18,
+        "addr": "0x0663C09Bd0911181B39D66ec4bfAC9d89c8516BA",
+        "tokenIndex": 34
+      },
+      {
+        "name": "SolvBTC.b",
+        "symbol": "SolvBTC.b",
+        "decimals": 18,
+        "addr": "0x0F921c39eFd98809FE6D20a88A4357454578987a",
+        "tokenIndex": 75,
+        "partner": "free"
+      }
+    ]
+  },
+  {
     "id": "ckb",
     "name": "CKB",
     "alias": "CKB",
