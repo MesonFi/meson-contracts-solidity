@@ -1,5 +1,34 @@
 [
   {
+    "id": "btc-testnet",
+    "name": "Bitcoin Testnet",
+    "alias": "btc",
+    "chainId": "btc:testnet",
+    "slip44": "0x80000001",
+    "shortSlip44": "0x0001",
+    "extensions": [
+      "bitcoin"
+    ],
+    "addressFormat": "btc",
+    "url": "https://mempool.space/signet/api",
+    "explorer": "https://sepolia.etherscan.io",
+    "nativeCurrency": {
+      "name": "BTC",
+      "symbol": "BTC",
+      "decimals": 8
+    },
+    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "tokens": [
+      {
+        "name": "BTC",
+        "symbol": "BTC",
+        "decimals": 8,
+        "addr": "",
+        "tokenIndex": 191
+      }
+    ]
+  },
+  {
     "id": "sepolia",
     "name": "Sepolia Testnet",
     "alias": "sep",
