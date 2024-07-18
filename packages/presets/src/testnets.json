@@ -10,7 +10,7 @@
       "bitcoin"
     ],
     "addressFormat": "bitcoin",
-    "url": "https://mempool.space/signet/api",
+    "url": "https://mempool.space/testnet/api",
     "explorer": "https://sepolia.etherscan.io",
     "nativeCurrency": {
       "name": "BTC",
