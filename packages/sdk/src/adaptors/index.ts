@@ -51,6 +51,8 @@ export function getWallet (privateKey, client) {
 export function getContract(address, abi, clientOrAdaptor) {
   if (clientOrAdaptor instanceof AptosClient || clientOrAdaptor instanceof AptosAdaptor) {
     return _aptos.getContract(address, abi, clientOrAdaptor)
+  } else if (clientOrAdaptor instanceof BtcAdaptor) {
+    return _bitcoin.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof SuiClient || clientOrAdaptor instanceof SuiAdaptor) {
     return _sui.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof SolConnection || clientOrAdaptor instanceof SolanaAdaptor) {

@@ -19,6 +19,16 @@ export default class BtcWallet extends BtcAdaptor {
   get address(): string {
     return this.#address
   }
+
+  async sendTransaction({ to, value }) {
+    console.log(to, value.toString())
+    // TODO
+
+    return {
+      hash: 'xxx',
+      wait: () => {}
+    }
+  }
 }
 
 export class BtcWalletFromExtension extends BtcWallet {

@@ -19,14 +19,17 @@ export default class BtcAdaptor {
   }
 
   async detectNetwork(): Promise<any> {
+    // TODO
     return 
   }
 
   async getBlockNumber() {
+    // TODO
     return 10
   }
 
   async getBalance(addr) {
+    // TODO
     return 10
   }
 

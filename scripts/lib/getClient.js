@@ -12,8 +12,8 @@ const CustomGasFeeProviderWrapper = require('./CustomGasFeeProviderWrapper')
 exports.getClient = function getClient (network) {
   if (network.id.startsWith('aptos')) {
     return new AptosClient(network.url)
-  } else if (network.id.startsWith('btc')) {
-    return new BtcAdaptor(network.url, network.id === 'btc-testnet')
+  } else if (network.id.startsWith('bitcoin')) {
+    return new BtcAdaptor(network.url, network.id === 'bitcoin-testnet')
   } else if (network.id.startsWith('sui')) {
     return new SuiClient({ url: network.url })
   } else if (network.id.startsWith('solana')) {
