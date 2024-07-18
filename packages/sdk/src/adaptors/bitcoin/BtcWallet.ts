@@ -7,7 +7,7 @@ export default class BtcWallet extends BtcAdaptor {
   readonly #address: string
 
   constructor(client: BtcAdaptor, keypair: any) {
-    super(client)
+    super(client, client.isTestnet)
     this.#pubkey = keypair.publicKey
     this.#address = bitcoin.payments.p2pkh({ pubkey: this.pubkey, network: this.network }).address
   }

@@ -12,10 +12,9 @@ const ECPair = ECPairFactory(tinysecp)
 export function getWallet(input: string = '', client: BtcAdaptor) {
   if (input.startsWith('0x')) {
     // HEX format
-    const buffer = Buffer.from([client.network.wif, ...Buffer.from(input.substring(2), 'hex')])
-    const wif = bs58check.encode(buffer)
-    console.log(wif)
-    const keypair = ECPair.fromWIF(wif, client.network)
+    const buffer = Buffer.from(input.substring(2), 'hex')
+    const keypair = ECPair.fromPrivateKey(buffer, { network: client.network })
+    console.log("WIF private key: ", keypair.toWIF())
     return new BtcWallet(client, keypair)
   } else if (input) {
     // WIF format
