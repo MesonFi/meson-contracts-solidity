@@ -730,5 +730,34 @@
         "tokenIndex": 242
       }
     ]
+  },
+  {
+    "id": "ton-testnet",
+    "name": "TON Testnet",
+    "alias": "TON",
+    "chainId": "ton:testnet",
+    "slip44": "0x8000025f",
+    "shortSlip44": "0x025f",
+    "extensions": [
+      "tonconnect"
+    ],
+    "addressFormat": "ton",
+    "url": "https://testnet.toncenter.com/api/v2/jsonRPC",
+    "explorer": "https://testnet.tonviewer.com/",
+    "nativeCurrency": {
+      "name": "TON",
+      "symbol": "TON",
+      "decimals": 9
+    },
+    "mesonAddress": "EQBPEaYVY1w44eFhbNlTypOmzCtPPepDaCQtNt0QBRNG0wzY",
+    "tokens": [
+      {
+        "name": "USDC",
+        "symbol": "USDC",
+        "decimals": 6,
+        "addr": "kQAOWCl4SQWu9gk81yIliNlwIemGPU-xbhUK6fq4uAcM3Rk6",
+        "tokenIndex": 1
+      }
+    ]
   }
 ]

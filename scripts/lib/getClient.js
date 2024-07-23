@@ -25,6 +25,8 @@ exports.getClient = function getClient (network) {
     const client = new CkbRPC(network.url)
     client.metadata = { ...network.metadata, tokens: network.tokens }
     return client
+  } else if (network.id.startsWith('ton')) {
+    return 'TODO'
   } else {
     hre.changeNetwork(network.id)
     ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)

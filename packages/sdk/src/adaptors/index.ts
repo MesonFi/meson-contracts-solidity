@@ -18,15 +18,19 @@ import * as _starknet from './starknet'
 import * as _tron from './tron'
 import * as _zksync from './zksync'
 import * as _ckb from './ckb'
+import * as _ton from './ton'
 import AptosAdaptor from './aptos/AptosAdaptor'
 import SuiAdaptor from './sui/SuiAdaptor'
 import SolanaAdaptor from './solana/SolanaAdaptor'
 import StarkAdaptor from './starknet/StarkAdaptor'
 import CkbAdaptor from './ckb/CkbAdaptor'
+import TonAdaptor from './ton/TonAdaptor'
 
 export function getWallet (privateKey, client) {
   if (client instanceof AptosClient) {
     return _aptos.getWallet(privateKey, client)
+  } else if (client instanceof TonAdaptor) {
+    return _ton.getWallet(privateKey, client)
   } else if (client instanceof SuiClient) {
     return _sui.getWallet(privateKey, client)
   } else if (client instanceof SolConnection) {
@@ -64,7 +68,7 @@ export function getContract(address, abi, clientOrAdaptor) {
   }
 }
 
-export type AddressFormat = 'ethers' | 'bitcoin' | 'tron' | 'aptos' | 'sui' | 'solana' | 'starknet' | 'ckb'
+export type AddressFormat = 'ethers' | 'bitcoin' | 'tron' | 'aptos' | 'sui' | 'solana' | 'starknet' | 'ckb' | 'ton'
 export function isAddress(format: AddressFormat, addr: string): boolean {
   if (format === 'ethers') {
     return utils.isHexString(addr) && utils.isAddress(addr)
@@ -80,6 +84,9 @@ export function isAddress(format: AddressFormat, addr: string): boolean {
     // TODO
     return !!addr
   } else if (format === 'ckb') {
+    // TODO
+    return !!addr
+  } else if (format === 'ton') {
     // TODO
     return !!addr
   }
@@ -117,3 +124,4 @@ export const starknet = _starknet
 export const tron = _tron
 export const zksync = _zksync
 export const ckb = _ckb
+export const ton = _ton
