@@ -58,6 +58,14 @@
         "addr": "0x7122985656e38BDC0302Db86685bb972b145bD3C",
         "tokenIndex": 71,
         "partner": "free"
+      },
+      {
+        "name": "pumpBTC",
+        "symbol": "pumpBTC",
+        "decimals": 8,
+        "addr": "0xF469fBD2abcd6B9de8E169d128226C0Fc90a012e",
+        "tokenIndex": 113,
+        "partner": "free"
       }
     ]
   },
@@ -139,6 +147,14 @@
         "decimals": 18,
         "addr": "0x4aae823a6a0b376De6A78e74eCC5b079d38cBCf7",
         "tokenIndex": 75,
+        "partner": "free"
+      },
+      {
+        "name": "pumpBTC",
+        "symbol": "pumpBTC",
+        "decimals": 8,
+        "addr": "0xf9C4FF105803A77eCB5DAE300871Ad76c2794fa4",
+        "tokenIndex": 113,
         "partner": "free"
       }
     ]
@@ -953,6 +969,14 @@
         "link": "address/0x7F934E97101e2239b9cB438A4B07d9474AD51406",
         "tokenIndex": 41,
         "partner": "free"
+      },
+      {
+        "name": "pumpBTC",
+        "symbol": "pumpBTC",
+        "decimals": 8,
+        "addr": "0xDAB5cD46A968aDb6911613896fC61b8B62Cf3B2C",
+        "tokenIndex": 113,
+        "partner": "free"
       }
     ]
   },
@@ -990,6 +1014,14 @@
         "decimals": 6,
         "addr": "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
         "tokenIndex": 2
+      },
+      {
+        "name": "pumpBTC",
+        "symbol": "pumpBTC",
+        "decimals": 8,
+        "addr": "0xC75D7767F2EdFbc6a5b18Fc1fA5d51ffB57c2B37",
+        "tokenIndex": 113,
+        "partner": "free"
       }
     ]
   },
@@ -2216,6 +2248,14 @@
         "addr": "0x5B1Fb849f1F76217246B8AAAC053b5C7b15b7dc3",
         "tokenIndex": 75,
         "partner": "free"
+      },
+      {
+        "name": "uBTC",
+        "symbol": "uBTC",
+        "decimals": 18,
+        "addr": "0x782e2b85fda9a8224C17B191fc5DE1e085a962b2",
+        "tokenIndex": 79,
+        "partner": "free"
       }
     ]
   },
@@ -2471,6 +2511,14 @@
         "decimals": 18,
         "addr": "0x2931a7dAb3dF4135823Ca9f36680fbbC741a2b3B",
         "tokenIndex": 73,
+        "partner": "free"
+      },
+      {
+        "name": "uBTC",
+        "symbol": "uBTC",
+        "decimals": 18,
+        "addr": "0x796e4D53067FF374B89b2Ac101ce0c1f72ccaAc2",
+        "tokenIndex": 79,
         "partner": "free"
       }
     ]
