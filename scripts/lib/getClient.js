@@ -7,6 +7,7 @@ const TronWeb = require('tronweb')
 const { Provider } = require('zksync-web3')
 const { RPC: CkbRPC } = require('@ckb-lumos/lumos')
 const CustomGasFeeProviderWrapper = require('./CustomGasFeeProviderWrapper')
+const { default: TonAdaptor } = require('@mesonfi/sdk/lib/adaptors/ton/TonAdaptor')
 
 exports.getClient = function getClient (network) {
   if (network.id.startsWith('aptos')) {
@@ -26,7 +27,7 @@ exports.getClient = function getClient (network) {
     client.metadata = { ...network.metadata, tokens: network.tokens }
     return client
   } else if (network.id.startsWith('ton')) {
-    return 'TODO'
+    return new TonAdaptor(network.url)
   } else {
     hre.changeNetwork(network.id)
     ethers.provider = new CustomGasFeeProviderWrapper(ethers.provider)

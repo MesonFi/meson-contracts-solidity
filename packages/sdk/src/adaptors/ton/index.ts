@@ -2,7 +2,7 @@ import { KeyPair, keyPairFromSecretKey, mnemonicToPrivateKey } from '@ton/crypto
 import TonAdaptor from "./TonAdaptor";
 import TonWallet from "./TonWallet";
 
-export async function getWallet(privateKey: string | Buffer, client: TonAdaptor): Promise<TonWallet> {
+export function getWallet(privateKey: string | Buffer, client: TonAdaptor): TonWallet {
   let keypair: KeyPair
   if (privateKey instanceof Buffer) {
     // Buffer secret key

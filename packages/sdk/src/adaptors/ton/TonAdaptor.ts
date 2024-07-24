@@ -1,6 +1,3 @@
-// import fetch from 'cross-fetch'
-// import { BigNumber } from 'ethers'
-// import { timer } from '../../utils'
 import { TonClient } from '@ton/ton'
 import { Address } from '@ton/core'
 
@@ -18,7 +15,7 @@ export default class TonAdaptor {
   }
 
   async detectNetwork(): Promise<any> {
-    return (await this.client.getMasterchainInfo())
+    return (await this.client.getMasterchainInfo()).latestSeqno != 0
   }
 
   async getBlockNumber() {
@@ -27,7 +24,7 @@ export default class TonAdaptor {
 
   async getBalance(addr: string | Address) {
     const tonAddr = typeof addr === 'string' ? Address.parse(addr) : addr
-    return (await this.client.getBalance(tonAddr))
+    return (await this.client.getBalance(tonAddr)).toString()
   }
 
   async getCode(addr) {
