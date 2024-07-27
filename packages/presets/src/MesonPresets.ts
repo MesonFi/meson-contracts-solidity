@@ -198,7 +198,7 @@ export class MesonPresets {
       throw new Error(`Unsupported network: ${id}`)
     }
 
-    const url = urls[0]
+    const url = urls.sort(() => Math.sign(Math.random() - 0.5))[0]
 
     if (id.startsWith('aptos')) {
       return [AptosFallbackClient, [urls]]
