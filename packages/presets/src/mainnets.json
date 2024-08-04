@@ -2877,6 +2877,36 @@
     ]
   },
   {
+    "id": "zircuit",
+    "name": "Zircuit",
+    "alias": "ZIRCUIT",
+    "chainId": "0xbf04",
+    "slip44": "0x8000bf04",
+    "shortSlip44": "0xbf04",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://zircuit1-mainnet.p2pify.com",
+    "explorer": "https://explorermainnet.zircuit.com",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
+      }
+    ]
+  },
+  {
     "id": "ckb",
     "name": "CKB",
     "alias": "CKB",
