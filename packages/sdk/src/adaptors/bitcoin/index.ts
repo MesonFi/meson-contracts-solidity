@@ -27,9 +27,11 @@ export function getWalletFromExtension(ext, client: BtcAdaptor): BtcWalletFromEx
   return new BtcWalletFromExtension(client, ext)
 }
 
-export function getContract(address, abi, clientOrAdaptor: BtcAdaptor) {
+export function getContract(address, abi, clientOrAdaptor: any) {
   let adaptor: BtcAdaptor
   if (clientOrAdaptor instanceof BtcAdaptor) {
+    adaptor = clientOrAdaptor
+  } else if (clientOrAdaptor instanceof BtcWallet) {
     adaptor = clientOrAdaptor
   } else {
     adaptor = new BtcAdaptor(clientOrAdaptor)
@@ -46,7 +48,7 @@ export function getContract(address, abi, clientOrAdaptor: BtcAdaptor) {
           return adaptor
         }
         throw new Error(`BtcContract doesn't have a signer.`)
-      } 
+      }
 
       let method = abi.find(item => item.name === prop)
       if (method?.type === 'function') {
@@ -61,7 +63,28 @@ export function getContract(address, abi, clientOrAdaptor: BtcAdaptor) {
             }
           }
         } else {
+          return async (...args) => {
+            let options
+            if (args.length > method.inputs.length) {
+              options = args.pop()
+            }
 
+            const swap = Swap.decode(args[0])
+            if (prop === 'directRelease') {
+              const [_encoded, _r, _yParityAndS, _initiator, recipient] = args
+              return await (adaptor as BtcWallet).sendTransaction({
+                to: recipient, value: swap.amount
+              })
+            } else if (prop === 'directExecuteSwap') {
+              return await (adaptor as BtcWallet).sendTransaction({
+                to: '<LP_ADDRESS>', value: swap.amount.sub(swap.fee)    // TODO: Replace the LP address here
+              })
+
+            } else {
+              throw new Error(`Method ${prop} is not implemented.`)
+            }
+
+          }
         }
       }
     }

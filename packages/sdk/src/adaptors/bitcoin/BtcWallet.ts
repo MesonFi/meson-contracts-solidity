@@ -100,13 +100,7 @@ export default class BtcWallet extends BtcAdaptor {
   }
 
   async sendTransaction({ to, value }) {
-    // console.log(to, value.toString())
-    // // TODO
-
-    // return {
-    //   hash: 'xxx',
-    //   wait: () => {}
-    // }
+    return this.transfer({ to, value })
   }
 }
 
@@ -116,5 +110,21 @@ export class BtcWalletFromExtension extends BtcWallet {
   constructor(client: BtcAdaptor, ext) {
     super(client, {})
     this.ext = ext
+  }
+
+  get address(): string {
+    return this.ext?._selectedAddress
+  }
+
+  async deploy(): Promise<any> {
+    throw new Error('Cannot deploy with extention wallet')
+  }
+
+  override async transfer({ to, value }) {
+    return this.ext?.sendBitcoin(to, value)
+  }
+
+  override async sendTransaction({ to, value }) {
+    return this.transfer({ to, value })
   }
 }
