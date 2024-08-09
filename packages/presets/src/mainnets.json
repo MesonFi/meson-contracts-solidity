@@ -1016,6 +1016,13 @@
         "tokenIndex": 2
       },
       {
+        "name": "Wrapped BTC",
+        "symbol": "WBTC",
+        "decimals": 8,
+        "addr": "0xCAbAE6f6Ea1ecaB08Ad02fE02ce9A44F09aebfA2",
+        "tokenIndex": 242
+      },
+      {
         "name": "pumpBTC",
         "symbol": "pumpBTC",
         "decimals": 8,
