@@ -60,6 +60,22 @@
         "partner": "free"
       },
       {
+        "name": "SolvBTC",
+        "symbol": "SolvBTC",
+        "decimals": 18,
+        "addr": "0x7A56E1C57C7475CCf742a1832B028F0456652F97",
+        "tokenIndex": 75,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.BBN",
+        "symbol": "SolvBTC.BBN",
+        "decimals": 18,
+        "addr": "0xd9D920AA40f578ab794426F5C90F6C731D159DEf",
+        "tokenIndex": 81,
+        "partner": "free"
+      },
+      {
         "name": "pumpBTC",
         "symbol": "pumpBTC",
         "decimals": 8,
@@ -142,11 +158,19 @@
         "tokenIndex": 242
       },
       {
-        "name": "SolvBTC.b",
-        "symbol": "SolvBTC.b",
+        "name": "SolvBTC",
+        "symbol": "SolvBTC",
         "decimals": 18,
         "addr": "0x4aae823a6a0b376De6A78e74eCC5b079d38cBCf7",
         "tokenIndex": 75,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.BBN",
+        "symbol": "SolvBTC.BBN",
+        "decimals": 18,
+        "addr": "0x1346b618dC92810EC74163e4c27004c921D446a5",
+        "tokenIndex": 81,
         "partner": "free"
       },
       {
