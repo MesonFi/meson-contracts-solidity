@@ -76,6 +76,14 @@
         "partner": "free"
       },
       {
+        "name": "SolvBTC.ENA",
+        "symbol": "SolvBTC.ENA",
+        "decimals": 18,
+        "addr": "0x325DC9EBceC31940C658aCACa45f8293418d811E",
+        "tokenIndex": 83,
+        "partner": "free"
+      },
+      {
         "name": "pumpBTC",
         "symbol": "pumpBTC",
         "decimals": 8,
@@ -174,6 +182,14 @@
         "partner": "free"
       },
       {
+        "name": "SolvBTC.ENA",
+        "symbol": "SolvBTC.ENA",
+        "decimals": 18,
+        "addr": "0x53E63a31fD1077f949204b94F431bCaB98F72BCE",
+        "tokenIndex": 83,
+        "partner": "free"
+      },
+      {
         "name": "pumpBTC",
         "symbol": "pumpBTC",
         "decimals": 8,
@@ -255,7 +271,7 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://rpc.ankr.com/arbitrum",
+    "url": "https://arb1.arbitrum.io/rpc",
     "explorer": "https://arbiscan.io",
     "nativeCurrency": {
       "name": "ETH",
@@ -308,6 +324,22 @@
         "decimals": 8,
         "addr": "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
         "tokenIndex": 242
+      },
+      {
+        "name": "SolvBTC",
+        "symbol": "SolvBTC",
+        "decimals": 18,
+        "addr": "0x3647c54c4c2C65bC7a2D63c0Da2809B399DBBDC0",
+        "tokenIndex": 75,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.BBN",
+        "symbol": "SolvBTC.BBN",
+        "decimals": 18,
+        "addr": "0x346c574C56e1A4aAa8dc88Cda8F7EB12b39947aB",
+        "tokenIndex": 81,
+        "partner": "free"
       }
     ]
   },
@@ -413,6 +445,22 @@
         "decimals": 6,
         "addr": "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7",
         "tokenIndex": 10
+      },
+      {
+        "name": "SolvBTC",
+        "symbol": "SolvBTC",
+        "decimals": 18,
+        "addr": "0xbc78D84Ba0c46dFe32cf2895a19939c86b81a777",
+        "tokenIndex": 75,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.BBN",
+        "symbol": "SolvBTC.BBN",
+        "decimals": 18,
+        "addr": "0xCC0966D8418d412c599A6421b760a847eB169A8c",
+        "tokenIndex": 81,
+        "partner": "free"
       }
     ]
   },
@@ -2437,6 +2485,14 @@
         "decimals": 18,
         "addr": "0x41D9036454BE47d3745A823C4aaCD0e29cFB0f71",
         "tokenIndex": 73,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.BBN",
+        "symbol": "SolvBTC.BBN",
+        "decimals": 18,
+        "addr": "0x1760900aCA15B90Fa2ECa70CE4b4EC441c2CF6c5",
+        "tokenIndex": 81,
         "partner": "free"
       },
       {
