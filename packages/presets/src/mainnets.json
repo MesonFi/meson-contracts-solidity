@@ -58,6 +58,38 @@
         "addr": "0x7122985656e38BDC0302Db86685bb972b145bD3C",
         "tokenIndex": 71,
         "partner": "free"
+      },
+      {
+        "name": "SolvBTC",
+        "symbol": "SolvBTC",
+        "decimals": 18,
+        "addr": "0x7A56E1C57C7475CCf742a1832B028F0456652F97",
+        "tokenIndex": 75,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.BBN",
+        "symbol": "SolvBTC.BBN",
+        "decimals": 18,
+        "addr": "0xd9D920AA40f578ab794426F5C90F6C731D159DEf",
+        "tokenIndex": 81,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.ENA",
+        "symbol": "SolvBTC.ENA",
+        "decimals": 18,
+        "addr": "0x325DC9EBceC31940C658aCACa45f8293418d811E",
+        "tokenIndex": 83,
+        "partner": "free"
+      },
+      {
+        "name": "pumpBTC",
+        "symbol": "pumpBTC",
+        "decimals": 8,
+        "addr": "0xF469fBD2abcd6B9de8E169d128226C0Fc90a012e",
+        "tokenIndex": 113,
+        "partner": "free"
       }
     ]
   },
@@ -134,11 +166,35 @@
         "tokenIndex": 242
       },
       {
-        "name": "SolvBTC.b",
-        "symbol": "SolvBTC.b",
+        "name": "SolvBTC",
+        "symbol": "SolvBTC",
         "decimals": 18,
         "addr": "0x4aae823a6a0b376De6A78e74eCC5b079d38cBCf7",
         "tokenIndex": 75,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.BBN",
+        "symbol": "SolvBTC.BBN",
+        "decimals": 18,
+        "addr": "0x1346b618dC92810EC74163e4c27004c921D446a5",
+        "tokenIndex": 81,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.ENA",
+        "symbol": "SolvBTC.ENA",
+        "decimals": 18,
+        "addr": "0x53E63a31fD1077f949204b94F431bCaB98F72BCE",
+        "tokenIndex": 83,
+        "partner": "free"
+      },
+      {
+        "name": "pumpBTC",
+        "symbol": "pumpBTC",
+        "decimals": 8,
+        "addr": "0xf9C4FF105803A77eCB5DAE300871Ad76c2794fa4",
+        "tokenIndex": 113,
         "partner": "free"
       }
     ]
@@ -215,7 +271,7 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://rpc.ankr.com/arbitrum",
+    "url": "https://arb1.arbitrum.io/rpc",
     "explorer": "https://arbiscan.io",
     "nativeCurrency": {
       "name": "ETH",
@@ -268,6 +324,22 @@
         "decimals": 8,
         "addr": "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
         "tokenIndex": 242
+      },
+      {
+        "name": "SolvBTC",
+        "symbol": "SolvBTC",
+        "decimals": 18,
+        "addr": "0x3647c54c4c2C65bC7a2D63c0Da2809B399DBBDC0",
+        "tokenIndex": 75,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.BBN",
+        "symbol": "SolvBTC.BBN",
+        "decimals": 18,
+        "addr": "0x346c574C56e1A4aAa8dc88Cda8F7EB12b39947aB",
+        "tokenIndex": 81,
+        "partner": "free"
       }
     ]
   },
@@ -373,6 +445,22 @@
         "decimals": 6,
         "addr": "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7",
         "tokenIndex": 10
+      },
+      {
+        "name": "SolvBTC",
+        "symbol": "SolvBTC",
+        "decimals": 18,
+        "addr": "0xbc78D84Ba0c46dFe32cf2895a19939c86b81a777",
+        "tokenIndex": 75,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.BBN",
+        "symbol": "SolvBTC.BBN",
+        "decimals": 18,
+        "addr": "0xCC0966D8418d412c599A6421b760a847eB169A8c",
+        "tokenIndex": 81,
+        "partner": "free"
       }
     ]
   },
@@ -953,6 +1041,14 @@
         "link": "address/0x7F934E97101e2239b9cB438A4B07d9474AD51406",
         "tokenIndex": 41,
         "partner": "free"
+      },
+      {
+        "name": "pumpBTC",
+        "symbol": "pumpBTC",
+        "decimals": 8,
+        "addr": "0xDAB5cD46A968aDb6911613896fC61b8B62Cf3B2C",
+        "tokenIndex": 113,
+        "partner": "free"
       }
     ]
   },
@@ -990,6 +1086,21 @@
         "decimals": 6,
         "addr": "0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE",
         "tokenIndex": 2
+      },
+      {
+        "name": "Wrapped BTC",
+        "symbol": "WBTC",
+        "decimals": 8,
+        "addr": "0xCAbAE6f6Ea1ecaB08Ad02fE02ce9A44F09aebfA2",
+        "tokenIndex": 242
+      },
+      {
+        "name": "pumpBTC",
+        "symbol": "pumpBTC",
+        "decimals": 8,
+        "addr": "0xC75D7767F2EdFbc6a5b18Fc1fA5d51ffB57c2B37",
+        "tokenIndex": 113,
+        "partner": "free"
       }
     ]
   },
@@ -2216,6 +2327,14 @@
         "addr": "0x5B1Fb849f1F76217246B8AAAC053b5C7b15b7dc3",
         "tokenIndex": 75,
         "partner": "free"
+      },
+      {
+        "name": "uBTC",
+        "symbol": "uBTC",
+        "decimals": 18,
+        "addr": "0x782e2b85fda9a8224C17B191fc5DE1e085a962b2",
+        "tokenIndex": 79,
+        "partner": "free"
       }
     ]
   },
@@ -2369,6 +2488,14 @@
         "partner": "free"
       },
       {
+        "name": "SolvBTC.BBN",
+        "symbol": "SolvBTC.BBN",
+        "decimals": 18,
+        "addr": "0x1760900aCA15B90Fa2ECa70CE4b4EC441c2CF6c5",
+        "tokenIndex": 81,
+        "partner": "free"
+      },
+      {
         "name": "Merlin's Seal STONE",
         "symbol": "M-STONE",
         "decimals": 18,
@@ -2471,6 +2598,14 @@
         "decimals": 18,
         "addr": "0x2931a7dAb3dF4135823Ca9f36680fbbC741a2b3B",
         "tokenIndex": 73,
+        "partner": "free"
+      },
+      {
+        "name": "uBTC",
+        "symbol": "uBTC",
+        "decimals": 18,
+        "addr": "0x796e4D53067FF374B89b2Ac101ce0c1f72ccaAc2",
+        "tokenIndex": 79,
         "partner": "free"
       }
     ]
@@ -2825,6 +2960,36 @@
         "addr": "0x0F921c39eFd98809FE6D20a88A4357454578987a",
         "tokenIndex": 75,
         "partner": "free"
+      }
+    ]
+  },
+  {
+    "id": "zircuit",
+    "name": "Zircuit",
+    "alias": "ZIRCUIT",
+    "chainId": "0xbf04",
+    "slip44": "0x8000bf04",
+    "shortSlip44": "0xbf04",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://zircuit1-mainnet.p2pify.com",
+    "explorer": "https://explorermainnet.zircuit.com",
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "ETH",
+        "symbol": "ETH",
+        "decimals": 18,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 255
       }
     ]
   },

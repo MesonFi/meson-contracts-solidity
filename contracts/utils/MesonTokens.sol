@@ -39,6 +39,8 @@ contract MesonTokens {
   ///       75:      SolvBTC.b
   ///       77:      SolvBTC.a
   ///       79:      uBTC
+  ///       81:      SolvBTC.BBN
+  ///       83:      SolvBTC.ENA
   ///     113-128:  3rd party tokens (decimals 8)
   ///       113:     pumpBTC
   ///     129-190: (Unspecified)
