@@ -249,7 +249,7 @@ export class Swap implements SwapData {
   }
 
   get _newFormat(): boolean {
-    return (parseInt(this.salt[4], 16) & 1) === 1
+    return (parseInt(this.salt[4], 16) & 1) === 1 && this.expireTs > new Date('2024-03-01').valueOf() / 1000
   }
 
   get _splitPos() : number {

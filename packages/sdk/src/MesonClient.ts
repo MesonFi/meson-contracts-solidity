@@ -20,6 +20,7 @@ import { SwapSigner, clipRecipient } from './SwapSigner'
 import { SignedSwapRequestData, SignedSwapReleaseData } from './SignedSwap'
 import * as adaptors from './adaptors'
 import AptosAdaptor from './adaptors/aptos/AptosAdaptor'
+import BtcAdaptor from './adaptors/bitcoin/BtcAdaptor'
 import SuiAdaptor from './adaptors/sui/SuiAdaptor'
 import SolanaAdaptor from './adaptors/solana/SolanaAdaptor'
 import StarkAdaptor from './adaptors/starknet/StarkAdaptor'
@@ -161,6 +162,8 @@ export class MesonClient {
       this.addressFormat = 'ethers'
     } else if (mesonInstance.provider instanceof AptosAdaptor) {
       this.addressFormat = 'aptos'
+    } else if (mesonInstance.provider instanceof BtcAdaptor) {
+      this.addressFormat = 'bitcoin'
     } else if (mesonInstance.provider instanceof SuiAdaptor) {
       this.addressFormat = 'sui'
     } else if (mesonInstance.provider instanceof SolanaAdaptor) {
@@ -264,6 +267,7 @@ export class MesonClient {
   get coreDecimals() {
     switch (this.addressFormat) {
       case 'aptos':
+      case 'bitcoin':
       case 'ckb':
         return 8
       case 'sui':

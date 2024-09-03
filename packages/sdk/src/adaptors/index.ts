@@ -11,6 +11,7 @@ import { Provider as ZkProvider, Wallet as ZkWallet } from 'zksync-web3'
 import { RPC as CkbRPC } from '@ckb-lumos/lumos'
 
 import * as _aptos from './aptos'
+import * as _bitcoin from './bitcoin'
 import * as _ethers from './ethers'
 import * as _sui from './sui'
 import * as _solana from './solana'
@@ -20,6 +21,7 @@ import * as _zksync from './zksync'
 import * as _ckb from './ckb'
 import * as _ton from './ton'
 import AptosAdaptor from './aptos/AptosAdaptor'
+import BtcAdaptor from './bitcoin/BtcAdaptor'
 import SuiAdaptor from './sui/SuiAdaptor'
 import SolanaAdaptor from './solana/SolanaAdaptor'
 import StarkAdaptor from './starknet/StarkAdaptor'
@@ -29,6 +31,8 @@ import TonAdaptor from './ton/TonAdaptor'
 export function getWallet (privateKey, client) {
   if (client instanceof AptosClient) {
     return _aptos.getWallet(privateKey, client)
+  } else if (client instanceof BtcAdaptor) {
+    return _bitcoin.getWallet(privateKey, client)
   } else if (client instanceof TonAdaptor) {
     return _ton.getWallet(privateKey, client)
   } else if (client instanceof SuiClient) {
@@ -51,6 +55,8 @@ export function getWallet (privateKey, client) {
 export function getContract(address, abi, clientOrAdaptor) {
   if (clientOrAdaptor instanceof AptosClient || clientOrAdaptor instanceof AptosAdaptor) {
     return _aptos.getContract(address, abi, clientOrAdaptor)
+  } else if (clientOrAdaptor instanceof BtcAdaptor) {
+    return _bitcoin.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof SuiClient || clientOrAdaptor instanceof SuiAdaptor) {
     return _sui.getContract(address, abi, clientOrAdaptor)
   } else if (clientOrAdaptor instanceof SolConnection || clientOrAdaptor instanceof SolanaAdaptor) {
@@ -73,7 +79,7 @@ export function isAddress(format: AddressFormat, addr: string): boolean {
   if (format === 'ethers') {
     return utils.isHexString(addr) && utils.isAddress(addr)
   } else if (format === 'bitcoin') {
-    return true
+    return !!addr
   } else if (format === 'tron') {
     return TronWeb.isAddress(addr)
   } else if (format === 'aptos' || format === 'sui') {
@@ -117,6 +123,7 @@ export function formatAddress(format: AddressFormat, addr: string): string {
 }
 
 export const aptos = _aptos
+export const bitcoin = _bitcoin
 export const ethers = _ethers
 export const sui = _sui
 export const solana = _solana

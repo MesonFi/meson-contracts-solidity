@@ -11,6 +11,8 @@ import {
   LockedSwapStatus,
   adaptors,
 } from '@mesonfi/sdk'
+import BtcAdaptor from '@mesonfi/sdk/lib/adaptors/bitcoin/BtcAdaptor'
+
 import { Meson } from '@mesonfi/contract-abis'
 
 import {
@@ -198,9 +200,11 @@ export class MesonPresets {
       throw new Error(`Unsupported network: ${id}`)
     }
 
-    const url = urls[0]
+    const url = urls.sort(() => Math.sign(Math.random() - 0.5))[0]
 
-    if (id.startsWith('aptos')) {
+    if (network.id.startsWith('bitcoin')) {
+      return [BtcAdaptor, [url, id === 'bitcoin-signet', network.mesonAddress]]
+    } else if (id.startsWith('aptos')) {
       return [AptosFallbackClient, [urls]]
     } else if (id.startsWith('sui')) {
       return [SuiClient, [{ url }]]

@@ -1,4 +1,5 @@
 const { ethers } = require('hardhat')
+const { default: BtcAdaptor } = require('@mesonfi/sdk/lib/adaptors/bitcoin/BtcAdaptor')
 const { AptosClient } = require('aptos')
 const { SuiClient } = require('@mysten/sui.js/client')
 const { Connection: SolConnection } = require('@solana/web3.js')
@@ -12,6 +13,8 @@ const { default: TonAdaptor } = require('@mesonfi/sdk/lib/adaptors/ton/TonAdapto
 exports.getClient = function getClient (network) {
   if (network.id.startsWith('aptos')) {
     return new AptosClient(network.url)
+  } else if (network.id.startsWith('bitcoin')) {
+    return new BtcAdaptor(network.url, network.id === 'bitcoin-testnet', network.mesonAddress)
   } else if (network.id.startsWith('sui')) {
     return new SuiClient({ url: network.url })
   } else if (network.id.startsWith('solana')) {
