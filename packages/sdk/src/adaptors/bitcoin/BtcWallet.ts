@@ -1,26 +1,28 @@
-import { ethers } from 'ethers'
+import { BigNumber } from 'ethers'
 import axios from 'axios'
 import * as bitcoin from 'bitcoinjs-lib'
-import * as tinysecp from 'tiny-secp256k1';
+import ecc from '@bitcoinerlab/secp256k1'
 import BtcAdaptor from './BtcAdaptor'
 import { ECPairInterface, ECPairFactory } from 'ecpair'
 
-bitcoin.initEccLib(tinysecp);
-const ECPair = ECPairFactory(tinysecp);
+bitcoin.initEccLib(ecc)
+const ECPair = ECPairFactory(ecc)
 
 export default class BtcWallet extends BtcAdaptor {
+  readonly #keypair: ECPairInterface
   readonly #pubkey: any
   readonly #address: string
-  readonly #keypair: ECPairInterface
 
   readonly #dustValue: number
   readonly #feeAll: number
 
-  constructor(client: BtcAdaptor, keypair: any) {
-    super(client, client.isTestnet)
-    this.#pubkey = keypair.publicKey
-    this.#address = bitcoin.payments.p2pkh({ pubkey: this.pubkey, network: this.network }).address
-    this.#keypair = keypair
+  constructor(client: BtcAdaptor, keypair?: any) {
+    super(client, client.isTestnet, client.mesonAddress)
+    if (keypair) {
+      this.#keypair = keypair
+      this.#pubkey = keypair.publicKey
+      this.#address = bitcoin.payments.p2pkh({ pubkey: this.pubkey, network: this.network }).address
+    }
 
     this.#dustValue = 10000
     this.#feeAll = 40000
@@ -107,8 +109,8 @@ export default class BtcWallet extends BtcAdaptor {
 export class BtcWalletFromExtension extends BtcWallet {
   readonly ext: any
 
-  constructor(client: BtcAdaptor, ext) {
-    super(client, {})
+  constructor(client: BtcAdaptor, ext: any) {
+    super(client)
     this.ext = ext
   }
 
@@ -121,7 +123,11 @@ export class BtcWalletFromExtension extends BtcWallet {
   }
 
   override async transfer({ to, value }) {
-    return this.ext?.sendBitcoin(to, value)
+    const hash = await this.ext?.transfer(to, BigNumber.from(value).toNumber())
+    return {
+      hash,
+      wait: () => this.waitForTransaction(hash)
+    }
   }
 
   override async sendTransaction({ to, value }) {

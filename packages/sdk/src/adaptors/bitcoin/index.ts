@@ -1,20 +1,19 @@
 import bs58check from 'bs58check'
 import { ECPairFactory } from 'ecpair'
-import * as tinysecp from 'tiny-secp256k1'
+import ecc from '@bitcoinerlab/secp256k1'
 
 import { getSwapId } from '../../utils'
 import { Swap } from '../../Swap'
 import BtcAdaptor from './BtcAdaptor'
 import BtcWallet, { BtcWalletFromExtension } from './BtcWallet'
 
-const ECPair = ECPairFactory(tinysecp)
+const ECPair = ECPairFactory(ecc)
 
 export function getWallet(input: string = '', client: BtcAdaptor) {
   if (input.startsWith('0x')) {
     // HEX format
     const buffer = Buffer.from(input.substring(2), 'hex')
     const keypair = ECPair.fromPrivateKey(buffer, { network: client.network })
-    console.log("WIF private key: ", keypair.toWIF())
     return new BtcWallet(client, keypair)
   } else if (input) {
     // WIF format
@@ -48,6 +47,23 @@ export function getContract(address, abi, clientOrAdaptor: any) {
           return adaptor
         }
         throw new Error(`BtcContract doesn't have a signer.`)
+      } else if (prop === 'interface') {
+        return {
+          format: () => abi,
+          parseTransaction: tx => {
+            // tx.data
+            return { name: '', args: [] }
+          }
+        }
+      } else if (['queryFilter', 'on', 'removeAllListeners'].includes(prop)) {
+        return () => { }
+      } else if (prop === 'connect') {
+        return (wallet: BtcWallet) => getContract(address, abi, wallet)
+      } else if (prop === 'filters') {
+        throw new Error('BtcContract.filters not implemented')
+      } else if (prop === 'pendingTokenBalance') {
+        return async (tokenIndex: number) => {
+        }
       }
 
       let method = abi.find(item => item.name === prop)
@@ -77,7 +93,8 @@ export function getContract(address, abi, clientOrAdaptor: any) {
               })
             } else if (prop === 'directExecuteSwap') {
               return await (adaptor as BtcWallet).sendTransaction({
-                to: '<LP_ADDRESS>', value: swap.amount.sub(swap.fee)    // TODO: Replace the LP address here
+                to: address,
+                value: swap.amount.sub(swap.fee),
               })
 
             } else {

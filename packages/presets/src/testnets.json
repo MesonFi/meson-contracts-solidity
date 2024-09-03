@@ -1,29 +1,29 @@
 [
   {
-    "id": "bitcoin-testnet",
-    "name": "Bitcoin Testnet",
+    "id": "bitcoin-signet",
+    "name": "Bitcoin Signet",
     "alias": "bitcoin",
-    "chainId": "bitcoin:testnet",
-    "slip44": "0x80000000",
-    "shortSlip44": "0x0000",
+    "chainId": "bitcoin:signet",
+    "slip44": "0x80000001",
+    "shortSlip44": "0x0001",
     "extensions": [
       "bitcoin"
     ],
     "addressFormat": "bitcoin",
-    "url": "https://mempool.space/testnet/api",
-    "explorer": "https://sepolia.etherscan.io",
+    "url": "https://mempool.space/signet/api",
+    "explorer": "https://mempool.space/signet",
     "nativeCurrency": {
       "name": "BTC",
       "symbol": "BTC",
       "decimals": 8
     },
-    "mesonAddress": "0x0d12d15b26a32e72A3330B2ac9016A22b1410CB6",
+    "mesonAddress": "tb1qrm4en4jl2lht3rd8drjr8vng2xv36fw5l089ly",
     "tokens": [
       {
         "name": "BTC",
         "symbol": "BTC",
         "decimals": 8,
-        "addr": "",
+        "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 243
       }
     ]

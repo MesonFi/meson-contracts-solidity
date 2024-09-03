@@ -1,6 +1,6 @@
 {
   "name": "@mesonfi/sdk",
-  "version": "1.18.4",
+  "version": "1.19.0-alpha.16",
   "description": "",
   "license": "MIT",
   "repository": "https://github.com/MesonFi/meson-contracts-solidity",
@@ -19,6 +19,7 @@
     "prepare": "yarn build"
   },
   "dependencies": {
+    "@bitcoinerlab/secp256k1": "^1.1.1",
     "@ckb-lumos/lumos": "^0.22.2",
     "@mesonfi/contract-abis": "^1.16.0",
     "@mesonfi/contract-types": "^1.13.0",
@@ -34,7 +35,6 @@
     "ethers": "5.7.2",
     "lodash": "^4.17.21",
     "starknet": "^5.24.3",
-    "tiny-secp256k1": "^2.2.3",
     "tronweb": "5.2.0",
     "tweetnacl": "1.0.3",
     "zksync-web3": "0.13.4"
