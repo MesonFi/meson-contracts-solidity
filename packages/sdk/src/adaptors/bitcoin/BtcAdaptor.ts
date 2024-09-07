@@ -1,5 +1,5 @@
 import fetch from 'cross-fetch'
-import * as bitcoin from 'bitcoinjs-lib'
+import * as btclib from 'bitcoinjs-lib'
 import { BigNumber } from 'ethers'
 import { timer } from '../../utils'
 
@@ -11,7 +11,7 @@ export default class BtcAdaptor {
 
   constructor(urlOrAdaptor: string | BtcAdaptor, isTestnet?: boolean, mesonAddress?: string) {
     this.isTestnet = Boolean(isTestnet)
-    this.network = isTestnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin
+    this.network = isTestnet ? btclib.networks.testnet : btclib.networks.bitcoin
     this.url = urlOrAdaptor instanceof BtcAdaptor ? urlOrAdaptor.url : urlOrAdaptor
     this.mesonAddress = mesonAddress
   }

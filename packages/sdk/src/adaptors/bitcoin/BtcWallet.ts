@@ -1,11 +1,11 @@
 import { BigNumber } from 'ethers'
 import axios from 'axios'
-import * as bitcoin from 'bitcoinjs-lib'
+import * as btclib from 'bitcoinjs-lib'
 import ecc from '@bitcoinerlab/secp256k1'
 import BtcAdaptor from './BtcAdaptor'
 import { ECPairInterface, ECPairFactory } from 'ecpair'
 
-bitcoin.initEccLib(ecc)
+btclib.initEccLib(ecc)
 const ECPair = ECPairFactory(ecc)
 
 export default class BtcWallet extends BtcAdaptor {
@@ -21,7 +21,7 @@ export default class BtcWallet extends BtcAdaptor {
     if (keypair) {
       this.#keypair = keypair
       this.#pubkey = keypair.publicKey
-      this.#address = bitcoin.payments.p2wpkh({ pubkey: this.pubkey, network: this.network }).address
+      this.#address = btclib.payments.p2wpkh({ pubkey: this.pubkey, network: this.network }).address
     }
 
     this.#dustValue = 10000
@@ -55,7 +55,7 @@ export default class BtcWallet extends BtcAdaptor {
     }
 
     // Build psbt
-    const psbt = new bitcoin.Psbt({ network: this.network })
+    const psbt = new btclib.Psbt({ network: this.network })
     for (const [txid, vout, hex] of utxoHexs) {
       psbt.addInput({
         hash: txid,
@@ -101,7 +101,7 @@ export default class BtcWallet extends BtcAdaptor {
     }
   }
 
-  async sendTransaction({ to, value }) {
+  async sendTransaction({ to, value }: { swapId?: string, to: string, value: number }) {
     return this.transfer({ to, value })
   }
 }

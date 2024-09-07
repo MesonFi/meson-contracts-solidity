@@ -1,9 +1,9 @@
-import bs58check from 'bs58check'
 import { ECPairFactory } from 'ecpair'
+import * as btclib from 'bitcoinjs-lib'
 import ecc from '@bitcoinerlab/secp256k1'
 
-import { getSwapId } from '../../utils'
 import { Swap } from '../../Swap'
+import { getSwapId } from '../../utils'
 import BtcAdaptor from './BtcAdaptor'
 import BtcWallet, { BtcWalletFromExtension } from './BtcWallet'
 
@@ -88,23 +88,39 @@ export function getContract(address, abi, clientOrAdaptor: any) {
             const swap = Swap.decode(args[0])
             if (prop === 'directRelease') {
               const [_encoded, _r, _yParityAndS, _initiator, recipient] = args
+              const swapId = getSwapId(_encoded, _initiator)
               return await (adaptor as BtcWallet).sendTransaction({
+                swapId,
                 to: recipient,
-                value: swap.amount.sub(swap.fee).mul(100),
+                value: swap.amount.sub(swap.fee).mul(100).toNumber(),
               })
             } else if (prop === 'directExecuteSwap') {
               return await (adaptor as BtcWallet).sendTransaction({
                 to: address,
-                value: swap.amount.mul(100),
+                value: swap.amount.mul(100).toNumber(),
               })
-
             } else {
               throw new Error(`Method ${prop} is not implemented.`)
             }
-
           }
         }
       }
     }
   })
+}
+
+export function parseAddress(addr: string) {
+  try {
+    const result = btclib.address.fromBech32(addr)
+    return { addr, format: 'bech32', hex: '0x' + result.data.toString('hex') }
+  } catch (e) {}
+
+  try {
+    const result = btclib.address.fromBase58Check(addr)
+    return { addr, format: 'base58', hex: '0x' + result.hash.toString('hex') }
+  } catch (e) {}
+}
+
+export function formatAddress(addr: string) {
+  return parseAddress(addr)?.addr
 }
