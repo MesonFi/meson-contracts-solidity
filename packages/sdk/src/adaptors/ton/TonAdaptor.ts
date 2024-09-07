@@ -1,4 +1,4 @@
-import { TonClient } from '@ton/ton'
+import { TonClient, TonClient4 } from '@ton/ton'
 import { Address, CommonMessageInfoInternal, Transaction } from '@ton/core'
 import { timer } from '../../utils'
 
@@ -16,6 +16,12 @@ export default class TonAdaptor {
   }
 
   async detectNetwork(): Promise<any> {
+    // const c = new TonClient4({ endpoint: 'https://sandbox-v4.tonhubapi.com' })
+    // console.log(await c.getLastBlock())
+
+    console.log((await this.client.getTransactions(Address.parse('0QCluJshXsoB7dASRWMAy6uOWfJEStrJOoHJj5SrEDeCK6Yg'), { limit: 2}))
+      // .map(tx => [tx.inMessage.info, tx.outMessages.values().map(r => {console.log([r.info.dest, r.info.src, r.info.type])})]))
+      .map(tx => tx.hash()))
     return (await this.client.getMasterchainInfo()).latestSeqno != 0
   }
 

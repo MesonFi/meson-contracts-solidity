@@ -4,7 +4,7 @@ const { addSupportedTokens, deposit, withdraw, send, authorize, transferOwner, w
 
 require('dotenv').config()
 
-const { TON_PRIVATE_KEY } = process.env
+const { TON_PRIVATE_KEY } = process.env // Notice that TON_PRIVATE_KEY has 64 bytes!
 
 const amount = '10'
 const symbol = 'USDC'
