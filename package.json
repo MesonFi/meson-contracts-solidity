@@ -94,7 +94,8 @@
     "deploy:bob": "hardhat deploy --mainnet bob --upgradable true",
     "deploy:taiko": "hardhat deploy --mainnet taiko --upgradable true",
     "deploy:ailayer": "hardhat deploy --mainnet ailayer --upgradable true",
-    "deploy:zircuit": "hardhat deploy --mainnet zircuit --upgradable true"
+    "deploy:zircuit": "hardhat deploy --mainnet zircuit --upgradable true",
+    "deploy:iotex": "hardhat deploy --mainnet iotex --upgradable true"
   },
   "devDependencies": {
     "@matterlabs/hardhat-zksync-deploy": "^0.6.2",

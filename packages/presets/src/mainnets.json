@@ -202,7 +202,7 @@
   {
     "id": "polygon",
     "name": "Polygon PoS",
-    "alias": "MATIC",
+    "alias": "POL",
     "chainId": "0x89",
     "slip44": "0x800003c6",
     "shortSlip44": "0x03c6",
@@ -214,8 +214,8 @@
     "url": "https://polygon-rpc.com",
     "explorer": "https://polygonscan.com",
     "nativeCurrency": {
-      "name": "MATIC",
-      "symbol": "MATIC",
+      "name": "POL",
+      "symbol": "POL",
       "decimals": 18
     },
     "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
@@ -251,8 +251,8 @@
         "tokenIndex": 242
       },
       {
-        "name": "MATIC",
-        "symbol": "MATIC",
+        "name": "POL",
+        "symbol": "POL",
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 239
@@ -2661,11 +2661,19 @@
         "partner": "free"
       },
       {
-        "name": "SolvBTC.b",
-        "symbol": "SolvBTC.b",
+        "name": "SolvBTC",
+        "symbol": "SolvBTC",
         "decimals": 18,
-        "addr": "0x59889b7021243dB5B1e065385F918316cD90D46c",
+        "addr": "0x443628281E4f3E5b5A5D029B9a0D13900ae41578",
         "tokenIndex": 75,
+        "partner": "free"
+      },
+      {
+        "name": "SolvBTC.BBN",
+        "symbol": "SolvBTC.BBN",
+        "decimals": 18,
+        "addr": "0xcc0966d8418d412c599a6421b760a847eb169a8c",
+        "tokenIndex": 81,
         "partner": "free"
       }
     ]
@@ -2990,6 +2998,45 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 255
+      },
+      {
+        "name": "pumpBTC",
+        "symbol": "pumpBTC",
+        "decimals": 8,
+        "addr": "0xF469fBD2abcd6B9de8E169d128226C0Fc90a012e",
+        "tokenIndex": 113,
+        "partner": "free"
+      }
+    ]
+  },
+  {
+    "id": "iotex",
+    "name": "IoTeX",
+    "alias": "IOTEX",
+    "chainId": "0x1251",
+    "slip44": "0x80001251",
+    "shortSlip44": "0x1251",
+    "extensions": [
+      "metamask",
+      "walletconnect"
+    ],
+    "addressFormat": "ethers",
+    "url": "https://babel-api.mainnet.iotex.io",
+    "explorer": "https://iotexscan.io",
+    "nativeCurrency": {
+      "name": "IOTX",
+      "symbol": "IOTX",
+      "decimals": 18
+    },
+    "mesonAddress": "0x25aB3Efd52e6470681CE037cD546Dc60726948D3",
+    "tokens": [
+      {
+        "name": "Merlin BTC",
+        "symbol": "M-BTC",
+        "decimals": 18,
+        "addr": "0x0F921c39eFd98809FE6D20a88A4357454578987a",
+        "tokenIndex": 67,
+        "partner": "free"
       }
     ]
   },
@@ -3015,7 +3062,7 @@
     "metadata": {
       "tx_hash_siglock": "0x87b319b42c47d4630e4f0ed0803180d2c09470f0c16c092bdf21c1fc34bb61d2",
       "tx_hash_refcell": "0x83543f277f427447046c09936835dddd23cd95393dd58b82d39c0f0bf61f4125",
-      "tx_hash_joyid": "0xbdc3153fcb7c256d007be758c0b50c8da60b5ac0e44ae9e11d3dcc5b73d2b347",
+      "tx_hash_joyid": "0xf05188e5f3a6767fc4687faf45ba5f1a6e25d3ada6129dae8722cb282f262493",
       "tx_hash_xudt": "0x3ceb520f240b168e0bddf0d89b4bcabbe7d4fa69751057cbe8e4f27239fad0e9",
       "code_hash_refcell": "0xa686df60b60d264d0e511ceebe63bb8a59eb685ffa6154c12a0471d63fb5a12b",
       "code_hash_xudt": "0x092c2c4a26ea475a8e860c29cf00502103add677705e2ccd8d6fe5af3caa5ae3",
