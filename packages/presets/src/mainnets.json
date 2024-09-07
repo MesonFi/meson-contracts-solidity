@@ -2664,7 +2664,7 @@
         "name": "SolvBTC",
         "symbol": "SolvBTC",
         "decimals": 18,
-        "addr": "0x443628281E4f3E5b5A5D029B9a0D13900ae41578",
+        "addr": "0x541FD749419CA806a8bc7da8ac23D346f2dF8B77",
         "tokenIndex": 75,
         "partner": "free"
       },
@@ -2983,8 +2983,8 @@
       "walletconnect"
     ],
     "addressFormat": "ethers",
-    "url": "https://zircuit1-mainnet.p2pify.com",
-    "explorer": "https://explorermainnet.zircuit.com",
+    "url": "https://zircuit-mainnet.drpc.org",
+    "explorer": "https://explorer.zircuit.com",
     "nativeCurrency": {
       "name": "ETH",
       "symbol": "ETH",
