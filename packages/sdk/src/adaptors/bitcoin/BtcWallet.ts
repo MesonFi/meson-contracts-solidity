@@ -21,7 +21,7 @@ export default class BtcWallet extends BtcAdaptor {
     if (keypair) {
       this.#keypair = keypair
       this.#pubkey = keypair.publicKey
-      this.#address = bitcoin.payments.p2pkh({ pubkey: this.pubkey, network: this.network }).address
+      this.#address = bitcoin.payments.p2wpkh({ pubkey: this.pubkey, network: this.network }).address
     }
 
     this.#dustValue = 10000

@@ -89,12 +89,13 @@ export function getContract(address, abi, clientOrAdaptor: any) {
             if (prop === 'directRelease') {
               const [_encoded, _r, _yParityAndS, _initiator, recipient] = args
               return await (adaptor as BtcWallet).sendTransaction({
-                to: recipient, value: swap.amount
+                to: recipient,
+                value: swap.amount.sub(swap.fee).mul(100),
               })
             } else if (prop === 'directExecuteSwap') {
               return await (adaptor as BtcWallet).sendTransaction({
                 to: address,
-                value: swap.amount.sub(swap.fee),
+                value: swap.amount.mul(100),
               })
 
             } else {
