@@ -20,9 +20,12 @@ module.exports = async function pool(network) {
   console.log(`🟩 Block height: ${await client.getBlockNumber()}`)
   console.log(`🟩 LP balance: ${await client.getBalance(wallet.address) / 1e8} ${client.isTestnet? 'tBTC' : 'BTC'}`)
 
-  const tx = await wallet.transfer({ to: wallet.address, value: 12000000 })
+  const feeRate = await client._getFeeRate()
+  console.log(`🟩 Fee Rate: [fastest] ${feeRate.fastestFee}, [economyFee] ${feeRate.economyFee}, [minimumFee] ${feeRate.minimumFee}`)
+
+  const tx = await wallet.transfer({ to: wallet.address, value: 50000 })
   console.log(`🟦 Simple transfer: ${tx.hash}`)
-  console.log(`   View on block explorer: https://mempool.space/testnet/tx/${tx.hash}`)
+  console.log(`   View on block explorer: https://mempool.space/signet/tx/${tx.hash}`)
   console.log(`   Waiting for confirmation...`)
   console.log(await tx.wait())
   
