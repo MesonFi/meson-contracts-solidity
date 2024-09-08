@@ -94,6 +94,35 @@
     ]
   },
   {
+    "id": "bitcoin",
+    "name": "Bitcoin",
+    "alias": "bitcoin",
+    "chainId": "bitcoin:mainnet",
+    "slip44": "0x80000000",
+    "shortSlip44": "0x0000",
+    "extensions": [
+      "bitcoin"
+    ],
+    "addressFormat": "bitcoin",
+    "url": "https://mempool.space/api",
+    "explorer": "https://mempool.space",
+    "nativeCurrency": {
+      "name": "BTC",
+      "symbol": "BTC",
+      "decimals": 8
+    },
+    "mesonAddress": "bc1qu4kt6vjzwsrvk46dlnk5q7vy4gk3reafff75su",
+    "tokens": [
+      {
+        "name": "BTC",
+        "symbol": "BTC",
+        "decimals": 8,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 243
+      }
+    ]
+  },
+  {
     "id": "bnb",
     "name": "BNB Smart Chain",
     "alias": "BNB",
