@@ -1,4 +1,5 @@
 const { adaptors } = require('@mesonfi/sdk')
+const { Meson } = require('@mesonfi/contract-abis')
 const { getClient } = require('./lib/getClient')
 const { addSupportedTokens, deposit, withdraw, send, authorize, transferOwner, withdrawServiceFee } = require('./lib/pool')
 
@@ -16,16 +17,11 @@ module.exports = async function pool(network) {
   const wallet = adaptors.getWallet(LP_PRIVATE_KEY, client)
   console.log(`⬜️ LP address: ${wallet.address}`)
 
-  console.log(`🟩 Status: ${await client.detectNetwork()}`)
-  console.log(`🟩 Block height: ${await client.getBlockNumber()}`)
-  console.log(`🟩 LP balance: ${await client.getBalance(wallet.address) / 1e8} ${client.isTestnet? 'tBTC' : 'BTC'}`)
+  const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
+  console.log(`🟩 Status: ${JSON.stringify(await mesonInstance.provider.detectNetwork())}`)
+  console.log(`🟩 Block height: ${await mesonInstance.provider.getBlockNumber()}`)
+  console.log(`🟩 LP balance: ${await mesonInstance.provider.getBalance(wallet.address)}`)
 
-  const tx = await wallet.transfer({ to: wallet.address, value: 12000000 })
-  console.log(`🟦 Simple transfer: ${tx.hash}`)
-  console.log(`   View on block explorer: https://mempool.space/testnet/tx/${tx.hash}`)
-  console.log(`   Waiting for confirmation...`)
-  console.log(await tx.wait())
-  
   // const tx = await deposit(symbol, amount, { network, wallet })
   // const tx = await withdraw(symbol, amount, { network, wallet })
   // const tx = await send(symbol, amount, addr, { network, wallet })

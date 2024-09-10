@@ -109,6 +109,12 @@ export default class BtcAdaptor {
     return info
   }
 
+  async _getFeeRate() {
+    const response = await fetch(`${this.url}/v1/fees/recommended`)
+    const data = await response.json()
+    return data
+  }
+
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
     return new Promise((resolve, reject) => {
       const tryGetTransaction = async () => {
