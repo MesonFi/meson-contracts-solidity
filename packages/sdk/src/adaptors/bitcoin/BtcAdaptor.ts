@@ -23,7 +23,7 @@ export default class BtcAdaptor {
   async detectNetwork(): Promise<any> {
     const response = await fetch(`${this.url}/v1/lightning/statistics/latest`)
     const data = await response.json()
-    return data != null && data != undefined
+    return data
   }
 
   async getBlockNumber() {
