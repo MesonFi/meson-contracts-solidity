@@ -35,8 +35,7 @@ export default class BtcAdaptor {
   async getBalance(addr: string) {
     const response = await fetch(`${this.url}/address/${addr}`)
     const data = await response.json()
-    const balance = data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum
-    return balance
+    return BigNumber.from(data.chain_stats.funded_txo_sum).sub(data.chain_stats.spent_txo_sum)
   }
 
   async getCode(addr) {

@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers'
 import { ECPairFactory } from 'ecpair'
 import * as btclib from 'bitcoinjs-lib'
 import ecc from '@bitcoinerlab/secp256k1'
@@ -71,11 +72,28 @@ export function getContract(address, abi, clientOrAdaptor: any) {
 
         if (['view', 'pure'].includes(method.stateMutability)) {
           return async (...args) => {
+            // ERC20 like
+            if (prop === 'name') {
+              return 'Bitcoin'
+            } else if (prop === 'symbol') {
+              return 'BTC'
+            } else if (prop === 'decimals') {
+              return 8
+            } else if (prop === 'balanceOf') {
+              return await adaptor.getBalance(args[0])
+            } else if (prop === 'allowance') {
+              return BigNumber.from(2).pow(128).sub(1)
+            }
+
             // Meson
             if (prop === 'getShortCoinType') {
               return '0x0000'
             } else if (prop === 'getSupportedTokens') {
-              return { tokens: [], indexes: [] }
+              return { tokens: ['0x0000000000000000000000000000000000000001'], indexes: [243] }
+            } else if (prop === 'poolTokenBalance') {
+              return BigNumber.from(0)
+            } else if (prop === 'serviceFeeCollected') {
+              return BigNumber.from(0)
             }
           }
         } else {

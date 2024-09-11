@@ -373,6 +373,8 @@ export function getContract(address: string, abi, clientOrAdaptor: CkbRPC | CkbA
               const [token, poolOwner] = args
               const balance = await _getUdtBalance(token, poolOwner)
               return balance.div(100) // ccBTC: decimals 8 -> 6
+            } else if (prop === 'serviceFeeCollected') {
+              return BigNumber.from(0)
             } else if (prop === 'getPostedSwap') {
               return (await _getPostedSwap(args[0])).posted
             } else if (prop === 'getLockedSwap') {
