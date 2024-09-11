@@ -3,8 +3,9 @@ import {
   Connection as SolConnection,
   PublicKey as SolPublicKey,
   type BlockResponse,
-  type TransactionResponse,
+  type VersionedTransactionResponse,
   type CompiledInstruction,
+  type MessageCompiledInstruction,
 } from '@solana/web3.js'
 import bs58 from 'bs58'
 import { timer } from '../../utils'
@@ -74,7 +75,7 @@ export default class AptosAdaptor {
   }
 
   async _getTransaction(hash: string, confirmations?: number) {
-    const result = await this.client.getTransaction(hash, { commitment: confirmations ? 'finalized' : 'confirmed' })
+    const result = await this.client.getTransaction(hash, { maxSupportedTransactionVersion: 0, commitment: confirmations ? 'finalized' : 'confirmed' })
     return result && _wrapSolanaTx(result)
   }
 
@@ -121,14 +122,18 @@ function _wrapSolanaBlock(raw: BlockResponse) {
   }
 }
 
-function _wrapSolanaTx(raw: TransactionResponse) {
+function _wrapSolanaTx(raw: VersionedTransactionResponse) {
   const {
     blockTime,
     slot,
     transaction: { signatures, message },
-    meta: { err, logMessages, innerInstructions }
+    meta: { err, logMessages, innerInstructions, loadedAddresses }
   } = raw
-  const { recentBlockhash, instructions, accountKeys } = message
+  const { recentBlockhash } = message
+  const accountKeys = message.version === 'legacy'
+    ? message.accountKeys
+    : [...message.staticAccountKeys, ...loadedAddresses.writable, ...loadedAddresses.readonly]
+  const instructions = message.version === 'legacy' ? message.instructions : message.compiledInstructions
   const signer = accountKeys.filter((_, i) => message.isAccountSigner(i))
   const parsed = instructions.map(ins => _parseInstruction(ins, accountKeys))
   const innerParsed = innerInstructions
@@ -152,12 +157,12 @@ function _wrapSolanaTx(raw: TransactionResponse) {
   }
 }
 
-function _parseInstruction(ins: CompiledInstruction, keys: SolPublicKey[], by?: string) {
-  const { accounts, data: bs58Data, programIdIndex } = ins
-  const data = utils.hexlify(bs58.decode(bs58Data)) + (by ? `@${by}` : '')
+function _parseInstruction(ins: CompiledInstruction | MessageCompiledInstruction, keys: SolPublicKey[], by?: string) {
+  const { data: _data, programIdIndex } = ins
+  const data = utils.hexlify(typeof _data === 'string' ? bs58.decode(_data) : _data) + (by ? `@${by}` : '')
   const programId = keys[programIdIndex]?.toString()
   if (!programId) {
     return
   }
-  return { programId, data, accounts }
+  return { programId, data, accounts: ins['accounts'] || ins['accountKeyIndexes'] }
 }
