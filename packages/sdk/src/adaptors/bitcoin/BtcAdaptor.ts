@@ -119,7 +119,8 @@ export default class BtcAdaptor {
     return new Promise((resolve, reject) => {
       const tryGetTransaction = async () => {
         const info = await this._getTransaction(hash)
-        if (info.status.confirmed) {
+        const height = await this.getBlockNumber()
+        if (info.status.confirmed && height - info.status.block_height + 1 >= (confirmations || 1)) {
           clearInterval(h)
           resolve(_wrapBtcTx(info, this.mesonAddress))
         }

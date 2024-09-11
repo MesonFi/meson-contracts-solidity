@@ -25,7 +25,7 @@ export default class BtcWallet extends BtcAdaptor {
     }
 
     this.#dustValue = 10000
-    this.#tolerance = 30
+    this.#tolerance = 4
   }
 
   get pubkey(): any {
