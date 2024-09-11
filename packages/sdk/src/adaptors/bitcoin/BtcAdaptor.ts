@@ -125,7 +125,7 @@ export default class BtcAdaptor {
           resolve(_wrapBtcTx(info, this.mesonAddress))
         }
       }
-      const h = setInterval(tryGetTransaction, 3000)
+      const h = setInterval(tryGetTransaction, 10_000)
       tryGetTransaction()
 
       if (timeout) {
