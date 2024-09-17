@@ -4,6 +4,8 @@ import TronWeb from 'tronweb'
 import bs58 from 'bs58'
 import { helpers, config } from '@ckb-lumos/lumos'
 
+import { bitcoin } from './adaptors'
+
 const NOTICE_SIGN_REQUEST = 'Sign to request a swap on Meson'
 const NOTICE_SIGN_RELEASE = 'Sign to release a swap on Meson'
 const NOTICE_TESTNET_SIGN_REQUEST = 'Sign to request a swap on Meson (Testnet)'
@@ -16,7 +18,18 @@ const fromTron = (encoded: string) => encoded.substring(60, 64) === '00c3'
 const toTron = (encoded: string) => encoded.substring(54, 58) === '00c3'
 export const clipRecipient = (recipient: string, encoded: string) => {
   const chain = encoded.substring(54, 58)
-  if (chain === '00c3') {
+  if (chain === '0000') {
+    // to bitcoin
+    if (utils.isAddress(recipient)) {
+      return recipient
+    } else {
+      const parsed = bitcoin.parseAddress(recipient)
+      if (!parsed) {
+        throw new Error('Invalid bitcoin address')
+      }
+      return parsed.hex.substring(0, 42)
+    }
+  } else if (chain === '00c3') {
     // to tron
     return `0x${TronWeb.address.toHex(recipient).substring(2)}`
   } else if (chain === '01f5') {

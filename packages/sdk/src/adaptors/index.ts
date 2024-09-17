@@ -79,7 +79,7 @@ export function isAddress(format: AddressFormat, addr: string): boolean {
   if (format === 'ethers') {
     return utils.isHexString(addr) && utils.isAddress(addr)
   } else if (format === 'bitcoin') {
-    return !!addr
+    return !!_bitcoin.formatAddress(addr)
   } else if (format === 'tron') {
     return TronWeb.isAddress(addr)
   } else if (format === 'aptos' || format === 'sui') {
@@ -106,7 +106,7 @@ export function formatAddress(format: AddressFormat, addr: string): string {
       return addr
     }
   } else if (format === 'bitcoin') {
-    return addr
+    return _bitcoin.formatAddress(addr)
   } else if (format === 'tron') {
     return TronWeb.address.fromHex(addr)
   } else if (format === 'aptos') {

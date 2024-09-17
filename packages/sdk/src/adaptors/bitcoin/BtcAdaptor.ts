@@ -1,5 +1,5 @@
 import fetch from 'cross-fetch'
-import * as bitcoin from 'bitcoinjs-lib'
+import * as btclib from 'bitcoinjs-lib'
 import { BigNumber } from 'ethers'
 import { timer } from '../../utils'
 
@@ -11,7 +11,7 @@ export default class BtcAdaptor {
 
   constructor(urlOrAdaptor: string | BtcAdaptor, isTestnet?: boolean, mesonAddress?: string) {
     this.isTestnet = Boolean(isTestnet)
-    this.network = isTestnet ? bitcoin.networks.testnet : bitcoin.networks.bitcoin
+    this.network = isTestnet ? btclib.networks.testnet : btclib.networks.bitcoin
     this.url = urlOrAdaptor instanceof BtcAdaptor ? urlOrAdaptor.url : urlOrAdaptor
     this.mesonAddress = mesonAddress
   }
@@ -23,7 +23,7 @@ export default class BtcAdaptor {
   async detectNetwork(): Promise<any> {
     const response = await fetch(`${this.url}/v1/lightning/statistics/latest`)
     const data = await response.json()
-    return data
+    return data != null && data != undefined
   }
 
   async getBlockNumber() {
@@ -35,8 +35,7 @@ export default class BtcAdaptor {
   async getBalance(addr: string) {
     const response = await fetch(`${this.url}/address/${addr}`)
     const data = await response.json()
-    const balance = data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum
-    return balance
+    return BigNumber.from(data.chain_stats.funded_txo_sum).sub(data.chain_stats.spent_txo_sum)
   }
 
   async getCode(addr) {
@@ -110,11 +109,18 @@ export default class BtcAdaptor {
     return info
   }
 
+  async _getFeeRate() {
+    const response = await fetch(`${this.url}/v1/fees/recommended`)
+    const data = await response.json()
+    return data
+  }
+
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
     return new Promise((resolve, reject) => {
       const tryGetTransaction = async () => {
         const info = await this._getTransaction(hash)
-        if (info.status.confirmed) {
+        const height = await this.getBlockNumber()
+        if (info.status.confirmed && height - info.status.block_height + 1 >= (confirmations || 1)) {
           clearInterval(h)
           resolve(_wrapBtcTx(info, this.mesonAddress))
         }

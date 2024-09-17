@@ -1,11 +1,11 @@
 import { BigNumber } from 'ethers'
 import axios from 'axios'
-import * as bitcoin from 'bitcoinjs-lib'
+import * as btclib from 'bitcoinjs-lib'
 import ecc from '@bitcoinerlab/secp256k1'
 import BtcAdaptor from './BtcAdaptor'
 import { ECPairInterface, ECPairFactory } from 'ecpair'
 
-bitcoin.initEccLib(ecc)
+btclib.initEccLib(ecc)
 const ECPair = ECPairFactory(ecc)
 
 export default class BtcWallet extends BtcAdaptor {
@@ -14,18 +14,18 @@ export default class BtcWallet extends BtcAdaptor {
   readonly #address: string
 
   readonly #dustValue: number
-  readonly #feeAll: number
+  readonly #tolerance: number
 
   constructor(client: BtcAdaptor, keypair?: any) {
     super(client, client.isTestnet, client.mesonAddress)
     if (keypair) {
       this.#keypair = keypair
       this.#pubkey = keypair.publicKey
-      this.#address = bitcoin.payments.p2pkh({ pubkey: this.pubkey, network: this.network }).address
+      this.#address = btclib.payments.p2wpkh({ pubkey: this.pubkey, network: this.network }).address
     }
 
     this.#dustValue = 10000
-    this.#feeAll = 40000
+    this.#tolerance = 4
   }
 
   get pubkey(): any {
@@ -40,11 +40,18 @@ export default class BtcWallet extends BtcAdaptor {
     // Fetch utxos
     const response = await fetch(`${this.url}/address/${this.#address}/utxo`)
     const utxos = await response.json()
+    const feeRate = (await this._getFeeRate()).fastestFee
 
     // Collect utxos until reach the value
     let collectedValue = 0
     let utxoHexs = []
-    while (collectedValue < value + this.#feeAll) {
+    let fee = Math.ceil((
+      10.5 +      // vBytes for Overhead. See https://bitcoinops.org/en/tools/calc-size/
+      31 * 2 +    // vBytes for 2 Outputs (P2WPKH)
+      this.#tolerance   // vBytes for fault tolerance
+    ) * feeRate)
+
+    while (collectedValue < value + fee) {
       const utxo = utxos.pop()
       if (!utxo) throw new Error('Insufficient balance')
       if (utxo.value < this.#dustValue) continue
@@ -52,10 +59,11 @@ export default class BtcWallet extends BtcAdaptor {
       const utxoHex = await response.text()
       utxoHexs.push([utxo.txid, utxo.vout, utxoHex])
       collectedValue += utxo.value
+      fee += 68 * feeRate     // vBytes for an extra Input (P2WPKH)
     }
 
     // Build psbt
-    const psbt = new bitcoin.Psbt({ network: this.network })
+    const psbt = new btclib.Psbt({ network: this.network })
     for (const [txid, vout, hex] of utxoHexs) {
       psbt.addInput({
         hash: txid,
@@ -71,7 +79,7 @@ export default class BtcWallet extends BtcAdaptor {
     })
     psbt.addOutput({
       address: this.#address,
-      value: collectedValue - value - this.#feeAll,
+      value: collectedValue - value - Math.ceil(fee),
     })
 
     return psbt
@@ -101,7 +109,7 @@ export default class BtcWallet extends BtcAdaptor {
     }
   }
 
-  async sendTransaction({ to, value }) {
+  async sendTransaction({ to, value }: { swapId?: string, to: string, value: number }) {
     return this.transfer({ to, value })
   }
 }

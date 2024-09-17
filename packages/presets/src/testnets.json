@@ -4,8 +4,8 @@
     "name": "Bitcoin Signet",
     "alias": "bitcoin",
     "chainId": "bitcoin:signet",
-    "slip44": "0x80000001",
-    "shortSlip44": "0x0001",
+    "slip44": "0x80000000",
+    "shortSlip44": "0x0000",
     "extensions": [
       "bitcoin"
     ],
@@ -17,7 +17,7 @@
       "symbol": "BTC",
       "decimals": 8
     },
-    "mesonAddress": "tb1qrm4en4jl2lht3rd8drjr8vng2xv36fw5l089ly",
+    "mesonAddress": "tb1qu6kc3euplxmhwqyvpnhu48tegxzyp2hcnpjd44",
     "tokens": [
       {
         "name": "BTC",

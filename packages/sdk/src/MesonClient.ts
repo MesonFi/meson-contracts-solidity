@@ -201,6 +201,9 @@ export class MesonClient {
   }
 
   formatAddress(addr: string): string {
+    if (addr === AddressOne) {
+      return addr
+    }
     return adaptors.formatAddress(this.addressFormat, addr)
   }
 
