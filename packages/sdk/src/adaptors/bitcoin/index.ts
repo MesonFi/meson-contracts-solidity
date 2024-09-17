@@ -80,6 +80,9 @@ export function getContract(address, abi, clientOrAdaptor: any) {
             } else if (prop === 'decimals') {
               return 8
             } else if (prop === 'balanceOf') {
+              if (args[0] === address) {
+                return BigNumber.from(0)
+              }
               return await adaptor.getBalance(args[0])
             } else if (prop === 'allowance') {
               return BigNumber.from(2).pow(128).sub(1)
@@ -91,7 +94,8 @@ export function getContract(address, abi, clientOrAdaptor: any) {
             } else if (prop === 'getSupportedTokens') {
               return { tokens: ['0x0000000000000000000000000000000000000001'], indexes: [243] }
             } else if (prop === 'poolTokenBalance') {
-              return BigNumber.from(0)
+              const balance = await adaptor.getBalance(address)
+              return balance.div(100) // decimals 8 -> 6
             } else if (prop === 'serviceFeeCollected') {
               return BigNumber.from(0)
             }
