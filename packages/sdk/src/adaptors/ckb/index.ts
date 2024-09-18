@@ -521,6 +521,7 @@ export function getContract(address: string, abi, clientOrAdaptor: CkbRPC | CkbA
                 if (prop === 'postSwapFromInitiator') {
                   txSkeleton = txSkeleton.update('cellDeps', cellDeps => cellDeps
                     .push({ depType: 'depGroup', outPoint: { txHash: metadata.tx_hash_joyid, index: '0x0' } })
+                    .push({ depType: 'depGroup', outPoint: { txHash: metadata.tx_hash_cota, index: '0x0' } })
                   )
                 }
 

@@ -740,6 +740,7 @@
       "tx_hash_refcell": "0x064d3d6c0799942b5ae339cf1dae6b29a3c9fcd0743ec532cb57c79f5499f25b",
       "tx_hash_joyid": "0x4dcf3f3b09efac8995d6cbee87c5345e812d310094651e0c3d9a730f32dc9263",
       "tx_hash_xudt": "0x877c4c3c6f7159f29ea711f0cd21a54f93dcf950642c6a3a5abc9c070051372e",
+      "tx_hash_cota": "0xd8c7396f955348bd74a8ed4398d896dad931977b7c1e3f117649765cd3d75b86",
       "code_hash_refcell": "0x109f97e74d7fedef4089408f51ef8290fc56ad5d35504b06ee09b75464663678",
       "code_hash_xudt": "0x98701eaf939113606a8a70013fd2e8f27b8f1e234acdc329f3d71f9e9d3d3233",
       "pools": [
