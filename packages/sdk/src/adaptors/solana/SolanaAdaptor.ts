@@ -8,13 +8,23 @@ import {
   type MessageCompiledInstruction,
 } from '@solana/web3.js'
 import bs58 from 'bs58'
-import { timer } from '../../utils'
 
-export default class AptosAdaptor {
-  readonly client: SolConnection
+import { timer } from '../../utils'
+import type { IAdaptor, WrappedTransaction } from '../types'
+
+export default class SolanaAdaptor implements IAdaptor {
+  #client: SolConnection | any
 
   constructor(client: SolConnection) {
-    this.client = client
+    this.#client = client
+  }
+
+  get client() {
+    return this.#client
+  }
+
+  protected set client(c) {
+    this.#client = c
   }
 
   get nodeUrl() {
@@ -29,7 +39,7 @@ export default class AptosAdaptor {
     return (await this.client.getBlockHeight('finalized'))
   }
 
-  async getTransactionCount() {
+  async getTransactionCount(addr: string) {
     return await this.client.getTransactionCount('finalized')
   }
 
@@ -37,9 +47,9 @@ export default class AptosAdaptor {
     return BigNumber.from(await this.client.getBalance(new SolPublicKey(addr)))
   }
 
-  async getCode(addr: string) {
+  async getCode(addr: string): Promise<string> {
     const accountInfo = await this.client.getAccountInfo(new SolPublicKey(addr))
-    return accountInfo.executable ? '0x1' : ''
+    return accountInfo.executable ? '0x1' : '0x'
   }
 
   async getLogs(filter) {
@@ -68,22 +78,22 @@ export default class AptosAdaptor {
       const block = await this.client.getBlock(number, params[1])
       return _wrapSolanaBlock(block)
     } else if (method === 'eth_getTransactionByHash') {
-      return this._getTransaction(params[0])
+      return this.#getTransaction(params[0])
     } else if (method === 'eth_getTransactionReceipt') {
-      return this._getTransaction(params[0], 1)
+      return this.#getTransaction(params[0], 1)
     }
   }
 
-  async _getTransaction(hash: string, confirmations?: number) {
+  async #getTransaction(hash: string, confirmations?: number) {
     const result = await this.client.getTransaction(hash, { maxSupportedTransactionVersion: 0, commitment: confirmations ? 'finalized' : 'confirmed' })
     return result && _wrapSolanaTx(result)
   }
 
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
-    return new Promise((resolve, reject) => {
+    return new Promise<WrappedTransaction>((resolve, reject) => {
       const tryGetTransaction = async () => {
         try {
-          const info = await this._getTransaction(hash, confirmations)
+          const info = await this.#getTransaction(hash, confirmations)
           if (info) {
             clearInterval(h)
             resolve(info)

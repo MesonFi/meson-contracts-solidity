@@ -1,6 +1,7 @@
 import { providers } from 'ethers'
 import { SuiClient } from '@mysten/sui.js/client'
 import { Connection as SolConnection } from '@solana/web3.js'
+import { AptosClient } from 'aptos'
 import { RpcProvider as StarkProvider } from 'starknet'
 import TronWeb from 'tronweb'
 
@@ -11,15 +12,12 @@ import {
   LockedSwapStatus,
   adaptors,
 } from '@mesonfi/sdk'
-import BtcAdaptor from '@mesonfi/sdk/lib/adaptors/bitcoin/BtcAdaptor'
+import BtcClient from '@mesonfi/sdk/lib/adaptors/bitcoin/BtcClient'
 
 import { Meson } from '@mesonfi/contract-abis'
 
 import {
-  AptosFallbackClient,
-  RpcFallbackProvider,
   FailsafeStaticJsonRpcProvider,
-  FailsafeWebSocketProvider,
   ExtendedCkbClient,
 } from './providers'
 
@@ -182,30 +180,28 @@ export class MesonPresets {
     return { swap, from, to }
   }
 
-  createMesonClient(id: string, client: any): MesonClient {
+  createMesonClient(id: string, clientOrAdaptor: any): MesonClient {
     const network = this.getNetwork(id)
     if (!network) {
       throw new Error(`Unsupported network: ${id}`)
     }
     this.disposeMesonClient(id)
-    const instance = adaptors.getContract(network.mesonAddress, Meson.abi, client)
+    const instance = adaptors.getContract(network.mesonAddress, Meson.abi, clientOrAdaptor)
     const mesonClient = new MesonClient(instance, network.shortSlip44)
     this._cache.set(id, mesonClient)
     return mesonClient
   }
 
-  _getProviderClassAndConstructParams(id: string, urls: string[] = [], opts?) {
+  _getProviderClassAndConstructParams(id: string, url: string, opts?) {
     const network = this.getNetwork(id)
     if (!network) {
       throw new Error(`Unsupported network: ${id}`)
     }
 
-    const url = urls.sort(() => Math.sign(Math.random() - 0.5))[0]
-
     if (network.id.startsWith('bitcoin')) {
-      return [BtcAdaptor, [url, id === 'bitcoin-signet', network.mesonAddress]]
+      return [BtcClient, [url, id === 'bitcoin-signet', network.mesonAddress]]
     } else if (id.startsWith('aptos')) {
-      return [AptosFallbackClient, [urls]]
+      return [AptosClient, [url]]
     } else if (id.startsWith('sui')) {
       return [SuiClient, [{ url }]]
     } else if (id.startsWith('solana')) {
@@ -219,38 +215,29 @@ export class MesonPresets {
     }
 
     const providerNetwork = { name: network.name, chainId: Number(network.chainId) }
-    if (urls.length >= 2) {
-      const fallbacks = urls.map(url => {
-        let provider
-        if (url.startsWith('ws')) {
-          if (opts?.WebSocket) {
-            const ws = new opts.WebSocket(url)
-            provider = new FailsafeWebSocketProvider(ws, providerNetwork)
-          } else {
-            provider = new FailsafeWebSocketProvider(url, providerNetwork)
-          }
-        } else {
-          provider = new FailsafeStaticJsonRpcProvider(url, providerNetwork)
-        }
-        return { provider, priority: 1, stallTimeout: 1000, weight: 1 }
-      })
-      return [RpcFallbackProvider, [fallbacks, opts?.threshold || (urls.length > 2 ? 2 : 1)]]
-    }
-    
     if (url.startsWith('ws')) {
-      if (WebSocket) {
-        return [providers.WebSocketProvider, [new WebSocket(url), providerNetwork]]
+      if (opts?.WebSocket) {
+        return [providers.WebSocketProvider, [new opts.WebSocket(url), providerNetwork]]
       } else {
         return [providers.WebSocketProvider, [url, providerNetwork]]
       }
     } else {
-      return [providers.StaticJsonRpcProvider, [url, providerNetwork]]
+      return [FailsafeStaticJsonRpcProvider, [url, providerNetwork]]
     }
   }
 
   createNetworkClient(id: string, urls: string[] = [], opts?): providers.Provider {
-    const [ProviderClass, constructParams] = this._getProviderClassAndConstructParams(id, urls, opts)
+    const url = [...urls].sort(() => Math.sign(Math.random() - 0.5))[0]
+    const [ProviderClass, constructParams] = this._getProviderClassAndConstructParams(id, url, opts)
     return new ProviderClass(...constructParams)
+  }
+
+  createFailoverAdaptor(id: string, urls: string[] = [], opts?) {
+    const clients = urls.map(url => {
+      const [ProviderClass, constructParams] = this._getProviderClassAndConstructParams(id, url, opts)
+      return new ProviderClass(...constructParams)
+    })
+    return adaptors.getFailoverAdaptor(clients)
   }
 
   disposeMesonClient(id: string) {

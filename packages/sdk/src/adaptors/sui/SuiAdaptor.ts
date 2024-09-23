@@ -1,13 +1,23 @@
 import { BigNumber, utils } from 'ethers'
 import { SuiClient, type SuiTransactionBlockResponse } from '@mysten/sui.js/client'
 
+import type { IAdaptor, WrappedTransaction } from '../types'
+
 const mesonAddress = '0x371a30d40fcc357a37d412c4750a57303d58c9482e5f51886e46f7bf774028f3'
 
-export default class SuiAdaptor {
-  readonly client: SuiClient
+export default class SuiAdaptor implements IAdaptor {
+  #client: SuiClient | any
 
   constructor(client: SuiClient) {
-    this.client = client
+    this.#client = client
+  }
+
+  get client() {
+    return this.#client
+  }
+
+  protected set client(c) {
+    this.#client = c
   }
 
   get nodeUrl() {
@@ -24,8 +34,7 @@ export default class SuiAdaptor {
     return Number(0)
   }
 
-  async getTransactionCount() {
-
+  async getTransactionCount(addr: string) {
   }
 
   async getBalance(addr) {
@@ -33,9 +42,12 @@ export default class SuiAdaptor {
     return BigNumber.from(data.totalBalance)
   }
 
-  async getCode(addr) {
+  async getCode(addr: string): Promise<string> {
     // TODO
-    return
+    return ''
+  }
+
+  async getLogs() {
   }
 
   on () {}
@@ -44,7 +56,7 @@ export default class SuiAdaptor {
   async send(method, params) {
     if (method === 'eth_getBlockByNumber') {
       if (params[0] === 'latest') {
-        return this._getTransactionBlock(mesonAddress)
+        return this.#getTransactionBlock(mesonAddress)
       } else {
         return
       }
@@ -52,7 +64,7 @@ export default class SuiAdaptor {
       if (params[0] === 'n/a') {
         return {}
       }
-      return this._getTransactionBlock(mesonAddress, params[0])
+      return this.#getTransactionBlock(mesonAddress, params[0])
     } else if (method === 'eth_getTransactionByHash' || method === 'eth_getTransactionReceipt') {
       return await this.waitForTransaction(params[0])
     }
@@ -63,7 +75,7 @@ export default class SuiAdaptor {
     return this._wrapSuiTx(txRes)
   }
 
-  async _getTransactionBlock(digest: string, cursor = null) {
+  async #getTransactionBlock(digest: string, cursor = null) {
     const result = await this.client.queryTransactionBlocks({
       filter: { InputObject: digest },
       options: { showInput: true },
@@ -80,8 +92,8 @@ export default class SuiAdaptor {
     }
   }
 
-  _wrapSuiTx(txRes: SuiTransactionBlockResponse) {
-    const moveCalls = this._moveCallsFromTxResponse(txRes)
+  protected _wrapSuiTx(txRes: SuiTransactionBlockResponse) {
+    const moveCalls = this.#moveCallsFromTxResponse(txRes)
 
     return {
       blockHash: 'n/a',
@@ -96,7 +108,7 @@ export default class SuiAdaptor {
     }
   }
 
-  _moveCallsFromTxResponse(txRes: SuiTransactionBlockResponse) {
+  #moveCallsFromTxResponse(txRes: SuiTransactionBlockResponse) {
     const txData = txRes.transaction?.data.transaction
     if (txData?.kind === 'ProgrammableTransaction') {
       return txData.transactions.map(tx => {
