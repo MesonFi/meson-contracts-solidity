@@ -66,6 +66,9 @@ export function getContract(address: string, abi, adaptor: SuiAdaptor) {
       }
       return (<any>res?.data.content).fields.value
     } catch (e) {
+      if (e.errors) {
+        e = e.errors[0]
+      }
       if (e.cause.message?.includes('Cannot find dynamic field')) {
         return
       }

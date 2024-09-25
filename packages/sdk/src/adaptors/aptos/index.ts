@@ -25,6 +25,9 @@ export function getContract(address: string, abi, adaptor: AptosAdaptor) {
       const result = await adaptor.client.getAccountResource(addr, type)
       return result.data as any
     } catch (e) {
+      if (e.errors) {
+        e = e.errors[0]
+      }
       if (e.errorCode === 'resource_not_found') {
         return
       }
@@ -37,6 +40,9 @@ export function getContract(address: string, abi, adaptor: AptosAdaptor) {
     try {
       return await adaptor.client.getTableItem(handle, data)
     } catch (e) {
+      if (e.errors) {
+        e = e.errors[0]
+      }
       if (e.errorCode === 'table_item_not_found') {
         return
       }
