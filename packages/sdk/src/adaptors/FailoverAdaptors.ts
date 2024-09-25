@@ -93,6 +93,24 @@ function extendToFailoverAdaptor<ClassAdaptor extends AdaptorConstructor>(Adapto
       }
       throw new AggregateError(errors, 'All failed')
     }
+
+    async sendTransaction(tx: any) {
+      return new Promise((resolve, reject) => {
+        let success = false
+        const errors = []
+        Promise.all(this.adaptors.map(adp => (adp as any).sendTransaction(tx)
+          .then((result: any) => {
+            success = true
+            resolve(result)
+          })
+          .catch((e: Error) => errors.push(e))
+        )).then(() => {
+          if (!success) {
+            reject(new AggregateError(errors, 'All failed (sendTransaction)'))
+          }
+        })
+      })
+    }
   }
 }
 
