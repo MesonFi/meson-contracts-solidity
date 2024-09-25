@@ -34,6 +34,10 @@ export default class SuiAdaptor implements IAdaptor {
     return Number(0)
   }
 
+  async getGasPrice() {
+    return BigNumber.from(0)
+  }
+
   async getTransactionCount(addr: string) {
   }
 

@@ -2,19 +2,17 @@ import { utils } from 'ethers'
 import {
   Keypair as SolKeypair,
   PublicKey as SolPublicKey,
-  Connection as SolConnection,
   Transaction as SolTransaction,
   SystemProgram,
 } from '@solana/web3.js'
-import sol from '@solana/web3.js'
 import nacl from 'tweetnacl'
 import SolanaAdaptor from './SolanaAdaptor'
 
 export default class SolanaWallet extends SolanaAdaptor {
   readonly keypair: SolKeypair
 
-  constructor(client: SolConnection, keypair: SolKeypair) {
-    super(client)
+  constructor(adaptor: SolanaAdaptor, keypair: SolKeypair) {
+    super(adaptor.client)
     this.keypair = keypair
   }
 
@@ -61,8 +59,8 @@ export default class SolanaWallet extends SolanaAdaptor {
 export class SolanaExtWallet extends SolanaWallet {
   readonly ext: any
 
-  constructor(client: sol.Connection, ext) {
-    super(client, null)
+  constructor(adaptor: SolanaAdaptor, ext) {
+    super(adaptor, null)
     this.ext = ext
   }
 
@@ -74,7 +72,7 @@ export class SolanaExtWallet extends SolanaWallet {
     return this.ext?.currentAccount?.address
   }
 
-  async sendTransaction(tx: sol.Transaction, options?) {
+  async sendTransaction(tx: SolTransaction, options?) {
     tx.recentBlockhash = await this.detectNetwork()
     tx.feePayer = this.publicKey
     const hash = await this.ext.sendTransaction(tx)

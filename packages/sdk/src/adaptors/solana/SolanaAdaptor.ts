@@ -39,6 +39,10 @@ export default class SolanaAdaptor implements IAdaptor {
     return (await this.client.getBlockHeight('finalized'))
   }
 
+  async getGasPrice() {
+    return BigNumber.from(0)
+  }
+
   async getTransactionCount(addr: string) {
     return await this.client.getTransactionCount('finalized')
   }

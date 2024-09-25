@@ -2816,6 +2816,7 @@
         "decimals": 18,
         "addr": "0xe5B9C20B3de172A4FEc1f9a0aa1D2aA0A03E86b4",
         "tokenIndex": 71,
+        "disabled": true,
         "partner": "free"
       },
       {

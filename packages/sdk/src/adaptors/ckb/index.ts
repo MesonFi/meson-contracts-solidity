@@ -1,6 +1,5 @@
 import { BigNumber, BigNumberish, utils } from 'ethers'
 import {
-  type RPC as CkbRPC,
   helpers,
   since,
   type Script,
@@ -13,16 +12,16 @@ import { Swap } from '../../Swap'
 import CkbAdaptor from './CkbAdaptor'
 import CkbWallet, { CkbWalletFromJoyId } from './CkbWallet'
 
-export function getWallet(input: string = '', client: CkbRPC) {
+export function getWallet(input: string = '', adaptor: CkbAdaptor, Wallet = CkbWallet): CkbWallet {
   if (input.startsWith('0x')) {
-    return new CkbWallet(client, { privateKey: input })
+    return new Wallet(adaptor, { privateKey: input })
   } else if (input.startsWith('ck')) {
-    return new CkbWallet(client, { address: input })
+    return new Wallet(adaptor, { address: input })
   }
 }
 
-export function getWalletFromJoyId(ext, client): CkbWalletFromJoyId {
-  return new CkbWalletFromJoyId(client, ext)
+export function getWalletFromJoyId(ext, adaptor: CkbAdaptor): CkbWalletFromJoyId {
+  return new CkbWalletFromJoyId(adaptor, ext)
 }
 
 const CAPACITY_MIN = 65_0000_0000
@@ -30,19 +29,10 @@ const CAPACITY_XUDT = 150_0000_0000
 const CAPACITY_SIGLOCK = 230_0000_0000
 const CAPACITY_REF_CELL = 150_0000_0000
 
-export function getContract(address: string, abi, clientOrAdaptor: CkbRPC | CkbAdaptor) {
-  let adaptor: CkbAdaptor
-  if (clientOrAdaptor instanceof CkbWallet) {
-    adaptor = clientOrAdaptor
-  } else if (clientOrAdaptor instanceof CkbAdaptor) {
-    adaptor = clientOrAdaptor
-  } else {
-    adaptor = new CkbAdaptor(clientOrAdaptor)
-  }
-
+export function getContract(address: string, abi, adaptor: CkbAdaptor) {
   const metadata = (<any>adaptor.client).metadata || {}
   const pools: [number, string][] = metadata.pools || []
-  const lpWallet = new CkbWallet(adaptor.client, { address: pools[0][1] })
+  const lpWallet = new CkbWallet(adaptor, { address: pools[0][1] })
 
   const _getUdtBalance = async (token: string, addr: string) => {
     const collector = adaptor.indexer.collector({
@@ -458,7 +448,7 @@ export function getContract(address: string, abi, clientOrAdaptor: CkbRPC | CkbA
                   const [_, { initiator, recipient }] = args
                   swapAmount = swap.amount.sub(swap.fee).toNumber() * 100
 
-                  const recipientWallet = new CkbWallet(adaptor.client, { address: recipient })
+                  const recipientWallet = new CkbWallet(adaptor, { address: recipient })
                   sigTimeLockScript = _generateSigTimeLock(swap.encoded, initiator, recipientWallet.pkh, lpWallet.pkh)
                   udtType = _udtTypeFromIndex(swap.outToken)
 
@@ -541,7 +531,7 @@ export function getContract(address: string, abi, clientOrAdaptor: CkbRPC | CkbA
                   cell = postedCell
                 } else {
                   const [_, r, yParityAndS, initiator, recipient] = args
-                  const recipientWallet = new CkbWallet(adaptor.client, { address: recipient })
+                  const recipientWallet = new CkbWallet(adaptor, { address: recipient })
                   outputLock = recipientWallet.lockScript
                   witnessLock = utils.hexConcat(['0x00', r, yParityAndS, '0x' + recipientWallet.pkh.substring(8)])
                   udtType = _udtTypeFromIndex(swap.outToken)

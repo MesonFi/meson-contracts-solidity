@@ -31,6 +31,10 @@ export default class AptosAdaptor implements IAdaptor {
     return Number(info.block_height)
   }
 
+  async getGasPrice() {
+    return BigNumber.from(0)
+  }
+
   async getTransactionCount(addr: string) {
   }
 

@@ -44,6 +44,10 @@ export default class StarkAdaptor implements IAdaptor {
     return result.block_number
   }
 
+  async getGasPrice() {
+    return BigNumber.from(0)
+  }
+
   async getTransactionCount(addr: string) {
     await this.client.getNonceForAddress(addr)
   }

@@ -39,7 +39,7 @@ export default class CkbAdaptor implements IAdaptor {
   }
 
   get nodeUrl() {
-    return ''
+    return this.#client.node.url
   }
 
   protected _prefixFromCodeHash(codeHash: string) {
@@ -79,6 +79,10 @@ export default class CkbAdaptor implements IAdaptor {
   async getBlockNumber() {
     const result = await this.client.getTipBlockNumber()
     return Number(result)
+  }
+
+  async getGasPrice() {
+    return BigNumber.from(0)
   }
 
   async getTransactionCount(addr: string) {

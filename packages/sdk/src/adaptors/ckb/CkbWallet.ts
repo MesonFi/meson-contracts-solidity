@@ -1,6 +1,5 @@
 import { BigNumber, type BigNumberish } from 'ethers'
 import {
-  type RPC as CkbRPC,
   hd,
   helpers,
   commons,
@@ -16,8 +15,8 @@ export default class CkbWallet extends CkbAdaptor {
 
   protected _pkhPrefix: string
 
-  constructor(client: CkbRPC, opt: { address?: string, privateKey?: string }) {
-    super(client)
+  constructor(adaptor: CkbAdaptor, opt: { address?: string, privateKey?: string }) {
+    super(adaptor.client)
     if (opt.privateKey) {
       this._pkhPrefix = '0x000000'
       this.#privateKey = opt.privateKey
@@ -102,8 +101,8 @@ export default class CkbWallet extends CkbAdaptor {
 export class CkbWalletFromJoyId extends CkbWallet {
   readonly ext: any
 
-  constructor(client: CkbRPC, ext) {
-    super(client, {})
+  constructor(adaptor: CkbAdaptor, ext) {
+    super(adaptor, {})
     this.ext = ext
     this._pkhPrefix = '0x01'
   }

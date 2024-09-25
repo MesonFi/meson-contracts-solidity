@@ -14,26 +14,32 @@ import TronAdaptor from './tron/TronAdaptor'
 function extendToFailoverAdaptor<ClassAdaptor extends AdaptorConstructor>(Adaptor: ClassAdaptor): ClassAdaptor {
   return class FailoverAdaptor extends Adaptor {
     readonly adaptors: IAdaptor[]
-    #currentClient: any
 
     constructor(...args: any[]) {
       const adaptors = args[0] as IAdaptor[]
       super(adaptors[0].client)
-      this.#currentClient = adaptors[0].client
       this.adaptors = adaptors
     }
 
+    // override get nodeUrl() {
+    //   return this.adaptors.map(adp => adp.nodeUrl).join('\n')
+    // }
+
     switch() {
       const adaptors = [...this.adaptors].sort(() => Math.random() - 0.5)
-      this.#currentClient = adaptors[0].client
+      super.client = adaptors[0].client
+    }
+
+    get currentClient() {
+      return super.client
     }
 
     get client() {
       const that = this
       return new Proxy({}, {
         get(target, prop: string) {
-          if (typeof that.#currentClient[prop] !== 'function') {
-            return that.#currentClient[prop]
+          if (typeof that.currentClient[prop] !== 'function') {
+            return that.currentClient[prop]
           }
           const adaptors = [...that.adaptors].sort(() => Math.random() - 0.5)
 
@@ -69,10 +75,6 @@ function extendToFailoverAdaptor<ClassAdaptor extends AdaptorConstructor>(Adapto
         }
       })
     }
-
-    // override get nodeUrl() {
-    //   return this.adaptors.map(adp => adp.nodeUrl).join('\n')
-    // }
 
     async send(method, params) {
       return await timeout(this._send(method, params), 30_000)

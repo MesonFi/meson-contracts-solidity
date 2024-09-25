@@ -1,12 +1,12 @@
 import { utils } from 'ethers'
-import { AptosClient, AptosAccount, TxnBuilderTypes, HexString } from 'aptos'
+import { AptosAccount, TxnBuilderTypes, HexString } from 'aptos'
 import AptosAdaptor from './AptosAdaptor'
 
 export default class AptosWallet extends AptosAdaptor {
   readonly account: AptosAccount
 
-  constructor(client: AptosClient, account: AptosAccount) {
-    super(client)
+  constructor(adaptor: AptosAdaptor, account: AptosAccount) {
+    super(adaptor.client)
     this.account = account
   }
 
@@ -47,8 +47,8 @@ export default class AptosWallet extends AptosAdaptor {
 export class AptosExtWallet extends AptosWallet {
   readonly ext: any
 
-  constructor(client: AptosClient, ext) {
-    super(client, null)
+  constructor(adaptor: AptosAdaptor, ext) {
+    super(adaptor, null)
     this.ext = ext
   }
 

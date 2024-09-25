@@ -1,5 +1,5 @@
 import { utils } from 'ethers'
-import { SuiClient, type SuiTransactionBlockResponseOptions } from '@mysten/sui.js/client'
+import { type SuiTransactionBlockResponseOptions } from '@mysten/sui.js/client'
 import { Ed25519Keypair as SuiKeypair } from '@mysten/sui.js/keypairs/ed25519'
 import { TransactionBlock } from '@mysten/sui.js/transactions'
 
@@ -8,8 +8,8 @@ import SuiAdaptor from './SuiAdaptor'
 export default class SuiWallet extends SuiAdaptor {
   readonly keypair: SuiKeypair
 
-  constructor(client: SuiClient, keypair?: SuiKeypair) {
-    super(client)
+  constructor(adaptor: SuiAdaptor, keypair?: SuiKeypair) {
+    super(adaptor.client)
     this.keypair = keypair
   }
 
@@ -70,8 +70,8 @@ export default class SuiWallet extends SuiAdaptor {
 export class SuiExtWallet extends SuiWallet {
   readonly ext: any
 
-  constructor(client: SuiClient, ext) {
-    super(client)
+  constructor(adaptor: SuiAdaptor, ext) {
+    super(adaptor)
     this.ext = ext
   }
 
