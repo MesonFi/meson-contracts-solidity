@@ -1,12 +1,22 @@
 import { BigNumber } from 'ethers'
 import TronWeb from 'tronweb'
-import { timer } from '../../utils'
 
-export default class TronAdaptor {
-  readonly client
+import { timer } from '../../utils'
+import type { IAdaptor, WrappedTransaction } from '../types'
+
+export default class TronAdaptor implements IAdaptor {
+  #client: any
 
   constructor(client) {
-    this.client = client
+    this.#client = client
+  }
+
+  get client() {
+    return this.#client
+  }
+
+  protected set client(c) {
+    this.#client = c
   }
 
   get nodeUrl() {
@@ -22,11 +32,14 @@ export default class TronAdaptor {
     return latestBlock?.block_header?.raw_data?.number
   }
 
+  async getTransactionCount(addr: string) {
+  }
+
   async getBalance(addr) {
     return BigNumber.from(await this.client.trx.getBalance(addr))
   }
 
-  async getCode(addr) {
+  async getCode(addr: string): Promise<string> {
     const account = await this.client.trx.getAccount(addr)
     return account.type === 'Contract' ? '0x1' : '0x'
   }
@@ -79,7 +92,7 @@ export default class TronAdaptor {
   }
 
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
-    return new Promise((resolve, reject) => {
+    return new Promise<WrappedTransaction>((resolve, reject) => {
       const tryGetTransaction = async () => {
         let info
         try {
@@ -153,6 +166,7 @@ function _wrapTronTx(raw) {
 
 function _wrapTronReceipt(raw) {
   return {
+    blockHash: '',
     status: raw.receipt?.result === 'SUCCESS' ? '1' : '0',
     blockNumber: raw.blockNumber,
     timestamp: Math.floor(raw.blockTimeStamp / 1000).toString(),

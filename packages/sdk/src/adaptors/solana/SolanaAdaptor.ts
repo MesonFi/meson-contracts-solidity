@@ -3,17 +3,28 @@ import {
   Connection as SolConnection,
   PublicKey as SolPublicKey,
   type BlockResponse,
-  type TransactionResponse,
+  type VersionedTransactionResponse,
   type CompiledInstruction,
+  type MessageCompiledInstruction,
 } from '@solana/web3.js'
 import bs58 from 'bs58'
-import { timer } from '../../utils'
 
-export default class AptosAdaptor {
-  readonly client: SolConnection
+import { timer } from '../../utils'
+import type { IAdaptor, WrappedTransaction } from '../types'
+
+export default class SolanaAdaptor implements IAdaptor {
+  #client: SolConnection | any
 
   constructor(client: SolConnection) {
-    this.client = client
+    this.#client = client
+  }
+
+  get client() {
+    return this.#client
+  }
+
+  protected set client(c) {
+    this.#client = c
   }
 
   get nodeUrl() {
@@ -28,7 +39,7 @@ export default class AptosAdaptor {
     return (await this.client.getBlockHeight('finalized'))
   }
 
-  async getTransactionCount() {
+  async getTransactionCount(addr: string) {
     return await this.client.getTransactionCount('finalized')
   }
 
@@ -36,9 +47,9 @@ export default class AptosAdaptor {
     return BigNumber.from(await this.client.getBalance(new SolPublicKey(addr)))
   }
 
-  async getCode(addr: string) {
+  async getCode(addr: string): Promise<string> {
     const accountInfo = await this.client.getAccountInfo(new SolPublicKey(addr))
-    return accountInfo.executable ? '0x1' : ''
+    return accountInfo.executable ? '0x1' : '0x'
   }
 
   async getLogs(filter) {
@@ -67,22 +78,22 @@ export default class AptosAdaptor {
       const block = await this.client.getBlock(number, params[1])
       return _wrapSolanaBlock(block)
     } else if (method === 'eth_getTransactionByHash') {
-      return this._getTransaction(params[0])
+      return this.#getTransaction(params[0])
     } else if (method === 'eth_getTransactionReceipt') {
-      return this._getTransaction(params[0], 1)
+      return this.#getTransaction(params[0], 1)
     }
   }
 
-  async _getTransaction(hash: string, confirmations?: number) {
-    const result = await this.client.getTransaction(hash, { commitment: confirmations ? 'finalized' : 'confirmed' })
+  async #getTransaction(hash: string, confirmations?: number) {
+    const result = await this.client.getTransaction(hash, { maxSupportedTransactionVersion: 0, commitment: confirmations ? 'finalized' : 'confirmed' })
     return result && _wrapSolanaTx(result)
   }
 
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
-    return new Promise((resolve, reject) => {
+    return new Promise<WrappedTransaction>((resolve, reject) => {
       const tryGetTransaction = async () => {
         try {
-          const info = await this._getTransaction(hash, confirmations)
+          const info = await this.#getTransaction(hash, confirmations)
           if (info) {
             clearInterval(h)
             resolve(info)
@@ -121,14 +132,18 @@ function _wrapSolanaBlock(raw: BlockResponse) {
   }
 }
 
-function _wrapSolanaTx(raw: TransactionResponse) {
+function _wrapSolanaTx(raw: VersionedTransactionResponse) {
   const {
     blockTime,
     slot,
     transaction: { signatures, message },
-    meta: { err, logMessages, innerInstructions }
+    meta: { err, logMessages, innerInstructions, loadedAddresses }
   } = raw
-  const { recentBlockhash, instructions, accountKeys } = message
+  const { recentBlockhash } = message
+  const accountKeys = message.version === 'legacy'
+    ? message.accountKeys
+    : [...message.staticAccountKeys, ...loadedAddresses.writable, ...loadedAddresses.readonly]
+  const instructions = message.version === 'legacy' ? message.instructions : message.compiledInstructions
   const signer = accountKeys.filter((_, i) => message.isAccountSigner(i))
   const parsed = instructions.map(ins => _parseInstruction(ins, accountKeys))
   const innerParsed = innerInstructions
@@ -152,12 +167,12 @@ function _wrapSolanaTx(raw: TransactionResponse) {
   }
 }
 
-function _parseInstruction(ins: CompiledInstruction, keys: SolPublicKey[], by?: string) {
-  const { accounts, data: bs58Data, programIdIndex } = ins
-  const data = utils.hexlify(bs58.decode(bs58Data)) + (by ? `@${by}` : '')
+function _parseInstruction(ins: CompiledInstruction | MessageCompiledInstruction, keys: SolPublicKey[], by?: string) {
+  const { data: _data, programIdIndex } = ins
+  const data = utils.hexlify(typeof _data === 'string' ? bs58.decode(_data) : _data) + (by ? `@${by}` : '')
   const programId = keys[programIdIndex]?.toString()
   if (!programId) {
     return
   }
-  return { programId, data, accounts }
+  return { programId, data, accounts: ins['accounts'] || ins['accountKeyIndexes'] }
 }

@@ -5,26 +5,41 @@ import {
   helpers,
   config,
 } from '@ckb-lumos/lumos'
+
 import { timer } from '../../utils'
+import type { IAdaptor, WrappedTransaction } from '../types'
 
 const JOYID_CODE_HASH = {
   TESTNET: '0xd23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac',
   MAINNET: '0xd00c84f0ec8fd441c38bc3f87a371f547190f2fcff88e642bc5bf54b9e318323',
 }
 
-export default class CkbAdaptor {
+export default class CkbAdaptor implements IAdaptor {
+  #client: CkbRPC | any
+
   readonly network: typeof config.TESTNET
   readonly joyidCodeHash: string
-  readonly client: CkbRPC
   readonly indexer: Indexer
 
   constructor(client: CkbRPC) {
     const isTestnet = client.node.url.includes('testnet')
     this.network = isTestnet ? config.TESTNET : config.MAINNET
     this.joyidCodeHash = isTestnet ? JOYID_CODE_HASH.TESTNET : JOYID_CODE_HASH.MAINNET
-    this.client = client
+    this.#client = client
     const indexerUrl = isTestnet ? 'https://testnet.ckb.dev/indexer' : 'https://mainnet.ckb.dev/indexer'
     this.indexer = new Indexer(indexerUrl, client.node.url)
+  }
+
+  get client() {
+    return this.#client
+  }
+
+  protected set client(c) {
+    this.#client = c
+  }
+
+  get nodeUrl() {
+    return ''
   }
 
   protected _prefixFromCodeHash(codeHash: string) {
@@ -80,9 +95,9 @@ export default class CkbAdaptor {
     return balance
   }
 
-  async getCode(addr) {
+  async getCode(addr: string): Promise<string> {
     // TODO
-    return
+    return ''
   }
 
   async getLogs(filter: providers.Filter) {
@@ -124,7 +139,7 @@ export default class CkbAdaptor {
   }
 
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
-    return new Promise((resolve, reject) => {
+    return new Promise<WrappedTransaction>((resolve, reject) => {
       const tryGetTransaction = async () => {
         try {
           const receipt = await this.client.getTransaction(hash, '0x2', true)

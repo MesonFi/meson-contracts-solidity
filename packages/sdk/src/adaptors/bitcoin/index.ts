@@ -5,12 +5,13 @@ import ecc from '@bitcoinerlab/secp256k1'
 
 import { Swap } from '../../Swap'
 import { getSwapId } from '../../utils'
+import BtcClient from './BtcClient'
 import BtcAdaptor from './BtcAdaptor'
 import BtcWallet, { BtcWalletFromExtension } from './BtcWallet'
 
 const ECPair = ECPairFactory(ecc)
 
-export function getWallet(input: string = '', client: BtcAdaptor) {
+export function getWallet(input: string = '', client: BtcClient) {
   if (input.startsWith('0x')) {
     // HEX format
     const buffer = Buffer.from(input.substring(2), 'hex')
@@ -23,15 +24,15 @@ export function getWallet(input: string = '', client: BtcAdaptor) {
   }
 }
 
-export function getWalletFromExtension(ext, client: BtcAdaptor): BtcWalletFromExtension {
+export function getWalletFromExtension(ext, client: BtcClient): BtcWalletFromExtension {
   return new BtcWalletFromExtension(client, ext)
 }
 
-export function getContract(address, abi, clientOrAdaptor: any) {
+export function getContract(address, abi, clientOrAdaptor: BtcClient | BtcAdaptor) {
   let adaptor: BtcAdaptor
-  if (clientOrAdaptor instanceof BtcAdaptor) {
+  if (clientOrAdaptor instanceof BtcWallet) {
     adaptor = clientOrAdaptor
-  } else if (clientOrAdaptor instanceof BtcWallet) {
+  } else if (clientOrAdaptor instanceof BtcAdaptor) {
     adaptor = clientOrAdaptor
   } else {
     adaptor = new BtcAdaptor(clientOrAdaptor)
@@ -91,7 +92,8 @@ export function getContract(address, abi, clientOrAdaptor: any) {
             } else if (prop === 'getSupportedTokens') {
               return { tokens: ['0x0000000000000000000000000000000000000001'], indexes: [243] }
             } else if (prop === 'poolTokenBalance') {
-              return BigNumber.from(0)
+              const balance = await adaptor.getBalance(address)
+              return balance.div(100) // decimals 8 -> 6
             } else if (prop === 'serviceFeeCollected') {
               return BigNumber.from(0)
             }

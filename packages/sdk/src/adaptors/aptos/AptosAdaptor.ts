@@ -1,11 +1,21 @@
 import { BigNumber, utils } from 'ethers'
 import { AptosClient, HexString } from 'aptos'
 
-export default class AptosAdaptor {
-  readonly client: AptosClient
+import { IAdaptor } from '../types'
+
+export default class AptosAdaptor implements IAdaptor {
+  #client: AptosClient | any
 
   constructor(client: AptosClient) {
-    this.client = client
+    this.#client = client
+  }
+
+  get client() {
+    return this.#client
+  }
+
+  protected set client(c) {
+    this.#client = c
   }
 
   get nodeUrl() {
@@ -21,8 +31,7 @@ export default class AptosAdaptor {
     return Number(info.block_height)
   }
 
-  async getTransactionCount() {
-
+  async getTransactionCount(addr: string) {
   }
 
   async getBalance(addr) {
@@ -38,9 +47,12 @@ export default class AptosAdaptor {
     }
   }
 
-  async getCode(addr) {
+  async getCode(addr: string): Promise<string> {
     // TODO
-    return
+    return ''
+  }
+
+  async getLogs(filter) {
   }
 
   on () {}

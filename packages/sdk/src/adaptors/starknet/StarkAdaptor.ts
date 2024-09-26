@@ -4,20 +4,35 @@ import {
   Contract as StarkContract,
   type RPC,
 } from 'starknet'
+
 import { timer } from '../../utils'
+import type { IAdaptor, WrappedTransaction } from '../types'
+
 import AbiERC20 from './abi/ERC20.json'
 import parseCalldata from './parse'
 
 const ETH_ADDRESS = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7'
 
-export default class StarkAdaptor {
-  readonly client: StarkProvider
+export default class StarkAdaptor implements IAdaptor {
+  #client: StarkProvider | any
 
   protected readonly _coreToken: StarkContract
 
   constructor(client: StarkProvider) {
-    this.client = client
+    this.#client = client
     this._coreToken = new StarkContract(AbiERC20, ETH_ADDRESS, client)
+  }
+
+  get client() {
+    return this.#client
+  }
+
+  protected set client(c) {
+    this.#client = c
+  }
+
+  get nodeUrl() {
+    return ''
   }
 
   async detectNetwork(): Promise<any> {
@@ -38,9 +53,9 @@ export default class StarkAdaptor {
     return BigNumber.from(balance)
   }
 
-  async getCode(addr) {
+  async getCode(addr: string): Promise<string> {
     // TODO
-    return
+    return ''
   }
 
   async getLogs(filter: providers.Filter) {
@@ -77,7 +92,7 @@ export default class StarkAdaptor {
   }
 
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
-    return new Promise((resolve, reject) => {
+    return new Promise<WrappedTransaction>((resolve, reject) => {
       const tryGetTransaction = async () => {
         try {
           const receipt = await this.client.getTransactionReceipt(hash)

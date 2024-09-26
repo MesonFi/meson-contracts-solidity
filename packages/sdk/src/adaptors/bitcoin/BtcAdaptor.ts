@@ -1,49 +1,70 @@
 import fetch from 'cross-fetch'
-import * as btclib from 'bitcoinjs-lib'
 import { BigNumber } from 'ethers'
+import * as btclib from 'bitcoinjs-lib'
+
 import { timer } from '../../utils'
+import type { IAdaptor, WrappedTransaction } from '../types'
+import type BtcClient from './BtcClient'
 
-export default class BtcAdaptor {
-  readonly isTestnet: boolean
-  readonly network: any
-  readonly url: string
-  readonly mesonAddress: string
+export default class BtcAdaptor implements IAdaptor {
+  #client: BtcClient | any
 
-  constructor(urlOrAdaptor: string | BtcAdaptor, isTestnet?: boolean, mesonAddress?: string) {
-    this.isTestnet = Boolean(isTestnet)
-    this.network = isTestnet ? btclib.networks.testnet : btclib.networks.bitcoin
-    this.url = urlOrAdaptor instanceof BtcAdaptor ? urlOrAdaptor.url : urlOrAdaptor
-    this.mesonAddress = mesonAddress
+  constructor(client: BtcClient) {
+    this.#client = client
+  }
+
+  get client() {
+    return this.#client
+  }
+
+  protected set client(c) {
+    this.#client = c
   }
 
   get nodeUrl() {
-    return this.url
+    return this.client.url
+  }
+
+  get isTestnet() {
+    return this.client.isTestnet
+  }
+
+  get network() {
+    return this.isTestnet ? btclib.networks.testnet : btclib.networks.bitcoin
+  }
+
+  get mesonAddress() {
+    return this.client.mesonAddress
   }
 
   async detectNetwork(): Promise<any> {
-    const response = await fetch(`${this.url}/v1/lightning/statistics/latest`)
+    const response = await fetch(`${this.nodeUrl}/v1/lightning/statistics/latest`)
     const data = await response.json()
     return data != null && data != undefined
   }
 
   async getBlockNumber() {
-    const response = await fetch(`${this.url}/blocks/tip/height`)
+    const response = await fetch(`${this.nodeUrl}/blocks/tip/height`)
     const height = await response.json()
     return height
   }
 
+  async getTransactionCount(addr: string) {
+  }
+
   async getBalance(addr: string) {
-    const response = await fetch(`${this.url}/address/${addr}`)
+    const response = await fetch(`${this.nodeUrl}/address/${addr}`)
     const data = await response.json()
     return BigNumber.from(data.chain_stats.funded_txo_sum).sub(data.chain_stats.spent_txo_sum)
   }
 
-  async getCode(addr) {
-    return
+  async getCode(addr: string): Promise<string> {
+    // TODO
+    return ''
   }
 
   async getLogs(filter) {
-    const response = await fetch(`${this.url}/address/${filter.address}/txs`)
+    const response = await fetch(`${this.nodeUrl}/address/${filter.address}/txs`)
     const txs = await response.json()
     return txs.map(raw => _wrapBtcEvent(raw, filter.address))
   }
@@ -53,79 +74,79 @@ export default class BtcAdaptor {
 
   async send(method, params) {
     if (method === 'eth_getTransactionByHash') {
-      return _wrapBtcTx(await this._getTransaction(params[0]), this.mesonAddress)
+      return _wrapBtcTx(await this.#getTransaction(params[0]), this.mesonAddress)
     } else if (method === 'eth_getTransactionReceipt') {
-      return _wrapBtcTx(await this._getTransaction(params[0]), this.mesonAddress)
+      return _wrapBtcTx(await this.#getTransaction(params[0]), this.mesonAddress)
     }
 
     if (method === 'eth_getBlockByNumber') {
       if (params[0] === 'latest') {
-        const hash = await this._getTipHash()
-        const block = await this._getBlock(hash)
-        const txs = params[1] && await this._getBlockTxs(hash)
+        const hash = await this.#getTipHash()
+        const block = await this.#getBlock(hash)
+        const txs = params[1] && await this.#getBlockTxs(hash)
         return _wrapBtcBlock(block, txs, this.mesonAddress)
       }
-      const hash = await this._getBlockHashByHeight(params[0])
-      const block = await this._getBlock(hash)
-      const txs = params[1] && await this._getBlockTxs(hash)
+      const hash = await this.#getBlockHashByHeight(params[0])
+      const block = await this.#getBlock(hash)
+      const txs = params[1] && await this.#getBlockTxs(hash)
       return _wrapBtcBlock(block, txs, this.mesonAddress)
     } else if (method === 'eth_getBlockByHash') {
       if (params[0] === 'n/a') {
         return {}
       }
-      const block = await this._getBlock(params[0])
-      const txs = params[1] && await this._getBlockTxs(params[0])
+      const block = await this.#getBlock(params[0])
+      const txs = params[1] && await this.#getBlockTxs(params[0])
       return _wrapBtcBlock(block, txs, this.mesonAddress)
     }
   }
 
-  async _getTipHash() {
-    const response = await fetch(`${this.url}/blocks/tip/hash`)
+  async #getTipHash() {
+    const response = await fetch(`${this.nodeUrl}/blocks/tip/hash`)
     const hash = await response.json()
     return hash
   }
 
-  async _getBlockHashByHeight(height: number) {
-    const response = await fetch(`${this.url}/block-height/${height}`)
+  async #getBlockHashByHeight(height: number) {
+    const response = await fetch(`${this.nodeUrl}/block-height/${height}`)
     const hash = await response.json()
     return hash
   }
 
-  async _getBlock(hash: string) {
-    const response = await fetch(`${this.url}/block/${hash}`)
+  async #getBlock(hash: string) {
+    const response = await fetch(`${this.nodeUrl}/block/${hash}`)
     const header = await response.json()
     return header
   }
 
-  async _getBlockTxs(hash: string) {
-    const response = await fetch(`${this.url}/block/${hash}/txs`)
+  async #getBlockTxs(hash: string) {
+    const response = await fetch(`${this.nodeUrl}/block/${hash}/txs`)
     const txs = await response.json()
     return txs
   }
 
-  async _getTransaction(hash: string) {
-    const response = await fetch(`${this.url}/tx/${hash}`)
+  async #getTransaction(hash: string) {
+    const response = await fetch(`${this.nodeUrl}/tx/${hash}`)
     const info = await response.json()
     return info
   }
 
-  async _getFeeRate() {
-    const response = await fetch(`${this.url}/v1/fees/recommended`)
+  protected async _getFeeRate() {
+    const response = await fetch(`${this.nodeUrl}/v1/fees/recommended`)
     const data = await response.json()
     return data
   }
 
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number) {
-    return new Promise((resolve, reject) => {
+    return new Promise<WrappedTransaction>((resolve, reject) => {
       const tryGetTransaction = async () => {
-        const info = await this._getTransaction(hash)
+        const info = await this.#getTransaction(hash)
         const height = await this.getBlockNumber()
         if (info.status.confirmed && height - info.status.block_height + 1 >= (confirmations || 1)) {
           clearInterval(h)
           resolve(_wrapBtcTx(info, this.mesonAddress))
         }
       }
-      const h = setInterval(tryGetTransaction, 3000)
+      const h = setInterval(tryGetTransaction, 10_000)
       tryGetTransaction()
 
       if (timeout) {
@@ -161,7 +182,7 @@ function _wrapBtcTx(raw, mesonAddress) {
   const { status: block } = raw || {}
   const matched = raw.vout.filter(v => v.scriptpubkey_address === mesonAddress)
   return {
-    blockHash: block.block_hash,
+    blockHash: block.block_hash as string,
     blockNumber: block.block_height,
     hash: raw.txid,
     status: block.confirmed ? '1' : '0',

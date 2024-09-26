@@ -2,6 +2,8 @@ import { BigNumber } from 'ethers'
 import axios from 'axios'
 import * as btclib from 'bitcoinjs-lib'
 import ecc from '@bitcoinerlab/secp256k1'
+
+import BtcClient from './BtcClient'
 import BtcAdaptor from './BtcAdaptor'
 import { ECPairInterface, ECPairFactory } from 'ecpair'
 
@@ -16,8 +18,8 @@ export default class BtcWallet extends BtcAdaptor {
   readonly #dustValue: number
   readonly #tolerance: number
 
-  constructor(client: BtcAdaptor, keypair?: any) {
-    super(client, client.isTestnet, client.mesonAddress)
+  constructor(client: BtcClient, keypair?: any) {
+    super(client)
     if (keypair) {
       this.#keypair = keypair
       this.#pubkey = keypair.publicKey
@@ -38,7 +40,7 @@ export default class BtcWallet extends BtcAdaptor {
 
   async _getTransferSkeleton({ to, value }) {
     // Fetch utxos
-    const response = await fetch(`${this.url}/address/${this.#address}/utxo`)
+    const response = await fetch(`${this.nodeUrl}/address/${this.#address}/utxo`)
     const utxos = await response.json()
     const feeRate = (await this._getFeeRate()).fastestFee
 
@@ -55,7 +57,7 @@ export default class BtcWallet extends BtcAdaptor {
       const utxo = utxos.pop()
       if (!utxo) throw new Error('Insufficient balance')
       if (utxo.value < this.#dustValue) continue
-      const response = await fetch(`${this.url}/tx/${utxo.txid}/hex`)
+      const response = await fetch(`${this.nodeUrl}/tx/${utxo.txid}/hex`)
       const utxoHex = await response.text()
       utxoHexs.push([utxo.txid, utxo.vout, utxoHex])
       collectedValue += utxo.value
@@ -99,7 +101,7 @@ export default class BtcWallet extends BtcAdaptor {
 
     // Broadcast
     const txHex = psbt.extractTransaction().toHex()
-    const response = await axios.post(`${this.url}/tx`, txHex, {
+    const response = await axios.post(`${this.nodeUrl}/tx`, txHex, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     })
     
@@ -117,7 +119,7 @@ export default class BtcWallet extends BtcAdaptor {
 export class BtcWalletFromExtension extends BtcWallet {
   readonly ext: any
 
-  constructor(client: BtcAdaptor, ext: any) {
+  constructor(client: BtcClient, ext: any) {
     super(client)
     this.ext = ext
   }
