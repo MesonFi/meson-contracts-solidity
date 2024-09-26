@@ -3,7 +3,6 @@ import axios from 'axios'
 import * as btclib from 'bitcoinjs-lib'
 import ecc from '@bitcoinerlab/secp256k1'
 
-import BtcClient from './BtcClient'
 import BtcAdaptor from './BtcAdaptor'
 import { ECPairInterface, ECPairFactory } from 'ecpair'
 
@@ -18,8 +17,8 @@ export default class BtcWallet extends BtcAdaptor {
   readonly #dustValue: number
   readonly #tolerance: number
 
-  constructor(client: BtcClient, keypair?: any) {
-    super(client)
+  constructor(adaptor: BtcAdaptor, keypair?: any) {
+    super(adaptor.client)
     if (keypair) {
       this.#keypair = keypair
       this.#pubkey = keypair.publicKey
@@ -119,8 +118,8 @@ export default class BtcWallet extends BtcAdaptor {
 export class BtcWalletFromExtension extends BtcWallet {
   readonly ext: any
 
-  constructor(client: BtcClient, ext: any) {
-    super(client)
+  constructor(adaptor: BtcAdaptor, ext: any) {
+    super(adaptor)
     this.ext = ext
   }
 

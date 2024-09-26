@@ -3,7 +3,7 @@ const TronWeb = require('tronweb')
 const { adaptors } = require('@mesonfi/sdk')
 const { Meson } = require('@mesonfi/contract-abis')
 
-const { getClient } = require('./lib/getClient')
+const { getAdaptor } = require('./lib/getAdaptor')
 const { deployContract } = require('./lib/deploy')
 const updatePresets = require('./lib/updatePresets')
 const PoDUpgradeable = require('../artifacts/contracts/Token/PoDUpgradeable.sol/PoDUpgradeable.json')
@@ -32,8 +32,8 @@ module.exports = async function uct(network) {
 }
 
 async function deploy(network) {
-  const client = getClient(network)
-  const wallet = adaptors.getWallet(PRIVATE_KEY, client)
+  const adaptor = getAdaptor(network)
+  const wallet = adaptors.getWallet(PRIVATE_KEY, adaptor)
 
   console.log('Deploying UCTUpgradeable...')
   const impl = await deployContract('UCTUpgradeable', wallet)
@@ -46,8 +46,8 @@ async function deploy(network) {
 }
 
 async function deployPoD(network) {
-  const client = getClient(network)
-  const wallet = adaptors.getWallet(PRIVATE_KEY, client)
+  const adaptor = getAdaptor(network)
+  const wallet = adaptors.getWallet(PRIVATE_KEY, adaptor)
 
   console.log('Deploying PoDUpgradeable...')
   const impl = await deployContract('PoDUpgradeable', wallet)
@@ -66,8 +66,8 @@ async function deployPoD(network) {
 }
 
 async function addUCT(network) {
-  const client = getClient(network)
-  const wallet = adaptors.getWallet(PRIVATE_KEY, client)
+  const adaptor = getAdaptor(network)
+  const wallet = adaptors.getWallet(PRIVATE_KEY, adaptor)
 
   console.log('ADD UCT to Meson...')
   const meson = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
@@ -75,8 +75,8 @@ async function addUCT(network) {
 }
 
 async function upgrade(network) {
-  const client = getClient(network)
-  const wallet = adaptors.getWallet(PRIVATE_KEY, client)
+  const adaptor = getAdaptor(network)
+  const wallet = adaptors.getWallet(PRIVATE_KEY, adaptor)
 
   console.log('Deploying UCTUpgradeable...')
   const impl = await deployContract('UCTUpgradeable', wallet)
@@ -87,8 +87,8 @@ async function upgrade(network) {
 }
 
 async function mint(network, targets, amount) {
-  const client = getClient(network)
-  const wallet = adaptors.getWallet(MINTER_PK, client)
+  const adaptor = getAdaptor(network)
+  const wallet = adaptors.getWallet(MINTER_PK, adaptor)
 
   const uct = adaptors.getContract(network.uctAddress, UCTUpgradeable.abi, wallet)
   const tx = await uct.batchMint(targets, ethers.utils.parseUnits(amount, 4))
@@ -96,8 +96,8 @@ async function mint(network, targets, amount) {
 }
 
 async function mint2(network, targets, amounts) {
-  const client = getClient(network)
-  const wallet = adaptors.getWallet(MINTER_PK, client)
+  const adaptor = getAdaptor(network)
+  const wallet = adaptors.getWallet(MINTER_PK, adaptor)
 
   const uct = adaptors.getContract(network.uctAddress, UCTUpgradeable.abi, wallet)
   const tx = await uct.batchMint2(targets, amounts)
@@ -105,8 +105,8 @@ async function mint2(network, targets, amounts) {
 }
 
 async function mintPoD(network, account, amount) {
-  const client = getClient(network)
-  const wallet = adaptors.getWallet(MINTER_PK, client)
+  const adaptor = getAdaptor(network)
+  const wallet = adaptors.getWallet(MINTER_PK, adaptor)
 
   const token = network.tokens.find(t => t.tokenIndex === 32)
   console.log(token)

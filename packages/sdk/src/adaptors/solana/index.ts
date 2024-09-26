@@ -4,7 +4,6 @@ import {
   AccountMeta,
   Keypair as SolKeypair,
   PublicKey as SolPublicKey,
-  Connection as SolConnection,
   Transaction as SolTransaction,
   TransactionInstruction as SolTransactionInstruction,
 } from '@solana/web3.js'
@@ -73,7 +72,7 @@ const SOLANA_METHODS = [
   /* 18 */ 'directRelease',
 ]
 
-export function getWallet(privateKey: string, client: SolConnection): SolanaWallet {
+export function getWallet(privateKey: string, adaptor: SolanaAdaptor, Wallet = SolanaWallet): SolanaWallet {
   let keypair: SolKeypair
   if (!privateKey) {
     keypair = SolKeypair.generate()
@@ -86,23 +85,14 @@ export function getWallet(privateKey: string, client: SolConnection): SolanaWall
     // specific for solana
     keypair = SolKeypair.fromSecretKey(bs58.decode(privateKey))
   }
-  return new SolanaWallet(client, keypair)
+  return new Wallet(adaptor, keypair)
 }
 
-export function getWalletFromExtension(ext, client: SolConnection): SolanaExtWallet {
-  return new SolanaExtWallet(client, ext)
+export function getWalletFromExtension(ext, adaptor: SolanaAdaptor): SolanaExtWallet {
+  return new SolanaExtWallet(adaptor, ext)
 }
 
-export function getContract(address, abi, clientOrAdaptor: SolConnection | SolanaAdaptor) {
-  let adaptor: SolanaAdaptor
-  if (clientOrAdaptor instanceof SolanaWallet) {
-    adaptor = clientOrAdaptor
-  } else if (clientOrAdaptor instanceof SolanaAdaptor) {
-    adaptor = clientOrAdaptor
-  } else {
-    adaptor = new SolanaAdaptor(clientOrAdaptor)
-  }
-
+export function getContract(address: string, abi, adaptor: SolanaAdaptor) {
   const programId = new SolPublicKey(address)
 
   const _getStore = (seeds: Buffer[]) => {

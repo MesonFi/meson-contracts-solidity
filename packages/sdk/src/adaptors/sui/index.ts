@@ -1,5 +1,4 @@
 import { BigNumber, BigNumberish, utils } from 'ethers'
-import { SuiClient } from '@mysten/sui.js/client'
 import { Ed25519Keypair as SuiKeypair } from '@mysten/sui.js/keypairs/ed25519'
 import { TransactionBlock } from '@mysten/sui.js/transactions'
 
@@ -10,7 +9,7 @@ import { Swap } from '../../Swap'
 import SuiAdaptor from './SuiAdaptor'
 import SuiWallet, { SuiExtWallet } from './SuiWallet'
 
-export function getWallet(privateKey: string, client: SuiClient): SuiWallet {
+export function getWallet(privateKey: string, adaptor: SuiAdaptor, Wallet = SuiWallet): SuiWallet {
   let keypair: SuiKeypair
   if (!privateKey) {
     keypair = SuiKeypair.generate()
@@ -19,23 +18,14 @@ export function getWallet(privateKey: string, client: SuiClient): SuiWallet {
   } else { // mnemonics
     keypair = SuiKeypair.deriveKeypair(privateKey)
   }
-  return new SuiWallet(client, keypair)
+  return new Wallet(adaptor, keypair)
 }
 
-export function getWalletFromExtension(ext, client: SuiClient): SuiExtWallet {
-  return new SuiExtWallet(client, ext)
+export function getWalletFromExtension(ext, adaptor: SuiAdaptor): SuiExtWallet {
+  return new SuiExtWallet(adaptor, ext)
 }
 
-export function getContract(address, abi, clientOrAdaptor: SuiClient | SuiAdaptor) {
-  let adaptor: SuiAdaptor
-  if (clientOrAdaptor instanceof SuiWallet) {
-    adaptor = clientOrAdaptor
-  } else if (clientOrAdaptor instanceof SuiAdaptor) {
-    adaptor = clientOrAdaptor
-  } else {
-    adaptor = new SuiAdaptor(clientOrAdaptor)
-  }
-
+export function getContract(address: string, abi, adaptor: SuiAdaptor) {
   const getMetadata = memoize(async () => {
     const obj = await adaptor.client.getObject({ id: address, options: { showPreviousTransaction: true } })
     const result = await adaptor.client.getTransactionBlock({ digest: obj.data.previousTransaction, options: { showEffects: true } })
@@ -76,6 +66,9 @@ export function getContract(address, abi, clientOrAdaptor: SuiClient | SuiAdapto
       }
       return (<any>res?.data.content).fields.value
     } catch (e) {
+      if (e.errors) {
+        e = e.errors[0]
+      }
       if (e.cause.message?.includes('Cannot find dynamic field')) {
         return
       }

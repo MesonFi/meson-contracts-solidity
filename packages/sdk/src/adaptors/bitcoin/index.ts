@@ -5,39 +5,29 @@ import ecc from '@bitcoinerlab/secp256k1'
 
 import { Swap } from '../../Swap'
 import { getSwapId } from '../../utils'
-import BtcClient from './BtcClient'
 import BtcAdaptor from './BtcAdaptor'
 import BtcWallet, { BtcWalletFromExtension } from './BtcWallet'
 
 const ECPair = ECPairFactory(ecc)
 
-export function getWallet(input: string = '', client: BtcClient) {
+export function getWallet(input: string = '', adaptor: BtcAdaptor, Wallet = BtcWallet): BtcWallet {
   if (input.startsWith('0x')) {
     // HEX format
     const buffer = Buffer.from(input.substring(2), 'hex')
-    const keypair = ECPair.fromPrivateKey(buffer, { network: client.network })
-    return new BtcWallet(client, keypair)
+    const keypair = ECPair.fromPrivateKey(buffer, { network: adaptor.client.network })
+    return new Wallet(adaptor, keypair)
   } else if (input) {
     // WIF format
-    const keypair = ECPair.fromWIF(input, client.network)
-    return new BtcWallet(client, keypair)
+    const keypair = ECPair.fromWIF(input, adaptor.client.network)
+    return new Wallet(adaptor, keypair)
   }
 }
 
-export function getWalletFromExtension(ext, client: BtcClient): BtcWalletFromExtension {
-  return new BtcWalletFromExtension(client, ext)
+export function getWalletFromExtension(ext, adaptor: BtcAdaptor): BtcWalletFromExtension {
+  return new BtcWalletFromExtension(adaptor, ext)
 }
 
-export function getContract(address, abi, clientOrAdaptor: BtcClient | BtcAdaptor) {
-  let adaptor: BtcAdaptor
-  if (clientOrAdaptor instanceof BtcWallet) {
-    adaptor = clientOrAdaptor
-  } else if (clientOrAdaptor instanceof BtcAdaptor) {
-    adaptor = clientOrAdaptor
-  } else {
-    adaptor = new BtcAdaptor(clientOrAdaptor)
-  }
-
+export function getContract(address: string, abi, adaptor: BtcAdaptor) {
   return new Proxy({}, {
     get(target, prop: string) {
       if (prop === 'address') {

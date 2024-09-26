@@ -1,6 +1,5 @@
 import { utils } from 'ethers'
 import {
-  type RpcProvider as StarkProvider,
   Account as StarkAccount,
   CallData,
   ec,
@@ -17,8 +16,8 @@ export default class StarkWallet extends StarkAdaptor {
   readonly address: string
   readonly account: StarkAccount
 
-  constructor(client: StarkProvider, opt: { privateKey?: string, account?: StarkAccount }) {
-    super(client)
+  constructor(adaptor: StarkAdaptor, opt: { privateKey?: string, account?: StarkAccount }) {
+    super(adaptor.client)
     if (opt.privateKey) {
       this.#privateKey = opt.privateKey
       this.publicKey = ec.starkCurve.getStarkKey(opt.privateKey)
@@ -29,7 +28,7 @@ export default class StarkWallet extends StarkAdaptor {
         this.#calldata,
         0
       ), 32)
-      this.account = new StarkAccount(client, this.address, opt.privateKey)
+      this.account = new StarkAccount(adaptor.client, this.address, opt.privateKey)
     } else if (opt.account) {
       this.account = opt.account
       this.address = utils.hexZeroPad(this.account.address, 32)
@@ -82,8 +81,8 @@ export default class StarkWallet extends StarkAdaptor {
 export class StarkExtWallet extends StarkWallet {
   readonly ext: any
 
-  constructor(client: StarkProvider, ext) {
-    super(client, { account: ext?.connection?.account })
+  constructor(adaptor: StarkAdaptor, ext) {
+    super(adaptor, { account: ext?.connection?.account })
     this.ext = ext
   }
 

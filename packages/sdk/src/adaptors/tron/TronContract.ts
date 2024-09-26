@@ -8,14 +8,8 @@ export default class TronContract {
   readonly #adaptor: TronAdaptor
   readonly #contract
 
-  constructor(address, abi, clientOrAdaptor: TronAdaptor | TronWeb) {
-    if (clientOrAdaptor instanceof TronWallet) {
-      this.#adaptor = clientOrAdaptor
-    } else if (clientOrAdaptor instanceof TronAdaptor) {
-      this.#adaptor = clientOrAdaptor
-    } else {
-      this.#adaptor = new TronWallet(clientOrAdaptor)
-    }
+  constructor(address: string, abi, adaptor: TronAdaptor) {
+    this.#adaptor = adaptor
     this.#contract = this.#adaptor.client.contract(abi, address)
 
     Object.entries(this.#contract.methodInstances)

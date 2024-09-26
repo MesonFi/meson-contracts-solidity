@@ -2,6 +2,7 @@ import { type BigNumber } from 'ethers'
 
 export type WrappedTransaction = {
   blockHash: string
+  status?: number | string
 }
 
 export interface IAdaptor {
@@ -10,11 +11,11 @@ export interface IAdaptor {
   get nodeUrl(): string
   detectNetwork(): Promise<any>
   getBlockNumber(): Promise<number>
-  getTransactionCount(addr: string): Promise<any>
+  getGasPrice(): Promise<BigNumber>
   getBalance(addr: string): Promise<BigNumber>
   getCode(addr: string): Promise<string>
+  // getTransactionCount(addr: string): Promise<any>
   getLogs(filter: any): Promise<any>
-  getGasPrice?: () => Promise<BigNumber>
   // on(): any
   // removeAllListeners(): any
   send(method: string, params: any[]): Promise<any>

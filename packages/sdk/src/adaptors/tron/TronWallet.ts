@@ -1,8 +1,8 @@
 import TronAdaptor from './TronAdaptor'
 
 export default class TronWallet extends TronAdaptor {
-  constructor(tronWeb) {
-    super(tronWeb)
+  constructor(adaptor: TronAdaptor) {
+    super(adaptor.client)
   }
 
   get tronWeb () {

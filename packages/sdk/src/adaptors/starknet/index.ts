@@ -5,7 +5,6 @@ import {
   CallData,
   Account as StarkAccount,
   Contract as StarkContract,
-  type RpcProvider as StarkProvider
 } from 'starknet'
 
 import { getSwapId } from '../../utils'
@@ -14,7 +13,7 @@ import StarkWallet, { StarkExtWallet } from './StarkWallet'
 import AbiMeson from './abi/Meson.json'
 import AbiERC20 from './abi/ERC20.json'
 
-export function getWallet(seed: string, client: StarkProvider) {
+export function getWallet(seed: string, adaptor: StarkAdaptor, Wallet = StarkWallet): StarkWallet {
   let privateKey: string
   if (!seed) {
     privateKey = stark.randomAddress()
@@ -26,11 +25,11 @@ export function getWallet(seed: string, client: StarkProvider) {
       privateKey = `0x${ec.starkCurve.grindKey(seed)}`
     }
   }
-  return new StarkWallet(client, { privateKey })
+  return new Wallet(adaptor, { privateKey })
 }
 
-export function getWalletFromExtension(ext, client): StarkExtWallet {
-  return new StarkExtWallet(client, ext)
+export function getWalletFromExtension(ext, adaptor: StarkAdaptor): StarkExtWallet {
+  return new StarkExtWallet(adaptor, ext)
 }
 
 const SELECTORS = {
@@ -41,16 +40,10 @@ const SELECTORS = {
   '0x032a1511efa26e7ac8cc6ed65fcdee1a0224012cfe96820e56d8030effe322f4': 'directRelease',
 }
 
-export function getContract(address: string, abi, clientOrAdaptor: StarkProvider | StarkAdaptor) {
-  let adaptor: StarkAdaptor
+export function getContract(address: string, abi, adaptor: StarkAdaptor) {
   let signer: StarkAccount
-  if (clientOrAdaptor instanceof StarkWallet) {
-    adaptor = clientOrAdaptor
-    signer = clientOrAdaptor.account
-  } else if (clientOrAdaptor instanceof StarkAdaptor) {
-    adaptor = clientOrAdaptor
-  } else {
-    adaptor = new StarkAdaptor(clientOrAdaptor)
+  if (adaptor instanceof StarkWallet) {
+    signer = adaptor.account
   }
 
   let starkContract: StarkContract

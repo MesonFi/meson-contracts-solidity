@@ -1,4 +1,4 @@
-import type { providers } from 'ethers'
+import { IAdaptor } from './adaptors/types'
 
 export type Block = {
   hash: string
@@ -27,9 +27,9 @@ export type Receipt = {
 }
 
 export class Rpc {
-  #provider: providers.JsonRpcProvider
+  #provider: IAdaptor
 
-  constructor(provider: providers.JsonRpcProvider) {
+  constructor(provider: IAdaptor) {
     this.#provider = provider
   }
 

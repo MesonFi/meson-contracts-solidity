@@ -32,6 +32,10 @@ export default class TronAdaptor implements IAdaptor {
     return latestBlock?.block_header?.raw_data?.number
   }
 
+  async getGasPrice() {
+    return BigNumber.from(0)
+  }
+
   async getTransactionCount(addr: string) {
   }
 

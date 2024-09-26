@@ -49,6 +49,10 @@ export default class BtcAdaptor implements IAdaptor {
     return height
   }
 
+  async getGasPrice() {
+    return BigNumber.from(0)
+  }
+
   async getTransactionCount(addr: string) {
   }
 

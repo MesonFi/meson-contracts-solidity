@@ -1,5 +1,5 @@
 import { BigNumber, BigNumberish, utils } from 'ethers'
-import { AptosClient, AptosAccount } from 'aptos'
+import { AptosAccount } from 'aptos'
 import memoize from 'lodash/memoize'
 
 import { getSwapId } from '../../utils'
@@ -7,33 +7,27 @@ import { Swap } from '../../Swap'
 import AptosAdaptor from './AptosAdaptor'
 import AptosWallet, { AptosExtWallet } from './AptosWallet'
 
-export function getWallet(privateKey: string, client: AptosClient): AptosWallet {
+export function getWallet(privateKey: string, adaptor: AptosAdaptor, Wallet = AptosWallet): AptosWallet {
   if (privateKey && !privateKey.startsWith('0x')) {
     privateKey = '0x' + privateKey
   }
   const signer = new AptosAccount(privateKey && utils.arrayify(privateKey))
-  return new AptosWallet(client, signer)
+  return new Wallet(adaptor, signer)
 }
 
-export function getWalletFromExtension(ext, client: AptosClient): AptosExtWallet {
-  return new AptosExtWallet(client, ext)
+export function getWalletFromExtension(ext, adaptor: AptosAdaptor): AptosExtWallet {
+  return new AptosExtWallet(adaptor, ext)
 }
 
-export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAdaptor) {
-  let adaptor: AptosAdaptor
-  if (clientOrAdaptor instanceof AptosWallet) {
-    adaptor = clientOrAdaptor
-  } else if (clientOrAdaptor instanceof AptosAdaptor) {
-    adaptor = clientOrAdaptor
-  } else {
-    adaptor = new AptosAdaptor(clientOrAdaptor)
-  }
-
+export function getContract(address: string, abi, adaptor: AptosAdaptor) {
   const getResource = async (addr: string, type: string) => {
     try {
       const result = await adaptor.client.getAccountResource(addr, type)
       return result.data as any
     } catch (e) {
+      if (e.errors) {
+        e = e.errors[0]
+      }
       if (e.errorCode === 'resource_not_found') {
         return
       }
@@ -46,6 +40,9 @@ export function getContract(address, abi, clientOrAdaptor: AptosClient | AptosAd
     try {
       return await adaptor.client.getTableItem(handle, data)
     } catch (e) {
+      if (e.errors) {
+        e = e.errors[0]
+      }
       if (e.errorCode === 'table_item_not_found') {
         return
       }

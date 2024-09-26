@@ -31,6 +31,10 @@ export default class AptosAdaptor implements IAdaptor {
     return Number(info.block_height)
   }
 
+  async getGasPrice() {
+    return BigNumber.from(0)
+  }
+
   async getTransactionCount(addr: string) {
   }
 
@@ -40,6 +44,9 @@ export default class AptosAdaptor implements IAdaptor {
       const result = await this.client.getAccountResource(new HexString(addr), type)
       return BigNumber.from((result.data as any).coin.value)
     } catch (e) {
+      if (e.errors) {
+        e = e.errors[0]
+      }
       if (e.errorCode === 'resource_not_found') {
         return BigNumber.from(0)
       }
