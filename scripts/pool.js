@@ -10,6 +10,7 @@ const { LP_PRIVATE_KEY } = process.env
 const amount = '10'
 const symbol = 'USDC'
 const addr = ''
+
 module.exports = async function pool(network) {
   const adaptor = getAdaptor(network)
 
@@ -20,6 +21,7 @@ module.exports = async function pool(network) {
   console.log(`🟩 Status: ${JSON.stringify(await mesonInstance.provider.detectNetwork())}`)
   console.log(`🟩 Block height: ${await mesonInstance.provider.getBlockNumber()}`)
   console.log(`🟩 LP balance: ${await mesonInstance.provider.getBalance(wallet.address)}`)
+  
   // const tx = await deposit(symbol, amount, { network, wallet })
   // const tx = await withdraw(symbol, amount, { network, wallet })
   // const tx = await send(symbol, amount, addr, { network, wallet })
