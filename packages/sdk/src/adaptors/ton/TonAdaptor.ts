@@ -1,14 +1,17 @@
 import { TonClient, TonClient4 } from '@ton/ton'
 import { Address, CommonMessageInfoInternal, Transaction } from '@ton/core'
-import { timer } from '../../utils'
+import { BigNumber } from 'ethers'
 
-export default class TonAdaptor {
+import { timer } from '../../utils'
+import type { IAdaptor, WrappedTransaction } from '../types'
+
+export default class TonAdaptor implements IAdaptor {
   readonly url: string
   readonly client: TonClient
 
-  constructor(urlOrAdaptor: string | TonAdaptor) {
-    this.url = urlOrAdaptor instanceof TonAdaptor ? urlOrAdaptor.url : urlOrAdaptor
-    this.client = new TonClient({ endpoint: this.url, apiKey: process.env.TON_TESTNET_API_KEY })
+  constructor(urlOrAdaptor: { url: string } | TonAdaptor) {
+    this.url = urlOrAdaptor.url
+    this.client = new TonClient({ endpoint: this.url, apiKey: process.env.TON_API })
   }
 
   get nodeUrl() {
@@ -16,12 +19,6 @@ export default class TonAdaptor {
   }
 
   async detectNetwork(): Promise<any> {
-    // const c = new TonClient4({ endpoint: 'https://sandbox-v4.tonhubapi.com' })
-    // console.log(await c.getLastBlock())
-
-    console.log((await this.client.getTransactions(Address.parse('0QCluJshXsoB7dASRWMAy6uOWfJEStrJOoHJj5SrEDeCK6Yg'), { limit: 2}))
-      // .map(tx => [tx.inMessage.info, tx.outMessages.values().map(r => {console.log([r.info.dest, r.info.src, r.info.type])})]))
-      .map(tx => tx.hash()))
     return (await this.client.getMasterchainInfo()).latestSeqno != 0
   }
 
@@ -29,13 +26,17 @@ export default class TonAdaptor {
     return (await this.client.getMasterchainInfo()).latestSeqno
   }
 
-  async getBalance(addr: string | Address) {
-    const tonAddr = typeof addr === 'string' ? Address.parse(addr) : addr
-    return (await this.client.getBalance(tonAddr)).toString()
+  async getGasPrice() {
+    return BigNumber.from(0)    // TODO
+  }
+
+  async getBalance(addr: string) {
+    const tonAddr = Address.parse(addr)
+    return BigNumber.from(await this.client.getBalance(tonAddr))
   }
 
   async getCode(addr) {
-    return
+    return ''   // TODO
   }
 
   async getLogs(filter) {
@@ -47,39 +48,47 @@ export default class TonAdaptor {
   async send(method, params) {
   }
 
+  async waitForTransaction(hash: string, confirmations?: number, timeout?: number): Promise<WrappedTransaction> {
+    return new Promise((resolve, reject) => {
+      resolve({ blockHash: '', status: 'success' })
+    })
+  }
+
   async waitForCompletion(submitTs: number, sender: string | Address, timeout?: number) {
     const tonAddr = typeof sender === 'string' ? Address.parse(sender) : sender
-    return new Promise((resolve, reject ) => {
+    return new Promise((resolve, reject) => {
       const tryGetTransaction = async () => {
         console.log("   waiting for tx completed on-chain...")
         const tx = (await this.client.getTransactions(tonAddr, { limit: 1 }))[0]
         if (tx.now >= submitTs) {
           clearInterval(h)
-          resolve(_wrapTonTx(tx))
+          resolve(this._wrapTonTx(tx))
         }
       }
       const h = setInterval(tryGetTransaction, 5000)
       tryGetTransaction()
 
-      if (timeout) 
+      if (timeout)
         timer(timeout * 1000).then(() => {
           clearInterval(h)
           reject(new Error('Time out'))
-      })
+        })
     })
+  }
+
+
+  _wrapTonTx(tx: Transaction) {
+    return {
+      from: tx.inMessage.info.src,
+      to: Address.parseRaw('0:' + tx.address.toString(16)),
+      hash: tx.hash().toString('hex'),
+      value: (tx.inMessage.info as CommonMessageInfoInternal).value.coins,
+      input: tx.inMessage.body,
+      timestamp: tx.now,
+    }
   }
 }
 
-function _wrapTonTx(tx: Transaction) {
-  return {
-    from: tx.inMessage.info.src,
-    to: Address.parseRaw('0:' + tx.address.toString(16)),
-    hash: tx.hash().toString('hex'),
-    value: (tx.inMessage.info as CommonMessageInfoInternal).value.coins,
-    input: tx.inMessage.body,
-    timestamp: tx.now,
-  }
-}
 
 // function _wrapBtcBlock(raw) {
 //   return {

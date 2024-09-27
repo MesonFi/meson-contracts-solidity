@@ -24,6 +24,7 @@ import CkbAdaptor from '@mesonfi/sdk/lib/adaptors/ckb/CkbAdaptor'
 import SolanaAdaptor from '@mesonfi/sdk/lib/adaptors/solana/SolanaAdaptor'
 import StarkAdaptor from '@mesonfi/sdk/lib/adaptors/starknet/StarkAdaptor'
 import SuiAdaptor from '@mesonfi/sdk/lib/adaptors/sui/SuiAdaptor'
+import TonAdaptor from '@mesonfi/sdk/lib/adaptors/ton/TonAdaptor'
 import TronAdaptor from '@mesonfi/sdk/lib/adaptors/tron/TronAdaptor'
 
 import { Meson } from '@mesonfi/contract-abis'
@@ -219,6 +220,8 @@ export class MesonPresets {
       return [StarkProvider, [{ nodeUrl: url }], StarkAdaptor]
     } else if (id.startsWith('sui')) {
       return [SuiClient, [{ url }], SuiAdaptor]
+    } else if (id.startsWith('ton')) {
+      return [TonAdaptor, [{ url }], TonAdaptor]
     } else if (id.startsWith('tron')) {
       return [TronWeb, [{ fullHost: url }], TronAdaptor]
     }

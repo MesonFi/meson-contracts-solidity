@@ -9,6 +9,7 @@ import CkbAdaptor from './ckb/CkbAdaptor'
 import SolanaAdaptor from './solana/SolanaAdaptor'
 import StarkAdaptor from './starknet/StarkAdaptor'
 import SuiAdaptor from './sui/SuiAdaptor'
+import TonAdaptor from './ton/TonAdaptor'
 import TronAdaptor from './tron/TronAdaptor'
 
 function extendToFailoverAdaptor<ClassAdaptor extends AdaptorConstructor>(Adaptor: ClassAdaptor): ClassAdaptor {
@@ -158,6 +159,12 @@ export class FailoverStarkAdaptor extends extendToFailoverAdaptor(StarkAdaptor) 
 
 export class FailoverSuiAdaptor extends extendToFailoverAdaptor(SuiAdaptor) {
   constructor(...adaptors: SuiAdaptor[]) {
+    super(adaptors as any)
+  }
+}
+
+export class FailoverTonAdaptor extends extendToFailoverAdaptor(TonAdaptor) {
+  constructor(...adaptors: TonAdaptor[]) {
     super(adaptors as any)
   }
 }

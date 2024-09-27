@@ -11,7 +11,6 @@ export default class TonWallet extends TonAdaptor {
   readonly #walletSender: Sender
   readonly #address: Address
 
-
   constructor(adaptor: TonAdaptor, keypair: KeyPair) {
     super(adaptor)
     this.#publicKey = keypair.publicKey
