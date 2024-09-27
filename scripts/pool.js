@@ -2,28 +2,24 @@ const { adaptors } = require('@mesonfi/sdk')
 const { Meson } = require('@mesonfi/contract-abis')
 const { getAdaptor } = require('./lib/getAdaptor')
 const { addSupportedTokens, deposit, withdraw, send, authorize, transferOwner, withdrawServiceFee } = require('./lib/pool')
-const { default: TonAdaptor } = require('@mesonfi/sdk/lib/adaptors/ton/TonAdaptor')
-const { default: TonWallet } = require('@mesonfi/sdk/lib/adaptors/ton/TonWallet')
 
 require('dotenv').config()
 
-const { LP_PRIVATE_KEY } = process.env // Notice that TON_PRIVATE_KEY has 64 bytes!
+const { LP_PRIVATE_KEY } = process.env
 
 const amount = '10'
 const symbol = 'USDC'
 const addr = ''
-
 module.exports = async function pool(network) {
   const adaptor = getAdaptor(network)
 
-  const wallet = adaptors.getWallet(LP_PRIVATE_KEY, adaptor, TonWallet)
+  const wallet = adaptors.getWallet(LP_PRIVATE_KEY, adaptor)
   console.log(`⬜️ LP address: ${wallet.address}`)
 
   const mesonInstance = adaptors.getContract(network.mesonAddress, Meson.abi, wallet)
   console.log(`🟩 Status: ${JSON.stringify(await mesonInstance.provider.detectNetwork())}`)
   console.log(`🟩 Block height: ${await mesonInstance.provider.getBlockNumber()}`)
   console.log(`🟩 LP balance: ${await mesonInstance.provider.getBalance(wallet.address)}`)
-
   // const tx = await deposit(symbol, amount, { network, wallet })
   // const tx = await withdraw(symbol, amount, { network, wallet })
   // const tx = await send(symbol, amount, addr, { network, wallet })

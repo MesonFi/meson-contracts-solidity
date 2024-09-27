@@ -3,9 +3,10 @@ import TonAdaptor from "./TonAdaptor";
 import TonWallet from "./TonWallet";
 
 export function getWallet(privateKey: string, adaptor: TonAdaptor, Wallet = TonWallet): TonWallet {
-  // Hex private key
-  const keypair = keyPairFromSecretKey(Buffer.from(privateKey.startsWith('0x') ? 
-    privateKey.substring(2) : privateKey, 'hex'))
+  // Notice that TON_PRIVATE_KEY has 64 bytes
+  const derivedKey = privateKey.startsWith('0x') ? 
+    privateKey.substring(2) + privateKey.substring(2) : privateKey + privateKey
+  const keypair = keyPairFromSecretKey(Buffer.from(derivedKey, 'hex'))
   return new Wallet(adaptor, keypair)
 }
 
