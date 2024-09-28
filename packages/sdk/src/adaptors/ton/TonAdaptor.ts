@@ -9,9 +9,13 @@ export default class TonAdaptor implements IAdaptor {
   readonly url: string
   readonly client: TonClient
 
-  constructor(urlOrAdaptor: { url: string } | TonAdaptor) {
-    this.url = urlOrAdaptor.url
-    this.client = new TonClient({ endpoint: this.url, apiKey: process.env.TON_API })
+  // constructor(urlOrAdaptor: { url: string } | TonAdaptor) {
+  //   this.url = urlOrAdaptor.url
+  //   this.client = new TonClient({ endpoint: this.url, apiKey: process.env.TON_API })
+  // }
+
+  constructor(client: TonClient) {
+    this.client = client
   }
 
   get nodeUrl() {

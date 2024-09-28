@@ -29,7 +29,7 @@ import TronAdaptor from '@mesonfi/sdk/lib/adaptors/tron/TronAdaptor'
 
 import { Meson } from '@mesonfi/contract-abis'
 
-import { ExtendedCkbClient } from './providers'
+import { ExtendedCkbClient, ExtendedTonClient } from './providers'
 
 import testnets from './testnets.json'
 import mainnets from './mainnets.json'
@@ -221,7 +221,7 @@ export class MesonPresets {
     } else if (id.startsWith('sui')) {
       return [SuiClient, [{ url }], SuiAdaptor]
     } else if (id.startsWith('ton')) {
-      return [TonAdaptor, [{ url }], TonAdaptor]
+      return [ExtendedTonClient, [{ endpoint: url, apiKey: process.env.TON_API }, { tokens: network.tokens }], TonAdaptor]
     } else if (id.startsWith('tron')) {
       return [TronWeb, [{ fullHost: url }], TronAdaptor]
     }

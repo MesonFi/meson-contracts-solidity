@@ -422,7 +422,9 @@ export class MesonClient {
         value: BigNumber.from(value).mul(10 ** (this.coreDecimals - 6))
       })
     }
+    console.log('here')
     const tokenAddr = await this.#asyncGetTokenAddr(tokenIndex, { from: this.address })
+    console.log(tokenAddr)
     const tokenContract = this.getTokenContract(tokenAddr).connect(this.#mesonInstance.signer)
     const decimals = await tokenContract.decimals()
     if (decimals > 6) {

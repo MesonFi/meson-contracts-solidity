@@ -1,6 +1,8 @@
 // import { ethers } from 'ethers'
 import { Address, internal, OpenedContract, Sender, WalletContractV4 } from "@ton/ton";
 import { KeyPair } from "@ton/crypto";
+import { TonClient } from "@ton/ton";
+import { ExtendedTonClient } from "../../../../presets/src/providers"
 import TonAdaptor from "./TonAdaptor";
 
 export default class TonWallet extends TonAdaptor {
@@ -11,12 +13,14 @@ export default class TonWallet extends TonAdaptor {
   readonly #walletSender: Sender
   readonly #address: Address
 
-  constructor(adaptor: TonAdaptor, keypair: KeyPair) {
-    super(adaptor)
+  constructor(adaptor: TonAdaptor, keypair?: KeyPair) {
+    super(adaptor.client)
     this.#publicKey = keypair.publicKey
     this.#secretKey = keypair.secretKey
     this.#wallet = WalletContractV4.create({ workchain: 0, publicKey: keypair.publicKey })
+    console.log("!")
     this.#walletContract = adaptor.client.open(this.#wallet)
+    console.log("?")
     this.#walletSender = this.#walletContract.sender(keypair.secretKey)
     this.#address = this.#wallet.address
   }
