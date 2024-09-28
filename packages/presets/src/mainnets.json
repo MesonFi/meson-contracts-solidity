@@ -90,6 +90,14 @@
         "addr": "0xF469fBD2abcd6B9de8E169d128226C0Fc90a012e",
         "tokenIndex": 113,
         "partner": "free"
+      },
+      {
+        "name": "MERL",
+        "symbol": "MERL",
+        "decimals": 18,
+        "addr": "0x0F3A12b78FEE11Ee088E454a0547BdBC5A253a6d",
+        "tokenIndex": 69,
+        "partner": "free"
       }
     ]
   },
@@ -620,6 +628,14 @@
         "decimals": 18,
         "addr": "0x0000000000000000000000000000000000000001",
         "tokenIndex": 255
+      },
+      {
+        "name": "pumpBTC",
+        "symbol": "pumpBTC",
+        "decimals": 8,
+        "addr": "0xF469fBD2abcd6B9de8E169d128226C0Fc90a012e",
+        "tokenIndex": 113,
+        "partner": "free"
       }
     ]
   },
@@ -2401,6 +2417,14 @@
         "decimals": 8,
         "addr": "0x13A0c5930C028511Dc02665E7285134B6d11A5f4",
         "tokenIndex": 242
+      },
+      {
+        "name": "pumpBTC",
+        "symbol": "pumpBTC",
+        "decimals": 8,
+        "addr": "0x1fCca65fb6Ae3b2758b9b2B394CB227eAE404e1E",
+        "tokenIndex": 113,
+        "partner": "free"
       }
     ]
   },
@@ -2530,6 +2554,14 @@
         "decimals": 18,
         "addr": "0xB5d8b1e73c79483d7750C5b8DF8db45A0d24e2cf",
         "tokenIndex": 71,
+        "partner": "free"
+      },
+      {
+        "name": "MERL",
+        "symbol": "MERL",
+        "decimals": 18,
+        "addr": "0x5c46bFF4B38dc1EAE09C5BAc65872a1D8bc87378",
+        "tokenIndex": 69,
         "partner": "free"
       }
     ]
@@ -2703,6 +2735,14 @@
         "decimals": 18,
         "addr": "0xcc0966d8418d412c599a6421b760a847eb169a8c",
         "tokenIndex": 81,
+        "partner": "free"
+      },
+      {
+        "name": "pumpBTC",
+        "symbol": "pumpBTC",
+        "decimals": 8,
+        "addr": "0x1fCca65fb6Ae3b2758b9b2B394CB227eAE404e1E",
+        "tokenIndex": 113,
         "partner": "free"
       }
     ]
