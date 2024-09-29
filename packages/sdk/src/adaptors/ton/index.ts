@@ -3,7 +3,8 @@ import TonAdaptor from "./TonAdaptor";
 import TonWallet from "./TonWallet";
 import { BigNumber } from 'ethers';
 import { Swap } from '../../Swap';
-import { Address as TonAddress, TupleBuilder } from '@ton/core';
+import { Dictionary, Address as TonAddress, TupleBuilder } from '@ton/core';
+import { memoize } from 'lodash';
 
 export function getWallet(privateKey: string, adaptor: TonAdaptor, Wallet = TonWallet): TonWallet {
   // Notice that TON_PRIVATE_KEY has 64 bytes
@@ -16,9 +17,25 @@ export function getWallet(privateKey: string, adaptor: TonAdaptor, Wallet = TonW
 export function getContract(address: string, abi, adaptor: TonAdaptor) {
   const tokens = (<any>adaptor.client).tokens || {}
 
-  const _getSupportedTokens = async () => {
-    return { tokens: tokens.map(t => t.addr), indexes: tokens.map(t => t.tokenIndex) }
-  }
+  const _getSupportedTokens = memoize(async () => {
+    const supportedTokensResultStack = (await adaptor.client.runMethod(TonAddress.parse(address), 'token_for_index_map')).stack
+    const supportedTokensDict = Dictionary.loadDirect(Dictionary.Keys.BigInt(257), Dictionary.Values.Address(), supportedTokensResultStack.readCell())
+    const indexes: number[] = []
+    const tokens: string[] = []
+    for (let i = 1n; i < 255n; i++) {
+      const tokenAddr = supportedTokensDict.get(i)
+      if (tokenAddr != undefined) {
+        indexes.push(Number(i))
+        tokens.push(tokenAddr.toString())
+      }
+    }
+    return { tokens, indexes }
+  })
+
+
+  // const _getSupportedTokens = async () => {
+  //   return { tokens: tokens.map(t => t.addr), indexes: tokens.map(t => t.tokenIndex) }
+  // }
 
   const _getBalanceOf = async (tokenAddress: TonAddress, userAddress: TonAddress) => {
     let builder = new TupleBuilder()
@@ -85,7 +102,6 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
               // See https://github.com/satoshilabs/slips/blob/master/slip-0044.md?plain=1#L638
               return '0x025f'
             } else if (prop === 'getSupportedTokens') {
-              // return { tokens: ['0x0000000000000000000000000000000000000001'], indexes: [243] }
               return _getSupportedTokens()
             } else if (prop === 'poolTokenBalance') {
               const balance = await adaptor.getBalance(address)

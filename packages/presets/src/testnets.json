@@ -764,7 +764,7 @@
     "id": "ton-testnet",
     "name": "TON Testnet",
     "alias": "TON",
-    "chainId": "ton:testnet",
+    "chainId": "ton:-3",
     "slip44": "0x8000025f",
     "shortSlip44": "0x025f",
     "extensions": [
