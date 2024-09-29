@@ -1,9 +1,8 @@
-import { KeyPair, keyPairFromSecretKey, mnemonicToPrivateKey } from '@ton/crypto'
+import { keyPairFromSecretKey } from '@ton/crypto'
 import TonAdaptor from "./TonAdaptor";
 import TonWallet from "./TonWallet";
 import { BigNumber } from 'ethers';
 import { Swap } from '../../Swap';
-import { Dictionary, TupleBuilder, Contract as TonContract, Address as TonAddress } from '@ton/core';
 
 export function getWallet(privateKey: string, adaptor: TonAdaptor, Wallet = TonWallet): TonWallet {
   // Notice that TON_PRIVATE_KEY has 64 bytes
@@ -13,23 +12,10 @@ export function getWallet(privateKey: string, adaptor: TonAdaptor, Wallet = TonW
   return new Wallet(adaptor, keypair)
 }
 
-
-class MesonLite implements TonContract {
-  readonly address: TonAddress; 
-  private constructor(address: TonAddress) {
-      this.address = address;
-  }
-  static fromAddress(address: TonAddress) {
-      return new MesonLite(address);
-  }
-}
-
 export function getContract(address: string, abi, adaptor: TonAdaptor) {
   const tokens = (<any>adaptor.client).tokens || {}
 
   const _getSupportedTokens = async () => {
-    console.log(tokens)
-    // const tokens = metadata.tokens || []
     return { tokens: tokens.map(t => t.addr), indexes: tokens.map(t => t.tokenIndex) }
   }
 

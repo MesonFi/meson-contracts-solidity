@@ -1,4 +1,4 @@
-import { TonClient, TonClient4 } from '@ton/ton'
+import { TonClient } from '@ton/ton'
 import { Address, CommonMessageInfoInternal, Transaction } from '@ton/core'
 import { BigNumber } from 'ethers'
 

@@ -8,7 +8,7 @@
   },
   "scripts": {
     "compile": "hardhat compile --config hardhat.config.ts",
-    "build": "hardhat chain --testnet goerli && hardhat clean && yarn compile",
+    "build": "hardhat chain --testnet sepolia && hardhat clean && yarn compile",
     "postbuild": "cp artifacts/contracts/Meson.sol/Meson.json packages/contract-abis/abis/Meson.json && cp artifacts/contracts/test/MockToken.sol/MockToken.json packages/contract-abis/abis/ERC20.json",
     "test": "hardhat test",
     "build:packages": "yarn workspace @mesonfi/sdk build && yarn workspace @mesonfi/presets build",
