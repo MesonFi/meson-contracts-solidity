@@ -3,6 +3,7 @@ import TonAdaptor from "./TonAdaptor";
 import TonWallet from "./TonWallet";
 import { BigNumber } from 'ethers';
 import { Swap } from '../../Swap';
+import { Address as TonAddress, TupleBuilder } from '@ton/core';
 
 export function getWallet(privateKey: string, adaptor: TonAdaptor, Wallet = TonWallet): TonWallet {
   // Notice that TON_PRIVATE_KEY has 64 bytes
@@ -17,6 +18,18 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
 
   const _getSupportedTokens = async () => {
     return { tokens: tokens.map(t => t.addr), indexes: tokens.map(t => t.tokenIndex) }
+  }
+
+  const _getBalanceOf = async (tokenAddress: TonAddress, userAddress: TonAddress) => {
+    let builder = new TupleBuilder()
+    builder.writeAddress(userAddress)
+    const userWalletAddress = (await adaptor.client.runMethod(
+      tokenAddress, 'get_wallet_address', builder.build(),
+    )).stack.readAddress()
+    const userWalletData = (await adaptor.client.runMethod(
+      userWalletAddress, 'get_wallet_data'
+    )).stack
+    return userWalletData.readBigNumber()
   }
 
   return new Proxy({}, {
@@ -56,13 +69,13 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
           return async (...args) => {
             // ERC20 like
             if (prop === 'name') {
-              return 'Ton'
+              return 'Mock Ton USD Circle'
             } else if (prop === 'symbol') {
-              return 'TON'
+              return 'USDC'
             } else if (prop === 'decimals') {
               return 9
             } else if (prop === 'balanceOf') {
-              return await adaptor.getBalance(args[0])
+              return await _getBalanceOf(TonAddress.parse(address), TonAddress.parse(args[0]))
             } else if (prop === 'allowance') {
               return BigNumber.from(0)
             }
