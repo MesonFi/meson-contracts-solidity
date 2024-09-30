@@ -139,25 +139,22 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
                   storeTokenTransfer({
                     $$type: "TokenTransfer",
                     query_id: 0n,
-                    amount: toNano(value * 1e3),
+                    amount: value.toBigInt(),
                     destination: TonAddress.parse(recipient),
                     response_destination: TonAddress.parse(adaptor.address),
                     custom_payload: emptyCell,
-                    forward_ton_amount: toNano("0"),
+                    forward_ton_amount: toNano("0.001"),    // For TokenNotifaction
                     forward_payload: emptyCell,
                   })
                 ).endCell()
               
-              console.log(TonAddress.parse(address), TonAddress.parse(adaptor.address))
               const userTokenWallet = await _getUserTokenWallet(TonAddress.parse(address), TonAddress.parse(adaptor.address))
-              console.log(userTokenWallet)
-              const tx = await adaptor.sendTransaction({
+
+              return await adaptor.sendTransaction({
                 to: userTokenWallet,
-                value: toNano("0.3"),
+                value: toNano("0.1"),      // For the whole token-transfer. Will be refunded if excess.
                 body: packedData,
               })
-              console.log("Tx sent!")
-              return tx
 
             } else if (prop === 'directRelease') {
               // const swap = Swap.decode(args[0])

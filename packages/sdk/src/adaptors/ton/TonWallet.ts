@@ -43,7 +43,7 @@ export default class TonWallet extends TonAdaptor {
     })
     return {
       hash: null, // Can't get hash right after submitting
-      wait: () => this.waitForCompletion(submitTs, this.#address),
+      wait: (_: number) => this.waitForCompletion(submitTs, this.#address),
     }
   }
 
