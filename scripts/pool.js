@@ -7,9 +7,9 @@ require('dotenv').config()
 
 const { LP_PRIVATE_KEY } = process.env
 
-const amount = '0.1'
+const amount = '0.002'
 const symbol = 'USDC'
-const addr = 'EQB7MCQfTSe8OPUg4PMNwvs6QcXPSVmzosBy-ajZj-XZMGvx'
+const addr = '0QDC8wdZwFffsiblcanTAn0Wp4Hi7pm0YlXUogaHMbS4XgQj'
 
 module.exports = async function pool(network) {
   const adaptor = getAdaptor(network)
@@ -22,12 +22,29 @@ module.exports = async function pool(network) {
   console.log(`🟩 Block height: ${await mesonInstance.provider.getBlockNumber()}`)
   console.log(`🟩 LP balance: ${await mesonInstance.provider.getBalance(wallet.address)}`)
 
+  let tx
+  tx = await wallet.transfer(addr, "0.1")
+  await tx.wait(); console.log("🟦 Sent!")
+
   // const tx = await deposit(symbol, amount, { network, wallet })
   // const tx = await withdraw(symbol, amount, { network, wallet })
-  const tx = await send(symbol, amount, addr, { network, wallet })
+
+  // tx = await send(symbol, amount, addr, { network, wallet })
+  // await tx.wait(); console.log("🟦 Sent!")
+
   // const tx = await addSupportedTokens(tokens, { network, wallet })
   // const tx = await authorize(addr, { network, wallet })
   // const tx = await transferOwner(addr, { network, wallet })
   // const tx = await withdrawServiceFee(symbol, amount, { network, wallet })
   // console.log(tx)
+
+  // [ ] transfer(native)
+  // [ ] deposit
+  // [ ] withdraw
+  // [ ] send
+  // [ ] addSupportedTokens
+  // [ ] authorize
+  // [ ] transferOwner
+  // [ ] withdrawServiceFee
+
 }

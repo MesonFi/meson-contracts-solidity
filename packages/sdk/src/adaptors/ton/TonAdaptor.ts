@@ -57,7 +57,6 @@ export default class TonAdaptor implements IAdaptor {
     const tonAddr = typeof sender === 'string' ? Address.parse(sender) : sender
     return new Promise((resolve, reject) => {
       const tryGetTransaction = async () => {
-        console.log("   waiting for tx completed on-chain...")
         const tx = (await this.client.getTransactions(tonAddr, { limit: 1 }))[0]
         if (tx.now >= submitTs) {
           clearInterval(h)
@@ -75,13 +74,12 @@ export default class TonAdaptor implements IAdaptor {
     })
   }
 
-
   _wrapTonTx(tx: Transaction) {
     return {
-      from: tx.inMessage.info.src,
-      to: Address.parseRaw('0:' + tx.address.toString(16)),
+      from: tx.outMessages.get(0).info.src,
+      to: tx.outMessages.get(0).info.dest,
       hash: tx.hash().toString('hex'),
-      value: (tx.inMessage.info as CommonMessageInfoInternal).value.coins,
+      value: (tx.outMessages.get(0).info as CommonMessageInfoInternal).value.coins,
       input: tx.inMessage.body,
       timestamp: tx.now,
     }

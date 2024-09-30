@@ -3,14 +3,19 @@ import TonAdaptor from "./TonAdaptor";
 import TonWallet from "./TonWallet";
 import { BigNumber } from 'ethers';
 import { Swap } from '../../Swap';
-import { Dictionary, Address as TonAddress, TupleBuilder } from '@ton/core';
+import { beginCell, Dictionary, Address as TonAddress, toNano, TupleBuilder } from '@ton/core';
 import { memoize } from 'lodash';
+import { storeTokenTransfer } from './types';
 
 export function getWallet(privateKey: string, adaptor: TonAdaptor, Wallet = TonWallet): TonWallet {
   // Notice that TON_PRIVATE_KEY has 64 bytes
-  const derivedKey = privateKey.startsWith('0x') ?
-    privateKey.substring(2) + privateKey.substring(2) : privateKey + privateKey
-  const keypair = keyPairFromSecretKey(Buffer.from(derivedKey, 'hex'))
+  // const derivedKey = privateKey.startsWith('0x') ?
+  //   privateKey.substring(2) + privateKey.substring(2) : privateKey + privateKey
+  privateKey = privateKey.replace(/^0x/, '')
+  if (privateKey.length !== 128) {
+    throw new Error('Invalid private key length')
+  }
+  const keypair = keyPairFromSecretKey(Buffer.from(privateKey, 'hex'))
   return new Wallet(adaptor, keypair)
 }
 
@@ -37,14 +42,17 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
   //   return { tokens: tokens.map(t => t.addr), indexes: tokens.map(t => t.tokenIndex) }
   // }
 
-  const _getBalanceOf = async (tokenAddress: TonAddress, userAddress: TonAddress) => {
+  const _getUserTokenWallet = async (tokenAddress: TonAddress, userAddress: TonAddress) => {
     let builder = new TupleBuilder()
     builder.writeAddress(userAddress)
-    const userWalletAddress = (await adaptor.client.runMethod(
+    return (await adaptor.client.runMethod(
       tokenAddress, 'get_wallet_address', builder.build(),
     )).stack.readAddress()
+  }
+
+  const _getBalanceOf = async (tokenAddress: TonAddress, userAddress: TonAddress) => {
     const userWalletData = (await adaptor.client.runMethod(
-      userWalletAddress, 'get_wallet_data'
+      await _getUserTokenWallet(tokenAddress, userAddress), 'get_wallet_data'
     )).stack
     return userWalletData.readBigNumber()
   }
@@ -58,8 +66,9 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
       } else if (prop === 'signer') {
         if (adaptor instanceof TonWallet) {
           return adaptor
+        } else {
+          throw new Error(`TonContract doesn't have a signer.`)
         }
-        throw new Error(`TonContract doesn't have a signer.`)
       } else if (prop === 'interface') {
         return {
           format: () => abi,
@@ -104,21 +113,54 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
             } else if (prop === 'getSupportedTokens') {
               return _getSupportedTokens()
             } else if (prop === 'poolTokenBalance') {
-              const balance = await adaptor.getBalance(address)
-              return balance.div(1000) // decimals 9 -> 6
+              // const balance = await adaptor.getBalance(address)
+              // return balance.div(1000)  // decimals 9 -> 6
+              throw new Error('TODO: poolTokenBalance not implemented')
             } else if (prop === 'serviceFeeCollected') {
               return BigNumber.from(0)
             }
           }
         } else {
           return async (...args) => {
+            if (!(adaptor instanceof TonWallet)) {
+              throw new Error(`TonContract doesn't have a signer.`)
+            }
+
             let options
             if (args.length > method.inputs.length) {
               options = args.pop()
             }
 
-            const swap = Swap.decode(args[0])
-            if (prop === 'directRelease') {
+            if (prop === 'transfer') {
+              const [recipient, value] = args
+              const emptyCell = beginCell().endCell()
+
+              let packedData = beginCell().store(
+                  storeTokenTransfer({
+                    $$type: "TokenTransfer",
+                    query_id: 0n,
+                    amount: toNano(value * 1e3),
+                    destination: TonAddress.parse(recipient),
+                    response_destination: TonAddress.parse(adaptor.address),
+                    custom_payload: emptyCell,
+                    forward_ton_amount: toNano("0"),
+                    forward_payload: emptyCell,
+                  })
+                ).endCell()
+              
+              console.log(TonAddress.parse(address), TonAddress.parse(adaptor.address))
+              const userTokenWallet = await _getUserTokenWallet(TonAddress.parse(address), TonAddress.parse(adaptor.address))
+              console.log(userTokenWallet)
+              const tx = await adaptor.sendTransaction({
+                to: userTokenWallet,
+                value: toNano("0.3"),
+                body: packedData,
+              })
+              console.log("Tx sent!")
+              return tx
+
+            } else if (prop === 'directRelease') {
+              // const swap = Swap.decode(args[0])
               // const [_encoded, _r, _yParityAndS, _initiator, recipient] = args
               // const swapId = getSwapId(_encoded, _initiator)
               // return await (adaptor as BtcWallet).sendTransaction({
@@ -128,6 +170,7 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
               // })
               throw new Error('TODO: TonContract.directRelease not implemented')
             } else if (prop === 'directExecuteSwap') {
+              // const ? = Swap.decode(args[0])
               // return await (adaptor as BtcWallet).sendTransaction({
               //   to: address,
               //   value: swap.amount.mul(100).toNumber(),

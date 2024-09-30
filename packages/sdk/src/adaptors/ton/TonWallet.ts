@@ -1,5 +1,5 @@
 // import { ethers } from 'ethers'
-import { Address, internal, OpenedContract, Sender, WalletContractV4 } from "@ton/ton";
+import { Address, Cell, internal, OpenedContract, Sender, WalletContractV4 } from "@ton/ton";
 import { KeyPair } from "@ton/crypto";
 import TonAdaptor from "./TonAdaptor";
 
@@ -29,38 +29,23 @@ export default class TonWallet extends TonAdaptor {
     return this.#address.toString()
   }
 
-  async transfer({ to, value }) {
+  async transfer(to: string | Address, value: string | bigint) {
+    return this.sendTransaction({ to, value })
+  }
+
+  async sendTransaction(data: { to: string | Address, value: string | bigint, body?: Cell}) {
     const seqno = await this.#walletContract.getSeqno()
-    const nowTs = Math.floor(Date.now() / 1e3)
+    const submitTs = Math.floor(Date.now() / 1e3)
     await this.#walletContract.sendTransfer({
       seqno,
       secretKey: this.#secretKey,
-      messages: [internal({ to, value })]
+      messages: [internal(data)]
     })
-    return await this.waitForCompletion(nowTs, this.#address)
+    return {
+      hash: null, // Can't get hash right after submitting
+      wait: () => this.waitForCompletion(submitTs, this.#address),
+    }
   }
 
-  // async sendTransaction(payload, overrides) {
-  //   if (!payload.contract) {
-  //     return await this.transfer(payload)
-  //   }
-  //   const { contract, method, args } = payload
-  //   const hash = await contract[method](...args).send(overrides)
-  //   return {
-  //     hash,
-  //     wait: (confirmations: number) => this.waitForTransaction(hash, confirmations)
-  //   }
-  // }
-
   // async deploy() {}
-
-  // async getTransaction(hash: string): Promise<any> {
-  //   while (true) {
-  //     try {
-  //       return await this.send('eth_getTransactionByHash', [hash])
-  //     } catch {
-  //       await new Promise(resolve => setTimeout(resolve, 1000))
-  //     }
-  //   }
-  // }
 }
