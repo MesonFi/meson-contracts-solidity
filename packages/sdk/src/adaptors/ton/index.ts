@@ -5,7 +5,7 @@ import { BigNumber } from 'ethers';
 import { Swap } from '../../Swap';
 import { beginCell, Dictionary, Address as TonAddress, toNano, TupleBuilder } from '@ton/core';
 import { memoize } from 'lodash';
-import { storeTokenTransfer } from './types';
+import { storeModifySupportToken, storeTokenTransfer } from './types';
 
 export function getWallet(privateKey: string, adaptor: TonAdaptor, Wallet = TonWallet): TonWallet {
   // Notice that TON_PRIVATE_KEY has 64 bytes
@@ -42,7 +42,7 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
   //   return { tokens: tokens.map(t => t.addr), indexes: tokens.map(t => t.tokenIndex) }
   // }
 
-  const _getUserTokenWallet = async (tokenAddress: TonAddress, userAddress: TonAddress) => {
+  const _getTokenWalletAddress = async (tokenAddress: TonAddress, userAddress: TonAddress) => {
     let builder = new TupleBuilder()
     builder.writeAddress(userAddress)
     return (await adaptor.client.runMethod(
@@ -52,7 +52,7 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
 
   const _getBalanceOf = async (tokenAddress: TonAddress, userAddress: TonAddress) => {
     const userWalletData = (await adaptor.client.runMethod(
-      await _getUserTokenWallet(tokenAddress, userAddress), 'get_wallet_data'
+      await _getTokenWalletAddress(tokenAddress, userAddress), 'get_wallet_data'
     )).stack
     return userWalletData.readBigNumber()
   }
@@ -148,13 +148,34 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
                   })
                 ).endCell()
               
-              const userTokenWallet = await _getUserTokenWallet(TonAddress.parse(address), TonAddress.parse(adaptor.address))
+              const userTokenWalletAddress = await _getTokenWalletAddress(TonAddress.parse(address), TonAddress.parse(adaptor.address))
 
               return await adaptor.sendTransaction({
-                to: userTokenWallet,
+                to: userTokenWalletAddress,
                 value: toNano("0.1"),      // For the whole token-transfer. Will be refunded if excess.
                 body: packedData,
               })
+
+            } else if (prop === 'addSupportToken') {
+              const [tokenAddress, tokenIndex] = args
+
+              const mesonTokenWalletAddress = await _getTokenWalletAddress(TonAddress.parse(tokenAddress), TonAddress.parse(address))
+
+              let packedData = beginCell().store(
+                  storeModifySupportToken({
+                    $$type: "ModifySupportToken",
+                    available: true,
+                    token_index: BigInt(tokenIndex),
+                    token_master_address: TonAddress.parse(tokenAddress),
+                    meson_wallet_address: mesonTokenWalletAddress,
+                  })
+                ).endCell()
+              
+                return await adaptor.sendTransaction({
+                  to: address,
+                  value: toNano("0.1"), 
+                  body: packedData,
+                })
 
             } else if (prop === 'directRelease') {
               // const swap = Swap.decode(args[0])

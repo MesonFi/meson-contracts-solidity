@@ -30,10 +30,12 @@ module.exports = async function pool(network) {
   // const tx = await deposit(symbol, amount, { network, wallet })
   // const tx = await withdraw(symbol, amount, { network, wallet })
 
-  tx = await send(symbol, amount, addr, { network, wallet })
-  await tx.wait(); console.log(`🟦 Transfer ${amount} ${symbol} success!`)
+  // tx = await send(symbol, amount, addr, { network, wallet })
+  // await tx.wait(); console.log(`🟦 Transfer ${amount} ${symbol} success!`)
 
-  // const tx = await addSupportedTokens(tokens, { network, wallet })
+  // tx = await addSupportedTokens([{addr: 'kQAOWCl4SQWu9gk81yIliNlwIemGPU-xbhUK6fq4uAcM3Rk6', tokenIndex: 1}], { network, wallet })
+  // await tx.wait(); console.log(`🟦 Add supported tokens success!`)
+
   // const tx = await authorize(addr, { network, wallet })
   // const tx = await transferOwner(addr, { network, wallet })
   // const tx = await withdrawServiceFee(symbol, amount, { network, wallet })
@@ -43,7 +45,7 @@ module.exports = async function pool(network) {
   // [ ] deposit
   // [ ] withdraw
   // [✅] send token
-  // [ ] addSupportedTokens
+  // [✅] addSupportedTokens
   // [ ] authorize
   // [ ] transferOwner
   // [ ] withdrawServiceFee

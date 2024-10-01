@@ -24,3 +24,22 @@ export function storeTokenTransfer(src: TokenTransfer) {
       b_0.storeBuilder(src.forward_payload.asBuilder());
   };
 }
+
+export type ModifySupportToken = {
+  $$type: 'ModifySupportToken';
+  available: boolean;
+  token_index: bigint;
+  token_master_address: Address;
+  meson_wallet_address: Address;
+}
+
+export function storeModifySupportToken(src: ModifySupportToken) {
+  return (builder: Builder) => {
+      let b_0 = builder;
+      b_0.storeUint(613687068, 32);
+      b_0.storeBit(src.available);
+      b_0.storeUint(src.token_index, 8);
+      b_0.storeAddress(src.token_master_address);
+      b_0.storeAddress(src.meson_wallet_address);
+  };
+}
