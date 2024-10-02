@@ -1,7 +1,7 @@
 import { keyPairFromSecretKey } from '@ton/crypto'
 import TonAdaptor from "./TonAdaptor";
 import TonWallet from "./TonWallet";
-import { BigNumber } from 'ethers';
+import { BigNumber, BigNumberish } from 'ethers';
 import { Swap } from '../../Swap';
 import { beginCell, Dictionary, Address as TonAddress, toNano, TupleBuilder } from '@ton/core';
 import { memoize } from 'lodash';
@@ -62,19 +62,17 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
     return userWalletData.readBigNumber()
   }
 
-  const _buildTransfer = async (tokenAddress: string, sender: string, recipient: string, value: BigNumber, forwardTonAmount: string, encodedSwap?: string) => {
-    const emptyCell = beginCell().endCell()
-    encodedSwap = encodedSwap.startsWith('0x') ? encodedSwap : '0x' + encodedSwap
-    if (encodedSwap.length != 66) throw new Error('Invalid encoded swap length')
+  const _buildTransfer = async (tokenAddress: string, sender: string, recipient: string, value: BigNumberish, forwardTonAmount: string, encodedSwap?: bigint) => {
     let packedData = beginCell().store(storeTokenTransfer({
       $$type: "TokenTransfer",
       query_id: 0n,
-      amount: value.toBigInt(),
+      amount: BigNumber.from(value).toBigInt(),
       destination: TonAddress.parse(recipient),
       response_destination: TonAddress.parse(sender),
-      custom_payload: emptyCell,
+      custom_payload: beginCell().endCell(),
       forward_ton_amount: toNano(forwardTonAmount),    // For token-notification.
-      forward_payload: encodedSwap ? beginCell().storeInt(BigInt(encodedSwap), 256).endCell() : emptyCell,
+      forward_payload: encodedSwap ? 
+        beginCell().storeInt(encodedSwap, 256).endCell() : beginCell().storeMaybeInt(null, 1).endCell(),
     })).endCell()
     const userTokenWalletAddress = await _getTokenWalletAddress(TonAddress.parse(tokenAddress), TonAddress.parse(sender))
 
@@ -125,9 +123,9 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
             if (prop === 'name') {
               return 'Mock Ton USD Circle'
             } else if (prop === 'symbol') {
-              return 'USDC'
+              return 'mUSDC'
             } else if (prop === 'decimals') {
-              return 9
+              return 6
             } else if (prop === 'balanceOf') {
               return await _getBalanceOf(TonAddress.parse(address), TonAddress.parse(args[0]))
             } else if (prop === 'allowance') {
@@ -189,7 +187,6 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
 
             } else if (['depositAndRegister', 'deposit'].includes(prop)) {
               let [value, fakePoolTokenIndex] = args
-              value = BigNumber.from(value * 1e3)     // Decimals 6 -> 9
               const tokenIndex = BigNumber.from(fakePoolTokenIndex).shr(40).toNumber()
               const tokenAddress = await _getTokenAddress(tokenIndex)
 
@@ -201,11 +198,9 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
 
             } else if (prop === 'withdraw') {
               let [value, fakePoolTokenIndex] = args
-              value = BigNumber.from(value * 1e3)     // Decimals 6 -> 9
               const tokenIndex = BigNumber.from(fakePoolTokenIndex).shr(40).toNumber()
               const tokenAddress = await _getTokenAddress(tokenIndex)
               const mesonTokenWalletAddress = await _getTokenWalletAddress(TonAddress.parse(tokenAddress), TonAddress.parse(address))
-              const emptyCell = beginCell().endCell()
 
               let packedData = beginCell().store(storeProxyTokenTransfer({
                 $$type: "ProxyTokenTransfer",
@@ -213,12 +208,12 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
                 token_transfer: {
                   $$type: "TokenTransfer",
                   query_id: 0n,
-                  amount: value.toBigInt(),
+                  amount: BigInt(value),
                   destination: TonAddress.parse(adaptor.address),
                   response_destination: TonAddress.parse(adaptor.address),
-                  custom_payload: emptyCell,
+                  custom_payload: beginCell().endCell(),
                   forward_ton_amount: toNano("0.001"),
-                  forward_payload: emptyCell,
+                  forward_payload: beginCell().storeMaybeInt(null, 1).endCell(),
                 }
               })).endCell()
 
@@ -230,10 +225,8 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
 
             } else if (prop === 'directRelease') {
               let [swapId, recipient, tokenIndex, value] = args
-              value = BigNumber.from(value * 1e3)     // Decimals 6 -> 9
               const tokenAddress = await _getTokenAddress(tokenIndex)
               const mesonTokenWalletAddress = await _getTokenWalletAddress(TonAddress.parse(tokenAddress), TonAddress.parse(address))
-              const emptyCell = beginCell().endCell()
 
               let packedData = beginCell().store(storeProxyTokenTransferWithSwapid({
                 $$type: "ProxyTokenTransferWithSwapid",
@@ -242,12 +235,12 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
                 token_transfer: {
                   $$type: "TokenTransfer",
                   query_id: 0n,
-                  amount: value.toBigInt(),
+                  amount: BigInt(value),
                   destination: TonAddress.parse(recipient),
                   response_destination: TonAddress.parse(adaptor.address),
-                  custom_payload: emptyCell,
+                  custom_payload: beginCell().endCell(),
                   forward_ton_amount: toNano("0.001"),
-                  forward_payload: emptyCell,
+                  forward_payload: beginCell().storeMaybeInt(null, 1).endCell(),
                 }
               })).endCell()
 
@@ -259,7 +252,7 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
 
             } else if (prop === 'directExecuteSwap') {
               let [encoded, tokenIndex, value] = args
-              value = BigNumber.from(value * 1e3)     // Decimals 6 -> 9
+              encoded = encoded.startsWith('0x') ? BigInt(encoded) : BigInt('0x' + encoded)
               const tokenAddress = await _getTokenAddress(tokenIndex)
 
               const txData = await _buildTransfer(

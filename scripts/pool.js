@@ -27,24 +27,24 @@ module.exports = async function pool(network) {
   // tx = await wallet.transfer(addr, "0.1")
   // await tx.wait(); console.log("🟦 Transfer (native) success!")
 
-  // tx = await deposit(symbol, amount, { network, wallet })
-  // await tx.wait(); console.log(`🟦 Deposit ${amount} ${symbol} success!`)
+  // tx = await addSupportedTokens([{addr: 'kQCuEuPPIiD3ngKC0JqtCaeS5ob6C9_fC3EkW8gWWums5GNJ', tokenIndex: 1}], { network, wallet })
+  // await tx.wait(); console.log(`🟦 Add supported tokens success!`)
 
-  // tx = await withdraw(symbol, amount, { network, wallet })
-  // await tx.wait(); console.log(`🟦 Withdraw ${amount} ${symbol} success!`)
+  // tx = await deposit('USDC', '10', { network, wallet })
+  // await tx.wait(); console.log(`🟦 Deposit success!`)
+
+  // tx = await withdraw('USDC', '3', { network, wallet })
+  // await tx.wait(); console.log(`🟦 Withdraw success!`)
 
   // tx = await send(symbol, amount, addr, { network, wallet })
   // await tx.wait(); console.log(`🟦 Transfer ${amount} ${symbol} success!`)
-
-  // tx = await addSupportedTokens([{addr: 'kQAOWCl4SQWu9gk81yIliNlwIemGPU-xbhUK6fq4uAcM3Rk6', tokenIndex: 1}], { network, wallet })
-  // await tx.wait(); console.log(`🟦 Add supported tokens success!`)
 
   // const swapId = '0x000000000000000000000000000000000000000000000000000000000000dead'
   // tx = await mesonInstance.directRelease(swapId, "EQDC8wdZwFffsiblcanTAn0Wp4Hi7pm0YlXUogaHMbS4XuJs", 1, MesonClient.toSwapValue(amount))
   // await tx.wait(); console.log(`🟦 Direct release success!`)
 
-  // const encoded = '0x000003938700000000000000000000000000000000000000000000000000cafe'
-  // tx = await mesonInstance.directExecuteSwap(encoded, 1, MesonClient.toSwapValue(amount))
+  // const encoded = '0x00000000ea60000000000000000000000000000000000000000000000000cafe'
+  // tx = await mesonInstance.directExecuteSwap(encoded, 1, MesonClient.toSwapValue('0.06'))   // 60000 -> 0x000000ea60
   // await tx.wait(); console.log(`🟦 Direct execute-swap success!`)
 
   // tx = await authorize(addr, { network, wallet })
