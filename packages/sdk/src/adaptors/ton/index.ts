@@ -5,7 +5,7 @@ import { BigNumber } from 'ethers';
 import { Swap } from '../../Swap';
 import { beginCell, Dictionary, Address as TonAddress, toNano, TupleBuilder } from '@ton/core';
 import { memoize } from 'lodash';
-import { storeModifySupportToken, storeProxyTokenTransfer, storeTokenTransfer } from './types';
+import { storeModifySupportToken, storeProxyTokenTransfer, storeProxyTokenTransferWithSwapid, storeTokenTransfer } from './types';
 import { parseEther, recoverPublicKey } from 'ethers/lib/utils';
 
 export function getWallet(privateKey: string, adaptor: TonAdaptor, Wallet = TonWallet): TonWallet {
@@ -62,8 +62,10 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
     return userWalletData.readBigNumber()
   }
 
-  const _buildTransfer = async (tokenAddress: string, sender: string, recipient: string, value: BigNumber, forwardTonAmount: string) => {
+  const _buildTransfer = async (tokenAddress: string, sender: string, recipient: string, value: BigNumber, forwardTonAmount: string, encodedSwap?: string) => {
     const emptyCell = beginCell().endCell()
+    encodedSwap = encodedSwap.startsWith('0x') ? encodedSwap : '0x' + encodedSwap
+    if (encodedSwap.length != 66) throw new Error('Invalid encoded swap length')
     let packedData = beginCell().store(storeTokenTransfer({
       $$type: "TokenTransfer",
       query_id: 0n,
@@ -72,7 +74,7 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
       response_destination: TonAddress.parse(sender),
       custom_payload: emptyCell,
       forward_ton_amount: toNano(forwardTonAmount),    // For token-notification.
-      forward_payload: emptyCell,
+      forward_payload: encodedSwap ? beginCell().storeInt(BigInt(encodedSwap), 256).endCell() : emptyCell,
     })).endCell()
     const userTokenWalletAddress = await _getTokenWalletAddress(TonAddress.parse(tokenAddress), TonAddress.parse(sender))
 
@@ -187,19 +189,19 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
 
             } else if (['depositAndRegister', 'deposit'].includes(prop)) {
               let [value, fakePoolTokenIndex] = args
-              value = value * 1e3     // Decimals 6 -> 9
+              value = BigNumber.from(value * 1e3)     // Decimals 6 -> 9
               const tokenIndex = BigNumber.from(fakePoolTokenIndex).shr(40).toNumber()
               const tokenAddress = await _getTokenAddress(tokenIndex)
 
               const txData = await _buildTransfer(
-                tokenAddress, adaptor.address, address, BigNumber.from(value),
+                tokenAddress, adaptor.address, address, value,
                 "0",  // No need to notify the meson contract when depositing.
               )
               return await adaptor.sendTransaction(txData)
 
             } else if (prop === 'withdraw') {
               let [value, fakePoolTokenIndex] = args
-              value = value * 1e3     // Decimals 6 -> 9
+              value = BigNumber.from(value * 1e3)     // Decimals 6 -> 9
               const tokenIndex = BigNumber.from(fakePoolTokenIndex).shr(40).toNumber()
               const tokenAddress = await _getTokenAddress(tokenIndex)
               const mesonTokenWalletAddress = await _getTokenWalletAddress(TonAddress.parse(tokenAddress), TonAddress.parse(address))
@@ -211,7 +213,7 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
                 token_transfer: {
                   $$type: "TokenTransfer",
                   query_id: 0n,
-                  amount: BigNumber.from(value).toBigInt(),
+                  amount: value.toBigInt(),
                   destination: TonAddress.parse(adaptor.address),
                   response_destination: TonAddress.parse(adaptor.address),
                   custom_payload: emptyCell,
@@ -227,22 +229,46 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
               })
 
             } else if (prop === 'directRelease') {
-              // const swap = Swap.decode(args[0])
-              // const [_encoded, _r, _yParityAndS, _initiator, recipient] = args
-              // const swapId = getSwapId(_encoded, _initiator)
-              // return await (adaptor as BtcWallet).sendTransaction({
-              //   swapId,
-              //   to: recipient,
-              //   value: swap.amount.sub(swap.fee).mul(100).toNumber(),
-              // })
-              throw new Error('TODO: TonContract.directRelease not implemented')
+              let [swapId, recipient, tokenIndex, value] = args
+              value = BigNumber.from(value * 1e3)     // Decimals 6 -> 9
+              const tokenAddress = await _getTokenAddress(tokenIndex)
+              const mesonTokenWalletAddress = await _getTokenWalletAddress(TonAddress.parse(tokenAddress), TonAddress.parse(address))
+              const emptyCell = beginCell().endCell()
+
+              let packedData = beginCell().store(storeProxyTokenTransferWithSwapid({
+                $$type: "ProxyTokenTransferWithSwapid",
+                swapid: BigInt(swapId),
+                wallet_address: mesonTokenWalletAddress,
+                token_transfer: {
+                  $$type: "TokenTransfer",
+                  query_id: 0n,
+                  amount: value.toBigInt(),
+                  destination: TonAddress.parse(recipient),
+                  response_destination: TonAddress.parse(adaptor.address),
+                  custom_payload: emptyCell,
+                  forward_ton_amount: toNano("0.001"),
+                  forward_payload: emptyCell,
+                }
+              })).endCell()
+
+              return await adaptor.sendTransaction({
+                to: address,
+                value: toNano("0.1"),
+                body: packedData,
+              })
+
             } else if (prop === 'directExecuteSwap') {
-              // const ? = Swap.decode(args[0])
-              // return await (adaptor as BtcWallet).sendTransaction({
-              //   to: address,
-              //   value: swap.amount.mul(100).toNumber(),
-              // })
-              throw new Error('TODO: TonContract.directExecuteSwap not implemented')
+              let [encoded, tokenIndex, value] = args
+              value = BigNumber.from(value * 1e3)     // Decimals 6 -> 9
+              const tokenAddress = await _getTokenAddress(tokenIndex)
+
+              const txData = await _buildTransfer(
+                tokenAddress, adaptor.address, address, value,
+                "0.1",  // Gas for sending back when encoded-swap duplicated.
+                encoded,
+              )
+              return await adaptor.sendTransaction(txData)
+
             } else {
               throw new Error(`Method ${prop} is not implemented.`)
             }

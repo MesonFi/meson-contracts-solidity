@@ -42,6 +42,25 @@ export function storeProxyTokenTransfer(src: ProxyTokenTransfer) {
   };
 }
 
+export type ProxyTokenTransferWithSwapid = {
+  $$type: 'ProxyTokenTransferWithSwapid';
+  swapid: bigint;
+  wallet_address: Address;
+  token_transfer: TokenTransfer;
+}
+
+export function storeProxyTokenTransferWithSwapid(src: ProxyTokenTransferWithSwapid) {
+  return (builder: Builder) => {
+      let b_0 = builder;
+      b_0.storeUint(2737718375, 32);
+      b_0.storeUint(src.swapid, 256);
+      b_0.storeAddress(src.wallet_address);
+      let b_1 = new Builder();
+      b_1.store(storeTokenTransfer(src.token_transfer));
+      b_0.storeRef(b_1.endCell());
+  };
+}
+
 export type ModifySupportToken = {
   $$type: 'ModifySupportToken';
   available: boolean;

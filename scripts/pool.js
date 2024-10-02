@@ -1,4 +1,4 @@
-const { adaptors } = require('@mesonfi/sdk')
+const { adaptors, MesonClient } = require('@mesonfi/sdk')
 const { Meson } = require('@mesonfi/contract-abis')
 const { getAdaptor } = require('./lib/getAdaptor')
 const { addSupportedTokens, deposit, withdraw, send, authorize, transferOwner, withdrawServiceFee } = require('./lib/pool')
@@ -39,6 +39,14 @@ module.exports = async function pool(network) {
   // tx = await addSupportedTokens([{addr: 'kQAOWCl4SQWu9gk81yIliNlwIemGPU-xbhUK6fq4uAcM3Rk6', tokenIndex: 1}], { network, wallet })
   // await tx.wait(); console.log(`🟦 Add supported tokens success!`)
 
+  // const swapId = '0x000000000000000000000000000000000000000000000000000000000000dead'
+  // tx = await mesonInstance.directRelease(swapId, "EQDC8wdZwFffsiblcanTAn0Wp4Hi7pm0YlXUogaHMbS4XuJs", 1, MesonClient.toSwapValue(amount))
+  // await tx.wait(); console.log(`🟦 Direct release success!`)
+
+  // const encoded = '0x000003938700000000000000000000000000000000000000000000000000cafe'
+  // tx = await mesonInstance.directExecuteSwap(encoded, 1, MesonClient.toSwapValue(amount))
+  // await tx.wait(); console.log(`🟦 Direct execute-swap success!`)
+
   // tx = await authorize(addr, { network, wallet })
   // tx = await transferOwner(addr, { network, wallet })
   // tx = await withdrawServiceFee(symbol, amount, { network, wallet })
@@ -48,8 +56,8 @@ module.exports = async function pool(network) {
   // [✅] withdraw
   // [✅] send token
   // [✅] addSupportedTokens
-  // [ ] directExecute
-  // [ ] directRelease
+  // [✅] directRelease
+  // [✅] directExecute
   // [❌] authorize
   // [❌] transferOwner
   // [❌] withdrawServiceFee
