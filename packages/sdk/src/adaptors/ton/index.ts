@@ -5,7 +5,8 @@ import { BigNumber } from 'ethers';
 import { Swap } from '../../Swap';
 import { beginCell, Dictionary, Address as TonAddress, toNano, TupleBuilder } from '@ton/core';
 import { memoize } from 'lodash';
-import { storeModifySupportToken, storeTokenTransfer } from './types';
+import { storeModifySupportToken, storeProxyTokenTransfer, storeTokenTransfer } from './types';
+import { parseEther, recoverPublicKey } from 'ethers/lib/utils';
 
 export function getWallet(privateKey: string, adaptor: TonAdaptor, Wallet = TonWallet): TonWallet {
   // Notice that TON_PRIVATE_KEY has 64 bytes
@@ -19,8 +20,8 @@ export function getWallet(privateKey: string, adaptor: TonAdaptor, Wallet = TonW
   return new Wallet(adaptor, keypair)
 }
 
+
 export function getContract(address: string, abi, adaptor: TonAdaptor) {
-  const tokens = (<any>adaptor.client).tokens || {}
 
   const _getSupportedTokens = memoize(async () => {
     const supportedTokensResultStack = (await adaptor.client.runMethod(TonAddress.parse(address), 'token_for_index_map')).stack
@@ -28,19 +29,23 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
     const indexes: number[] = []
     const tokens: string[] = []
     for (let i = 1n; i < 255n; i++) {
-      const tokenAddr = supportedTokensDict.get(i)
-      if (tokenAddr != undefined) {
+      const tokenAddress = supportedTokensDict.get(i)
+      if (tokenAddress != undefined) {
         indexes.push(Number(i))
-        tokens.push(tokenAddr.toString())
+        tokens.push(tokenAddress.toString())
       }
     }
     return { tokens, indexes }
   })
 
-
-  // const _getSupportedTokens = async () => {
-  //   return { tokens: tokens.map(t => t.addr), indexes: tokens.map(t => t.tokenIndex) }
-  // }
+  const _getTokenAddress = async (tokenIndex: number) => {
+    const { tokens, indexes } = await _getSupportedTokens()
+    const i = indexes.findIndex(i => i === tokenIndex)
+    if (i === -1) {
+      throw new Error(`Token index ${tokenIndex} not found.`)
+    }
+    return tokens[i]
+  }
 
   const _getTokenWalletAddress = async (tokenAddress: TonAddress, userAddress: TonAddress) => {
     let builder = new TupleBuilder()
@@ -55,6 +60,27 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
       await _getTokenWalletAddress(tokenAddress, userAddress), 'get_wallet_data'
     )).stack
     return userWalletData.readBigNumber()
+  }
+
+  const _buildTransfer = async (tokenAddress: string, sender: string, recipient: string, value: BigNumber, forwardTonAmount: string) => {
+    const emptyCell = beginCell().endCell()
+    let packedData = beginCell().store(storeTokenTransfer({
+      $$type: "TokenTransfer",
+      query_id: 0n,
+      amount: value.toBigInt(),
+      destination: TonAddress.parse(recipient),
+      response_destination: TonAddress.parse(sender),
+      custom_payload: emptyCell,
+      forward_ton_amount: toNano(forwardTonAmount),    // For token-notification.
+      forward_payload: emptyCell,
+    })).endCell()
+    const userTokenWalletAddress = await _getTokenWalletAddress(TonAddress.parse(tokenAddress), TonAddress.parse(sender))
+
+    return {
+      to: userTokenWalletAddress,
+      value: toNano("0.1") + toNano(forwardTonAmount),      // For the whole token-transfer. Will be refunded if excess.
+      body: packedData,
+    }
   }
 
   return new Proxy({}, {
@@ -103,7 +129,7 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
             } else if (prop === 'balanceOf') {
               return await _getBalanceOf(TonAddress.parse(address), TonAddress.parse(args[0]))
             } else if (prop === 'allowance') {
-              return BigNumber.from(0)
+              return parseEther('1000000000')
             }
 
             // Meson
@@ -116,6 +142,8 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
               // const balance = await adaptor.getBalance(address)
               // return balance.div(1000)  // decimals 9 -> 6
               throw new Error('TODO: poolTokenBalance not implemented')
+            } else if (prop === 'poolOfAuthorizedAddr') {
+              return 0
             } else if (prop === 'serviceFeeCollected') {
               return BigNumber.from(0)
             }
@@ -133,49 +161,70 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
 
             if (prop === 'transfer') {
               const [recipient, value] = args
-              const emptyCell = beginCell().endCell()
-
-              let packedData = beginCell().store(
-                  storeTokenTransfer({
-                    $$type: "TokenTransfer",
-                    query_id: 0n,
-                    amount: value.toBigInt(),
-                    destination: TonAddress.parse(recipient),
-                    response_destination: TonAddress.parse(adaptor.address),
-                    custom_payload: emptyCell,
-                    forward_ton_amount: toNano("0.001"),    // For TokenNotifaction
-                    forward_payload: emptyCell,
-                  })
-                ).endCell()
-              
-              const userTokenWalletAddress = await _getTokenWalletAddress(TonAddress.parse(address), TonAddress.parse(adaptor.address))
-
-              return await adaptor.sendTransaction({
-                to: userTokenWalletAddress,
-                value: toNano("0.1"),      // For the whole token-transfer. Will be refunded if excess.
-                body: packedData,
-              })
+              const txData = await _buildTransfer(
+                address, adaptor.address, recipient, value,
+                "0.001",  // For notification to normal recipient.
+              )
+              return await adaptor.sendTransaction(txData)
 
             } else if (prop === 'addSupportToken') {
               const [tokenAddress, tokenIndex] = args
-
               const mesonTokenWalletAddress = await _getTokenWalletAddress(TonAddress.parse(tokenAddress), TonAddress.parse(address))
 
-              let packedData = beginCell().store(
-                  storeModifySupportToken({
-                    $$type: "ModifySupportToken",
-                    available: true,
-                    token_index: BigInt(tokenIndex),
-                    token_master_address: TonAddress.parse(tokenAddress),
-                    meson_wallet_address: mesonTokenWalletAddress,
-                  })
-                ).endCell()
-              
-                return await adaptor.sendTransaction({
-                  to: address,
-                  value: toNano("0.1"), 
-                  body: packedData,
-                })
+              let packedData = beginCell().store(storeModifySupportToken({
+                $$type: "ModifySupportToken",
+                available: true,
+                token_index: BigInt(tokenIndex),
+                token_master_address: TonAddress.parse(tokenAddress),
+                meson_wallet_address: mesonTokenWalletAddress,
+              })).endCell()
+
+              return await adaptor.sendTransaction({
+                to: address,
+                value: toNano("0.1"),
+                body: packedData,
+              })
+
+            } else if (['depositAndRegister', 'deposit'].includes(prop)) {
+              let [value, fakePoolTokenIndex] = args
+              value = value * 1e3     // Decimals 6 -> 9
+              const tokenIndex = BigNumber.from(fakePoolTokenIndex).shr(40).toNumber()
+              const tokenAddress = await _getTokenAddress(tokenIndex)
+
+              const txData = await _buildTransfer(
+                tokenAddress, adaptor.address, address, BigNumber.from(value),
+                "0",  // No need to notify the meson contract when depositing.
+              )
+              return await adaptor.sendTransaction(txData)
+
+            } else if (prop === 'withdraw') {
+              let [value, fakePoolTokenIndex] = args
+              value = value * 1e3     // Decimals 6 -> 9
+              const tokenIndex = BigNumber.from(fakePoolTokenIndex).shr(40).toNumber()
+              const tokenAddress = await _getTokenAddress(tokenIndex)
+              const mesonTokenWalletAddress = await _getTokenWalletAddress(TonAddress.parse(tokenAddress), TonAddress.parse(address))
+              const emptyCell = beginCell().endCell()
+
+              let packedData = beginCell().store(storeProxyTokenTransfer({
+                $$type: "ProxyTokenTransfer",
+                wallet_address: mesonTokenWalletAddress,
+                token_transfer: {
+                  $$type: "TokenTransfer",
+                  query_id: 0n,
+                  amount: BigNumber.from(value).toBigInt(),
+                  destination: TonAddress.parse(adaptor.address),
+                  response_destination: TonAddress.parse(adaptor.address),
+                  custom_payload: emptyCell,
+                  forward_ton_amount: toNano("0.001"),
+                  forward_payload: emptyCell,
+                }
+              })).endCell()
+
+              return await adaptor.sendTransaction({
+                to: address,
+                value: toNano("0.1"),
+                body: packedData,
+              })
 
             } else if (prop === 'directRelease') {
               // const swap = Swap.decode(args[0])

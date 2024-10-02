@@ -7,7 +7,7 @@ require('dotenv').config()
 
 const { LP_PRIVATE_KEY } = process.env
 
-const amount = '0.032'
+const amount = '0.06'
 const symbol = 'USDC'
 const addr = '0QDC8wdZwFffsiblcanTAn0Wp4Hi7pm0YlXUogaHMbS4XgQj'
 
@@ -27,8 +27,11 @@ module.exports = async function pool(network) {
   // tx = await wallet.transfer(addr, "0.1")
   // await tx.wait(); console.log("🟦 Transfer (native) success!")
 
-  // const tx = await deposit(symbol, amount, { network, wallet })
-  // const tx = await withdraw(symbol, amount, { network, wallet })
+  // tx = await deposit(symbol, amount, { network, wallet })
+  // await tx.wait(); console.log(`🟦 Deposit ${amount} ${symbol} success!`)
+
+  // tx = await withdraw(symbol, amount, { network, wallet })
+  // await tx.wait(); console.log(`🟦 Withdraw ${amount} ${symbol} success!`)
 
   // tx = await send(symbol, amount, addr, { network, wallet })
   // await tx.wait(); console.log(`🟦 Transfer ${amount} ${symbol} success!`)
@@ -36,18 +39,19 @@ module.exports = async function pool(network) {
   // tx = await addSupportedTokens([{addr: 'kQAOWCl4SQWu9gk81yIliNlwIemGPU-xbhUK6fq4uAcM3Rk6', tokenIndex: 1}], { network, wallet })
   // await tx.wait(); console.log(`🟦 Add supported tokens success!`)
 
-  // const tx = await authorize(addr, { network, wallet })
-  // const tx = await transferOwner(addr, { network, wallet })
-  // const tx = await withdrawServiceFee(symbol, amount, { network, wallet })
-  // console.log(tx)
+  // tx = await authorize(addr, { network, wallet })
+  // tx = await transferOwner(addr, { network, wallet })
+  // tx = await withdrawServiceFee(symbol, amount, { network, wallet })
 
   // [✅] transfer(native)
-  // [ ] deposit
-  // [ ] withdraw
+  // [✅] deposit
+  // [✅] withdraw
   // [✅] send token
   // [✅] addSupportedTokens
-  // [ ] authorize
-  // [ ] transferOwner
-  // [ ] withdrawServiceFee
+  // [ ] directExecute
+  // [ ] directRelease
+  // [❌] authorize
+  // [❌] transferOwner
+  // [❌] withdrawServiceFee
 
 }
