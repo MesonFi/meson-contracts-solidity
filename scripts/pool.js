@@ -45,7 +45,10 @@ module.exports = async function pool(network) {
 
   // const encoded = '0x00000000ea60000000000000000000000000000000000000000000000000cafe'
   // tx = await mesonInstance.directExecuteSwap(encoded, 1, MesonClient.toSwapValue('0.06'))   // 60000 -> 0x000000ea60
-  // await tx.wait(); console.log(`🟦 Direct execute-swap success!`)
+  // await tx.wait(); console.log(`🟦 Direct execute-swap success (expected failure)!`)
+
+  // tx = await mesonInstance.directExecuteSwap(encoded, 1, MesonClient.toSwapValue('0.06'))
+  // await tx.wait(); console.log(`🟦 Direct execute-swap 2nd times (expected refunding)!`)
 
   // tx = await authorize(addr, { network, wallet })
   // tx = await transferOwner(addr, { network, wallet })
