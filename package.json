@@ -14,7 +14,6 @@
     "build:packages": "yarn workspace @mesonfi/sdk build && yarn workspace @mesonfi/presets build",
     "estimate": "hardhat estimate --upgradable true",
     "docgen": "solidity-docgen --solc-module solc -t ./templates",
-    "testnet:goerli": "hardhat deploy --testnet goerli --upgradable true",
     "testnet:sepolia": "hardhat deploy --testnet sepolia --upgradable true",
     "testnet:bnb": "hardhat deploy --testnet bnb --upgradable true",
     "testnet:polygon": "hardhat deploy --testnet polygon --upgradable true",
