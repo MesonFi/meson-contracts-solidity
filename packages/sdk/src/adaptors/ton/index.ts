@@ -22,6 +22,8 @@ export function getWallet(privateKey: string, adaptor: TonAdaptor, Wallet = TonW
 
 
 export function getContract(address: string, abi, adaptor: TonAdaptor) {
+  const metadata = (<any>adaptor.client).metadata || {}
+  const tokensInPresets: {name: string, symbol: string, decimals: number, addr: string, tokenIndex: number}[] = metadata.tokens || []
 
   const _getSupportedTokens = memoize(async () => {
     const supportedTokensResultStack = (await adaptor.client.runMethod(TonAddress.parse(address), 'token_for_index_map')).stack
@@ -121,11 +123,11 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
           return async (...args) => {
             // ERC20 like
             if (prop === 'name') {
-              return 'Mock Ton USD Circle'
+              return tokensInPresets.filter(t => t.addr === address)[0]?.name || ''
             } else if (prop === 'symbol') {
-              return 'mUSDC'
+              return tokensInPresets.filter(t => t.addr === address)[0]?.symbol || ''
             } else if (prop === 'decimals') {
-              return 6
+              return tokensInPresets.filter(t => t.addr === address)[0]?.decimals || 6
             } else if (prop === 'balanceOf') {
               return await _getBalanceOf(TonAddress.parse(address), TonAddress.parse(args[0]))
             } else if (prop === 'allowance') {
