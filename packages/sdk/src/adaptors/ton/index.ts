@@ -1,6 +1,6 @@
 import { keyPairFromSecretKey } from '@ton/crypto'
 import TonAdaptor from "./TonAdaptor";
-import TonWallet from "./TonWallet";
+import TonWallet, { TonExtWallet } from "./TonWallet";
 import { BigNumber, BigNumberish } from 'ethers';
 import { Swap } from '../../Swap';
 import { beginCell, Dictionary, Address as TonAddress, toNano, TupleBuilder } from '@ton/core';
@@ -20,6 +20,9 @@ export function getWallet(privateKey: string, adaptor: TonAdaptor, Wallet = TonW
   return new Wallet(adaptor, keypair)
 }
 
+export function getWalletFromExtension(ext, adaptor: TonAdaptor): TonExtWallet {
+  return new TonExtWallet(adaptor, ext)
+}
 
 export function getContract(address: string, abi, adaptor: TonAdaptor) {
   const metadata = (<any>adaptor.client).metadata || {}

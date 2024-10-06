@@ -6,11 +6,14 @@ import { timer } from '../../utils'
 import type { IAdaptor, WrappedTransaction } from '../types'
 
 export default class TonAdaptor implements IAdaptor {
-  readonly url: string
-  readonly client: TonClient
+  #client: TonClient | any
 
   constructor(client: TonClient) {
-    this.client = client
+    this.#client = client
+  }
+
+  get client() {
+    return this.#client
   }
 
   get nodeUrl() {

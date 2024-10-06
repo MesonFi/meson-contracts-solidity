@@ -22,10 +22,11 @@ import * as adaptors from './adaptors'
 import { IAdaptor } from './adaptors/types'
 import AptosAdaptor from './adaptors/aptos/AptosAdaptor'
 import BtcAdaptor from './adaptors/bitcoin/BtcAdaptor'
-import SuiAdaptor from './adaptors/sui/SuiAdaptor'
+import CkbAdaptor from './adaptors/ckb/CkbAdaptor'
 import SolanaAdaptor from './adaptors/solana/SolanaAdaptor'
 import StarkAdaptor from './adaptors/starknet/StarkAdaptor'
-import CkbAdaptor from './adaptors/ckb/CkbAdaptor'
+import SuiAdaptor from './adaptors/sui/SuiAdaptor'
+import TonAdaptor from './adaptors/ton/TonAdaptor'
 
 const Zero = constants.AddressZero.substring(2)
 const AddressOne = '0x0000000000000000000000000000000000000001'
@@ -173,6 +174,8 @@ export class MesonClient {
       this.addressFormat = 'starknet'
     } else if (mesonInstance.provider instanceof CkbAdaptor) {
       this.addressFormat = 'ckb'
+    } else if (mesonInstance.provider instanceof TonAdaptor) {
+      this.addressFormat = 'ton'
     } else {
       this.addressFormat = 'tron'
     }
