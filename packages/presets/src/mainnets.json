@@ -3161,5 +3161,34 @@
         "tokenIndex": 242
       }
     ]
+  },
+  {
+    "id": "ton",
+    "name": "TON",
+    "alias": "TON",
+    "chainId": "ton:-239",
+    "slip44": "0x8000025f",
+    "shortSlip44": "0x025f",
+    "extensions": [
+      "tonconnect"
+    ],
+    "addressFormat": "ton",
+    "url": "https://toncenter.com/api/v2/jsonRPC",
+    "explorer": "https://tonviewer.com/",
+    "nativeCurrency": {
+      "name": "TON",
+      "symbol": "TON",
+      "decimals": 9
+    },
+    "mesonAddress": "",
+    "tokens": [
+      {
+        "name": "Tether USD",
+        "symbol": "USD₮",
+        "decimals": 6,
+        "addr": "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs",
+        "tokenIndex": 2
+      }
+    ]
   }
 ]
