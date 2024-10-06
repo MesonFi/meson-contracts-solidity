@@ -2073,9 +2073,9 @@
   resolved "https://registry.yarnpkg.com/@swc/wasm/-/wasm-1.2.130.tgz#88ac26433335d1f957162a9a92f1450b73c176a0"
   integrity sha512-rNcJsBxS70+pv8YUWwf5fRlWX6JoY/HJc25HD/F8m6Kv7XhJdqPPMhyX6TKkUBPAG7TWlZYoxa+rHAjPy4Cj3Q==
 
-"@ton/core@^0.56.3":
+"@ton/core@0.56.3":
   version "0.56.3"
-  resolved "https://registry.npmjs.org/@ton/core/-/core-0.56.3.tgz#1162764573abb76032eba70f8497e5cb2ea532ee"
+  resolved "https://registry.yarnpkg.com/@ton/core/-/core-0.56.3.tgz#1162764573abb76032eba70f8497e5cb2ea532ee"
   integrity sha512-HVkalfqw8zqLLPehtq0CNhu5KjVzc7IrbDwDHPjGoOSXmnqSobiWj8a5F+YuWnZnEbQKtrnMGNOOjVw4LG37rg==
   dependencies:
     symbol.inspect "1.0.1"
@@ -2087,18 +2087,18 @@
   dependencies:
     jssha "3.2.0"
 
-"@ton/crypto@^3.2.0":
+"@ton/crypto@3.3.0":
   version "3.3.0"
-  resolved "https://registry.npmjs.org/@ton/crypto/-/crypto-3.3.0.tgz#019103df6540fbc1d8102979b4587bc85ff9779e"
+  resolved "https://registry.yarnpkg.com/@ton/crypto/-/crypto-3.3.0.tgz#019103df6540fbc1d8102979b4587bc85ff9779e"
   integrity sha512-/A6CYGgA/H36OZ9BbTaGerKtzWp50rg67ZCH2oIjV1NcrBaCK9Z343M+CxedvM7Haf3f/Ee9EhxyeTp0GKMUpA==
   dependencies:
     "@ton/crypto-primitives" "2.1.0"
     jssha "3.2.0"
     tweetnacl "1.0.3"
 
-"@ton/ton@^14.0.0":
+"@ton/ton@14.0.0":
   version "14.0.0"
-  resolved "https://registry.npmjs.org/@ton/ton/-/ton-14.0.0.tgz#a66fbbfb159200892557442039a0341cda71fc2d"
+  resolved "https://registry.yarnpkg.com/@ton/ton/-/ton-14.0.0.tgz#a66fbbfb159200892557442039a0341cda71fc2d"
   integrity sha512-xb2CY6U0AlHUKc7DV7xK/K4Gqn6YoR253yUrM2E7L5WegVFsDF0CQRUIfpYACCuj1oUywQc5J2oMolYNu/uGkA==
   dependencies:
     axios "^1.6.7"
