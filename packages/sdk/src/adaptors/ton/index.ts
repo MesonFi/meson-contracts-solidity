@@ -26,22 +26,26 @@ export function getWalletFromExtension(ext, adaptor: TonAdaptor): TonExtWallet {
 
 export function getContract(address: string, abi, adaptor: TonAdaptor) {
   const metadata = (<any>adaptor.client).metadata || {}
-  const tokensInPresets: {name: string, symbol: string, decimals: number, addr: string, tokenIndex: number}[] = metadata.tokens || []
 
-  const _getSupportedTokens = memoize(async () => {
-    const supportedTokensResultStack = (await adaptor.client.runMethod(TonAddress.parse(address), 'token_for_index_map')).stack
-    const supportedTokensDict = Dictionary.loadDirect(Dictionary.Keys.BigInt(257), Dictionary.Values.Address(), supportedTokensResultStack.readCell())
-    const indexes: number[] = []
-    const tokens: string[] = []
-    for (let i = 1n; i < 255n; i++) {
-      const tokenAddress = supportedTokensDict.get(i)
-      if (tokenAddress != undefined) {
-        indexes.push(Number(i))
-        tokens.push(tokenAddress.toString())
-      }
-    }
-    return { tokens, indexes }
-  })
+  const _getSupportedTokens = () => {
+    const tokens = metadata.tokens || []
+    return { tokens: tokens.map(t => t.addr), indexes: tokens.map(t => t.tokenIndex) }
+  }
+
+  // const _getSupportedTokens = memoize(async () => {
+  //   const supportedTokensResultStack = (await adaptor.client.runMethod(TonAddress.parse(address), 'token_for_index_map')).stack
+  //   const supportedTokensDict = Dictionary.loadDirect(Dictionary.Keys.BigInt(257), Dictionary.Values.Address(), supportedTokensResultStack.readCell())
+  //   const indexes: number[] = []
+  //   const tokens: string[] = []
+  //   for (let i = 1n; i < 255n; i++) {
+  //     const tokenAddress = supportedTokensDict.get(i)
+  //     if (tokenAddress != undefined) {
+  //       indexes.push(Number(i))
+  //       tokens.push(tokenAddress.toString())
+  //     }
+  //   }
+  //   return { tokens, indexes }
+  // })
 
   const _getTokenAddress = async (tokenIndex: number) => {
     const { tokens, indexes } = await _getSupportedTokens()
@@ -126,11 +130,11 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
           return async (...args) => {
             // ERC20 like
             if (prop === 'name') {
-              return tokensInPresets.filter(t => t.addr === address)[0]?.name || ''
+              return metadata.tokens.filter(t => t.addr === address)[0]?.name || ''
             } else if (prop === 'symbol') {
-              return tokensInPresets.filter(t => t.addr === address)[0]?.symbol || ''
+              return metadata.tokens.filter(t => t.addr === address)[0]?.symbol || ''
             } else if (prop === 'decimals') {
-              return tokensInPresets.filter(t => t.addr === address)[0]?.decimals || 6
+              return metadata.tokens.filter(t => t.addr === address)[0]?.decimals || 6
             } else if (prop === 'balanceOf') {
               return await _getBalanceOf(TonAddress.parse(address), TonAddress.parse(args[0]))
             } else if (prop === 'allowance') {

@@ -3,7 +3,6 @@ import { AptosClient } from 'aptos'
 import { Connection as SolConnection } from '@solana/web3.js'
 import { RpcProvider as StarkProvider } from 'starknet'
 import { SuiClient } from '@mysten/sui.js/client'
-import { TonClient } from '@ton/ton'
 import TronWeb from 'tronweb'
 import { Provider as ZkProvider } from 'zksync-web3'
 
@@ -30,7 +29,7 @@ import TronAdaptor from '@mesonfi/sdk/lib/adaptors/tron/TronAdaptor'
 
 import { Meson } from '@mesonfi/contract-abis'
 
-import { ExtendedCkbClient } from './providers'
+import { ExtendedCkbClient, ExtendedTonClient } from './providers'
 
 import testnets from './testnets.json'
 import mainnets from './mainnets.json'
@@ -222,7 +221,7 @@ export class MesonPresets {
     } else if (id.startsWith('sui')) {
       return [SuiClient, [{ url }], SuiAdaptor]
     } else if (id.startsWith('ton')) {
-      return [TonClient, [{ endpoint: url, apiKey: process.env.TON_API }], TonAdaptor]
+      return [ExtendedTonClient, [{ endpoint: url, apiKey: process.env.TON_API }, { ...network.metadata, tokens: network.tokens }], TonAdaptor]
     } else if (id.startsWith('tron')) {
       return [TronWeb, [{ fullHost: url }], TronAdaptor]
     }
