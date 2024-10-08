@@ -36,7 +36,7 @@ export default class TonWallet extends TonAdaptor {
     return this.sendTransaction({ to, value })
   }
 
-  async sendTransaction(data: { to: string | Address, value: string | bigint, body?: Cell}) {
+  async sendTransaction(data: { to: string | Address, value: string | bigint, body?: Cell, swapId?: string }) {
     const seqno = await this.#walletContract.getSeqno()
     const submitTs = Math.floor(Date.now() / 1e3)
     await this.#walletContract.sendTransfer({

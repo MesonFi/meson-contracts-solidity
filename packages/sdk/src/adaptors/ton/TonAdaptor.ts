@@ -88,37 +88,3 @@ export default class TonAdaptor implements IAdaptor {
     }
   }
 }
-
-
-// function _wrapBtcBlock(raw) {
-//   return {
-//     hash: raw.blockID,
-//     parentHash: raw.block_header.raw_data.parentHash,
-//     number: raw.block_header.raw_data.number,
-//     timestamp: Math.floor(raw.block_header.raw_data.timestamp / 1000).toString(),
-//     transactions: raw.transactions?.map(_wrapBtcTx) || []
-//   }
-// }
-
-// function _wrapBtcEvent(raw) {
-//   const { block, timestamp, contract, name, transaction } = raw
-//   return {
-//     blockNumber: block,
-//     address: contract,
-//     name,
-//     transactionHash: transaction,
-//   }
-// }
-
-// function _wrapBtcReceipt(raw) {
-//   return {
-//     status: raw.receipt?.result === 'SUCCESS' ? '1' : '0',
-//     blockNumber: raw.blockNumber,
-//     timestamp: Math.floor(raw.blockTimeStamp / 1000).toString(),
-//     logs: raw.log?.map(log => ({
-//         // address: TronWeb.address.fromHex(`0x${log.address}`),
-//         topics: log.topics.map(topic => `0x${topic}`),
-//         data: `0x${log.data || ''}`
-//     })),
-//   }
-// }
