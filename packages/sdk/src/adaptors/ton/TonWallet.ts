@@ -29,7 +29,7 @@ export default class TonWallet extends TonAdaptor {
   }
 
   get address(): string {
-    return this.#address.toString()
+    return this.#address.toString({ bounceable: false })
   }
 
   async transfer(to: string | Address, value: string | bigint) {
