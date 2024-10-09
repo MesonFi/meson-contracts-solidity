@@ -49,8 +49,6 @@ export default class TonWallet extends TonAdaptor {
       wait: (_: number) => this.waitForCompletion(submitTs, this.#address),
     }
   }
-
-  // async deploy() {}
 }
 
 export class TonExtWallet extends TonWallet {
@@ -65,12 +63,21 @@ export class TonExtWallet extends TonWallet {
     return this.ext?.currentAccount?.address
   }
 
-  async sendTransaction(tx: any) {
+  async sendTransaction(data: { to: string | Address, value: string | bigint, body?: Cell, swapId?: string }) {
     const submitTs = Math.floor(Date.now() / 1e3)
-    const hash = ''
+    const result = await this.ext?.sendTransaction({
+      validUntil: submitTs + 120,
+      messages: [
+        {
+          address: data.to.toString(),
+          amount: data.value.toString(),
+          payload: data.body?.toBoc().toString('base64'),
+        }
+      ]
+    })
     return {
-      hash,
-      wait: () => this.waitForCompletion(submitTs, this.address),
+      hash: result.boc,
+      wait: () => this.waitForCompletion(result.boc, this.address),
     }
   }
 

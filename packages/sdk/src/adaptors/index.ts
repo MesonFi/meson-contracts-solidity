@@ -137,8 +137,7 @@ export function isAddress(format: AddressFormat, addr: string): boolean {
     // TODO
     return !!addr
   } else if (format === 'ton') {
-    // TODO
-    return !!addr
+    return !!_ton.formatAddress(addr)
   } else if (format === 'tron') {
     return TronWeb.isAddress(addr)
   }
