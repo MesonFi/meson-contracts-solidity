@@ -1,15 +1,29 @@
 import { TonClient } from '@ton/ton'
-import { Address, CommonMessageInfoInternal, Transaction } from '@ton/core'
+import { Address } from '@ton/core'
+import { HttpClient, Api as TonConsoleClient, Trace } from 'tonapi-sdk-js'
 import { BigNumber } from 'ethers'
 
 import { timer } from '../../utils'
 import type { IAdaptor, WrappedTransaction } from '../types'
 
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 export default class TonAdaptor implements IAdaptor {
   #client: TonClient | any
+  #clientTonConsole: TonConsoleClient<HttpClient>
 
   constructor(client: TonClient) {
     this.#client = client
+    this.#clientTonConsole = new TonConsoleClient(new HttpClient({
+      baseUrl: (<any>client).metadata.url_tonconsole,
+      baseApiParams: {
+        headers: {
+          Authorization: `Bearer ${process.env.TON_CONSOLE_API}`,
+          'Content-type': 'application/json'
+        }
+      }
+    }))
   }
 
   get client() {
@@ -52,7 +66,23 @@ export default class TonAdaptor implements IAdaptor {
 
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number): Promise<WrappedTransaction> {
     return new Promise((resolve, reject) => {
-      resolve({ blockHash: '', status: 'success' })
+      const tryGetTransaction = async () => {
+        let info: Trace
+        try { info = await this.#clientTonConsole.traces.getTrace(hash) } catch { }
+        if (Object.keys(info || {}).length) {
+          clearInterval(h)
+          resolve(this._wrapTonTx(info))
+        }
+      }
+      const h = setInterval(tryGetTransaction, 3000)
+      tryGetTransaction()
+
+      if (timeout) {
+        timer(timeout * 1000).then(() => {
+          clearInterval(h)
+          reject(new Error('Time out'))
+        })
+      }
     })
   }
 
@@ -77,14 +107,16 @@ export default class TonAdaptor implements IAdaptor {
     })
   }
 
-  _wrapTonTx(tx: Transaction) {
+  protected _wrapTonTx(tx: Trace) {
     return {
-      from: tx.outMessages.get(0).info.src,
-      to: tx.outMessages.get(0).info.dest,
-      hash: tx.hash().toString('hex'),
-      value: (tx.outMessages.get(0).info as CommonMessageInfoInternal).value.coins,
-      input: tx.inMessage.body,
-      timestamp: tx.now,
+      from: Address.parseRaw(tx.transaction.account.address),
+      to: Address.parseRaw(tx.children[0].transaction.account.address),
+      hash: tx.transaction.hash,
+      timestamp: tx.transaction.utime,
+      block: parseInt(tx.transaction.block   // format: '(0,e000000000000000,46178664)'
+        .split(',')[2].replace(')', '')),
+      blockHash: 'n/a',
+      status: '0x1',
     }
   }
 }

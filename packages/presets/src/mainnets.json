@@ -3181,6 +3181,9 @@
       "decimals": 9
     },
     "mesonAddress": "",
+    "metadata": {
+      "url_tonconsole": "https://tonapi.io"
+    },
     "tokens": [
       {
         "name": "Tether USD",

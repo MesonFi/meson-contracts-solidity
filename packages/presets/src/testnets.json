@@ -779,6 +779,9 @@
       "decimals": 9
     },
     "mesonAddress": "EQCZ9JTLwg-vPhcSORZXAsRBkhJ_6Lut1RnZqCSh8Z7y5J0V",
+    "metadata": {
+      "url_tonconsole": "https://testnet.tonapi.io"
+    },
     "tokens": [
       {
         "name": "USDC",
