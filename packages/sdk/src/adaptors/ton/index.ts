@@ -1,23 +1,19 @@
-import { keyPairFromSecretKey } from '@ton/crypto'
-import TonAdaptor from "./TonAdaptor";
-import TonWallet, { TonExtWallet } from "./TonWallet";
-import { BigNumber, BigNumberish } from 'ethers';
-import { Swap } from '../../Swap';
-import { beginCell, Address as TonAddress, toNano, TupleBuilder } from '@ton/core';
-import { storeTokenTransfer } from './types';
-import { parseEther } from 'ethers/lib/utils';
-import { getSwapId } from '../../utils';
+import { keyPairFromSeed, keyPairFromSecretKey } from '@ton/crypto'
+import TonAdaptor from './TonAdaptor'
+import TonWallet, { TonExtWallet } from './TonWallet'
+import { BigNumber, BigNumberish } from 'ethers'
+import { Swap } from '../../Swap'
+import { beginCell, Address as TonAddress, toNano, TupleBuilder } from '@ton/core'
+import { storeTokenTransfer } from './types'
+import { getSwapId } from '../../utils'
 
-export function getWallet(privateKey: string, adaptor: TonAdaptor, Wallet = TonWallet): TonWallet {
-  // Notice that TON_PRIVATE_KEY has 64 bytes
-  // const derivedKey = privateKey.startsWith('0x') ?
-  //   privateKey.substring(2) + privateKey.substring(2) : privateKey + privateKey
-  privateKey = privateKey.replace(/^0x/, '')
-  if (privateKey.length !== 128) {
-    throw new Error('Invalid private key length')
+export function getWallet(key: string, adaptor: TonAdaptor, Wallet = TonWallet): TonWallet {
+  key = key.replace(/^0x/, '')
+  if (key.length === 64) {
+    return new Wallet(adaptor, keyPairFromSeed(Buffer.from(key, 'hex')))
+  } else if (key.length === 128) {
+    return new Wallet(adaptor, keyPairFromSecretKey(Buffer.from(key, 'hex')))
   }
-  const keypair = keyPairFromSecretKey(Buffer.from(privateKey, 'hex'))
-  return new Wallet(adaptor, keypair)
 }
 
 export function getWalletFromExtension(ext, adaptor: TonAdaptor): TonExtWallet {
@@ -56,22 +52,22 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
     return userWalletData.readBigNumber()
   }
 
-  const _buildTransfer = async (tokenAddress: string, sender: string, recipient: string, value: BigNumberish, forwardTonAmount: string) => {
+  const _buildTransfer = async (tokenAddress: string, sender: string, recipient: string, value: BigNumberish) => {
     let packedData = beginCell().store(storeTokenTransfer({
-      $$type: "TokenTransfer",
+      $$type: 'TokenTransfer',
       query_id: 0n,
       amount: BigNumber.from(value).toBigInt(),
       destination: TonAddress.parse(recipient),
       response_destination: TonAddress.parse(sender),
       custom_payload: beginCell().endCell(),
-      forward_ton_amount: toNano(forwardTonAmount),
+      forward_ton_amount: 1n,
       forward_payload: beginCell().storeMaybeInt(null, 1).endCell(),
     })).endCell()
     const senderTokenWalletAddress = await _getTokenWalletAddress(TonAddress.parse(tokenAddress), TonAddress.parse(sender))
 
     return {
       to: senderTokenWalletAddress,
-      value: toNano("0.1") + toNano(forwardTonAmount),      // For the whole token-transfer. Will be refunded if excess.
+      value: toNano('0.05'),
       body: packedData,
     }
   }
@@ -122,12 +118,11 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
             } else if (prop === 'balanceOf') {
               return await _getBalanceOf(TonAddress.parse(address), TonAddress.parse(args[0]))
             } else if (prop === 'allowance') {
-              return parseEther('1000000000')
+              return BigNumber.from(2).pow(128).sub(1)
             }
 
             // Meson
             if (prop === 'getShortCoinType') {
-              // See https://github.com/satoshilabs/slips/blob/master/slip-0044.md?plain=1#L638
               return '0x025f'
             } else if (prop === 'getSupportedTokens') {
               return _getSupportedTokens()
@@ -154,12 +149,12 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
             if (prop === 'directRelease') {
               const [_encoded, _r, _yParityAndS, _initiator, recipient] = args
               const swapId = getSwapId(_encoded, _initiator)
-              const outTokenAddress = await _getTokenAddress(swap.outToken)   // TODO: check this
-              const txData = await _buildTransfer(outTokenAddress, adaptor.address, recipient, swap.amount, "0.001")
+              const outTokenAddress = await _getTokenAddress(swap.outToken)
+              const txData = await _buildTransfer(outTokenAddress, adaptor.address, recipient, swap.amount)
               return await adaptor.sendTransaction({ swapId, ...txData })
             } else if (prop === 'directExecuteSwap') {
               const inTokenAddress = await _getTokenAddress(swap.inToken)
-              const txData = await _buildTransfer(inTokenAddress, adaptor.address, address, swap.amount, "0.001")
+              const txData = await _buildTransfer(inTokenAddress, adaptor.address, address, swap.amount)
               return await adaptor.sendTransaction(txData)
             } else {
               throw new Error(`Method ${prop} is not implemented.`)
@@ -173,5 +168,9 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
 }
 
 export function formatAddress(addr: string) {
-  return addr // TODO
+  try {
+    return TonAddress.parseFriendly(addr).address.toString({ bounceable: false })
+  } catch {
+    return
+  }
 }
