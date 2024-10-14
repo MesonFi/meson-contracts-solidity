@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers'
-import { TonClient } from '@ton/ton'
 import { Address } from '@ton/core'
+import { TonClient } from '@ton/ton'
 import { HttpClient, Api as TonConsoleClient, Trace } from 'tonapi-sdk-js'
 
 import { timer } from '../../utils'

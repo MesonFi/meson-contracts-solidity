@@ -1,6 +1,7 @@
 // import { ethers } from 'ethers'
 import { KeyPair } from '@ton/crypto'
-import { Address, Cell, internal, OpenedContract, Sender, WalletContractV4 } from '@ton/ton'
+import { beginCell, storeMessage } from '@ton/core'
+import { Address, Cell, internal, external, OpenedContract, Sender, WalletContractV4 } from '@ton/ton'
 
 import TonAdaptor from './TonAdaptor'
 
@@ -37,13 +38,16 @@ export default class TonWallet extends TonAdaptor {
   }
 
   async sendTransaction(data: { to: string, value: bigint, body?: Cell, swapId?: string }) {
-    const hash = data.body?.hash().toString('hex')
     const seqno = await this.#walletContract.getSeqno()
-    await this.#walletContract.sendTransfer({
+    const transfer = this.#wallet.createTransfer({
       seqno,
       secretKey: this.#secretKey,
       messages: [internal(data)]
     })
+    const msg = external({ to: this.#address, init: null, body: transfer })
+    const cell = beginCell().store(storeMessage(msg)).endCell()
+    const hash = cell.hash().toString('hex')
+    await this.client.sendFile(cell.toBoc())
     return {
       hash,
       wait: (_: number) => this.waitForTransaction(hash),
