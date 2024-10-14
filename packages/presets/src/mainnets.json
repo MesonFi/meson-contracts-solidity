@@ -1,5 +1,34 @@
 [
   {
+    "id": "bitcoin",
+    "name": "Bitcoin",
+    "alias": "bitcoin",
+    "chainId": "bitcoin:mainnet",
+    "slip44": "0x80000000",
+    "shortSlip44": "0x0000",
+    "extensions": [
+      "bitcoin"
+    ],
+    "addressFormat": "bitcoin",
+    "url": "https://mempool.space/api",
+    "explorer": "https://mempool.space",
+    "nativeCurrency": {
+      "name": "BTC",
+      "symbol": "BTC",
+      "decimals": 8
+    },
+    "mesonAddress": "bc1qu4kt6vjzwsrvk46dlnk5q7vy4gk3reafff75su",
+    "tokens": [
+      {
+        "name": "BTC",
+        "symbol": "BTC",
+        "decimals": 8,
+        "addr": "0x0000000000000000000000000000000000000001",
+        "tokenIndex": 243
+      }
+    ]
+  },
+  {
     "id": "eth",
     "name": "Ethereum",
     "alias": "ETH",
@@ -92,41 +121,20 @@
         "partner": "free"
       },
       {
+        "name": "Merlin BTC",
+        "symbol": "M-BTC",
+        "decimals": 18,
+        "addr": "0x2F913C820ed3bEb3a67391a6eFF64E70c4B20b19",
+        "tokenIndex": 67,
+        "partner": "free"
+      },
+      {
         "name": "MERL",
         "symbol": "MERL",
         "decimals": 18,
         "addr": "0x0F3A12b78FEE11Ee088E454a0547BdBC5A253a6d",
         "tokenIndex": 69,
         "partner": "free"
-      }
-    ]
-  },
-  {
-    "id": "bitcoin",
-    "name": "Bitcoin",
-    "alias": "bitcoin",
-    "chainId": "bitcoin:mainnet",
-    "slip44": "0x80000000",
-    "shortSlip44": "0x0000",
-    "extensions": [
-      "bitcoin"
-    ],
-    "addressFormat": "bitcoin",
-    "url": "https://mempool.space/api",
-    "explorer": "https://mempool.space",
-    "nativeCurrency": {
-      "name": "BTC",
-      "symbol": "BTC",
-      "decimals": 8
-    },
-    "mesonAddress": "bc1qu4kt6vjzwsrvk46dlnk5q7vy4gk3reafff75su",
-    "tokens": [
-      {
-        "name": "BTC",
-        "symbol": "BTC",
-        "decimals": 8,
-        "addr": "0x0000000000000000000000000000000000000001",
-        "tokenIndex": 243
       }
     ]
   },
