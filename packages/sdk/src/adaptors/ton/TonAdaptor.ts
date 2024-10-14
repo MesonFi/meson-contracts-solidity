@@ -1,18 +1,18 @@
 import { BigNumber } from 'ethers'
 import { Address } from '@ton/core'
 import { TonClient } from '@ton/ton'
-import { HttpClient, Api as TonConsoleClient, Trace } from 'tonapi-sdk-js'
+import { HttpClient, Api as TonApi, Trace } from 'tonapi-sdk-js'
 
 import { timer } from '../../utils'
 import type { IAdaptor, WrappedTransaction } from '../types'
 
 export default class TonAdaptor implements IAdaptor {
   #client: TonClient | any
-  #clientTonConsole: TonConsoleClient<HttpClient>
+  #tonApi: TonApi<HttpClient>
 
   constructor(client: TonClient) {
     this.#client = client
-    this.#clientTonConsole = new TonConsoleClient(new HttpClient({
+    this.#tonApi = new TonApi(new HttpClient({
       baseUrl: (<any>client).metadata.url_tonconsole,
       baseApiParams: {
         headers: {
@@ -58,7 +58,28 @@ export default class TonAdaptor implements IAdaptor {
   on() { }
   removeAllListeners() { }
 
+  async #getTransaction(hash: string) {
+    return await this.#tonApi.traces.getTrace(hash)
+  }
+
   async send(method, params) {
+    if (method === 'eth_getTransactionByHash') {
+      return this._wrapTonTx(await this.#getTransaction(params[0]))
+    } else if (method === 'eth_getTransactionReceipt') {
+      return this._wrapTonTx(await this.#getTransaction(params[0]))
+    }
+
+    if (method === 'eth_getBlockByNumber') {
+      if (params[0] === 'latest') {
+        // return _wrapTronBlock(await this.client.trx.getCurrentBlock())
+      } else {
+        console.warn(`TonAdaptor: 'eth_getBlockByNumber' unsupported`)
+        return
+      }
+    } else if (method === 'eth_getBlockByHash') {
+      // return _wrapTronBlock(await this.client.trx.getBlockByHash(params[0]))
+    }
+    throw new Error(`TonAdaptor: '${method}' unsupported`)
   }
 
   async waitForTransaction(hash: string, confirmations?: number, timeout?: number): Promise<WrappedTransaction> {
@@ -66,7 +87,7 @@ export default class TonAdaptor implements IAdaptor {
       const tryGetTransaction = async () => {
         let info: Trace
         try {
-          info = await this.#clientTonConsole.traces.getTrace(hash)
+          info = await this.#getTransaction(hash)
         } catch {}
         if (Object.keys(info || {}).length) {
           clearInterval(h)
@@ -85,37 +106,35 @@ export default class TonAdaptor implements IAdaptor {
     })
   }
 
-  async waitForCompletion(submitTs: number, sender: string | Address, timeout?: number) {
-    const tonAddr = typeof sender === 'string' ? Address.parse(sender) : sender
-    return new Promise((resolve, reject) => {
-      const tryGetTransaction = async () => {
-        const tx = (await this.client.getTransactions(tonAddr, { limit: 1 }))[0]
-        if (tx.now >= submitTs) {
-          clearInterval(h)
-          resolve(this._wrapTonTx(tx))
-        }
-      }
-      const h = setInterval(tryGetTransaction, 5000)
-      tryGetTransaction()
-
-      if (timeout)
-        timer(timeout * 1000).then(() => {
-          clearInterval(h)
-          reject(new Error('Time out'))
-        })
-    })
-  }
-
   protected _wrapTonTx(tx: Trace) {
+    const { transaction } = tx
+    const parsed = transaction.in_msg.decoded_body?.actions.map(a => {
+      switch (a.msg.sum_type) {
+        case 'MessageInternal': {
+          const data = a.msg.message_internal.body.value
+          if (data.sum_type === 'JettonTransfer') {
+            return {
+              value: data.value.amount,
+              to: Address.parseRaw(data.value.destination).toString({ bounceable: false }),
+            }
+          }
+          return
+        }
+        default:
+          console.log(a)
+          return
+      }
+    })
     return {
-      from: Address.parseRaw(tx.transaction.account.address),
-      to: Address.parseRaw(tx.children[0].transaction.account.address),
-      hash: tx.transaction.hash,
-      timestamp: tx.transaction.utime,
-      block: parseInt(tx.transaction.block   // format: '(0,e000000000000000,46178664)'
-        .split(',')[2].replace(')', '')),
       blockHash: 'n/a',
-      status: '0x1',
+      blockNumber: '',
+      block: Number(transaction.block.split(',')[2].replace(')', '')), // (0,e000000000000000,46178664)
+      hash: transaction.hash,
+      from: Address.parseRaw(transaction.account.address).toString({ bounceable: false }),
+      to: parsed.map(v => v.to),
+      input: parsed.map(v => v.value),
+      timestamp: transaction.utime.toString(),
+      status: transaction.success ? '0x1' : '0x0',
     }
   }
 }
