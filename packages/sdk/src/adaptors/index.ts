@@ -11,6 +11,7 @@ import * as _ethers from './ethers'
 import * as _solana from './solana'
 import * as _starknet from './starknet'
 import * as _sui from './sui'
+import * as _ton from './ton'
 import * as _tron from './tron'
 import * as _zksync from './zksync'
 
@@ -22,6 +23,7 @@ import CkbAdaptor from './ckb/CkbAdaptor'
 import SolanaAdaptor from './solana/SolanaAdaptor'
 import StarkAdaptor from './starknet/StarkAdaptor'
 import SuiAdaptor from './sui/SuiAdaptor'
+import TonAdaptor from './ton/TonAdaptor'
 import TronAdaptor from './tron/TronAdaptor'
 
 import {
@@ -33,6 +35,7 @@ import {
   FailoverSolanaAdaptor,
   FailoverStarkAdaptor,
   FailoverSuiAdaptor,
+  FailoverTonAdaptor,
   FailoverTronAdaptor,
 } from './FailoverAdaptors'
 
@@ -53,6 +56,8 @@ export function getWallet (privateKey: string, adaptor: IAdaptor, Wallet?) {
     return _starknet.getWallet(privateKey, adaptor)
   } else if (adaptor instanceof SuiAdaptor) {
     return _sui.getWallet(privateKey, adaptor, Wallet)
+  } else if (adaptor instanceof TonAdaptor) {
+    return _ton.getWallet(privateKey, adaptor, Wallet)
   } else if (adaptor instanceof TronAdaptor) {
     return _tron.getWallet(privateKey, adaptor, Wallet)
   } else {
@@ -77,6 +82,8 @@ export function getContract(address: string, abi, adaptor: IAdaptor | Signer) {
     return _starknet.getContract(address, abi, adaptor)
   } else if (adaptor instanceof SuiAdaptor) {
     return _sui.getContract(address, abi, adaptor)
+  } else if (adaptor instanceof TonAdaptor) {
+    return _ton.getContract(address, abi, adaptor)
   } else if (adaptor instanceof TronAdaptor) {
     return _tron.getContract(address, abi, adaptor)
   } else {
@@ -104,6 +111,8 @@ export function getFailoverAdaptor(adps: IAdaptor[]) {
     return new FailoverStarkAdaptor(...adps as StarkAdaptor[])
   } else if (adps.every(a => a instanceof SuiAdaptor)) {
     return new FailoverSuiAdaptor(...adps as SuiAdaptor[])
+  } else if (adps.every(a => a instanceof TonAdaptor)) {
+    return new FailoverTonAdaptor(...adps as TonAdaptor[])
   } else if (adps.every(a => a instanceof TronAdaptor)) {
     return new FailoverTronAdaptor(...adps as TronAdaptor[])
   } else {
@@ -111,7 +120,7 @@ export function getFailoverAdaptor(adps: IAdaptor[]) {
   }
 }
 
-export type AddressFormat = 'ethers' | 'aptos' | 'bitcoin' | 'ckb' | 'solana' | 'starknet' | 'sui' | 'tron'
+export type AddressFormat = 'ethers' | 'aptos' | 'bitcoin' | 'ckb' | 'solana' | 'starknet' | 'sui' | 'ton' |  'tron'
 export function isAddress(format: AddressFormat, addr: string): boolean {
   if (format === 'ethers') {
     return utils.isHexString(addr) && utils.isAddress(addr)
@@ -127,6 +136,8 @@ export function isAddress(format: AddressFormat, addr: string): boolean {
   } else if (format === 'starknet') {
     // TODO
     return !!addr
+  } else if (format === 'ton') {
+    return !!_ton.formatAddress(addr)
   } else if (format === 'tron') {
     return TronWeb.isAddress(addr)
   }
@@ -151,6 +162,8 @@ export function formatAddress(format: AddressFormat, addr: string): string {
     return _starknet.formatAddress(addr)
   } else if (format === 'sui') {
     return _sui.formatAddress(addr)
+  } else if (format === 'ton') {
+    return _ton.formatAddress(addr)
   } else if (format === 'tron') {
     return TronWeb.address.fromHex(addr)
   }
@@ -163,5 +176,6 @@ export const ckb = _ckb
 export const solana = _solana
 export const starknet = _starknet
 export const sui = _sui
+export const ton = _ton
 export const tron = _tron
 export const zksync = _zksync

@@ -7,7 +7,7 @@ import { Swap } from '../../Swap'
 import AptosAdaptor from './AptosAdaptor'
 import AptosWallet, { AptosExtWallet } from './AptosWallet'
 
-export function getWallet(privateKey: string, adaptor: AptosAdaptor, Wallet = AptosWallet): AptosWallet {
+export function getWallet(privateKey: string = '', adaptor: AptosAdaptor, Wallet = AptosWallet): AptosWallet {
   if (privateKey && !privateKey.startsWith('0x')) {
     privateKey = '0x' + privateKey
   }

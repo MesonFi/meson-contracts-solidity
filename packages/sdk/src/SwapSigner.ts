@@ -1,6 +1,7 @@
 import { Wallet, utils } from 'ethers'
 import { HDNode } from '@ethersproject/hdnode'
 import TronWeb from 'tronweb'
+import { Address as TonAddress } from '@ton/core'
 import bs58 from 'bs58'
 import { helpers, config } from '@ckb-lumos/lumos'
 
@@ -22,43 +23,45 @@ export const clipRecipient = (recipient: string, encoded: string) => {
     // to bitcoin
     if (utils.isAddress(recipient)) {
       return recipient
-    } else {
-      const parsed = bitcoin.parseAddress(recipient)
-      if (!parsed) {
-        throw new Error('Invalid bitcoin address')
-      }
-      return parsed.hex.substring(0, 42)
     }
+    const parsed = bitcoin.parseAddress(recipient)
+    if (!parsed) {
+      throw new Error('Invalid bitcoin address')
+    }
+    return parsed.hex.substring(0, 42)
+  } else if (chain === '025f') {
+    // to ton
+    if (utils.isAddress(recipient)) {
+      return recipient
+    }
+    return '0x' + TonAddress.parse(recipient).toRaw().toString('hex').substring(0, 40)
   } else if (chain === '00c3') {
     // to tron
     return `0x${TronWeb.address.toHex(recipient).substring(2)}`
   } else if (chain === '01f5') {
     // to solana
-    if (utils.isHexString(recipient)) {
+    if (utils.isAddress(recipient)) {
       return recipient
-    } else {
-      return utils.hexlify(bs58.decode(recipient)).substring(0, 42)
     }
+    return utils.hexlify(bs58.decode(recipient)).substring(0, 42)
   } else if (['027d', '0310', '232c'].includes(chain)) {
     // to aptos, sui, starknet
     if (utils.isAddress(recipient)) {
       return recipient
-    } else {
-      return utils.hexZeroPad(recipient, 32).substring(0, 42)
     }
+    return utils.hexZeroPad(recipient, 32).substring(0, 42)
   } else if (chain === '0135') {
     // to ckb
     if (utils.isAddress(recipient)) {
       return recipient
-    } else {
-      const lockScript = helpers.parseAddress(recipient, {
-        config: recipient.startsWith('ckb') ? config.MAINNET : config.TESTNET
-      })
-      if (!lockScript.args.startsWith('0x0001')) {
-        throw new Error('Recipient not supported. Please enter a JoyID address.')
-      }
-      return lockScript.args.replace('0x0001', '0x')
     }
+    const lockScript = helpers.parseAddress(recipient, {
+      config: recipient.startsWith('ckb') ? config.MAINNET : config.TESTNET
+    })
+    if (!lockScript.args.startsWith('0x0001')) {
+      throw new Error('Recipient not supported. Please enter a JoyID address.')
+    }
+    return lockScript.args.replace('0x0001', '0x')
   } else {
     // to eth
     return recipient
