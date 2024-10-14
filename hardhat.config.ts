@@ -1,6 +1,7 @@
 import '@typechain/hardhat'
 import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-ethers'
+import '@nomicfoundation/hardhat-verify'
 import 'hardhat-change-network'
 import '@openzeppelin/hardhat-upgrades'
 import '@matterlabs/hardhat-zksync-deploy'
