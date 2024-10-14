@@ -221,7 +221,6 @@ export class MesonPresets {
     } else if (id.startsWith('sui')) {
       return [SuiClient, [{ url }], SuiAdaptor]
     } else if (id.startsWith('ton')) {
-      console.log(process.env.TON_API)
       return [ExtendedTonClient, [{ endpoint: url, apiKey: process.env.TON_API }, { ...network.metadata, tokens: network.tokens }], TonAdaptor]
     } else if (id.startsWith('tron')) {
       return [TronWeb, [{ fullHost: url }], TronAdaptor]

@@ -1,8 +1,8 @@
 // import { ethers } from 'ethers'
-import { Address, Cell, internal, OpenedContract, Sender, WalletContractV4 } from "@ton/ton";
-import { Transaction as TonTransaction } from '@ton/core'
-import { KeyPair } from "@ton/crypto";
-import TonAdaptor from "./TonAdaptor";
+import { KeyPair } from '@ton/crypto'
+import { Address, Cell, internal, OpenedContract, Sender, WalletContractV4 } from '@ton/ton'
+
+import TonAdaptor from './TonAdaptor'
 
 export default class TonWallet extends TonAdaptor {
   readonly #publicKey: Buffer
@@ -32,21 +32,21 @@ export default class TonWallet extends TonAdaptor {
     return this.#address.toString({ bounceable: false })
   }
 
-  async transfer(to: string | Address, value: string | bigint) {
+  async transfer(to: string, value: bigint) {
     return this.sendTransaction({ to, value })
   }
 
-  async sendTransaction(data: { to: string | Address, value: string | bigint, body?: Cell, swapId?: string }) {
+  async sendTransaction(data: { to: string, value: bigint, body?: Cell, swapId?: string }) {
+    const hash = data.body?.hash().toString('hex')
     const seqno = await this.#walletContract.getSeqno()
-    const submitTs = Math.floor(Date.now() / 1e3)
     await this.#walletContract.sendTransfer({
       seqno,
       secretKey: this.#secretKey,
       messages: [internal(data)]
     })
     return {
-      hash: null, // Can't get hash right after submitting
-      wait: (_: number) => this.waitForCompletion(submitTs, this.#address),
+      hash,
+      wait: (_: number) => this.waitForTransaction(hash),
     }
   }
 }
@@ -63,9 +63,9 @@ export class TonExtWallet extends TonWallet {
     return this.ext?.currentAccount?.address
   }
 
-  async sendTransaction(data: { to: string | Address, value: string | bigint, body?: Cell, swapId?: string }) {
+  async sendTransaction(data: { to: string, value: bigint, body?: Cell, swapId?: string }) {
     const submitTs = Math.floor(Date.now() / 1e3)
-    const result = await this.ext?.sendTransaction({
+    const hash = await this.ext?.sendTransaction({
       validUntil: submitTs + 120,
       messages: [
         {
@@ -76,8 +76,8 @@ export class TonExtWallet extends TonWallet {
       ]
     })
     return {
-      hash: result.boc,
-      wait: () => this.waitForCompletion(result.boc, this.address),
+      hash,
+      wait: () => this.waitForTransaction(hash),
     }
   }
 

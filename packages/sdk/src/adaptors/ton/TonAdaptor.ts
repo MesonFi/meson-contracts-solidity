@@ -1,13 +1,10 @@
+import { BigNumber } from 'ethers'
 import { TonClient } from '@ton/ton'
 import { Address } from '@ton/core'
 import { HttpClient, Api as TonConsoleClient, Trace } from 'tonapi-sdk-js'
-import { BigNumber } from 'ethers'
 
 import { timer } from '../../utils'
 import type { IAdaptor, WrappedTransaction } from '../types'
-
-import * as dotenv from 'dotenv';
-dotenv.config();
 
 export default class TonAdaptor implements IAdaptor {
   #client: TonClient | any
@@ -68,7 +65,9 @@ export default class TonAdaptor implements IAdaptor {
     return new Promise((resolve, reject) => {
       const tryGetTransaction = async () => {
         let info: Trace
-        try { info = await this.#clientTonConsole.traces.getTrace(hash) } catch { }
+        try {
+          info = await this.#clientTonConsole.traces.getTrace(hash)
+        } catch {}
         if (Object.keys(info || {}).length) {
           clearInterval(h)
           resolve(this._wrapTonTx(info))

@@ -1,14 +1,19 @@
+import { BigNumber, BigNumberish } from 'ethers'
 import { keyPairFromSeed, keyPairFromSecretKey } from '@ton/crypto'
+import { beginCell, Address as TonAddress, toNano, TupleBuilder } from '@ton/core'
+
 import TonAdaptor from './TonAdaptor'
 import TonWallet, { TonExtWallet } from './TonWallet'
-import { BigNumber, BigNumberish } from 'ethers'
 import { Swap } from '../../Swap'
-import { beginCell, Address as TonAddress, toNano, TupleBuilder } from '@ton/core'
 import { storeTokenTransfer } from './types'
 import { getSwapId } from '../../utils'
 
-export function getWallet(key: string, adaptor: TonAdaptor, Wallet = TonWallet): TonWallet {
-  key = key.replace(/^0x/, '')
+export function getWallet(_key: string = '', adaptor: TonAdaptor, Wallet = TonWallet): TonWallet {
+  if (!_key) {
+    throw new Error('No private key given')
+  }
+  
+  const key = _key.replace(/^0x/, '')
   if (key.length === 64) {
     return new Wallet(adaptor, keyPairFromSeed(Buffer.from(key, 'hex')))
   } else if (key.length === 128) {
@@ -127,9 +132,8 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
             } else if (prop === 'getSupportedTokens') {
               return _getSupportedTokens()
             } else if (prop === 'poolTokenBalance') {
-              // const balance = await adaptor.getBalance(address)
-              // return balance.div(1000)  // decimals 9 -> 6
-              throw new Error('TODO: poolTokenBalance not implemented')
+              const balance = await _getBalanceOf(TonAddress.parse(args[0]), TonAddress.parse(address))
+              return balance
             } else if (prop === 'serviceFeeCollected') {
               return BigNumber.from(0)
             }
@@ -150,7 +154,7 @@ export function getContract(address: string, abi, adaptor: TonAdaptor) {
               const [_encoded, _r, _yParityAndS, _initiator, recipient] = args
               const swapId = getSwapId(_encoded, _initiator)
               const outTokenAddress = await _getTokenAddress(swap.outToken)
-              const txData = await _buildTransfer(outTokenAddress, adaptor.address, recipient, swap.amount)
+              const txData = await _buildTransfer(outTokenAddress, adaptor.address, recipient, swap.receive)
               return await adaptor.sendTransaction({ swapId, ...txData })
             } else if (prop === 'directExecuteSwap') {
               const inTokenAddress = await _getTokenAddress(swap.inToken)
