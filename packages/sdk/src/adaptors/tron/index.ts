@@ -11,7 +11,7 @@ export function getWallet(privateKey: string, adaptor: TronAdaptor, Wallet = Tro
   }
   let injectedAdaptor
   if (adaptor['adaptors']) {
-    injectedAdaptor = new FailoverTronAdaptor(...adaptor['adaptors'].map(adp => _injectPrivateKey(privateKey, adp)))
+    injectedAdaptor = new FailoverTronAdaptor(adaptor['adaptors'].map(adp => _injectPrivateKey(privateKey, adp)))
   } else {
     injectedAdaptor = _injectPrivateKey(privateKey, adaptor)
   }

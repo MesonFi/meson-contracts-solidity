@@ -91,30 +91,30 @@ export function getContract(address: string, abi, adaptor: IAdaptor | Signer) {
   }
 }
 
-export function getFailoverAdaptor(adps: IAdaptor[]) {
+export function getFailoverAdaptor(adps: IAdaptor[], opt: any = {}) {
   if (!adps.length) {
     throw new Error('Empty clients')
   }
   if (adps.every(a => a instanceof ZksyncAdaptor)) {
-    return new FailoverZksyncAdaptor(...adps as ZksyncAdaptor[])
+    return new FailoverZksyncAdaptor(adps as ZksyncAdaptor[], opt)
   } else if (adps.every(a => a instanceof EthersAdaptor)) {
-    return new FailoverEthersAdaptor(...adps as EthersAdaptor[])
+    return new FailoverEthersAdaptor(adps as EthersAdaptor[], opt)
   } else if (adps.every(a => a instanceof AptosAdaptor)) {
-    return new FailoverAptosAdaptor(...adps as AptosAdaptor[])
+    return new FailoverAptosAdaptor(adps as AptosAdaptor[], opt)
   } else if (adps.every(a => a instanceof BtcAdaptor)) {
-    return new FailoverBtcAdaptor(...adps as BtcAdaptor[])
+    return new FailoverBtcAdaptor(adps as BtcAdaptor[], opt)
   } else if (adps.every(a => a instanceof CkbAdaptor)) {
-    return new FailoverCkbAdaptor(...adps as CkbAdaptor[])
+    return new FailoverCkbAdaptor(adps as CkbAdaptor[], opt)
   } else if (adps.every(a => a instanceof SolanaAdaptor)) {
-    return new FailoverSolanaAdaptor(...adps as SolanaAdaptor[])
+    return new FailoverSolanaAdaptor(adps as SolanaAdaptor[], opt)
   } else if (adps.every(a => a instanceof StarkAdaptor)) {
-    return new FailoverStarkAdaptor(...adps as StarkAdaptor[])
+    return new FailoverStarkAdaptor(adps as StarkAdaptor[], opt)
   } else if (adps.every(a => a instanceof SuiAdaptor)) {
-    return new FailoverSuiAdaptor(...adps as SuiAdaptor[])
+    return new FailoverSuiAdaptor(adps as SuiAdaptor[], opt)
   } else if (adps.every(a => a instanceof TonAdaptor)) {
-    return new FailoverTonAdaptor(...adps as TonAdaptor[])
+    return new FailoverTonAdaptor(adps as TonAdaptor[], opt)
   } else if (adps.every(a => a instanceof TronAdaptor)) {
-    return new FailoverTronAdaptor(...adps as TronAdaptor[])
+    return new FailoverTronAdaptor(adps as TronAdaptor[], opt)
   } else {
     throw new Error('Conflicting clients')
   }

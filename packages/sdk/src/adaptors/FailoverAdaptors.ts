@@ -16,10 +16,13 @@ function extendToFailoverAdaptor<ClassAdaptor extends AdaptorConstructor>(Adapto
   return class FailoverAdaptor extends Adaptor {
     readonly adaptors: IAdaptor[]
 
+    #timeout: number
+
     constructor(...args: any[]) {
-      const adaptors = args[0] as IAdaptor[]
+      const [adaptors, opt = {}] = args[0] as [IAdaptor[], any]
       super(adaptors[0].client)
       this.adaptors = adaptors
+      this.#timeout = opt.timeout || 3000
     }
 
     // override get nodeUrl() {
@@ -54,7 +57,7 @@ function extendToFailoverAdaptor<ClassAdaptor extends AdaptorConstructor>(Adapto
             const errors = []
             return new Promise(async (resolve, reject) => {
               try {
-                resolve(await timeout(result, 3000))
+                resolve(await timeout(result, that.#timeout))
                 return
               } catch (e) {
                 errors.push(e)
@@ -63,7 +66,7 @@ function extendToFailoverAdaptor<ClassAdaptor extends AdaptorConstructor>(Adapto
               while (adaptors.length) {
                 const current = adaptors.pop()
                 try {
-                  resolve(await timeout(current.client[prop](...args), 3000))
+                  resolve(await timeout(current.client[prop](...args), that.#timeout))
                   return
                 } catch (e) {
                   errors.push(e)
@@ -87,7 +90,7 @@ function extendToFailoverAdaptor<ClassAdaptor extends AdaptorConstructor>(Adapto
       while (adaptors.length) {
         const current = adaptors.pop()
         try {
-          return await timeout(current.send(method, params), 3000)
+          return await timeout(current.send(method, params), this.#timeout)
         } catch (e) {
           errors.push(e)
         }
@@ -116,61 +119,61 @@ function extendToFailoverAdaptor<ClassAdaptor extends AdaptorConstructor>(Adapto
 }
 
 export class FailoverEthersAdaptor extends extendToFailoverAdaptor(EthersAdaptor) {
-  constructor(...adaptors: EthersAdaptor[]) {
-    super(adaptors as any)
+  constructor(adaptors: EthersAdaptor[], opt: any = {}) {
+    super([adaptors, opt] as any)
   }
 }
 
 export class FailoverZksyncAdaptor extends extendToFailoverAdaptor(ZksyncAdaptor) {
-  constructor(...adaptors: ZksyncAdaptor[]) {
-    super(adaptors as any)
+  constructor(adaptors: ZksyncAdaptor[], opt: any = {}) {
+    super([adaptors, opt] as any)
   }
 }
 
 export class FailoverAptosAdaptor extends extendToFailoverAdaptor(AptosAdaptor) {
-  constructor(...adaptors: AptosAdaptor[]) {
-    super(adaptors as any)
+  constructor(adaptors: AptosAdaptor[], opt: any = {}) {
+    super([adaptors, opt] as any)
   }
 }
 
 export class FailoverBtcAdaptor extends extendToFailoverAdaptor(BtcAdaptor) {
-  constructor(...adaptors: BtcAdaptor[]) {
-    super(adaptors as any)
+  constructor(adaptors: BtcAdaptor[], opt: any = {}) {
+    super([adaptors, opt] as any)
   }
 }
 
 export class FailoverCkbAdaptor extends extendToFailoverAdaptor(CkbAdaptor) {
-  constructor(...adaptors: CkbAdaptor[]) {
-    super(adaptors as any)
+  constructor(adaptors: CkbAdaptor[], opt: any = {}) {
+    super([adaptors, opt] as any)
   }
 }
 
 export class FailoverSolanaAdaptor extends extendToFailoverAdaptor(SolanaAdaptor) {
-  constructor(...adaptors: SolanaAdaptor[]) {
-    super(adaptors as any)
+  constructor(adaptors: SolanaAdaptor[], opt: any = {}) {
+    super([adaptors, opt] as any)
   }
 }
 
 export class FailoverStarkAdaptor extends extendToFailoverAdaptor(StarkAdaptor) {
-  constructor(...adaptors: StarkAdaptor[]) {
-    super(adaptors as any)
+  constructor(adaptors: StarkAdaptor[], opt: any = {}) {
+    super([adaptors, opt] as any)
   }
 }
 
 export class FailoverSuiAdaptor extends extendToFailoverAdaptor(SuiAdaptor) {
-  constructor(...adaptors: SuiAdaptor[]) {
-    super(adaptors as any)
+  constructor(adaptors: SuiAdaptor[], opt: any = {}) {
+    super([adaptors, opt] as any)
   }
 }
 
 export class FailoverTonAdaptor extends extendToFailoverAdaptor(TonAdaptor) {
-  constructor(...adaptors: TonAdaptor[]) {
-    super(adaptors as any)
+  constructor(adaptors: TonAdaptor[], opt: any = {}) {
+    super([adaptors, opt] as any)
   }
 }
 
 export class FailoverTronAdaptor extends extendToFailoverAdaptor(TronAdaptor) {
-  constructor(...adaptors: TronAdaptor[]) {
-    super(adaptors as any)
+  constructor(adaptors: TronAdaptor[], opt: any = {}) {
+    super([adaptors, opt] as any)
   }
 }

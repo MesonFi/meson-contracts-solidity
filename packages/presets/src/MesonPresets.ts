@@ -253,7 +253,7 @@ export class MesonPresets {
   }
 
   createFailoverAdaptor(id: string, urls: string[] = [], opts?) {
-    return adaptors.getFailoverAdaptor(urls.map(url => this.createAdaptor(id, url, opts)))
+    return adaptors.getFailoverAdaptor(urls.map(url => this.createAdaptor(id, url, opts)), opts)
   }
 
   disposeMesonClient(id: string) {
